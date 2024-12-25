@@ -1,0 +1,33 @@
+Title: org
+Date: nil
+
+
+--<div class="org-src-container">
+<pre class="src src-elisp">(org-export-define-derived-backend 'stasis-html 'html
+  <span style="color: #8f0075;">:translate-alist</span>
+  '((template . stasis-html-template)))
+
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">stasis-html-template</span> (contents info)
+  (concat
+   (format <span style="color: #3548cf;">"Title: %s\n"</span> (car (plist-get info <span style="color: #8f0075;">:title</span>)))
+   (format <span style="color: #3548cf;">"Date: %s\n"</span> (car (plist-get info <span style="color: #8f0075;">:date</span>)))
+   <span style="color: #3548cf;">"\n\n--"</span>
+   contents))
+
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">my/stasis-export</span> ()
+  <span style="color: #2a5045;">"Export each top-level heading of the current Org file to its own file."</span>
+  (<span style="color: #531ab6;">interactive</span>)
+  (<span style="color: #531ab6;">save-excursion</span>
+    (goto-char (point-min))
+    (<span style="color: #531ab6;">while</span> (re-search-forward <span style="color: #3548cf;">"^\\* "</span> nil t) <span style="color: #595959;">;; </span><span style="color: #595959;">Match top-level headings</span>
+      (org-narrow-to-subtree)
+      (<span style="color: #531ab6;">let*</span> ((file (org-export-output-file-name <span style="color: #3548cf;">".html"</span> 'subtree))
+             (dir (<span style="color: #531ab6;">and</span> file (file-name-directory file))))
+        (<span style="color: #531ab6;">when</span> file
+          (message <span style="color: #3548cf;">"Exporting %s..."</span> file)
+          (<span style="color: #531ab6;">when</span> (<span style="color: #531ab6;">and</span> dir (not (file-directory-p dir)))
+            (make-directory dir 'parents))
+          (org-export-to-file 'stasis-html file nil 'subtree)))
+      (widen))))
+</pre>
+</div>

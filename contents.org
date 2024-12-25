@@ -2,15 +2,15 @@
 
 * org
 #+begin_src elisp
-(org-export-define-derived-backend 'stasis-md 'md
+(org-export-define-derived-backend 'stasis-html 'html
   :translate-alist
-  '((template . stasis-md-template)))
+  '((template . stasis-html-template)))
 
-(defun stasis-md-template (contents info)
+(defun stasis-html-template (contents info)
   (concat
    (format "Title: %s\n" (car (plist-get info :title)))
    (format "Date: %s\n" (car (plist-get info :date)))
-   "\n\n"
+   "\n\n--"
    contents))
 
 (defun my/stasis-export ()
@@ -20,13 +20,13 @@
     (goto-char (point-min))
     (while (re-search-forward "^\\* " nil t) ;; Match top-level headings
       (org-narrow-to-subtree)
-      (let* ((file (org-export-output-file-name ".md" 'subtree))
+      (let* ((file (org-export-output-file-name ".html" 'subtree))
              (dir (and file (file-name-directory file))))
         (when file
           (message "Exporting %s..." file)
           (when (and dir (not (file-directory-p dir)))
             (make-directory dir 'parents))
-          (org-export-to-file 'stasis-md file nil 'subtree)))
+          (org-export-to-file 'stasis-html file nil 'subtree)))
       (widen))))
 #+end_src
 
@@ -50,7 +50,7 @@ my/stasis-export
 * Hello Stasis
 :properties:
 :export_title: Hello Stasis
-:export_file_name: generated/contents/blog/2024/5a7fcc.md
+:export_file_name: generated/contents/blog/2024/5a7fcc
 :export_date: 2024-12-21
 :end:
 
@@ -70,10 +70,10 @@ descriptionには「Some Clojure functions for creating static websites.」と�
 ソースは[[https://github.com/conao3/blog-stasis-src][conao3/blog-stasis-src]]においてあります。
 ひとまずこんなところで。
 
-* ClojureでEcho Server
+* ClojureでEcho Serverh
 :properties:
 :export_title: ClojureでEcho Server
-:export_file_name: generated/contents/blog/2024/4d880f.md
+:export_file_name: generated/contents/blog/2024/4d880f
 :export_date: 2024-12-23
 :end:
 

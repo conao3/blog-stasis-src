@@ -1,0 +1,137 @@
+Title: ClojureでEcho Server
+Date: 2024-12-23
+
+
+--<p>
+ClojureでTCPソケットを使ったプログラムを書きたくなりました。
+TCPソケットを使おうと思ったら書くのがEcho Serverですね。書きましょう。
+</p>
+
+<p>
+ライブラリなしで書くときはとりあえずcoreのドキュメントを参照します。
+<a href="https://clojure.github.io/clojure/index.html">https://clojure.github.io/clojure/index.html</a>
+</p>
+
+<p>
+しかし、ソケット通信のためのAPIは用意されてないので、javaのドキュメントを参照します。
+Clojureが利用しているJDKのバージョンは以下で調べることができます
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #005f5f;">System</span>/getProperty <span style="color: #3548cf;">"java.version"</span>)
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; "21.0.5</span>
+</pre>
+</div>
+
+<p>
+JDK21のドキュメントはこちらです。
+</p>
+<ul class="org-ul">
+<li><a href="https://docs.oracle.com/javase/jp/21/index.html">https://docs.oracle.com/javase/jp/21/index.html</a></li>
+<li><a href="https://docs.oracle.com/javase/jp/21/docs/api/index.html">https://docs.oracle.com/javase/jp/21/docs/api/index.html</a></li>
+</ul>
+
+<p>
+<code>java.net</code> を使うことで実装できそうです。
+</p>
+<div id="outline-container-org44bf178" class="outline-2">
+<h2 id="org44bf178"><span class="section-number-2">1.</span> 調査</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+まずサーバー側のソケットを作り、 <code>accept</code> で待ち受けます。
+<code>accept</code> は通信要求が来るまでブロッキングされます。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #531ab6;">def</span> <span style="color: #005e8b;">server-socket</span> (java.net.ServerSocket. 15390))
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; #'user/server-socket</span>
+
+(<span style="color: #531ab6;">def</span> <span style="color: #005e8b;">client-socket</span> (<span style="color: #531ab6;">.</span> server-socket accept))
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; #'user/client-socket</span>
+</pre>
+</div>
+
+<p>
+なお、クライアントは <code>telnet</code> で試すことができます。
+<code>telnet</code> は <code>C-]</code> を押すと通信を止めることができます。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ telnet localhost 15390
+Trying ::1...
+Connected to localhost.
+Escape character is <span style="color: #3548cf;">'^]'</span>.
+</pre>
+</div>
+
+<p>
+サーバー側に戻ります。
+<code>client-socket</code> を得ることができたら、 <code>io/reader</code> と <code>io/writer</code> により、ioを得ることができます。
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #531ab6;">def</span> <span style="color: #005e8b;">input-stream</span> (<span style="color: #005f5f;">io</span>/reader client-socket))
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; #'user/input-stream</span>
+
+(<span style="color: #531ab6;">def</span> <span style="color: #005e8b;">output-stream</span> (<span style="color: #005f5f;">io</span>/writer client-socket))
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; #'user/output-stream</span>
+</pre>
+</div>
+
+<p>
+<code>io/reader</code> の返り値のため、 <code>readLine</code> などを利用することができます。
+</p>
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #531ab6;">.</span> input-stream readLine)
+<span style="color: #595959;">;;</span><span style="color: #595959;">=&gt; "asdf"</span>
+</pre>
+</div>
+
+<p>
+<code>readLine</code> は <code>"\n"</code> が入力されるまでブロッキングします。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb3ffe3c" class="outline-2">
+<h2 id="orgb3ffe3c"><span class="section-number-2">2.</span> 実装</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+調査を受けて、実装はこちらです。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-clojure">(<span style="color: #531ab6;">ns</span> <span style="color: #005f5f;">echo-server.core</span>
+  (<span style="color: #8f0075;">:require</span>
+   [clojure.java.io <span style="color: #8f0075;">:as</span> io])
+  (<span style="color: #8f0075;">:import</span>
+   [java.net ServerSocket]
+   [java.io BufferedReader BufferedWriter])
+  (<span style="color: #8f0075;">:gen-class</span>))
+
+(<span style="color: #531ab6;">defn</span> <span style="color: #721045;">handle-client</span> [client-socket]
+  (<span style="color: #531ab6;">let</span> [input-stream <span style="color: #000000; background-color: #ffffff;">^</span><span style="color: #005f5f;">BufferedReader</span> (<span style="color: #005f5f;">io</span>/reader client-socket)
+        output-stream <span style="color: #000000; background-color: #ffffff;">^</span><span style="color: #005f5f;">BufferedWriter</span> (<span style="color: #005f5f;">io</span>/writer client-socket)]
+    (<span style="color: #531ab6;">loop</span> []
+      (<span style="color: #531ab6;">let</span> [inpt (<span style="color: #531ab6;">.</span> input-stream readLine)]
+        (println <span style="color: #3548cf;">"Received: "</span> inpt)
+        (<span style="color: #531ab6;">when</span> (<span style="color: #531ab6;">and</span> inpt (not= <span style="color: #3548cf;">""</span> inpt))
+          (<span style="color: #531ab6;">.</span> output-stream write (str inpt <span style="color: #3548cf;">"</span><span style="color: #3548cf; font-weight: bold;">\n</span><span style="color: #3548cf;">"</span>))
+          (<span style="color: #531ab6;">.</span> output-stream flush))
+        (<span style="color: #531ab6;">when-not</span> (nil? inpt)         <span style="color: #595959;">; nil indicates EOF</span>
+          (<span style="color: #531ab6;">recur</span>))))))
+
+(<span style="color: #531ab6;">defn</span> <span style="color: #721045;">start-server</span> []
+  (println <span style="color: #3548cf;">"Listening localhost:15390"</span>)
+  (<span style="color: #531ab6;">let</span> [server-socket (ServerSocket. 15390)]
+    (<span style="color: #531ab6;">loop</span> []
+      (<span style="color: #531ab6;">let</span> [client-socket (<span style="color: #531ab6;">.</span> server-socket accept)]
+        (println <span style="color: #3548cf;">"Connection Accepted"</span>)
+        (handle-client client-socket))
+      (<span style="color: #531ab6;">recur</span>))))
+</pre>
+</div>
+
+<p>
+もうちょっとClojureらしく書かせて欲しいという感情はありますが、とりあえずこれでできました。
+</p>
+</div>
+</div>
