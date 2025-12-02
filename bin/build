@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 set -euxo pipefail -o posix
 
-asdf plugin add java || true
-asdf install java temurin-21.0.4+7.0.LTS
-asdf global java temurin-21.0.4+7.0.LTS
+if ! command -v java &> /dev/null; then
+  asdf plugin add java || true
+  asdf install java temurin-21.0.4+7.0.LTS
+  asdf global java temurin-21.0.4+7.0.LTS
+fi
 
-curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
-chmod +x linux-install.sh
-./linux-install.sh --prefix "$HOME/.local"
-
-export PATH="$HOME/.local/bin:$PATH"
+if ! command -v clojure &> /dev/null; then
+  curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
+  chmod +x linux-install.sh
+  ./linux-install.sh --prefix "$HOME/.local"
+  export PATH="$HOME/.local/bin:$PATH"
+fi
 
 make build
