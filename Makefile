@@ -10,7 +10,7 @@ build:
 
 .PHONY: deploy
 deploy:
-	npx wrangler pages deploy
+	npx wrangler pages deploy target --project-name blog-stasis-src
 
 resources/spectrum:
 	mkdir -p $@
