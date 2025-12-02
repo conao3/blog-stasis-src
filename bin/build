@@ -13,7 +13,7 @@ set -euxo pipefail -o posix
 # 
 # export PATH="$HOME/.local/bin:$PATH"
 
-curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
-. "$HOME/.nix-profile/etc/profile.d/nix.sh"
+curl -L -o nix-portable https://github.com/DavHau/nix-portable/releases/latest/download/nix-portable-$(uname -m)
+chmod +x nix-portable
 
-nix develop --extra-experimental-features "nix-command flakes" --command make build
+./nix-portable nix develop --extra-experimental-features "nix-command flakes" --command make build
