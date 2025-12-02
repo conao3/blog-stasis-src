@@ -4,8 +4,8 @@ set -euxo pipefail -o posix
 asdf plugin add java || true
 asdf install java temurin-21.0.4+7.0.LTS
 asdf global java temurin-21.0.4+7.0.LTS
-export JAVA_HOME="$(asdf where java)"
-export PATH="$JAVA_HOME/bin:$PATH"
+# export JAVA_HOME="$(asdf where java)"
+# export PATH="$JAVA_HOME/bin:$PATH"
 
 curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
 chmod +x linux-install.sh
