@@ -1,5 +1,6 @@
 (ns blog-clojure.core
   (:require
+   [clojure.java.io :as io]
    [markdown.core :as markdown]
    [hiccup.page :as hiccup.page]
    [hiccup2.core :as hiccup]
@@ -8,6 +9,18 @@
 
 (def blog-name "Conao3 Notes")
 (def stasis-config {:stasis/ignore-nil-pages? true})
+
+(defn slurp-binary-directory [dir re]
+  (->> (file-seq (io/file dir))
+       (filter (fn [file] (and (.isFile file) (re-find re (.getName file)))))
+       (map (fn [file]
+              (let [relative-path (subs (.getPath file) (count dir))
+                    path (str "/" (clojure.string/replace relative-path #"^[\\/]+" ""))]
+                [path (with-open [in (io/input-stream file)]
+                        (let [out (java.io.ByteArrayOutputStream.)]
+                          (io/copy in out)
+                          (.toByteArray out)))])))
+       (into {})))
 
 (defn render-page [{:keys [title body]}]
   (hiccup.page/html5 {:lang "ja"}
@@ -57,7 +70,7 @@
      {:contents (-> contents
                     (update-vals render-page)
                     (->> (into {})))
-      :public (stasis/slurp-directory "resources/public" #"\.[^.]+$")
+      :public (slurp-binary-directory "resources/public" #"\.[^.]+$")
       :spectrum (-> (stasis/slurp-directory "generated/spectrum" #"\.[^.]+$")
                     (update-keys (partial str "/assets/spectrum")))})))
 
