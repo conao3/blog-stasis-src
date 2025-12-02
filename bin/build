@@ -3,6 +3,8 @@ set -euxo pipefail -o posix
 
 curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
 chmod +x linux-install.sh
-sudo ./linux-install.sh
+./linux-install.sh --prefix "$HOME/.local"
+
+export PATH="$HOME/.local/bin:$PATH"
 
 make build
