@@ -1,16 +1,19 @@
 #!/bin/bash
 set -euxo pipefail -o posix
 
-asdf plugin add java || true
-asdf install java temurin-21.0.4+7.0.LTS
-asdf global java temurin-21.0.4+7.0.LTS
-# export JAVA_HOME="$(asdf where java)"
-# export PATH="$JAVA_HOME/bin:$PATH"
+# asdf plugin add java || true
+# asdf install java temurin-21.0.4+7.0.LTS
+# asdf global java temurin-21.0.4+7.0.LTS
+# # export JAVA_HOME="$(asdf where java)"
+# # export PATH="$JAVA_HOME/bin:$PATH"
+# 
+# curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
+# chmod +x linux-install.sh
+# ./linux-install.sh --prefix "$HOME/.local"
+# 
+# export PATH="$HOME/.local/bin:$PATH"
 
-curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
-chmod +x linux-install.sh
-./linux-install.sh --prefix "$HOME/.local"
+curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+. "$HOME/.nix-profile/etc/profile.d/nix.sh"
 
-export PATH="$HOME/.local/bin:$PATH"
-
-make build
+nix develop --extra-experimental-features "nix-command flakes" --command make build
