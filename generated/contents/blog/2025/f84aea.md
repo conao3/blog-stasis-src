@@ -2,6 +2,8 @@ Title: 日本語レポートから始めるorg-modeとEmacs
 Date: 2025-12-02
 
 
+この記事は[Emacs Advent Calendar 2025](https://qiita.com/advent-calendar/2025/emacs)の4日目の記事です。
+
 [org-mode](https://orgmode.org/)は言わずと知れたEmacsのキラーフィーチャーですが、Emacsの学習曲線もさることながら、org-modeの学習曲線も同様に急峻であるため入門したくても踏み切れないという初心者の方がたくさん居るという声を聞きます。
 しかし、タイトルにもありますが、日本語レポートから始めるorg-modeでゆるやかにorg-mode、しいてはEmacsに入門するのは私がとてもおすすめしている入門経路で、実は私もこの経路でorg-modeとEmacsに入門しています。
 
