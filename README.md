@@ -70,7 +70,31 @@ make build
 
 ## Deploy
 
-Deploy to Cloudflare Pages:
+### Automatic Deployment (GitHub Actions)
+
+The site is automatically deployed to Cloudflare Pages when you push to the `main` branch.
+
+#### Required GitHub Secrets
+
+Set up the following secrets in your GitHub repository (Settings > Secrets and variables > Actions):
+
+- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token with "Cloudflare Pages:Edit" permission
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
+
+To create an API token:
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
+2. Click "Create Token"
+3. Use the "Edit Cloudflare Workers" template or create a custom token with "Cloudflare Pages:Edit" permission
+4. Copy the token and add it to GitHub secrets
+
+To find your Account ID:
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Select your account
+3. The Account ID is shown in the right sidebar under "API"
+
+### Manual Deployment
+
+Deploy to Cloudflare Pages manually:
 
 ```bash
 make deploy
@@ -78,7 +102,7 @@ make deploy
 
 This command runs `npx wrangler pages deploy`.
 
-### Initial Deploy Setup
+#### Initial Manual Deploy Setup
 
 1. Create a Cloudflare account
 2. Login with wrangler: `npx wrangler login`
@@ -87,8 +111,8 @@ This command runs `npx wrangler pages deploy`.
 ### How Deployment Works
 
 - `make build` generates static files to the `target/` directory
-- `make deploy` uploads to Cloudflare Pages
-- No build configuration needed (pre-built)
+- `make deploy` (or GitHub Actions) uploads to Cloudflare Pages
+- No build configuration needed on Cloudflare (pre-built)
 
 ## Other
 
