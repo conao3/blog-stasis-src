@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euxo pipefail -o posix
+
+curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
+chmod +x linux-install.sh
+sudo ./linux-install.sh
+
+make build
