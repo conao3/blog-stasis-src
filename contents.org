@@ -15,16 +15,14 @@
    contents))
 
 (defun stasis-md-link (link desc info)
-  (let ((type (org-element-property :type link))
-        (path (org-element-property :path link))
-        (raw-link (org-element-property :raw-link link)))
+  (let ((type (org-element-property :type link)))
     (cond
      ((string= type "file")
-      (let ((new-path (replace-regexp-in-string
-                       "^\\./resources/public"
-                       ""
-                       path)))
-        (format "![img](%s)" new-path)))
+      (let* ((path (org-element-property :path link))
+             (new-path (replace-regexp-in-string "^\\./resources/public" "" path))
+             (new-link (org-element-copy link)))
+        (org-element-put-property new-link :path new-path)
+        (org-md-link new-link desc info)))
      (t (org-md-link link desc info)))))
 
 (defun my/stasis-export ()
