@@ -689,3 +689,139 @@ org-modeから始めるEmacs入門を書きました。
 Emacsでいきなりコードを書き始めるのではなく、まずは日本語から書いてみてはどうかという趣旨です。
 
 この記事を見てorg-modeに、そしてEmacsに入門してみようかなという人が一人でも増えてくれたらいいなと思います。
+
+* ClojureのIO, Stream回りの整理
+:properties:
+:export_title: ClojureのIO回りの整理
+:export_file_name: generated/contents/blog/2025/68a957
+:export_date: 2025-11-27
+:end:
+
+ClojureはJavaで動作するため、Javaとの相互運用のために便利な仕組みが用意されています。
+特にIO回りはホスト言語に依存する要素が多いため専用のネームスペースである =clojure.java.io= も用意されています。
+
+javaの概念とClojureの抽象化がどのように対応しているのか整理します。
+
+なお、この記事においては直近の日本語ドキュメントがあるLTSの[[https://docs.oracle.com/javase/jp/21/index.html][JDK21]]を前提にします。
+
+** JavaのIO
+Javaには主要なIOのパッケージが2つあります。 =java.io= と =java.nio= です。
+=java.io= は =java.nio= で置き換えられたということではなく、より高パフォーマンスで利便性の高いパッケージとして導入されています。
+
+特にファイル操作に関しては =java.nio= を利用することで便利になりますが、IOについては =java.io= の範囲で十分です。
+
+=java.io= の各クラスの継承関係は[[https://docs.oracle.com/javase/jp/21/docs/api/java.base/java/io/package-tree.html][javadoc]]で見ることができます。
+
+重要クラスは =InputStream=, =OutputStream=, =Reader=, =Writer= です。
+これだけに絞って抜き出すとこのような関係になっています。
+
+- InputStream (Closeableを実装)
+  - ByteArrayInputStream
+  - FileInputStream
+  - FilterInputStream
+    - BufferedInputStream
+    - DataInputStream (DataInputを実装)
+    - LineNumberInputStream
+    - PushbackInputStream
+  - ObjectInputStream (ObjectInput、ObjectStreamConstantsを実装)
+  - PipedInputStream
+  - SequenceInputStream
+  - StringBufferInputStream
+- OutputStream (Closeable、Flushableを実装)
+  - ByteArrayOutputStream
+  - FileOutputStream
+  - FilterOutputStream
+    - BufferedOutputStream
+    - DataOutputStream (DataOutputを実装)
+    - PrintStream (java.lang.Appendable、Closeableを実装)
+  - ObjectOutputStream (ObjectOutput、ObjectStreamConstantsを実装)
+  - PipedOutputStream
+- Reader (Closeable、java.lang.Readableを実装)
+  - BufferedReader
+    - LineNumberReader
+  - CharArrayReader
+  - FilterReader
+    - PushbackReader
+  - InputStreamReader
+    - FileReader
+  - PipedReader
+  - lStringReader
+- Writer (java.lang.Appendable、Closeable、Flushableを実装)
+  - BufferedWriter
+  - CharArrayWriter
+  - FilterWriter
+  - OutputStreamWriter
+    - FileWriter
+  - PipedWriter
+  - PrintWriter
+  - StringWriter
+
+=InputStream= がバイト単位で入力できる基本のクラスで、 =Reader= はcharsetを設定して文字列として入力できるという関係になっています。
+
+** java.ioを直接使う
+Clojureのinteropを使って、java.ioを直接使ってみましょう。
+
+以下のテキストを =sample.txt= として保存します。
+#+begin_src text
+あ
+#+end_src
+
+=sample.txt= を =java.io.FileInputStream= で読み込みます。
+
+#+begin_src clojure
+(import '[java.io FileInputStream])
+;;=> java.io.FileInputStream
+
+(def f (java.io/FileInputStream. "sample.txt"))
+;;=> #'user/f
+
+(.read f)
+;;=> 227
+
+(.read f)
+;;=> 129
+
+(.read f)
+;;=> 130
+
+(.read f)
+;;=> 10
+
+(.read f)
+;;=> -1
+
+(.close f)
+;;=> nil
+#+end_src
+
+このようにバイト単位で読み込み、読み込めるデータがないときは =read()= は =-1= を返却します。
+使い終わったら =close()= を呼んで閉じておきましょう。
+
+=FileReader= はReaderのため、charsetを考慮できます。
+charsetを渡さない場合は =java.nio.charset.Charset/defaultCharset()= で返却される値が利用されます。
+
+#+begin_src clojure
+(do (import '[java.io FileInputStream FileReader])
+    (import '[java.nio.charset Charset]))
+
+(java.nio.charset.Charset/defaultCharset)
+#object[sun.nio.cs.UTF_8 0xd9f1005 "UTF-8"]
+
+(def f (java.io/FileReader. "sample.txt"))
+;;=> #'user/f
+
+(def f (java.io/FileReader. "sample.txt" (java.nio.charset.Charset/forName "UTF-8")))
+;;=> #'user/f
+
+(.read f)
+;;=> 12354
+
+(.read f)
+;;=> 10
+
+(.read f)
+;;=> -1
+
+(.close f)
+;;=> nil
+#+end_src
