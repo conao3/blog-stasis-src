@@ -32,15 +32,16 @@
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (while (re-search-forward "^\\* " nil t) ;; Match top-level headings
+    (while (re-search-forward "^\\* " nil t)
       (org-narrow-to-subtree)
-      (let* ((file (org-export-output-file-name ".md" 'subtree))
-             (dir (and file (file-name-directory file))))
-        (when file
-          (message "Exporting %s..." file)
-          (when (and dir (not (file-directory-p dir)))
-            (make-directory dir 'parents))
-          (org-export-to-file 'stasis-md file nil 'subtree)))
+      (unless (org-in-commented-heading-p)
+        (let* ((file (org-export-output-file-name ".md" 'subtree))
+               (dir (and file (file-name-directory file))))
+          (when file
+            (message "Exporting %s..." file)
+            (when (and dir (not (file-directory-p dir)))
+              (make-directory dir 'parents))
+            (org-export-to-file 'stasis-md file nil 'subtree))))
       (widen))))
 #+end_src
 
@@ -187,7 +188,7 @@ Escape character is '^]'.
 
 もうちょっとClojureらしく書かせて欲しいという感情はありますが、とりあえずこれでできました。
 
-* Nix with Commonlisp
+* COMMENT Nix with Commonlisp
 :properties:
 :export_title: Nix with Commonlisp
 :export_file_name: generated/contents/blog/2024/fa34f6
@@ -690,7 +691,7 @@ Emacsでいきなりコードを書き始めるのではなく、まずは日本
 
 この記事を見てorg-modeに、そしてEmacsに入門してみようかなという人が一人でも増えてくれたらいいなと思います。
 
-* ClojureのIO, Stream回りの整理
+* COMMENT ClojureのIO, Stream回りの整理
 :properties:
 :export_title: ClojureのIO回りの整理
 :export_file_name: generated/contents/blog/2025/68a957
