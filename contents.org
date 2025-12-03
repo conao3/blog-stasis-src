@@ -48,9 +48,8 @@
 my/stasis-export
 :end:
 
-* Top page
+* Conao3 Notes
 :properties:
-:export_title: Conao3 Notes
 :export_file_name: generated/contents/index.md
 :export_date: 2024-12-21
 :end:
@@ -62,7 +61,6 @@ my/stasis-export
 
 * Hello Stasis
 :properties:
-:export_title: Hello Stasis
 :export_file_name: generated/contents/blog/2024/5a7fcc.md
 :export_date: 2024-12-21
 :end:
@@ -85,7 +83,6 @@ descriptionには「Some Clojure functions for creating static websites.」と�
 
 * ClojureでEcho Server
 :properties:
-:export_title: ClojureでEcho Server
 :export_file_name: generated/contents/blog/2024/4d880f.md
 :export_date: 2024-12-23
 :end:
@@ -188,7 +185,6 @@ Escape character is '^]'.
 
 * COMMENT Nix with Commonlisp
 :properties:
-:export_title: Nix with Commonlisp
 :export_file_name: generated/contents/blog/2024/fa34f6
 :export_date: 2024-12-27
 :end:
@@ -218,7 +214,6 @@ test
 
 * 日本語レポートから始めるorg-modeとEmacs
 :properties:
-:export_title: 日本語レポートから始めるorg-modeとEmacs
 :export_file_name: generated/contents/blog/2025/f84aea
 :export_date: 2025-12-02
 :end:
@@ -691,7 +686,6 @@ Emacsでいきなりコードを書き始めるのではなく、まずは日本
 
 * COMMENT ClojureのIO, Stream回りの整理
 :properties:
-:export_title: ClojureのIO回りの整理
 :export_file_name: generated/contents/blog/2025/68a957
 :export_date: 2025-11-27
 :end:
