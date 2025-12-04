@@ -41,11 +41,22 @@
               (make-directory dir 'parents))
             (org-export-to-file 'stasis-md file nil 'subtree))))
       (widen))))
+
+(defun my/stasis-new (title)
+  "Create a new blog post heading with properties."
+  (interactive "sTitle: ")
+  (let* ((random-id (mapconcat (lambda (_) (format "%x" (random 16))) (make-list 6 nil) ""))
+         (date (format-time-string "%Y-%m-%d"))
+         (year (format-time-string "%Y"))
+         (file-name (format "generated/contents/blog/%s/%s" year random-id)))
+    (goto-char (point-max))
+    (insert (format "\n* %s\n:properties:\n:export_file_name: %s\n:export_date: %s\n:end:\n\n"
+                    title file-name date))))
 #+end_src
 
 #+RESULTS:
 :results:
-my/stasis-export
+my/stasis-new
 :end:
 
 * Conao3 Notes
@@ -818,3 +829,11 @@ charsetを渡さない場合は =java.nio.charset.Charset/defaultCharset()= で�
 (.close f)
 ;;=> nil
 #+end_src
+
+* COMMENT ClaudeCodeのブラウザフロントエンドを作る
+:properties:
+:export_file_name: generated/contents/blog/2025/1488a7
+:export_date: 2025-12-03
+:end:
+
+ClaudeCode
