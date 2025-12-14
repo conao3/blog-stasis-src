@@ -837,3 +837,27 @@ charsetを渡さない場合は =java.nio.charset.Charset/defaultCharset()= で�
 :end:
 
 ClaudeCode
+
+* Nixpkgsでのアップデート作業
+:properties:
+:export_file_name: generated/contents/blog/2025/b1a436
+:export_date: 2025-12-14
+:end:
+
+nixpkgsに登録されているclj-kondoが少し古いバージョンだった。
+nixpkgsを更新するために調べたのでメモ。
+
+** 結論
+[[https://github.com/Mic92/nix-update][nix-update]] を使えば良い。
+特にグローバルに入れる必要もなく、nix runから直接起動すると良い。
+
+#+begin_src sh
+nix run nixpkgs#nix-update -- clj-kondo --build --commit
+#+end_src
+
+** Tips
+おそらくこのツールで作られたPRが [[https://github.com/NixOS/nixpkgs/pull/455542][NixOS/nixpkgs#455542]] 。
+このPRがnixpkgsの各ブランチにshipされたかどうかを追跡する以下のような便利サイトがある。
+
+- https://nixpk.gs/pr-tracker.html?pr=455542
+- https://nixpkgs-tracker.ocfox.me/?pr=455542
