@@ -1,103 +1,97 @@
 # blog-stasis-src
 
-A blog system using [Stasis](https://github.com/magnars/stasis), a Clojure static site generator.
-Write articles in org-mode, export them to Markdown, and generate HTML.
+A static blog built with [Stasis](https://github.com/magnars/stasis), a simple and flexible Clojure static site generator. Articles are written in Org-mode, exported to Markdown, and compiled into HTML.
 
 ## Requirements
 
-- Nix (with flake support)
+- [Nix](https://nixos.org/) with flakes enabled
 - Clojure
-- Node.js (for wrangler)
+- Node.js (for Wrangler CLI)
 
-## Setup
+## Getting Started
 
-Enter the Nix environment:
+1. Enter the development environment:
 
-```bash
-nix develop
-```
+   ```bash
+   nix develop
+   ```
 
-Install Node.js dependencies:
+2. Install Node.js dependencies:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   make dev
+   ```
+
+4. Open http://localhost:8080 in your browser.
 
 ## Project Structure
 
 ```
 .
-├── contents.org          # Blog article source (org-mode)
+├── contents.org          # Blog articles (Org-mode source)
 ├── deps.edn              # Clojure dependencies
 ├── flake.nix             # Nix flake configuration
-├── Makefile              # Build and deploy tasks
+├── Makefile              # Build and deployment tasks
 ├── package.json          # Node.js dependencies
 ├── src/
 │   └── blog_clojure/
-│       └── core.clj      # Main logic
+│       └── core.clj      # Main application logic
 ├── dev/
 │   └── user.clj          # Development utilities
 ├── resources/
-│   └── public/           # Static files (images, etc.)
+│   └── public/           # Static assets (images, etc.)
 └── generated/
-    ├── contents/         # Markdown exported from org-mode
-    └── spectrum/         # Adobe Spectrum tokens
+    ├── contents/         # Markdown files exported from Org-mode
+    └── spectrum/         # Adobe Spectrum design tokens
 ```
 
-## Development
+## Writing Articles
 
-### Creating Articles
+1. Add a new top-level heading in `contents.org`
+2. Set the required properties:
+   - `export_title` - Article title
+   - `export_file_name` - Output filename
+   - `export_date` - Publication date
+3. Export to Markdown from Emacs: `M-x my/stasis-export`
 
-1. Add a new top-level heading to `contents.org`
-2. Set properties: `export_title`, `export_file_name`, `export_date`
-3. Export to Markdown in Emacs: `M-x my/stasis-export`
+## Building
 
-### Starting Development Server
-
-```bash
-make dev
-```
-
-Access the site at http://localhost:8080
-
-## Build
-
-Generate static files to the `target/` directory:
+Generate static files in the `target/` directory:
 
 ```bash
 make build
 ```
 
-## Deploy
+## Deployment
 
-Deploy to Cloudflare Pages:
+This project deploys to Cloudflare Pages.
+
+### First-Time Setup
+
+1. Create a [Cloudflare](https://cloudflare.com) account
+2. Authenticate with Wrangler: `npx wrangler login`
+3. The Pages project is created automatically on first deploy
+
+### Deploy
 
 ```bash
 make deploy
 ```
 
-This command runs `npx wrangler pages deploy`.
+This runs `npx wrangler pages deploy` to upload the pre-built static files from `target/`.
 
-### Initial Deploy Setup
+## Additional Commands
 
-1. Create a Cloudflare account
-2. Login with wrangler: `npx wrangler login`
-3. Create a Pages project (automatically created on first deploy)
+### Fetch Adobe Spectrum Tokens
 
-### How Deployment Works
-
-- `make build` generates static files to the `target/` directory
-- `make deploy` uploads to Cloudflare Pages
-- No build configuration needed (pre-built)
-
-## Other
-
-### Fetching Adobe Spectrum Tokens
-
-Download design tokens:
+Download design tokens to `resources/spectrum/`:
 
 ```bash
 make fetch
 ```
-
-This command downloads Adobe Spectrum tokens to `resources/spectrum/`.
