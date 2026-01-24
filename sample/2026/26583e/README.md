@@ -1,7 +1,4 @@
 # Sample configure using nixos-vm
-:PROPERTIES:
-:ID:       2ee153bf-46c6-4353-8278-5f815ac28d5c
-:END:
 
 ## Usage
 
