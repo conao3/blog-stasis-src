@@ -861,3 +861,13 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 
 - https://nixpk.gs/pr-tracker.html?pr=455542
 - https://nixpkgs-tracker.ocfox.me/?pr=455542
+
+* Nixで始めるemacsclient
+:properties:
+:export_file_name: generated/contents/blog/2026/26583e
+:export_date: 2026-01-24
+:end:
+
+Nixを利用してemacsclientを設定することで簡単に始めることができることが分かったのでまとめる。
+
+
