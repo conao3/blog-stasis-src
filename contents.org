@@ -870,15 +870,29 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 :export_date: 2026-01-24
 :end:
 
-Nixを利用してemacsclientを設定することで簡単に始めることができることが分かったのでまとめる。
+Emacsを使っていると、シェルから現在のEmacsのインスタンスを使ってファイル編集したいことがあります。
+
+そこで登場するのがemacsclientです。
+Emacsをサーバーとして常駐させておき、クライアントから接続することで瞬時にファイルを開くことができます。
+
+この記事ではNixOSのservices.emacsを利用して、簡単にemacsclient環境を構築する方法を紹介します。
 
 ref: [[https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/editors/emacs.md][nixpkgs/nixos/modules/services/editors/emacs.md at master · NixOS/nixpkgs · GitHub]]
+
+** emacsclientとは
+Emacsはサーバー/クライアントモデルをサポートしています。
+通常Emacsを起動すると独立したプロセスとして動作しますが、サーバーモードで起動することでバックグラウンドで常駐させることができます。
+
+その後、emacsclientコマンドを使うことで既に起動しているEmacsサーバーに接続し、新しいフレームやバッファでファイルを開くことができます。
 
 ** 検証環境
 :PROPERTIES:
 :ID:       5bca7858-d433-4930-b520-0d6b78d34b80
 :END:
-flakeを利用する。
+NixOSを使っていない人でも試せるよう、NixのFlakeを使ってQEMU上でNixOS VMを起動する環境を用意します。
+もちろんNixOSを既に使っている場合は、自分の =configuration.nix= に直接設定を追加すれば良いです。
+
+今回の検証環境は最小限のXfceデスクトップ環境を持つVMで、Emacsのサーバー/クライアント機能を試すのに十分な環境となっています。
 
 flake.nix
 #+begin_src nix
@@ -917,7 +931,7 @@ configuration.nix
 }
 #+end_src
 
-この2ファイルを置いて、以下のコマンドでVMを起動できる。
+この2ファイルを置いて、以下のコマンドでVMを起動できます。
 
 #+begin_src shell
 QEMU_OPTS="-m 8192 -smp 4" nix run
@@ -927,24 +941,26 @@ QEMU_OPTS="-m 8192 -smp 4" nix run
 #+DOWNLOADED: screenshot @ 2026-01-24 14:40:56
 [[file:resources/public/img/42afe4e0-4c5c-0b43-1d32-56bbbcc695ab.png]]
 
-以降、基本的にconfiguration.nixを編集することになる。
+以降、基本的にconfiguration.nixを編集することになります。
 
 ** 設定
+=services.emacs= を有効化することで、ユーザーログイン時に自動的にEmacsサーバーが起動するようになります。
+
 configation.nix
 #+begin_src nix
 {
   services.emacs = {
     enable = true;
     defaultEditor = true;
-  }; 
+  };
 }
 #+end_src
 
-この設定でOS起動時に同時にemacsclientを起動することができる。
+この設定でOS起動時に同時にemacsclientを起動することができます。
 
-さらに =defaultEditor= を設定することで =EDITOR= をemacscilentを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができる。
+さらに =defaultEditor= を設定することで =EDITOR= をemacscilentを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができます。
 
-環境変数に設定されるだけのため、 =EDITOR= を =e= として起動できるようにしておくと =e something.txt= でファイルを開くことができるようになる。
+環境変数に設定されるだけのため、 =EDITOR= を =e= として起動できるようにしておくと =e something.txt= でファイルを開くことができるようになります。
 
 #+begin_src nix
 {
@@ -954,13 +970,36 @@ configation.nix
 }
 #+end_src
 
+*** services.emacsのオプション
+=services.emacs= には他にも便利なオプションがあります。
+
+**** package
+使用するEmacsのパッケージを指定できます。
+デフォルトは =pkgs.emacs= ですが、emacs-noxやemacs-pgtk、自分でカスタマイズしたEmacsパッケージなども指定できます。
+
+#+begin_src nix
+{
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk;
+  };
+}
+#+end_src
+
 ** 使い方
 *** 起動後
 :PROPERTIES:
 :ID:       f1a2c804-e101-429a-b0cb-8369353e76ac
 :END:
-emacsclientはOS起動時に起動しているため =emacsclient -c= で新規フレームを開くことができる。
-=&= を付けてブロックしないようにすると良い。
+emacsclientはOS起動時に起動しているため、新規フレームを開くことができます。
+先ほど =e= を =$EDITOR= のエイリアスとして設定したので、 =e= を実行するだけで新しいフレームが開きます。
+=&= を付けてブロックしないようにすると良いです。
+
+#+begin_src shell
+e &
+#+end_src
+
+もちろん、 =emacsclient -c= を直接実行することもできます。
 
 #+begin_src shell
 emacsclient -c &
@@ -970,8 +1009,117 @@ emacsclient -c &
 [[file:resources/public/img/471b70d6-8461-e881-8367-ce86c4246ad3.png]]
 
 *** ファイルを開く
-=e= を =$EDITIOR= に設定しているため、 =e something.txt= でファイルを開くことができる。
-開いたシェルに制御を返すには =C-x #= で編集終了を伝えることができる。
+同様に、 =e something.txt= でファイルを開くことができます。
+開いたシェルに制御を返すには =C-x #= で編集終了を伝えることができます。
+
+#+begin_src shell
+e something.txt
+#+end_src
+
+*** emacsclientの主要オプション
+**** -c (--create-frame)
+新しいフレームを作成して開きます。
+
+#+begin_src shell
+e -c file.txt
+#+end_src
+
+**** -t (--tty)
+ターミナル内でEmacsを開きます。
+
+#+begin_src shell
+e -t file.txt
+#+end_src
+
+**** -n (--no-wait)
+ファイルを開いた後、すぐにシェルに制御を返します。
+デフォルトではemacsclientは編集が終わるまで待機しますが、このオプションを付けることでバックグラウンドで開くことができます。
+
+#+begin_src shell
+e -n file.txt
+#+end_src
+
+*** サーバーの状態確認
+Emacsサーバーが正常に動作しているか確認するには =systemctl= を使います。
+
+#+begin_src shell
+systemctl --user status emacs
+#+end_src
+
+サーバーを手動で再起動したい場合:
+
+#+begin_src shell
+systemctl --user restart emacs
+#+end_src
+
+*** トラブルシューティング
+**** サーバーが起動しない
+まずログを確認します。
+
+#+begin_src shell
+journalctl --user -u emacs
+#+end_src
+
+多くの場合、Emacsの設定ファイル（init.el）にエラーがあることが原因です。
+Emacsを通常起動して設定を修正した後、サーバーを再起動します。
+
+**** 複数のサーバーが動いている
+何らかの理由で複数のEmacsサーバーが起動してしまった場合、以下のコマンドで全て停止できます。
+
+#+begin_src shell
+systemctl --user stop emacs
+pkill -u $USER emacs
+#+end_src
+
+その後、サーバーを再起動します。
+
+#+begin_src shell
+systemctl --user start emacs
+#+end_src
+
+**** クリップボードの共有
+QEMU VM上でコピーした内容をホスト側でも使えるようにするには、QEMUのGTKバックエンドを使用します。
+
+VM起動時のQEMU_OPTSに =-display gtk= を追加するだけです:
+
+#+begin_src shell
+QEMU_OPTS="-m 8192 -smp 4 -display gtk" nix run
+#+end_src
+
+これでVM内でコピーした内容がホスト側のクリップボードにも反映されるようになります。
+
+**** tips
+どういう設定がされているのか見てみると楽しいです。
+
+systemdのユニットファイルを確認:
+
+#+begin_src shell
+systemctl --user cat emacs
+#+end_src
+
+環境変数EDITORの内容を確認:
+
+#+begin_src shell
+$ echo $EDITOR
+emacseditor
+
+$ which $EDITOR
+/run/current-system/sw/bin/emacseditor
+
+$ cat $(which $EDITOR)
+#!/nix/store/lw117lsr8d585xs63kx5k233impyrq7q-bash-5.3p3/bin/bash
+if [ -z "$1" ]; then
+  exec /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacsclient --create-frame --alternate-editor /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacs
+else
+  exec /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacsclient --alternate-editor /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacs "$@"
+fi
+#+end_src
+
+=emacsclient= を簡単にラップした =emacseditor= というシェルスクリプトが動いていることが分かります。
+
+** まとめ
+NixOSの =services.emacs= を利用することで、emacsclientの環境を簡単に構築できます。
+emacsclientに興味がありながらも上手く設定できずに悩んでいた人におすすめです。
 
 * COMMENT Local variables
 # Local Variables:
