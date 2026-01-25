@@ -50,7 +50,9 @@
          (year (format-time-string "%Y"))
          (file-name (format "generated/contents/blog/%s/%s" year random-id)))
     (goto-char (point-max))
-    (insert (format "\n* %s\n:properties:\n:export_file_name: %s\n:export_date: %s\n:end:\n\n"
+    (when (re-search-backward "^\\* COMMENT Local variables" nil t)
+      (beginning-of-line))
+    (insert (format "* %s\n:properties:\n:export_file_name: %s\n:export_date: %s\n:end:\n\n"
                     title file-name date))))
 #+end_src
 
@@ -870,4 +872,108 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 
 Nixを利用してemacsclientを設定することで簡単に始めることができることが分かったのでまとめる。
 
+ref: [[https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/editors/emacs.md][nixpkgs/nixos/modules/services/editors/emacs.md at master · NixOS/nixpkgs · GitHub]]
 
+** 検証環境
+:PROPERTIES:
+:ID:       5bca7858-d433-4930-b520-0d6b78d34b80
+:END:
+flakeを利用する。
+
+flake.nix
+#+begin_src nix
+{
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+  outputs = { self, nixpkgs }: {
+    nixosConfigurations.minimal-vm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [ ./configuration.nix ];
+    };
+
+    packages.x86_64-linux.default = self.nixosConfigurations.minimal-vm.config.system.build.vm;
+  };
+}
+#+end_src
+
+configuration.nix
+#+begin_src nix
+{ modulesPath, pkgs, ... }: {
+  imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
+
+  system.stateVersion = "24.11";
+
+  users.users.demo = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+    initialPassword = "demo";
+  };
+
+  services.xserver.enable = true;
+  services.xserver.desktopManager.xfce.enable = true;
+  services.xserver.desktopManager.xfce.enableScreensaver = false;
+
+  environment.systemPackages = with pkgs; [ git ];
+}
+#+end_src
+
+この2ファイルを置いて、以下のコマンドでVMを起動できる。
+
+#+begin_src shell
+QEMU_OPTS="-m 8192 -smp 4" nix run
+#+end_src
+
+
+#+DOWNLOADED: screenshot @ 2026-01-24 14:40:56
+[[file:resources/public/img/42afe4e0-4c5c-0b43-1d32-56bbbcc695ab.png]]
+
+以降、基本的にconfiguration.nixを編集することになる。
+
+** 設定
+configation.nix
+#+begin_src nix
+{
+  services.emacs = {
+    enable = true;
+    defaultEditor = true;
+  }; 
+}
+#+end_src
+
+この設定でOS起動時に同時にemacsclientを起動することができる。
+
+さらに =defaultEditor= を設定することで =EDITOR= をemacscilentを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができる。
+
+環境変数に設定されるだけのため、 =EDITOR= を =e= として起動できるようにしておくと =e something.txt= でファイルを開くことができるようになる。
+
+#+begin_src nix
+{
+  environment.shellAliases = {
+    e = "$EDITOR";
+  };
+}
+#+end_src
+
+** 使い方
+*** 起動後
+:PROPERTIES:
+:ID:       f1a2c804-e101-429a-b0cb-8369353e76ac
+:END:
+emacsclientはOS起動時に起動しているため =emacsclient -c= で新規フレームを開くことができる。
+=&= を付けてブロックしないようにすると良い。
+
+#+begin_src shell
+emacsclient -c &
+#+end_src
+
+#+DOWNLOADED: screenshot @ 2026-01-25 10:51:15
+[[file:resources/public/img/471b70d6-8461-e881-8367-ce86c4246ad3.png]]
+
+*** ファイルを開く
+=e= を =$EDITIOR= に設定しているため、 =e something.txt= でファイルを開くことができる。
+開いたシェルに制御を返すには =C-x #= で編集終了を伝えることができる。
+
+* COMMENT Local variables
+# Local Variables:
+# org-download-image-dir: "./resources/public/img"
+# End:
