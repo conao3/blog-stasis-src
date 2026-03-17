@@ -1121,6 +1121,105 @@ fi
 NixOSの =services.emacs= を利用することで、emacsclientの環境を簡単に構築できます。
 emacsclientに興味がありながらも上手く設定できずに悩んでいた人におすすめです。
 
+* Emacs posframe入門
+:properties:
+:export_file_name: generated/contents/blog/2025/ba3a31
+:export_date: 2025-12-17
+:end:
+
+posframeはEmacsで独立したポップアップを表示するパッケージです。
+裏では単にフレームが使われています。
+
+このフレームに対してミニバッファを消したりモードラインを消したりしてポップアップ「らしさ」を調整し、さらにいろいろなハンドリング関数を追加したものがposframeです。
+特にウィンドウ分割関係なく自由な位置に配置できるため、このposframeを使うことで簡単に「Emacsでは通常不可能なリッチな表示」が可能となります。
+[[https://melpa.org/#/?q=posframe&sort=downloads&asc=false][posframeに依存しているパッケージ一覧]]を見るとそのイメージが掴みやすいと思います。
+
+ではposframeを触っていきましょう。
+
+** posframeことはじめ
+まずここから始めます。
+
+#+begin_src elisp
+(leaf posframe :ensure t :require t)
+;;=> posframe
+
+(posframe-workable-p)
+;;=> t
+
+(posframe-show " *my-posframe-buffer*"
+               :string "This is a test"
+               :position (point))
+;;=> #<frame *scratch* 0xb3c235c30>
+
+(posframe-hide " *my-posframe-buffer*")
+;;=> nil
+#+end_src
+
+leafでインストールします。
+=(posframe-workable-p)= が =t= であることが必要です。
+=posframe-show= で表示して =posframe-hide= で隠します。以上です。
+
+** 装飾をしてみよう
+posframe-showは以下のような引数を受け取ることができます。
+
+#+begin_src elisp
+(cl-defun posframe-show (buffer-or-name
+                         &key
+                         string
+                         position
+                         poshandler
+                         poshandler-extra-info
+                         width
+                         height
+                         max-width
+                         max-height
+                         min-width
+                         min-height
+                         x-pixel-offset
+                         y-pixel-offset
+                         left-fringe
+                         right-fringe
+                         border-width
+                         border-color
+                         internal-border-width
+                         internal-border-color
+                         font
+                         cursor
+                         tty-non-selected-cursor
+                         window-point
+                         foreground-color
+                         background-color
+                         respect-header-line
+                         respect-mode-line
+                         initialize
+                         no-properties
+                         keep-ratio
+                         lines-truncate
+                         override-parameters
+                         timeout
+                         refresh
+                         accept-focus
+                         hidehandler
+                         refposhandler
+                         &allow-other-keys)
+#+end_src
+
+いくつか使ってみるとposframeを装飾することができます。
+
+#+begin_src elisp
+(posframe-show " *my-posframe-buffer*"
+               :string "表示するテキスト"
+               :position (point)
+               :background-color "#282a36"
+               :foreground-color "#f8f8f2"
+               :border-width 1
+               :border-color "#6272a4")
+#+end_src
+
+** もっとリッチなposframeを表示したい
+posframeの装飾はposframe自体の装飾とposframeが表示するバッファに分かれます。
+posframe自体の装飾は常識的な範囲に滞まっているので、
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
