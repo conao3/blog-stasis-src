@@ -1220,6 +1220,176 @@ posframe-showは以下のような引数を受け取ることができます。
 posframeの装飾はposframe自体の装飾とposframeが表示するバッファに分かれます。
 posframe自体の装飾は常識的な範囲に滞まっているので、
 
+* bunsai — Docker不要、単一バイナリのAWSエミュレータをBunで書いた
+:properties:
+:export_file_name: generated/contents/blog/2026/2653f0
+:export_date: 2026-06-14
+:end:
+
+ローカル開発やCIでAWSをモックするとき、長らくLocalStackが定番でした。
+Docker daemonを立てて、 =localstack/localstack= を =docker run= して、 =--endpoint-url= をSDKに食わせる、というやつです。
+
+このやり方の不満をBunで全部書き直したのが [[https://github.com/conao3/bun-bunsai][bunsai]] です。
+本記事ではv1.3.0 ( =@conao3/bunsai@1.3.0= )を題材に、何ができて何が違うかを実機で確認しながら紹介します。
+
+** 何が違うのか
+LocalStackと比べた構造的な差は次の3点です。
+
+1. *Docker不要・単一バイナリ起動*。 =bunx @conao3/bunsai= またはGitHub Releasesのlinux-x64 / darwin-arm64バイナリを直接実行できます。コールドスタートは手元で約0.7-1.4秒、RSSは237MB程度。LocalStack 3.8.1の =docker run= は同条件で約3.88秒・404MBでした。
+2. *Web dashboardがApache-2.0で同梱*。LocalStackのResource BrowserはPro限定のSaaS ( =app.localstack.cloud= )ですが、bunsaiは =http://localhost:4566/= をブラウザで開くと自前のReact 19製ダッシュボードが立ち上がります。
+3. *Lambdaを実プロセスで実行*。Node.jsはBunが直接ハンドラを読み込むので低レイテンシ。Python / Ruby / Java / .NET / Go ( =provided.al*= )はホストにインストールされた言語ランタイムを =Bun.spawn= で起動します。LocalStackがDocker内のLambdaランタイムイメージを別途起動するのに対し、bunsaiは「ホストの =python3= を直接叩く」シンプルな経路です。
+
+** 起動してみる
+依存はBunだけです。fresh dirで:
+
+#+begin_src sh
+mkdir bunsai-demo && cd bunsai-demo
+bun add @conao3/bunsai@1.3.0
+bunx bunsai
+# bunsai listening on http://localhost:4566/
+#   AWS gateway:    POST/GET http://localhost:4566/ (any signed AWS request)
+#   Management API: http://localhost:4566/__bunsai/*
+#   Dashboard:      http://localhost:4566/__dashboard/
+#+end_src
+
+ポートは =4566= の1本だけ。AWS gateway / management API / dashboardが同じoriginに同居していて、SigV4で署名されたリクエストはgatewayへ、 =/__bunsai/*= は管理API、ブラウザでルートを叩くと =/__dashboard/= に302 redirectされます。
+
+AWS CLIから普通に叩けます:
+
+#+begin_src sh
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1
+EU=http://localhost:4566
+
+aws --endpoint-url $EU s3 mb s3://demo-bucket
+aws --endpoint-url $EU s3 cp /etc/hostname s3://demo-bucket/hostname.txt
+aws --endpoint-url $EU sqs create-queue --queue-name jobs
+aws --endpoint-url $EU dynamodb create-table --table-name Users \
+    --attribute-definitions AttributeName=id,AttributeType=S \
+    --key-schema AttributeName=id,KeyType=HASH \
+    --billing-mode PAY_PER_REQUEST
+aws --endpoint-url $EU secretsmanager create-secret --name db/password \
+    --secret-string '{"user":"admin","pass":"hunter2"}'
+aws --endpoint-url $EU kms create-key
+aws --endpoint-url $EU sns create-topic --name notifications
+#+end_src
+
+認証情報は =test= / =test= で構いません(SigV4署名は検証していません)。
+
+** Dashboard
+ここからが面白いところで、 =http://localhost:4566/= をブラウザで開くと、いま立てたリソースとリクエストがリアルタイムで見えます。
+
+*** Overview
+[[./resources/public/img/d3794e6d7434.png]]
+
+カードは「実際に呼び出した」「リソースを作った」サービス順に並び、 ``No activity yet'' のサービスは色味を抑えて表示されます。
+左上のステータスサマリで全体のヘルスとUptime、上部にUptime / Total Requests / Error Rate / Avg Latencyの4つのKPIが出ます。
+
+*** Resource Browser
+[[./resources/public/img/9f6ff2222d8a.png]]
+
+サービス横断のリソースツリーで、bucketを開けばオブジェクト一覧、queueを選べばapproximate countとmessage本文が、DynamoDBテーブルを選べば先頭5件のitemが見えます。
+状態をブラウザで覗けるのはローカルAWSをやるなら必需品で、これがOSSのbunsaiにそのまま入っているのが大きな差別化軸です。
+
+*** Request Log
+[[./resources/public/img/f89d18f8505f.png]]
+
+呼び出された全API callがSSEでライブストリームされ、service / operation / status / latencyで絞り込んだり検索したりできます。
+1行クリックすると右ドロワー(または下部パネル、Settingsで切替可)で生ボディ・ヘッダ・パース後パラメータ・レスポンスが見えます。
+
+** 多言語Lambda
+LocalStackのCommunity版でもLambdaは動きますが、bunsaiはホスト直叩き方式を採っています。
+
+#+begin_src sh
+# Node.js — Bunが直接ハンドラを実行(低レイテンシ)
+cat > index.mjs <<'EOF'
+export const handler = async (e) => ({ statusCode: 200, hello: e.name ?? 'world' });
+EOF
+zip fn.zip index.mjs
+
+aws --endpoint-url $EU lambda create-function --function-name hello \
+    --runtime nodejs20.x --role arn:aws:iam::000000000000:role/r \
+    --handler index.handler --zip-file fileb://fn.zip
+
+aws --endpoint-url $EU lambda invoke --function-name hello \
+    --payload "$(echo -n '{"name":"bunsai"}' | base64)" /tmp/out.json
+cat /tmp/out.json
+# {"statusCode":200,"hello":"bunsai"}
+#+end_src
+
+Pythonを試したいなら =python3= がホストにあればOK:
+
+#+begin_src sh
+cat > lambda_function.py <<'EOF'
+def lambda_handler(event, context):
+    return {"statusCode": 200, "hello": event.get("name", "world")}
+EOF
+zip py.zip lambda_function.py
+
+aws --endpoint-url $EU lambda create-function --function-name py-fn \
+    --runtime python3.13 --role arn:aws:iam::000000000000:role/r \
+    --handler lambda_function.lambda_handler --zip-file fileb://py.zip
+
+aws --endpoint-url $EU lambda invoke --function-name py-fn \
+    --payload "$(echo -n '{"name":"bunsai"}' | base64)" /tmp/out.json
+#+end_src
+
+ホストに =python3= が見つからない場合、bunsaiは正規のAWSエラー =Runtime.NotReady= を返します。 =BUNSAI_LAMBDA_PYTHON= / =_RUBY= / =_JAVA= / =_DOTNET= でインタプリタのパスを上書きできます。
+
+| Runtime                  | 実行方法                                       |
+|--------------------------+------------------------------------------------|
+| =nodejs*=                | Bunが直接 =import()=                           |
+| =python*=                | ホストの =python3= を =Bun.spawn=              |
+| =ruby*=                  | ホストの =ruby= を =Bun.spawn=                 |
+| =java*=                  | ホストの =java <source>.java= を =Bun.spawn=   |
+| =dotnet*=                | ホストの =dotnet= を =Bun.spawn=               |
+| =provided.al*= / =go1.x= | zip内の =bootstrap= を直接起動 + AWS Runtime APIシム |
+
+Docker daemonを立ち上げなくていいので、CI runnerの =setup-python= や =setup-ruby= がそのまま使えます。
+
+** サービスカバレッジ
+bunsaiは146サービスをbotocoreのservice-2.jsonから取り込んで実装しています。
+LocalStack OSS Community(35サービス)とdiffを取ったところ、 ``LocalStackで動くがbunsaiで動かない'' サービスは0でした(v1.2.0で =dynamodbstreams= / =resourcegroupstaggingapi= / =support= / =s3control= / =es= の5サービスを追加してギャップを閉じています)。
+
+| 観点              | LocalStack OSS Community  | bunsai            |
+|-------------------+---------------------------+-------------------|
+| サービス数        | 35                        | 146               |
+| Web Dashboard     | Pro限定SaaS               | 同梱 (Apache-2.0) |
+| Lambda runtime    | Docker内のLambdaイメージ  | ホスト直接実行    |
+| 起動時間          | ~3.88s (docker run cold)  | ~0.7-1.4s         |
+| RSS               | ~404MB                    | ~237MB            |
+| Docker依存        | あり                      | なし              |
+| 配布形態          | Docker image / pip        | npm + 単一バイナリ |
+
+** スコープ外
+bunsaiの差別化のために割り切っている部分も書いておきます。
+
+- *SigV4署名は検証しません*。credential pairは何でも通ります。
+- *IAMポリシーの評価はしません*。CRUDだけです。
+- *Lambdaのメモリ / CPU隔離なし*。ホストプロセスとして動くので、MemorySizeは記録するだけです。
+- *rpcv2Cborは未対応*。AWS SDKがCBORを既定化したら追従予定です。
+- *event-stream APIは未対応*(Kinesis =SubscribeToShard= 等)。
+
+これらは「実装してもbunsaiの差別化を毀損する」「LocalStackと併用すれば足りる」ものを意図的に省いた結果です。
+
+** 入手
+3経路あります。
+
+#+begin_src sh
+# 1) bunx — Bunがあれば一発で起動
+bunx @conao3/bunsai
+
+# 2) npm install してCLI起動
+npm install -g @conao3/bunsai
+bunsai
+
+# 3) GitHub Releasesの単一バイナリ
+curl -fLo bunsai https://github.com/conao3/bun-bunsai/releases/latest/download/bunsai-linux-x64
+chmod +x bunsai && ./bunsai
+#+end_src
+
+ライセンスはApache-2.0、リポジトリは [[https://github.com/conao3/bun-bunsai]] です。
+Issue / PR大歓迎です。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
