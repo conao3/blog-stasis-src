@@ -27,8 +27,8 @@
         ...
       }: let
         overlay = final: prev: let
-          jdk = prev.jdk21;
-          nodejs = prev.nodejs_22;
+          jdk = prev.jdk25;
+          nodejs = prev.nodejs_latest;
           clojure = prev.clojure.override {inherit jdk;};
         in {
           inherit jdk nodejs clojure;
