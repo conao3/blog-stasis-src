@@ -36,22 +36,22 @@
                       (hiccup.page/include-css "/assets/modern-css-reset.css")
                       (hiccup.page/include-css "/assets/spectrum/color-palette.css")
                       (hiccup.page/include-css "/assets/spectrum/typography.css")
+                      (hiccup.page/include-css "/assets/spectrum/layout.css")
                       (hiccup.page/include-css "/assets/index.css")]
                      [:body
-                      [:h2 blog-name]
-                      [:div {:style {:display "flex"}}
-                       [:a {:href "/"} "Home"]]
-                      (hiccup/raw body)]))
+                      [:header
+                       [:a {:class "site-title" :href "/"} blog-name]]
+                      [:main (hiccup/raw body)]]))
 
 
 (defn render-content
   [{:keys [title body date]}]
   (hiccup/html
     [:article
-     [:h1 title]
-     [:div date]
-     [:hr]
-     (hiccup/raw body)]))
+     [:header
+      [:h1 title]
+      [:time date]]
+     [:div {:class "content"} (hiccup/raw body)]]))
 
 
 (defn site
@@ -66,13 +66,13 @@
                                 (assoc obj :body (render-content obj))])))
                       (into {}))
         blog-inx (hiccup/html
-                   [:div
-                    [:h1 "Blogs"]
+                   [:section {:class "post-list"}
+                    [:h2 "Blogs"]
                     [:ul
-                     (->> contents
-                          (map (fn [[k v]] [:li [:a {:href k} (:title v)]]))
+                     (->> (dissoc contents "/index.html")
                           (sort-by (comp :date second))
-                          reverse)]])
+                          reverse
+                          (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)]])))]])
         contents (update-in contents ["/index.html" :body]
                             #(str % blog-inx))]
     (stasis/merge-page-sources
