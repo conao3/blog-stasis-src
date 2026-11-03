@@ -126,6 +126,7 @@ article > header time {
 
 code {
     font-family: var(--code-font-family), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-variant-emoji: text;
 }
 
 :not(pre) > code {
