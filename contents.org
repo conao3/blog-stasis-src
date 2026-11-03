@@ -1390,7 +1390,7 @@ chmod +x bunsai && ./bunsai
 ライセンスはApache-2.0、リポジトリは [[https://github.com/conao3/bun-bunsai]] です。
 Issue / PR大歓迎です。
 
-* 期間と税額の計算に条文どおりであることの証明を付けた lean-ritsuryo
+* Leanで書く証明付きの日付計算と税計算
 :properties:
 :export_file_name: generated/contents/blog/2026/5499a8
 :export_date: 2026-11-03
