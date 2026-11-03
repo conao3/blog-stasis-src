@@ -5,12 +5,13 @@ html {
     font-family: system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
     font-size: var(--body-size-m);
     line-height: var(--cjk-line-height-200);
+    margin: 0 1rem;
 }
 
 body {
     margin: 0 auto;
-    max-width: 48rem;
-    padding: var(--spacing-500) var(--spacing-300);
+    max-width: 1100px;
+    padding: var(--spacing-500) 0;
 }
 
 body > header {
