@@ -22,8 +22,32 @@
   (-> (org.commonmark.parser.Parser/builder) (.extensions markdown-extensions) .build))
 
 
+(def lazy-image-attributes
+  (reify org.commonmark.renderer.html.AttributeProviderFactory
+    (create [_ _]
+      (reify org.commonmark.renderer.html.AttributeProvider
+        (setAttributes [_ node _ attributes]
+          (when (instance? org.commonmark.node.Image node)
+            (.put attributes "loading" "lazy")))))))
+
+
 (def markdown-renderer
-  (-> (org.commonmark.renderer.html.HtmlRenderer/builder) (.extensions markdown-extensions) .build))
+  (-> (org.commonmark.renderer.html.HtmlRenderer/builder)
+      (.extensions markdown-extensions)
+      (.attributeProviderFactory lazy-image-attributes)
+      .build))
+
+
+(def stylesheets
+  ["resources/public/assets/modern-css-reset.css"
+   "generated/spectrum/color-palette.css"
+   "generated/spectrum/typography.css"
+   "generated/spectrum/layout.css"
+   "resources/public/assets/index.css"])
+
+
+(def speculation-rules
+  "{\"prerender\":[{\"where\":{\"href_matches\":\"/*\"},\"eagerness\":\"moderate\"}]}")
 
 
 (defn parse-markdown
@@ -58,12 +82,10 @@
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
-                      (hiccup.page/include-css "/assets/modern-css-reset.css")
-                      (hiccup.page/include-css "/assets/spectrum/color-palette.css")
-                      (hiccup.page/include-css "/assets/spectrum/typography.css")
-                      (hiccup.page/include-css "/assets/spectrum/layout.css")
-                      (hiccup.page/include-css "/assets/index.css")
-                      (hiccup.page/include-js "/assets/math.js")]
+                      [:style (hiccup/raw (str/join "\n" (map slurp stylesheets)))]
+                      [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
+                      (when (str/includes? body "data-tex")
+                        [:script {:src "/assets/math.js" :defer true}])]
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"} blog-name]]
