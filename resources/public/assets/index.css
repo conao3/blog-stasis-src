@@ -151,10 +151,13 @@ pre code {
 }
 
 .content table {
+    border: none;
     border-collapse: collapse;
     display: block;
     font-size: var(--body-size-s);
+    max-width: 100%;
     overflow-x: auto;
+    width: max-content;
 }
 
 .content .katex-display {
