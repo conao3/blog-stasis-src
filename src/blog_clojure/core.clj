@@ -41,7 +41,10 @@
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"} blog-name]]
-                      [:main (hiccup/raw body)]]))
+                      [:main (hiccup/raw body)]
+                      [:footer
+                       [:a {:href "/"} blog-name]
+                       [:span "© conao3"]]]))
 
 
 (defn render-content
