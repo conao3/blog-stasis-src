@@ -1,7 +1,10 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.12.6"}
   org.clojure/data.json {:mvn/version "2.5.2"}
-  markdown-clj/markdown-clj {:mvn/version "1.12.10"}
+  org.commonmark/commonmark {:mvn/version "0.32.0"}
+  org.commonmark/commonmark-ext-gfm-tables {:mvn/version "0.32.0"}
+  org.commonmark/commonmark-ext-gfm-strikethrough {:mvn/version "0.32.0"}
+  org.commonmark/commonmark-ext-heading-anchor {:mvn/version "0.32.0"}
   stasis/stasis {:mvn/version "2023.11.21"}
   babashka/fs {:mvn/version "0.5.34"}
   ring/ring-core {:mvn/version "1.15.6"}

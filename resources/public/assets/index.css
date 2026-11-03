@@ -157,6 +157,11 @@ pre code {
     overflow-x: auto;
 }
 
+.content .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
 .content th,
 .content td {
     border: var(--border-width-100) solid var(--gray-300);

@@ -1,15 +1,40 @@
 (ns blog-clojure.core
   (:require
     [clojure.java.io :as io]
+    [clojure.string :as str]
     [hiccup.page :as hiccup.page]
     [hiccup2.core :as hiccup]
-    [markdown.core :as markdown]
     [ring.adapter.jetty :as jetty]
     [stasis.core :as stasis]))
 
 
 (def blog-name "Conao3 Notes")
 (def stasis-config {:stasis/ignore-nil-pages? true})
+
+
+(def markdown-extensions
+  [(org.commonmark.ext.gfm.tables.TablesExtension/create)
+   (org.commonmark.ext.gfm.strikethrough.StrikethroughExtension/create)
+   (org.commonmark.ext.heading.anchor.HeadingAnchorExtension/create)])
+
+
+(def markdown-parser
+  (-> (org.commonmark.parser.Parser/builder) (.extensions markdown-extensions) .build))
+
+
+(def markdown-renderer
+  (-> (org.commonmark.renderer.html.HtmlRenderer/builder) (.extensions markdown-extensions) .build))
+
+
+(defn parse-markdown
+  [s]
+  (let [[header body] (str/split s #"\n\n" 2)
+        metadata (->> (str/split-lines header)
+                      (keep #(re-matches #"(\w+):\s*(.*)" %))
+                      (map (fn [[_ k v]] [(keyword (str/lower-case k)) v]))
+                      (into {}))]
+    {:metadata metadata
+     :html (.render markdown-renderer (.parse markdown-parser (or body "")))}))
 
 
 (defn slurp-binary-directory
@@ -37,7 +62,8 @@
                       (hiccup.page/include-css "/assets/spectrum/color-palette.css")
                       (hiccup.page/include-css "/assets/spectrum/typography.css")
                       (hiccup.page/include-css "/assets/spectrum/layout.css")
-                      (hiccup.page/include-css "/assets/index.css")]
+                      (hiccup.page/include-css "/assets/index.css")
+                      (hiccup.page/include-js "/assets/math.js")]
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"} blog-name]]
@@ -61,9 +87,9 @@
   []
   (let [contents (->> (stasis/slurp-directory "generated/contents" #"\.md$")
                       (map (fn [[k v]]
-                             (let [p (markdown/md-to-html-string-with-meta v :heading-anchors true)
-                                   obj {:title (first (:title (:metadata p)))
-                                        :date (first (:date (:metadata p)))
+                             (let [p (parse-markdown v)
+                                   obj {:title (:title (:metadata p))
+                                        :date (:date (:metadata p))
                                         :body (:html p)}]
                                [(str (subs k 0 (- (count k) 3)) ".html")
                                 (assoc obj :body (render-content obj))])))
