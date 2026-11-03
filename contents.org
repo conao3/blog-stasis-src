@@ -1533,11 +1533,48 @@ def probeIncome (x_1 : @& tobj) : tobj :=
 
 **** 実装が条件付きで仕様と一致するとき
 民法 第143条は、週、月、年で定めた期間を暦に従って計算し、応当日の前日に満了すると定めます。
-週の期間を写した仕様は日付を 1 日ずつ進めて応当日を探すので、期間が長いほど遅くなります。
-そこで、日付を通算日 (ある基準日からの日数) に直して計算する実装を別に書きました。
+この条文を写した仕様は応当日を次のように求めます。
 
-実装が返す起算日、応当日、末日が仕様と一致することは、定理 PER-1 で証明しています。
-ただし、PER-1 が一致を保証するのは日付が実在する (=event.Valid=) ときだけで、 =@[csimp]= はこのような条件の付いた等式には使えません。
+#+begin_src lean
+def correspondingDaySpec (start : Date) : Length → Option Date
+  | .days n => some (start.addDaysNaive n)
+  | .weeks n => some (weekCorrespondingSpec start n)
+  | len =>
+    let ym := lastMonthSpec start len
+    if start.day ≤ ym.daysInMonth then some ⟨ym.year, ym.month, start.day⟩ else none
+#+end_src
+
+日の期間は =addDaysNaive= で翌日を =n= 回たどり、週の期間は =weekCorrespondingSpec= で翌日をたどりながら同じ曜日の日を探します。
+月と年の期間も、 =lastMonthSpec= が 1 か月ずつ進めて最後の月を求めます。
+どれも、計算の回数が期間の日数か月数に比例して増えます。
+
+実装は日付を通算日 (ある基準日からの日数) に直して計算します。
+
+#+begin_src lean
+def correspondingDays (start : Date) : Length → Option Int
+  | .days n => some (start.toDays + n)
+  | .weeks n => some (start.toDays + 7 * n)
+  | len =>
+    let ym := lastMonth start len
+    if start.day ≤ ym.daysInMonth then some (toDays ⟨ym.year, ym.month, start.day⟩) else none
+#+end_src
+
+日と週の期間は通算日に =n= か =7 * n= を足すだけです。
+月と年の期間も、 =lastMonth= が月の通し番号に =n= を足して最後の月を求めます。
+
+ライブラリの期間の計算 =compute= はこの実装を使い、その結果が仕様と一致することを定理 PER-1 で証明しています。
+
+#+begin_src lean
+theorem per1_compute_eq_spec (event : Date) (h : event.Valid) (startAtMidnight : Bool)
+    (len : Length) :
+    (compute event startAtMidnight len).start = Civil.startDateSpec event startAtMidnight ∧
+      (compute event startAtMidnight len).corresponding =
+        Civil.correspondingDaySpec (Civil.startDateSpec event startAtMidnight) len ∧
+      (compute event startAtMidnight len).expiry = Civil.expirySpec event startAtMidnight len
+#+end_src
+
+仮定の =h : event.Valid= は、出来事の日 =event= が実在する日付であることを表します。
+PER-1 が一致を保証するのはこの仮定が成り立つときだけで、 =@[csimp]= はこのような仮定の付いた等式には使えません。
 そのため、ライブラリの関数からは実装を直接呼んでいます。
 =@[csimp]= を使うには、実在する日付だけを表す型を作り、関数の引数をその型にする必要があります。
 
@@ -1545,7 +1582,17 @@ def probeIncome (x_1 : @& tobj) : tobj :=
 民法 第142条などの繰り下げの規定は、末日が休日なら「その翌日」に満了すると書いています。
 翌日も休日のときについては書いていないので、lean-ritsuryo は休日でない最初の日まで繰り下げると読んでいます。
 この読み方が定めているのは、計算の手順ではなく、結果が満たすべき条件です。
-仕様が実行できる関数ではないので、繰り下げの関数を 1 つ書き、その結果が次の 2 つの条件を満たすことを証明しました (定理 ROL-1)。
+仕様が実行できる関数ではないので、繰り下げの実装を 1 つ書きました。
+実装は通算日を 1 日ずつ進め、休日でない日が見つかったところで止まります。
+
+#+begin_src lean
+def rolloverDays (isHoliday : Int → Bool) : Nat → Int → Option Int
+  | 0, _ => none
+  | fuel + 1, z => if isHoliday z then rolloverDays isHoliday fuel (z + 1) else some z
+#+end_src
+
+=fuel= は調べる日数の上限で、上限までに休日でない日がなければ =none= を返します。
+定理 ROL-1 は、この実装の結果が次の 2 つの条件を満たすことを証明しています。
 
 - 繰り下げた日は、もとの日以後で休日でない
 - もとの日から繰り下げた日の前日までは、すべて休日である
