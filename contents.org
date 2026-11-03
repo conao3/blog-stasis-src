@@ -7,7 +7,8 @@
   '((template . stasis-md-template)
     (link . stasis-md-link)
     (latex-fragment . stasis-md-latex)
-    (latex-environment . stasis-md-latex)))
+    (latex-environment . stasis-md-latex)
+    (footnote-reference . stasis-md-footnote-reference)))
 
 (defun stasis-md-template (contents info)
   (concat
@@ -30,6 +31,19 @@
      ((not tex) value)
      (environment (format "<div class=\"math display\" data-tex=\"%s\"></div>\n" data))
      (t (format "<span class=\"math%s\" data-tex=\"%s\"></span>" (if display " display" "") data)))))
+
+(defun stasis-md-footnote-reference (reference contents info)
+  (let* ((definition (org-export-get-footnote-definition reference info))
+         (body (string-trim (org-export-data definition info)))
+         (body (replace-regexp-in-string "\n\\(?:[ \t]*\n\\)+" "<br>" body))
+         (body (replace-regexp-in-string "[ \t]*\n[ \t]*" " " body))
+         (html (org-html-footnote-reference reference contents info)))
+    (string-match "<a id=\"\\([^\"]+\\)\" class=\"footref\" href=\"[^\"]*\" role=\"doc-backlink\">\\([^<]*\\)</a>" html)
+    (let ((id (match-string 1 html))
+          (number (match-string 2 html)))
+      (format "<span class=\"footnote\">%s<span class=\"footnote-body\" id=\"%s-body\" popover>%s</span></span>"
+              (replace-match (format "<button type=\"button\" id=\"%s\" class=\"footref\" popovertarget=\"%s-body\">%s</button>" id id number) t t html)
+              id body))))
 
 (defun stasis-md-link (link desc info)
   (let ((type (org-element-property :type link)))

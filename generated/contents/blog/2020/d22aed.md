@@ -38,7 +38,7 @@ Emacs-26.1とEmacs-26.2はELPAからのダウンロードに問題がありま�
     under the terms of the GNU General Public License.
     For more information about these matters, see the file named COPYING.
 
-もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味が分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
+もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味が分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
 
 
 # Emacs設定ファイル
@@ -46,7 +46,7 @@ Emacs-26.1とEmacs-26.2はELPAからのダウンロードに問題がありま�
 
 ## init.elの作成
 
-Emacsの設定ファイルは `~/.emacs.d/init.el` です。既にディレクトリがある場合は `~/.emacs.d/` を `~/.emacs.d.old` などにリネームした上で新しくディレクトリを作成してください。 `~/.emacs.d/init.el` にファイルを作成し、その先頭にleafの[インストールコード](https://github.com/conao3/leaf.el#install)を貼り付けます<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>。
+Emacsの設定ファイルは `~/.emacs.d/init.el` です。既にディレクトリがある場合は `~/.emacs.d/` を `~/.emacs.d.old` などにリネームした上で新しくディレクトリを作成してください。 `~/.emacs.d/init.el` にファイルを作成し、その先頭にleafの[インストールコード](https://github.com/conao3/leaf.el#install)を貼り付けます<span class="footnote"><sup><button type="button" id="fnr.2" class="footref" popovertarget="fnr.2-body">2</button></sup><span class="footnote-body" id="fnr.2-body" popover>: leafのインストールコードには書いてませんが、別途 `user-emacs-directory` の設定を加えました。理由はコメントのような起動方法ができるからです。参考ブログ: [Emacsでお試しinit.elの指針 - peccu.hatenablog](http://peccu.hatenablog.com/entry/20130218/trial_init)</span></span>。
 
 なお、現在では `leaf` のimenuインテグレーションのおかげでファイル分割しないinit.el管理がトレンドです。
 

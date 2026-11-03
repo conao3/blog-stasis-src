@@ -219,3 +219,43 @@ pre code {
         font-size: var(--heading-cjk-size-m);
     }
 }
+
+.content .footnote {
+    position: relative;
+}
+
+.content .footref {
+    background: none;
+    border: none;
+    color: var(--blue-900);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.content .footnote-body {
+    background-color: var(--gray-200);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: var(--corner-radius-100);
+    color: var(--gray-800);
+    font-size: var(--body-size-s);
+    max-width: min(24rem, calc(100vw - 2rem));
+    overflow-wrap: anywhere;
+    padding: var(--spacing-100) var(--spacing-200);
+}
+
+@media (hover: hover) {
+    .content .footnote:hover .footnote-body:not(:popover-open) {
+        bottom: 100%;
+        display: block;
+        inset-block-start: auto;
+        left: 50%;
+        margin: 0;
+        position: absolute;
+        transform: translateX(-50%);
+        width: max-content;
+        z-index: 1;
+    }
+}

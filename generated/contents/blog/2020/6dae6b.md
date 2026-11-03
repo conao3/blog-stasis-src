@@ -33,7 +33,7 @@ Date: 2020-09-25
 
 org-modeはとても大きく、私も全容を把握できていません。
 しかしつまみ食いをするだけでもとても大きなメリットがある機能があります。
-それがorgのエクスポート機能とコード実行機能<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>です。
+それがorgのエクスポート機能とコード実行機能<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>Eric Schulte, Dan Davison, Thomas Dye, et.al., "A Multi-Language Computing Environment for Literate Programming and Reproducible Research" <https://www.jstatsoft.org/article/view/v046i03></span></span>です。
 
 ![img](/img/6dae6b-92e07c45-cc71-48c6-b009-1e7e1b7a524d.png)
 

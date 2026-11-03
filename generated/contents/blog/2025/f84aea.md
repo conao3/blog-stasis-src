@@ -176,7 +176,7 @@ markdownでは `` ``` 言語 `` と `` ``` `` で囲むことによって表現�
 
 markdownでは `foo[^foo]` と `[^foo]: fooに対しての脚注` と書きますが、org-modeは `foo[fn::fooに対しての脚注]` と表記します。
 
-こんな感じ<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>になります。
+こんな感じ<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>どんな感じ？</span></span>になります。
 
 
 ## メタ設定
