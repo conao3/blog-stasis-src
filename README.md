@@ -37,7 +37,7 @@ A static blog built with [Stasis](https://github.com/magnars/stasis), a simple a
 ├── contents.org          # Blog articles (Org-mode source)
 ├── deps.edn              # Clojure dependencies
 ├── flake.nix             # Nix flake configuration
-├── Makefile              # Build and deployment tasks
+├── Makefile              # Development server and build tasks
 ├── package.json          # Node.js dependencies
 ├── src/
 │   └── blog_clojure/
@@ -70,21 +70,9 @@ make build
 
 ## Deployment
 
-This project deploys to Cloudflare Pages.
+The Cloudflare Pages project `blog-stasis-src` is connected to this repository. Pushing to `master` makes Cloudflare build the site and publish it at https://s.conao3.com/.
 
-### First-Time Setup
-
-1. Create a [Cloudflare](https://cloudflare.com) account
-2. Authenticate with Wrangler: `npx wrangler login`
-3. The Pages project is created automatically on first deploy
-
-### Deploy
-
-```bash
-make deploy
-```
-
-This runs `npx wrangler pages deploy` to upload the pre-built static files from `target/`.
+The build reads the Markdown files committed under `generated/contents/`, so a post goes live only after its exported Markdown is committed.
 
 ## Additional Commands
 

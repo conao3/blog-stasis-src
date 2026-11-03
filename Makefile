@@ -8,10 +8,6 @@ dev:
 build:
 	clojure -X blog-clojure.core/export
 
-.PHONY: deploy
-deploy:
-	npx wrangler pages deploy target --project-name blog-stasis-src
-
 resources/spectrum:
 	mkdir -p $@
 
