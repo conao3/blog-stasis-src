@@ -1390,6 +1390,179 @@ chmod +x bunsai && ./bunsai
 ライセンスはApache-2.0、リポジトリは [[https://github.com/conao3/bun-bunsai]] です。
 Issue / PR大歓迎です。
 
+* 期間と税額の計算に条文どおりであることの証明を付けた lean-ritsuryo
+:properties:
+:export_file_name: generated/contents/blog/2026/5499a8
+:export_date: 2026-11-03
+:end:
+
+控訴期間の末日や所得税の額は、条文を読めば計算の手順が決まります。
+それでも、年末年始に当たる末日の繰り下げや、税率の区分の境目のように、手で計算すると間違えやすい所があります。プログラムに書いた場合も、その計算が条文どおりかを確かめるには手間がかかります。
+
+[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]] は、日本の法令が定める期間と税額の計算を Lean 4 で書いたライブラリと CLI です。
+CLI が実行する関数には、条文どおりに計算することの証明を付けています。
+以下の出力は、どれも v0.5.0 で実行したものです。
+
+** 何を計算できるか
+扱う条文は次のとおりです。
+
+- 期間: 民法 第140条〜第143条、年齢計算ニ関スル法律、国税通則法 第10条、民事訴訟法 第95条、第285条、第313条、第332条、所得税法 第120条
+- 祝日: 国民の祝日に関する法律 第2条、第3条
+- 所得税: 所得税法 第89条と、復興特別所得税、防衛特別所得税
+- 相続税: 相続税法 第15条、第16条と、民法 第900条の法定相続分
+- 消費税: 消費税法 第29条、消費税法施行令 第70条の10
+- 延滞税と利子税: 国税通則法 第60条、租税特別措置法 第93条、第94条
+- 加算税: 国税通則法 第65条〜第68条
+- 端数計算: 国税通則法 第118条、第119条
+
+** 使ってみる
+CLI の引数は AWS CLI と同じ文法で書きます。
+どのコマンドも、計算の結果 (=Result=)、途中の値 (=Steps=)、根拠の条文 (=Basis=)、結果が依拠する前提 (=Assumptions=) を JSON で出力します。
+
+*** 控訴期間
+2026-12-15 に判決の送達を受けたときの控訴期間です。
+2 週間の末日は 2026-12-29 ですが、この日は年末年始に当たるので、民事訴訟法 第95条第3項により末日は 2027-01-04 に繰り下がります。
+
+#+begin_src console
+$ ritsuryo deadline compute-appeal-deadline --served-date 2026-12-15 \
+    --query '{Result: Result, RolledOver: Steps.RolledOverDays[].Date}'
+{
+    "Result": {
+        "Deadline": "2027-01-04",
+        "Period": "控訴期間",
+        "Invariable": true
+    },
+    "RolledOver": [
+        "2026-12-29",
+        "2026-12-30",
+        "2026-12-31",
+        "2027-01-01",
+        "2027-01-02",
+        "2027-01-03"
+    ]
+}
+#+end_src
+
+=RolledOver= には、繰り下げのときに飛ばした日が並びます。
+祝日は内閣府の祝日 CSV から取り、出力の =Data= に CSV の取得元と SHA-256 を書きます。
+
+*** 所得税
+2026 年分で課税総所得金額が 7,000,000 円のとき、所得税は 974,000 円になります。
+これは国税庁の速算表で求めた額 (7,000,000 × 23% − 636,000) と同じです。
+
+#+begin_src console
+$ ritsuryo income-tax compute-tax --tax-year 2026 --taxable-income 7000000 --query Result
+{
+    "IncomeTax": 974000,
+    "ReconstructionTax": 20454,
+    "DefenseTax": 0,
+    "Total": 994454,
+    "Payable": 994400
+}
+#+end_src
+
+2027 年分からは、復興特別所得税が 1.1%、防衛特別所得税が 1% になります。
+=--tax-year 2027= を渡すと、 =ReconstructionTax= が 10714、 =DefenseTax= が 9740 になります。
+
+*** 延滞税
+税額 1,000,000 円、法定納期限 2026-03-16、納付日 2026-07-31 のときの延滞税です。
+延滞税の割合は納期限の翌日から 2 か月を過ぎると上がるので、CLI はその日で期間を分けて計算します。
+
+#+begin_src console
+$ ritsuryo delinquency-tax compute-tax --tax 1000000 \
+    --legal-due-date 2026-03-16 --payment-date 2026-07-31 \
+    --output table --query Steps.Segments
++----------------------------------------------------------------------+
+|                              ComputeTax                              |
++----------------------------------------------------------------------+
+|  From       | To         | Days | Rate | Band              | Amount  |
+|+--------------------------------------------------------------------+|
+|  2026-03-17 | 2026-05-16 | 61   | 2.8% | within-two-months | 4679    |
+|  2026-05-17 | 2026-07-31 | 76   | 9.1% | after-two-months  | 18947   |
++----------------------------------------------------------------------+
+#+end_src
+
+区間ごとの額は一円未満を切り捨て、その合計 23,626 円から百円未満を切り捨てた 23,600 円が延滞税になります。
+
+** 何を証明したか
+計算ごとに定義を 2 つ書いています。
+1 つは条文の構造をそのまま写した仕様で、もう 1 つは CLI が実行する実装です。
+定理は、仕様と実装がすべての入力で同じ値を返すことを示します。
+
+所得税を例にします。
+所得税法 第89条は課税総所得金額を表の区分に分けてそれぞれに税率を掛け、合計した額を税額とします。
+仕様はこの文言をそのまま写し、表と、区分ごとに積み上げる関数で書きます。
+
+#+begin_src lean
+def table : List Bracket := [
+  ⟨some 1950000, 5⟩, ⟨some 3300000, 10⟩, ⟨some 6950000, 20⟩, ⟨some 9000000, 23⟩,
+  ⟨some 18000000, 33⟩, ⟨some 40000000, 40⟩, ⟨none, 45⟩]
+
+def incomeTaxCentsSpec (x : Nat) : Nat :=
+  progressiveCents table 0 x
+#+end_src
+
+CLI が実行するのは、国税庁の速算表 (税率 × 金額 − 控除額) の式です。
+金額は百分の一円単位で持っています。
+
+#+begin_src lean
+def quickCents (x : Nat) : Nat :=
+  if x ≤ 1950000 then 5 * x
+  else if x ≤ 3300000 then 10 * x - 9750000
+  else if x ≤ 6950000 then 20 * x - 42750000
+  else if x ≤ 9000000 then 23 * x - 63600000
+  else if x ≤ 18000000 then 33 * x - 153600000
+  else if x ≤ 40000000 then 40 * x - 279600000
+  else 45 * x - 479600000
+#+end_src
+
+定理 TAX-1 は、2 つの式がすべての金額で一致することと、CLI の税額 =taxOn= が千円未満を切り捨てた金額での積み上げと一致することを述べます。
+
+#+begin_src lean
+theorem tax1_quick_eq_spec (x : Nat) :
+    quickCents x = incomeTaxCentsSpec x ∧ 100 * taxOn x = incomeTaxCentsSpec (taxBase x)
+#+end_src
+
+ほかの計算にも同じ形の定理があり、全部で 35 個の設計 ID に定理を付けています。
+たとえば次のような性質を示しています。
+
+- 民法 第143条の期間の末日が起算点についても長さについても単調であること
+- 繰り下げの規定が休日でない最初の日を返すこと
+- 2 月 29 日に生まれた人が、2 月 28 日に年齢に達すること
+- 消費税の端数処理を品目ごとにしたときと合計でしたときの差が、品目の数から 1 を引いた円以下であること
+- 民法 第900条の法定相続分の合計が 1 になること
+
+内閣府の CSV に載っているすべての年について、祝日も Lean のカーネルで CSV と照らしています。祝日法 第3条から導いた振替休日と国民の休日は、CSV の「休日」の行とちょうど一致します。第2条の規定から作った国民の祝日も、CSV の行とちょうど一致します（春分の日と秋分の日は、CSV から日付を取っています）。
+
+定理はすべて =lake build= のときに Lean が検査します。
+どの定理の証明も =sorry= 、 =admit= 、 =native_decide= を使っていません。
+=lake exe basis-report --check= は、公開の定理が =propext= 、 =Classical.choice= 、 =Quot.sound= 以外の公理に依存するときと、設計 ID に定理がないときに失敗します。
+
+** 実行時間とバイナリの大きさ
+リリースの =ritsuryo= は 3.4 MB の実行ファイル 1 つです (x86_64-linux)。
+Lean のランタイム、GMP、libuv はこのファイルに含まれていて、ほかに必要なのは C ライブラリだけです。
+1 回の実行は約 6 ms で終わり、使うメモリは最大で約 10 MiB です。
+
+Lean で書いたプログラムは、ライブラリの書き方によってはバイナリが 140 MB になります。
+属性を定義するモジュールが =Lean= を import していて、それを普通に import すると =Lean= 全体がリンクされるためです。
+lean-ritsuryo はこのモジュールを =meta import= で読み込み、属性をコンパイルのときだけ使うようにしています。
+=Lean.Data.Json= を使ってもバイナリが同じように大きくなるので、JSON の読み書きは自前のモジュールで書いています。
+
+** 入手
+[[https://github.com/conao3/lean-ritsuryo/releases][GitHub のリリース]] に、x86_64-linux、aarch64-linux、aarch64-darwin のアーカイブがあります。
+
+#+begin_src sh
+curl -sSfL https://github.com/conao3/lean-ritsuryo/releases/download/v0.5.0/ritsuryo-x86_64-linux.tar.gz | tar -xz
+./ritsuryo --version
+# ritsuryo 0.5.0
+#+end_src
+
+Nix を使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行できます。
+
+ライセンスは Apache-2.0 で、リポジトリは [[https://github.com/conao3/lean-ritsuryo]] です。
+条文の読み方は =docs/interpretation.md= に書いています。
+読み方の違いや計算の誤りに気づいたら、Issue で教えてください。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
