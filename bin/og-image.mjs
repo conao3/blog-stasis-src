@@ -15,7 +15,7 @@ const icon = `data:image/jpeg;base64,${(await readFile("resources/public/assets/
 
 const element = (type, style, children) => ({ type, props: { style, children } });
 
-const frameColors = ["rgb(0, 165, 159)", "rgb(0, 140, 186)", "rgb(29, 128, 245)"];
+const frameColors = ["rgb(26, 185, 178)", "rgb(4, 160, 205)", "rgb(64, 150, 243)"];
 
 const frameSvg = ({ width, height, flip }) => {
   const thickness = 38;
