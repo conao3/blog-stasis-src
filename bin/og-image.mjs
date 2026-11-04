@@ -15,12 +15,22 @@ const icon = `data:image/jpeg;base64,${(await readFile("resources/public/assets/
 
 const element = (type, style, children) => ({ type, props: { style, children } });
 
+const frame = (corner) =>
+  element("div", {
+    [`border${corner[0]}`]: "24px solid rgb(94, 170, 247)",
+    [`border${corner[1]}`]: "24px solid rgb(94, 170, 247)",
+    [corner[0].toLowerCase()]: 0,
+    [corner[1].toLowerCase()]: 0,
+    height: 220,
+    position: "absolute",
+    width: 360,
+  });
+
 const card = ({ title, date, site, host }) =>
   element(
     "div",
     {
       backgroundColor: "rgb(29, 29, 29)",
-      borderTop: "16px solid rgb(94, 170, 247)",
       boxSizing: "border-box",
       color: "rgb(235, 235, 235)",
       display: "flex",
@@ -28,13 +38,16 @@ const card = ({ title, date, site, host }) =>
       fontFamily: "Noto Sans JP",
       height: "100%",
       justifyContent: "space-between",
-      paddingBottom: 56,
-      paddingLeft: 90,
-      paddingRight: 90,
-      paddingTop: 80,
+      paddingBottom: 72,
+      paddingLeft: 96,
+      paddingRight: 96,
+      paddingTop: 88,
+      position: "relative",
       width: "100%",
     },
     [
+      frame(["Top", "Left"]),
+      frame(["Bottom", "Right"]),
       element(
         "div",
         {
