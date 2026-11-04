@@ -183,7 +183,7 @@
 
 
 (defn render-page
-  [path {:keys [title body description lang og-type]}]
+  [path {:keys [title body description lang og-type draft? portfolio-href]}]
   (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
@@ -210,9 +210,10 @@
                         [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
                         blog-name]
                        [:nav
-                        (if (= lang "en")
-                          [:a {:href (portfolio/urls :en)} "Portfolio"]
-                          [:a {:href (portfolio/urls :ja)} "ポートフォリオ"])]]
+                        (when portfolio-href
+                          [:a {:href portfolio-href} (if (= lang "en") "Portfolio" "ポートフォリオ")])]]
+                      (when draft?
+                        [:p {:class "draft-banner"} "下書き: 開発用サーバーでだけ表示し、本番のビルドには出しません。"])
                       [:main (hiccup/raw body)]
                       [:footer
                        [:a {:href "/"} blog-name]
@@ -245,8 +246,12 @@
 
 
 (defn site
-  []
-  (let [contents (->> (stasis/slurp-directory "generated/contents" #"\.md$")
+  ([] (site {:drafts? true}))
+  ([{:keys [drafts?]}]
+  (let [portfolio-langs (->> (keys portfolio/paths)
+                             (filter #(or drafts? (not (get-in portfolio/pages [% :draft?]))))
+                             set)
+        contents (->> (stasis/slurp-directory "generated/contents" #"\.md$")
                       (map (fn [[k v]]
                              (let [p (parse-markdown v)
                                    path (str (subs k 0 (- (count k) 3)) ".html")
@@ -254,30 +259,39 @@
                                         :url (page-url path)
                                         :post? (not= path "/index.html")
                                         :date (:date (:metadata p))
+                                        :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
                                         :body (:html p)}]
                                [path (assoc obj :body (render-content obj))])))
+                      (into {})
+                      (merge (into {}
+                                   (map (fn [[lang path]]
+                                          [path {:title (get-in portfolio/pages [lang :title])
+                                                 :description (get-in portfolio/pages [lang :description])
+                                                 :lang (name lang)
+                                                 :og-type "profile"
+                                                 :draft? (get-in portfolio/pages [lang :draft?])
+                                                 :portfolio? true
+                                                 :body (portfolio/body lang portfolio-langs)}]))
+                                   (select-keys portfolio/paths portfolio-langs)))
+                      (remove (fn [[_ page]] (and (:draft? page) (not drafts?))))
                       (into {}))
+        portfolio-href (fn [lang]
+                         (let [lang (if (= lang "en") :en :ja)]
+                           (when (contains? contents (portfolio/paths lang))
+                             (portfolio/urls lang))))
         blog-inx (hiccup/html
                    [:section {:class "post-list"}
                     [:h2 "Blogs"]
                     [:ul
                      (->> (dissoc contents "/index.html")
+                          (remove (comp :portfolio? second))
                           (sort-by (comp :date second))
                           reverse
-                          (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)]])))]])
-        contents (-> contents
-                     (update-in ["/index.html" :body] #(str % blog-inx))
-                     (merge (into {}
-                                  (map (fn [[lang path]]
-                                         [path {:title (get-in portfolio/pages [lang :title])
-                                                :description (get-in portfolio/pages [lang :description])
-                                                :lang (name lang)
-                                                :og-type "profile"
-                                                :body (portfolio/body lang)}]))
-                                  portfolio/paths)))]
+                          (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))]])
+        contents (update-in contents ["/index.html" :body] #(str % blog-inx))]
     (stasis/merge-page-sources
-      {:contents (into {} (map (fn [[path page]] [path (render-page path page)])) contents)
+      {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
        :og-images (into {}
                         (map (fn [[path page]]
                                [(og-image-path path)
@@ -285,7 +299,7 @@
                         contents)
        :public (slurp-binary-directory "resources/public" #"\.[^.]+$")
        :spectrum (-> (stasis/slurp-directory "generated/spectrum" #"\.[^.]+$")
-                     (update-keys (partial str "/assets/spectrum")))})))
+                     (update-keys (partial str "/assets/spectrum")))}))))
 
 
 (defn export
@@ -295,7 +309,7 @@
         old-files (load-export-dir)]
     (stasis/empty-directory! export-dir)
     (println "Exporting...")
-    (stasis/export-pages (site) "target/" stasis-config)
+    (stasis/export-pages (site {:drafts? false}) "target/" stasis-config)
     (println "Export complete:")
     (stasis/report-differences old-files (load-export-dir))))
 

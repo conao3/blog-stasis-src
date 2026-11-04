@@ -33,6 +33,25 @@ body > header nav a:hover {
     color: var(--gray-900);
 }
 
+.draft-banner {
+    background-color: var(--gray-200);
+    border: var(--border-width-100) dashed var(--gray-500);
+    border-radius: var(--corner-radius-100);
+    color: var(--gray-900);
+    font-size: var(--body-size-s);
+    margin: 0 0 var(--spacing-400);
+    padding: var(--spacing-100) var(--spacing-200);
+}
+
+.draft-label {
+    border: var(--border-width-100) dashed var(--gray-500);
+    border-radius: var(--corner-radius-100);
+    color: var(--gray-700);
+    font-size: var(--body-size-xs);
+    margin-left: var(--spacing-100);
+    padding: 0 var(--spacing-75);
+}
+
 .portfolio-lang {
     border: var(--border-width-100) solid var(--gray-300);
     border-radius: 9999px;

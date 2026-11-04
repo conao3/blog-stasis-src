@@ -3,6 +3,7 @@
 * org
 #+begin_src elisp
 (org-export-define-derived-backend 'stasis-md 'md
+  :options-alist '((:draft "DRAFT" nil nil t))
   :translate-alist
   '((template . stasis-md-template)
     (link . stasis-md-link)
@@ -15,6 +16,7 @@
   (concat
    (format "Title: %s\n" (car (plist-get info :title)))
    (format "Date: %s\n" (car (plist-get info :date)))
+   (if (plist-get info :draft) "Draft: true\n" "")
    "\n\n"
    contents))
 
