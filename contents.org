@@ -16274,6 +16274,9 @@ theorem incomeTaxCentsSpec_eq_quickCents : @incomeTaxCentsSpec = @quickCents := 
 
 =@[csimp]= の付いた等式があると、Lean のコンパイラは、左辺の関数を呼ぶ箇所を右辺の関数を呼ぶように書き換えます。
 そのため、ライブラリの税額の関数はソースでは仕様の =incomeTaxCentsSpec= を呼んでいても、実行されるのは速算表の式です。
+
+[[./resources/public/img/5499a8-csimp.svg]]
+
 書き換えられたことは、コンパイラが出力する中間表現 (IR) で確かめられます。
 次は =incomeTaxCentsSpec x= を返すだけの関数 =probeIncome= の IR です。
 
@@ -16739,6 +16742,7 @@ CLI は =https://aixiv.online/cli/aixiv.js= をダウンロードし、中身を
 どれも指摘のとおりだったので、直して第 2 版を出しました。
 投稿から十数分で審査の結果が付き、その指摘が実際に直したほうがよい箇所を突いていたことには驚きました。
 第 2 版にも notes が 3 点付き、そのうち 1 点は祝日法 第3条の第2項と第3項の改正の経過をまとめすぎているという指摘でした。
+この 3 点も直して、第 3 版を出しました。
 
 ** 改訂の公開と =--dry-run=
 第 2 版を出す前に、直した内容を確かめるつもりで、Claude Code が =--new-version= と =--dry-run= を付けて =publish= を実行しました。
