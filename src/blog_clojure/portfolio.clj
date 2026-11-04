@@ -34,19 +34,19 @@
                :writing "Writing and Talks"
                :education "Education and Certifications"}
     :open-source [["leaf.el" "https://github.com/conao3/leaf.el"
-                   "Declarative init.el configuration for Emacs. On ELPA and MELPA with 5 companion packages."]
+                   "Declarative init.el configuration for Emacs. On ELPA and MELPA with 5 companion packages." "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
-                   "Rust CLI that brokers Chrome DevTools Protocol (CDP) sessions across coding agents, with a per-profile daemon and JSON-RPC batches. Published on crates.io."]
+                   "Rust CLI that brokers Chrome DevTools Protocol (CDP) sessions across coding agents, with a per-profile daemon and JSON-RPC batches. Published on crates.io." nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
-                   "Parallel Emacs package manager with async installs."]
+                   "Parallel Emacs package manager with async installs." "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
-                   "Major mode for SEML, HTML authoring in S-expressions."]
+                   "Major mode for SEML, HTML authoring in S-expressions." "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
-                   "Elisp package development tooling with built-in testing and CI."]]
+                   "Elisp package development tooling with built-in testing and CI." "33"]]
     :maintained ["Maintainer on "
-                 [["cask" "https://github.com/cask/cask" "project management for Emacs"]
-                  ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy completion in a child frame"]
-                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "SKK input method for Vim/Neovim"]]
+                 [["cask" "https://github.com/cask/cask" "project management for Emacs" "1.3k"]
+                  ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy completion in a child frame" "422"]
+                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "SKK input method for Vim/Neovim" "335"]]
                  "."]
     :experience [{:heading ["Software Engineer" "Toyokumo, Inc."]
                   :period "Jun 2024 – Present (on leave)"
@@ -99,19 +99,19 @@
                :writing "執筆・登壇"
                :education "学歴・資格"}
     :open-source [["leaf.el" "https://github.com/conao3/leaf.el"
-                   "Emacs の宣言的な init.el 設定パッケージ。ELPA と MELPA で公開し、関連パッケージが 5 つあります。"]
+                   "Emacs の宣言的な init.el 設定パッケージ。ELPA と MELPA で公開し、関連パッケージが 5 つあります。" "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
-                   "複数のコーディングエージェントで Chrome DevTools Protocol のセッションを共有する Rust 製の CLI。プロファイルごとのデーモンと JSON-RPC のバッチで動きます。crates.io で公開しています。"]
+                   "複数のコーディングエージェントで Chrome DevTools Protocol のセッションを共有する Rust 製の CLI。プロファイルごとのデーモンと JSON-RPC のバッチで動きます。crates.io で公開しています。" nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
-                   "非同期にインストールする、並列の Emacs パッケージマネージャ。"]
+                   "非同期にインストールする、並列の Emacs パッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
-                   "HTML を S 式で書く SEML のメジャーモード。"]
+                   "HTML を S 式で書く SEML のメジャーモード。" "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
-                   "テストと CI を備えた Elisp パッケージの開発ツール。"]]
+                   "テストと CI を備えた Elisp パッケージの開発ツール。" "33"]]
     :maintained [""
-                 [["cask" "https://github.com/cask/cask" "Emacs のプロジェクト管理"]
-                  ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy の候補を子フレームに表示"]
-                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "Vim / Neovim の SKK 日本語入力"]]
+                 [["cask" "https://github.com/cask/cask" "Emacs のプロジェクト管理" "1.3k"]
+                  ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy の候補を子フレームに表示" "422"]
+                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "Vim / Neovim の SKK 日本語入力" "335"]]
                  " のメンテナをしています。"]
     :experience [{:heading ["トヨクモ株式会社" "ソフトウェアエンジニア"]
                   :period "2024 年 6 月 〜 現在 (休職中)"
@@ -170,12 +170,12 @@
           [:p description summary]
           [:h2 (:open-source headings)]
           [:ul
-           (for [[project href text] open-source]
-             [:li [:a {:href href} [:strong project]] ": " text])
+           (for [[project href text stars] open-source]
+             [:li [:a {:href href} [:strong project]] (when stars (str " (★ " stars ")")) ": " text])
            [:li before
             (interpose (if (= lang :ja) "、" ", ")
-                       (for [[project href text] projects]
-                         (list [:a {:href href} [:strong project]] " (" text ")")))
+                       (for [[project href text stars] projects]
+                         (list [:a {:href href} [:strong project]] " (★ " stars (if (= lang :ja) "、" ", ") text ")")))
             after]]
           [:h2 (:experience headings)]
           (for [{:keys [heading period items]} experience]
