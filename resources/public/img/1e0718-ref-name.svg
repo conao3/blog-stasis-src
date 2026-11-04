@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 170" width="560" height="170" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+  </defs>
+  <rect width="560" height="170" rx="8" fill="#fff"/>
+  <text x="74.0" y="78" font-size="38" text-anchor="middle" fill="#000">r</text>
+  <text x="102.0" y="78" font-size="38" text-anchor="middle" fill="#000">e</text>
+  <text x="130.0" y="78" font-size="38" text-anchor="middle" fill="#000">f</text>
+  <text x="158.0" y="78" font-size="38" text-anchor="middle" fill="#000">s</text>
+  <text x="186.0" y="78" font-size="38" text-anchor="middle" fill="#000">/</text>
+  <text x="214.0" y="78" font-size="38" text-anchor="middle" fill="#000">A</text>
+  <text x="242.0" y="78" font-size="38" text-anchor="middle" fill="#000">/</text>
+  <text x="270.0" y="78" font-size="38" text-anchor="middle" fill="#d63a22">s</text>
+  <text x="298.0" y="78" font-size="38" text-anchor="middle" fill="#d63a22">3</text>
+  <text x="326.0" y="78" font-size="38" text-anchor="middle" fill="#000">x</text>
+  <text x="354.0" y="78" font-size="38" text-anchor="middle" fill="#d63a22">a</text>
+  <text x="382.0" y="78" font-size="38" text-anchor="middle" fill="#d63a22">a</text>
+  <text x="410.0" y="78" font-size="38" text-anchor="middle" fill="#000">y</text>
+  <text x="438.0" y="78" font-size="38" text-anchor="middle" fill="#d63a22">b</text>
+  <text x="466.0" y="78" font-size="38" text-anchor="middle" fill="#000">z</text>
+  <path d="M62,98 V106 H254 V98" fill="none" stroke="#000" stroke-width="1.5"/>
+  <path d="M158.0,106 V120" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="158.0" y="138" font-size="14" text-anchor="middle">slot A</text>
+  <path d="M258,98 V106 H310 V98" fill="none" stroke="#000" stroke-width="1.5"/>
+  <path d="M284.0,106 V120" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="284.0" y="138" font-size="14" text-anchor="middle">state 3</text>
+  <path d="M342,98 V106 H394 V98" fill="none" stroke="#000" stroke-width="1.5"/>
+  <path d="M368.0,106 V120" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="368.0" y="138" font-size="14" text-anchor="middle">a = 2</text>
+  <path d="M426,98 V106 H450 V98" fill="none" stroke="#000" stroke-width="1.5"/>
+  <path d="M438.0,106 V120" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="438.0" y="138" font-size="14" text-anchor="middle">b = 1</text>
+  <path d="M326.0,30 V40" stroke="#666" stroke-width="1.5"/>
+  <path d="M410.0,30 V40" stroke="#666" stroke-width="1.5"/>
+  <path d="M466.0,30 V40" stroke="#666" stroke-width="1.5"/>
+  <text x="326.0" y="24" fill="#666" font-size="13" text-anchor="middle">markers x, y, z</text>
+</svg>
