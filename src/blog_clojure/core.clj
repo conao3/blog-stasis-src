@@ -262,6 +262,7 @@
                                         :url (page-url path)
                                         :post? (not= path "/index.html")
                                         :date (:date (:metadata p))
+                                        :lang (:lang (:metadata p))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
                                         :body (:html p)}]
