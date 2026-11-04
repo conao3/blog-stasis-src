@@ -16,6 +16,9 @@
 (def tech-book-fest "https://techbookfest.org/organization/b48gui73eygdZDs02kqB1C")
 
 
+(def shibuya-lisp "https://lisp.connpass.com/")
+
+
 (def pages
   {:en
    {:title "Naoya Yamashita"
@@ -73,7 +76,8 @@
              ["Cloud and DevOps" "AWS (Lambda, ECS, EKS, S3, RDS, SQS, EventBridge, CloudFront, IAM), AWS CDK, Docker, Kubernetes, GitHub Actions, Nix"]
              ["Frontend" "React, Next.js, ClojureScript, TanStack Query, Apollo Client, Tailwind CSS"]
              ["AI Engineering" "Model Context Protocol (MCP), AI coding agents (Claude Code, Codex, Devin)"]]
-    :books ["Published 3 Clojure books at " [:a {:href tech-book-fest} "Tech Book Fest"] ", and organize Shibuya.lisp."]
+    :books [["Published 3 Clojure books at " [:a {:href tech-book-fest} "Tech Book Fest"] "."]
+            ["Organizing member of " [:a {:href shibuya-lisp} "Shibuya.lisp"] "."]]
     :talks [["2025年からを生きるためのEmacs入門 (Tokyo Emacs Study Meeting, Aug 2024)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (Tokyo Emacs Study Meeting, Oct 2024)" "/blog/2024/5d087f"]
             ["Blog posts (Japanese)" "/"]]
@@ -137,7 +141,8 @@
              ["クラウド / DevOps" "AWS (Lambda、ECS、EKS、S3、RDS、SQS、EventBridge、CloudFront、IAM)、AWS CDK、Docker、Kubernetes、GitHub Actions、Nix"]
              ["フロントエンド" "React、Next.js、ClojureScript、TanStack Query、Apollo Client、Tailwind CSS"]
              ["AI エンジニアリング" "Model Context Protocol (MCP)、AI コーディングエージェント (Claude Code、Codex、Devin)"]]
-    :books [[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。Shibuya.lisp を運営。"]
+    :books [[[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。"]
+            [[:a {:href shibuya-lisp} "Shibuya.lisp"] " の運営メンバー。"]]
     :talks [["2025年からを生きるためのEmacs入門 (東京Emacs勉強会、2024 年 8 月)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (東京Emacs勉強会、2024 年 10 月)" "/blog/2024/5d087f"]
             ["ブログの記事一覧" "/"]]
@@ -186,7 +191,8 @@
              [:li [:strong label] ": " text])]
           [:h2 (:writing headings)]
           [:ul
-           [:li (seq books)]
+           (for [book books]
+             [:li (seq book)])
            (for [[text href] talks]
              [:li [:a {:href href} text]])]
           [:h2 (:education headings)]
