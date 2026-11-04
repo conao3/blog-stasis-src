@@ -188,6 +188,7 @@
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
+                      [:link {:rel "icon" :href "/assets/icon.jpg"}]
                       (when description
                         [:meta {:name "description" :content description}])
                       [:meta {:property "og:title" :content title}]
@@ -204,7 +205,9 @@
                         [:script {:src "/assets/math.js" :defer true}])]
                      [:body
                       [:header
-                       [:a {:class "site-title" :href "/"} blog-name]]
+                       [:a {:class "site-title" :href "/"}
+                        [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
+                        blog-name]]
                       [:main (hiccup/raw body)]
                       [:footer
                        [:a {:href "/"} blog-name]

@@ -11,6 +11,8 @@ const fonts = [
   { name: "Noto Sans JP", data: await font("700Bold/NotoSansJP_700Bold.ttf"), weight: 700 },
 ];
 
+const icon = `data:image/jpeg;base64,${(await readFile("resources/public/assets/icon.jpg")).toString("base64")}`;
+
 const element = (type, style, children) => ({ type, props: { style, children } });
 
 const card = ({ title, date, site, host }) =>
@@ -50,7 +52,13 @@ const card = ({ title, date, site, host }) =>
         "div",
         { alignItems: "flex-end", display: "flex", fontSize: 36, justifyContent: "space-between", width: "100%" },
         [
-          element("div", { color: "rgb(176, 176, 176)", display: "flex" }, date ?? ""),
+          element("div", { alignItems: "center", display: "flex", gap: 28 }, [
+            { type: "img", props: { src: icon, width: 96, height: 96, style: { borderRadius: 48 } } },
+            element("div", { display: "flex", flexDirection: "column" }, [
+              element("div", { fontSize: 40, fontWeight: 700 }, "conao3"),
+              element("div", { color: "rgb(176, 176, 176)", fontSize: 30 }, date ?? ""),
+            ]),
+          ]),
           element("div", { display: "flex", flexDirection: "column", alignItems: "flex-end" }, [
             element("div", { fontSize: 44, fontWeight: 700 }, site),
             element("div", { color: "rgb(176, 176, 176)", fontSize: 30 }, host),

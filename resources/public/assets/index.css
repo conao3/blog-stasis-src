@@ -37,10 +37,17 @@ body > footer a {
 }
 
 .site-title {
+    align-items: center;
     color: var(--gray-900);
+    display: inline-flex;
     font-size: var(--heading-cjk-size-s);
     font-weight: bold;
+    gap: var(--spacing-100);
     text-decoration: none;
+}
+
+.site-title img {
+    border-radius: 50%;
 }
 
 a {
