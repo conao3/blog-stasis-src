@@ -35,6 +35,21 @@
             (.put attributes "loading" "lazy")))))))
 
 
+(defn link-images
+  [node]
+  (loop [child (.getFirstChild node)]
+    (when child
+      (let [next-child (.getNext child)]
+        (if (and (instance? org.commonmark.node.Image child)
+                 (not (instance? org.commonmark.node.Link node)))
+          (let [link (org.commonmark.node.Link. (.getDestination child) nil)]
+            (.insertBefore child link)
+            (.appendChild link child))
+          (link-images child))
+        (recur next-child))))
+  node)
+
+
 (defn node-worker
   [script]
   (delay
@@ -156,7 +171,7 @@
         document (.parse markdown-parser (or body ""))]
     {:metadata metadata
      :description (markdown-description document)
-     :html (.render markdown-renderer document)}))
+     :html (.render markdown-renderer (link-images document))}))
 
 
 (defn slurp-binary-directory

@@ -251,6 +251,11 @@ article > header .post-meta {
     margin: var(--spacing-300) 0;
 }
 
+.content a:has(> img) {
+    display: block;
+    width: fit-content;
+}
+
 code {
     font-family: var(--code-font-family), ui-monospace, "SFMono-Regular", Menlo, monospace;
     font-variant-emoji: text;
