@@ -55,7 +55,7 @@
                           "Led adoption of AI coding agents (Devin, Claude Code); zero-downtime migration from AWS Elastic Beanstalk to ECS (Docker), JVM 11 to 21 upgrade, and a 30% cut in GraphQL Codegen output."]}
                  {:heading ["Software Engineer, Backend Team Lead" "Optarc LLC"]
                   :period "Apr 2021 – May 2024"
-                  :items ["Owned an automated ordering system on AWS from requirements to operations: order quantities computed from 10M+ sales records covering the previous 30 days across 100 stores."
+                  :items ["Owned an automated ordering system on AWS from requirements to operations: order quantities computed from about 10M sales records covering the previous 30 days across 100 stores."
                           "Serverless microservices in Python on AWS Lambda with GraphQL APIs: Amazon Redshift for nightly batches, Aurora PostgreSQL for daytime OLTP, and Cedar policy-based authorization across 20+ endpoints."
                           "Led a backend team of up to 4 engineers with test-driven development (TDD), code review, and CI/CD; SQL tuning and metrics monitoring kept the system at 99.9% uptime."]}
                  {:heading ["Contract Frontend Engineer" "Forcode Inc."]
