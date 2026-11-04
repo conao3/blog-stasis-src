@@ -75,9 +75,26 @@ time {
     font-size: var(--body-size-s);
 }
 
-article > header time {
-    display: block;
+article > header .post-meta {
+    align-items: center;
+    display: flex;
+    gap: var(--spacing-200);
     margin-top: var(--spacing-200);
+}
+
+.share-x {
+    color: var(--gray-600);
+    display: inline-flex;
+}
+
+.share-x:hover {
+    color: var(--gray-900);
+}
+
+.share-x svg {
+    fill: currentColor;
+    height: 18px;
+    width: 18px;
 }
 
 .content h1,

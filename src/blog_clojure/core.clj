@@ -214,13 +214,26 @@
                        [:span "© conao3"]]]))
 
 
+(def x-logo
+  "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\"/></svg>")
+
+
+(defn x-share-url
+  [title url]
+  (let [encode #(str/replace (java.net.URLEncoder/encode % "UTF-8") "+" "%20")]
+    (str "https://x.com/intent/post?text=" (encode title) "&url=" (encode url))))
+
+
 (defn render-content
-  [{:keys [title body date]}]
+  [{:keys [title body date url]}]
   (hiccup/html
     [:article
      [:header
       [:h1 title]
-      [:time date]]
+      [:div {:class "post-meta"}
+       [:time date]
+       [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener" :title "X でシェア" :aria-label "X でシェア"}
+        (hiccup/raw x-logo)]]]
      [:div {:class "content"} (hiccup/raw body)]]))
 
 
@@ -229,12 +242,13 @@
   (let [contents (->> (stasis/slurp-directory "generated/contents" #"\.md$")
                       (map (fn [[k v]]
                              (let [p (parse-markdown v)
+                                   path (str (subs k 0 (- (count k) 3)) ".html")
                                    obj {:title (:title (:metadata p))
+                                        :url (page-url path)
                                         :date (:date (:metadata p))
                                         :description (:description p)
                                         :body (:html p)}]
-                               [(str (subs k 0 (- (count k) 3)) ".html")
-                                (assoc obj :body (render-content obj))])))
+                               [path (assoc obj :body (render-content obj))])))
                       (into {}))
         blog-inx (hiccup/html
                    [:section {:class "post-list"}
