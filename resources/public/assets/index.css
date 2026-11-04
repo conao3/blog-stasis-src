@@ -33,6 +33,36 @@ body > header nav a:hover {
     color: var(--gray-900);
 }
 
+.portfolio-lang {
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: 9999px;
+    display: flex;
+    font-size: var(--body-size-s);
+    margin: 0 0 var(--spacing-200) auto;
+    overflow: hidden;
+    width: fit-content;
+}
+
+.portfolio-lang > * {
+    padding: var(--spacing-75) var(--spacing-300);
+}
+
+.portfolio-lang a {
+    color: var(--gray-700);
+    text-decoration: none;
+}
+
+.portfolio-lang a:hover {
+    background-color: var(--gray-200);
+    color: var(--gray-900);
+}
+
+.portfolio-lang [aria-current] {
+    background-color: var(--gray-300);
+    color: var(--gray-900);
+    font-weight: bold;
+}
+
 .portfolio > header {
     align-items: center;
     display: flex;

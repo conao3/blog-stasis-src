@@ -25,12 +25,10 @@
     :role "Software Engineer (Backend / Full-Stack) · conao3"
     :description "Backend-focused software engineer with 6+ years building and operating production services in TypeScript, Python, and Clojure on PostgreSQL and AWS."
     :summary " Owns features end to end: API design through implementation and operation, data modeling, the React frontend, CI/CD, and on-call. Writes Rust and Emacs Lisp in open source and runs an AI-native workflow with coding agents."
-    :switch ["日本語" :ja]
     :links [["GitHub" "https://github.com/conao3"]
             ["LinkedIn" "https://www.linkedin.com/in/conao3/"]
             ["X" "https://x.com/conao_3"]
-            ["Tech Book Fest" tech-book-fest]
-            ["Email" "mailto:conao3@gmail.com"]]
+            ["Tech Book Fest" tech-book-fest]]
     :headings {:open-source "Open Source"
                :experience "Experience"
                :skills "Skills"
@@ -91,12 +89,10 @@
     :role "ソフトウェアエンジニア (バックエンド / フルスタック) · conao3"
     :description "バックエンドサービスとフルスタック Web アプリケーションの開発で 6 年以上の実務経験を持つソフトウェアエンジニア。"
     :summary "TypeScript (Node.js)、Python、Clojure、Rust を使い、AWS 上で REST / GraphQL API の設計から実装と運用、PostgreSQL のデータモデリング、React のフロントエンドまで、機能を一貫して担当できます。新しい技術スタックの習得が速く、Clojure に移って半年でチームの相談役になりました。OSS では Rust と Emacs Lisp を書いています。また、Claude Code、Codex、Devin を使った AI ネイティブな開発フローを実践しています。"
-    :switch ["English" :en]
     :links [["GitHub" "https://github.com/conao3"]
             ["LinkedIn" "https://www.linkedin.com/in/conao3/"]
             ["X" "https://x.com/conao_3"]
-            ["技術書典" tech-book-fest]
-            ["メール" "mailto:conao3@gmail.com"]]
+            ["技術書典" tech-book-fest]]
     :headings {:open-source "OSS 活動"
                :experience "職務経歴"
                :skills "テクニカルスキル"
@@ -155,13 +151,17 @@
 
 (defn body
   [lang]
-  (let [{:keys [title role description summary switch links headings open-source maintained
+  (let [{:keys [title role description summary links headings open-source maintained
                 experience skills books talks education]} (pages lang)
-        [switch-label switch-lang] switch
         [maintainer projects] maintained]
     (str
       (hiccup/html
         [:article {:class "portfolio"}
+         [:nav {:class "portfolio-lang"}
+          (for [[code label] [[:en "English"] [:ja "日本語"]]]
+            (if (= code lang)
+              [:span {:aria-current "page"} label]
+              [:a {:href (urls code) :hreflang (name code) :lang (name code)} label]))]
          [:header
           [:img {:class "portfolio-icon" :src "/assets/icon.jpg" :alt "" :width 96 :height 96}]
           [:div
@@ -169,8 +169,7 @@
            [:p {:class "portfolio-role"} role]
            [:ul {:class "portfolio-links"}
             (for [[label href] links]
-              [:li [:a {:href href} label]])
-            [:li [:a {:href (urls switch-lang) :hreflang (name switch-lang) :lang (name switch-lang)} switch-label]]]]]
+              [:li [:a {:href href} label]])]]]
          [:div {:class "content"}
           [:p description summary]
           [:h2 (:open-source headings)]
