@@ -83,18 +83,28 @@ article > header .post-meta {
 }
 
 .share-x {
-    color: var(--gray-600);
+    align-items: center;
+    background-color: var(--gray-200);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: 9999px;
+    color: var(--gray-900);
     display: inline-flex;
+    font-size: var(--body-size-xs);
+    font-weight: bold;
+    gap: var(--spacing-75);
+    line-height: 1;
+    padding: var(--spacing-75) var(--spacing-200);
+    text-decoration: none;
 }
 
 .share-x:hover {
-    color: var(--gray-900);
+    background-color: var(--gray-300);
 }
 
 .share-x svg {
     fill: currentColor;
-    height: 18px;
-    width: 18px;
+    height: 14px;
+    width: 14px;
 }
 
 .content h1,

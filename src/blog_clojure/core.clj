@@ -233,8 +233,9 @@
       (when post?
         [:div {:class "post-meta"}
          [:time date]
-         [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener" :title "X でシェア" :aria-label "X でシェア"}
-          (hiccup/raw x-logo)]])]
+         [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
+          (hiccup/raw x-logo)
+          "ポスト"]])]
      [:div {:class "content"} (hiccup/raw body)]]))
 
 
