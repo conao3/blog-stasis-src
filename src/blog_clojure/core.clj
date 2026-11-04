@@ -46,6 +46,29 @@
    "resources/public/assets/index.css"])
 
 
+(defn prune-custom-properties
+  [css]
+  (let [declaration #"(?m)^--([\w-]+):(.*);$"
+        definitions (into {} (map (fn [[_ k v]] [k v]) (re-seq declaration css)))
+        references #(map second (re-seq #"var\(--([\w-]+)" %))
+        used (loop [used #{}
+                    pending (references (str/replace css declaration ""))]
+               (if-let [[k & more] (seq pending)]
+                 (if (used k)
+                   (recur used more)
+                   (recur (conj used k) (concat more (references (get definitions k "")))))
+                 used))]
+    (str/replace css declaration #(if (used (nth % 1)) (first %) ""))))
+
+
+(defn inline-style
+  []
+  (->> (map slurp stylesheets)
+       (str/join "\n")
+       prune-custom-properties
+       (#(str/replace % #"\n{2,}" "\n"))))
+
+
 (def speculation-rules
   "{\"prerender\":[{\"where\":{\"href_matches\":\"/*\"},\"eagerness\":\"moderate\"}]}")
 
@@ -82,7 +105,7 @@
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
-                      [:style (hiccup/raw (str/join "\n" (map slurp stylesheets)))]
+                      [:style (hiccup/raw (inline-style))]
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
                         [:script {:src "/assets/math.js" :defer true}])]
