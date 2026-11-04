@@ -2,6 +2,7 @@
   (:require
     [clojure.data.json :as json]
     [clojure.java.io :as io]
+    [blog-clojure.portfolio :as portfolio]
     [clojure.string :as str]
     [hiccup.page :as hiccup.page]
     [hiccup2.core :as hiccup]
@@ -182,8 +183,8 @@
 
 
 (defn render-page
-  [path {:keys [title body description]}]
-  (hiccup.page/html5 {:lang "ja"}
+  [path {:keys [title body description lang og-type]}]
+  (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
@@ -192,7 +193,7 @@
                       (when description
                         [:meta {:name "description" :content description}])
                       [:meta {:property "og:title" :content title}]
-                      [:meta {:property "og:type" :content (if (= path "/index.html") "website" "article")}]
+                      [:meta {:property "og:type" :content (or og-type (if (= path "/index.html") "website" "article"))}]
                       [:meta {:property "og:url" :content (page-url path)}]
                       [:meta {:property "og:image" :content (str site-url (og-image-path path))}]
                       [:meta {:property "og:site_name" :content blog-name}]
@@ -207,7 +208,9 @@
                       [:header
                        [:a {:class "site-title" :href "/"}
                         [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
-                        blog-name]]
+                        blog-name]
+                       [:nav
+                        [:a {:href "/portfolio"} "Portfolio"]]]
                       [:main (hiccup/raw body)]
                       [:footer
                        [:a {:href "/"} blog-name]
@@ -261,8 +264,13 @@
                           (sort-by (comp :date second))
                           reverse
                           (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)]])))]])
-        contents (update-in contents ["/index.html" :body]
-                            #(str % blog-inx))]
+        contents (-> contents
+                     (update-in ["/index.html" :body] #(str % blog-inx))
+                     (assoc "/portfolio.html" {:title portfolio/title
+                                               :description portfolio/description
+                                               :lang "en"
+                                               :og-type "profile"
+                                               :body (portfolio/body)}))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path page)])) contents)
        :og-images (into {}
