@@ -1,5 +1,6 @@
 (ns blog-clojure.core
   (:require
+    [clojure.data.json :as json]
     [clojure.java.io :as io]
     [clojure.string :as str]
     [hiccup.page :as hiccup.page]
@@ -31,10 +32,41 @@
             (.put attributes "loading" "lazy")))))))
 
 
+(def highlighter
+  (delay
+    (let [process (-> (ProcessBuilder. ["node" "bin/highlight.mjs"])
+                      (.redirectError java.lang.ProcessBuilder$Redirect/INHERIT)
+                      .start)]
+      {:writer (io/writer (.getOutputStream process))
+       :reader (io/reader (.getInputStream process))})))
+
+
+(defn highlight
+  [lang code]
+  (let [{:keys [writer reader]} @highlighter]
+    (locking highlighter
+      (.write writer (str (json/write-str {:lang lang :code (str/replace code #"\n$" "")}) "\n"))
+      (.flush writer)
+      (:html (json/read-str (.readLine reader) :key-fn keyword)))))
+
+
+(def highlighted-code-blocks
+  (reify org.commonmark.renderer.html.HtmlNodeRendererFactory
+    (create [_ context]
+      (reify org.commonmark.renderer.NodeRenderer
+        (getNodeTypes [_] #{org.commonmark.node.FencedCodeBlock})
+        (render [_ node]
+          (let [writer (.getWriter context)]
+            (.line writer)
+            (.raw writer (highlight (first (str/split (or (.getInfo node) "") #"\s+")) (.getLiteral node)))
+            (.line writer)))))))
+
+
 (def markdown-renderer
   (-> (org.commonmark.renderer.html.HtmlRenderer/builder)
       (.extensions markdown-extensions)
       (.attributeProviderFactory lazy-image-attributes)
+      (.nodeRendererFactory highlighted-code-blocks)
       .build))
 
 

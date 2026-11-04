@@ -14,5 +14,8 @@
   "packageManager": "npm@11.20.0",
   "overrides": {
     "undici": "^8.12.3"
+  },
+  "dependencies": {
+    "shiki": "^4.6.0"
   }
 }

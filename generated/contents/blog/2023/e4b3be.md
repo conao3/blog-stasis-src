@@ -41,23 +41,25 @@ Remark/Rehypeの関係は掴み辛いですが、「[Introduction to unified](ht
 
 Astroでは書き下しませんが、READMEの例が分かりやすかったので引用します。
 
-    import {read} from 'to-vfile'
-    import {unified} from 'unified'
-    import remarkParse from 'remark-parse'
-    import remarkMath from 'remark-math'
-    import remarkRehype from 'remark-rehype'
-    import rehypeKatex from 'rehype-katex'
-    import rehypeStringify from 'rehype-stringify'
-    
-    const file = await unified()
-      .use(remarkParse)
-      .use(remarkMath)
-      .use(remarkRehype)
-      .use(rehypeKatex)
-      .use(rehypeStringify)
-      .process(await read('example.md'))
-    
-    console.log(String(file))
+```ts
+import {read} from 'to-vfile'
+import {unified} from 'unified'
+import remarkParse from 'remark-parse'
+import remarkMath from 'remark-math'
+import remarkRehype from 'remark-rehype'
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+
+const file = await unified()
+  .use(remarkParse)
+  .use(remarkMath)
+  .use(remarkRehype)
+  .use(rehypeKatex)
+  .use(rehypeStringify)
+  .process(await read('example.md'))
+
+console.log(String(file))
+```
 
 マークダウンの文字列をmdastに変換して、mdastでmathを変換して、hastに変換して、hastでkatexを変換して、htmlに変換しているのが分かります。
 
@@ -69,22 +71,24 @@ Astroでは書き下しませんが、READMEの例が分かりやすかったの
 
 Astroから使えるようにするには `astro.config.mjs` に以下のように設定します。
 
-     import { defineConfig } from 'astro/config';
-     import mdx from '@astrojs/mdx';
-     import sitemap from '@astrojs/sitemap';
-    +import remarkMath from 'remark-math';
-    +import rehypeKatex from 'rehype-katex';
-    
-     import react from "@astrojs/react";
-    
-     export default defineConfig({
-       site: 'https://a.conao3.com',
-       integrations: [mdx(), sitemap(), react()],
-    +  markdown: {
-    +    remarkPlugins: [remarkMath],
-    +    rehypePlugins: [rehypeKatex],
-    +  }
-     });
+```diff
+ import { defineConfig } from 'astro/config';
+ import mdx from '@astrojs/mdx';
+ import sitemap from '@astrojs/sitemap';
++import remarkMath from 'remark-math';
++import rehypeKatex from 'rehype-katex';
+
+ import react from "@astrojs/react";
+
+ export default defineConfig({
+   site: 'https://a.conao3.com',
+   integrations: [mdx(), sitemap(), react()],
++  markdown: {
++    remarkPlugins: [remarkMath],
++    rehypePlugins: [rehypeKatex],
++  }
+ });
+```
 
 
 ## CSSの追加
@@ -92,7 +96,9 @@ Astroから使えるようにするには `astro.config.mjs` に以下のよう�
 [KaTeXのページ](https://katex.org/docs/browser.html)からCSSのタグをコピーして良い感じのところに貼り付けます。
 私はいろいろ面倒だったので、 `src/component/BaseHeader.astro` に貼り付けて全ページで読み込まれるようにしました。
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+```
 
 
 # 動作確認
@@ -101,12 +107,14 @@ Astroから使えるようにするには `astro.config.mjs` に以下のよう�
 
 ブロックスタイルはこんな感じ。
 
-    $$
-    \frac{1}{\pi} = \frac{2\sqrt{2}}{99^2}
-                    \sum_{n=0}^\infty
-                    \frac{(4n)!}{(4^n n!)^4}
-                    \frac{1103 + 26390n}{99^{4n}}
-    $$
+```md
+$$
+\frac{1}{\pi} = \frac{2\sqrt{2}}{99^2}
+                \sum_{n=0}^\infty
+                \frac{(4n)!}{(4^n n!)^4}
+                \frac{1103 + 26390n}{99^{4n}}
+$$
+```
 
 <span class="math display" data-tex="ClxmcmFjezF9e1xwaX0gPSBcZnJhY3syXHNxcnR7Mn19ezk5XjJ9CiAgICAgICAgICAgICAgICBcc3VtX3tuPTB9XlxpbmZ0eQogICAgICAgICAgICAgICAgXGZyYWN7KDRuKSF9eyg0Xm4gbiEpXjR9CiAgICAgICAgICAgICAgICBcZnJhY3sxMTAzICsgMjYzOTBufXs5OV57NG59fQo="></span>
 

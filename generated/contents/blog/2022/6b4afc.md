@@ -29,38 +29,46 @@ TUIアプリケーション専用ではなく、仮想DOMを使ってWebフロ�
 
 適当なRustプロジェクトを作って遊んでみます。
 
-    mkdir rust-dioxus-tui-sample
-    cd rust-dioxus-tui-sample
-    cargo init --name dioxus-tui-sample
+```sh
+mkdir rust-dioxus-tui-sample
+cd rust-dioxus-tui-sample
+cargo init --name dioxus-tui-sample
+```
 
 cargoで取ってきます。
 
-    cargo add dioxus dioxus-tui
+```sh
+cargo add dioxus dioxus-tui
+```
 
 `src/main.rs` を以下で置き換えます。
 
-    use dioxus::prelude::*;
-    
-    fn main() {
-        dioxus_tui::launch(app);
-    }
-    
-    fn app(cx: Scope) -> Element {
-        cx.render(rsx! {
-            div {
-                width: "100%",
-                height: "10px",
-                background_color: "red",
-                justify_content: "center",
-                align_items: "center",
-                "Hello world!"
-            }
-        })
-    }
+```rust
+use dioxus::prelude::*;
+
+fn main() {
+    dioxus_tui::launch(app);
+}
+
+fn app(cx: Scope) -> Element {
+    cx.render(rsx! {
+        div {
+            width: "100%",
+            height: "10px",
+            background_color: "red",
+            justify_content: "center",
+            align_items: "center",
+            "Hello world!"
+        }
+    })
+}
+```
 
 cargoで起動します。
 
-    cargo run
+```sh
+cargo run
+```
 
 起動できたら成功です! :tada:
 ![img](/img/6b4afc-b58d9c16-6660-40dc-b655-03cba36e2cd9.png)
@@ -73,24 +81,26 @@ cargoで起動します。
 
 JSXのようなインターフェースを提供するマクロ。次のようなサンプルが動きます。
 
-    use dioxus::prelude::*;
-    
-    fn main() {
-        dioxus_tui::launch(app);
-    }
-    
-    fn app(cx: Scope) -> Element {
-        let val = 42;
-        let name = if val == 42 { "Jack" } else { "Bob" };
-    
-        cx.render(rsx! (
-            div {
-                "hello world"
-                "hello {val}"
-                "hello {name}"
-            }
-        ))
-    }
+```rust
+use dioxus::prelude::*;
+
+fn main() {
+    dioxus_tui::launch(app);
+}
+
+fn app(cx: Scope) -> Element {
+    let val = 42;
+    let name = if val == 42 { "Jack" } else { "Bob" };
+
+    cx.render(rsx! (
+        div {
+            "hello world"
+            "hello {val}"
+            "hello {name}"
+        }
+    ))
+}
+```
 
 なおJSXのように `{}` の中に任意の式を書くことはできないようです。一旦rsxマクロの外で計算しておくのがおすすめとのこと。
 
@@ -99,43 +109,49 @@ JSXのようなインターフェースを提供するマクロ。次のよう�
 
 一方でこういうのはできるようです。
 
-    let show_title = true;
-    rsx!(
-        div {
-            // Renders nothing by returning None when show_title is false
-            show_title.then(|| rsx!{
-                "This is the title"
-            })
-        }
-    )
+```rust
+let show_title = true;
+rsx!(
+    div {
+        // Renders nothing by returning None when show_title is false
+        show_title.then(|| rsx!{
+            "This is the title"
+        })
+    }
+)
+```
 
 
 ## rsx - Option.map()
 
 `Option` に対する `map` 風のAPIも使えます。
 
-    let user_name = Some("bob");
-    rsx!(
-        div {
-            // Renders nothing if user_name is None
-            user_name.map(|name| rsx!("Hello {name}"))
-        }
-    )
+```rust
+let user_name = Some("bob");
+rsx!(
+    div {
+        // Renders nothing if user_name is None
+        user_name.map(|name| rsx!("Hello {name}"))
+    }
+)
+```
 
 
 ## rsx - iter
 
 動的に `rsx!` を作ることもできます。
 
-    let names = ["jim", "bob", "jane", "doe", "a"];
-    
-    cx.render(rsx! (
-        ul {
-            names.iter().map(|name| rsx!{
-                li { "{name}" }
-            })
-        }
-    ))
+```rust
+let names = ["jim", "bob", "jane", "doe", "a"];
+
+cx.render(rsx! (
+    ul {
+        names.iter().map(|name| rsx!{
+            li { "{name}" }
+        })
+    }
+))
+```
 
 が、tuiのレンダラは上手く表示できないようです。(改行せずに上書き表示されてる？)
 ![img](/img/6b4afc-5df13c92-b44b-4268-b735-9be1fc8acff9.png)
@@ -145,32 +161,34 @@ JSXのようなインターフェースを提供するマクロ。次のよう�
 
 Componentの実装
 
-    #![allow(non_snake_case)]
-    
-    use dioxus::prelude::*;
-    
-    #[derive(Props)]
-    struct TitleCardProps<'a> {
-        title: &'a str,
-    }
-    
-    fn TitleCard<'a>(cx: Scope<'a, TitleCardProps<'a>>) -> Element {
-        cx.render(rsx!{
-            h1 { "{cx.props.title}" }
-        })
-    }
-    
-    fn main() {
-        dioxus_tui::launch(app);
-    }
-    
-    fn app(cx: Scope) -> Element {
-        cx.render(rsx! (
-            TitleCard {
-                title: "hello world"
-            }
-        ))
-    }
+```rust
+#![allow(non_snake_case)]
+
+use dioxus::prelude::*;
+
+#[derive(Props)]
+struct TitleCardProps<'a> {
+    title: &'a str,
+}
+
+fn TitleCard<'a>(cx: Scope<'a, TitleCardProps<'a>>) -> Element {
+    cx.render(rsx!{
+        h1 { "{cx.props.title}" }
+    })
+}
+
+fn main() {
+    dioxus_tui::launch(app);
+}
+
+fn app(cx: Scope) -> Element {
+    cx.render(rsx! (
+        TitleCard {
+            title: "hello world"
+        }
+    ))
+}
+```
 
 ![img](/img/6b4afc-fb43d7c3-2ef6-47a5-8219-ab07b80abc9e.png)
 
@@ -184,13 +202,15 @@ React風のhookが利用できます。
 
 `use_state` はReactと全く同じです。
 
-    let count = use_state(&cx, || 0);
-    
-    cx.render(rsx! (
-        div {
-            "count: {count}"
-        }
-    ))
+```rust
+let count = use_state(&cx, || 0);
+
+cx.render(rsx! (
+    div {
+        "count: {count}"
+    }
+))
+```
 
 本来ならボタンを追加して値の更新をするのですが。。dioxus-tuiにはまだボタンが実装されていなく確かめられませんでした。
 
@@ -199,48 +219,50 @@ React風のhookが利用できます。
 
 dioxusの拡張。async関数を取って、非同期で実行してくれます。
 
-    use dioxus::prelude::*;
-    
-    fn main() {
-        dioxus_tui::launch(app);
-    }
-    
-    fn app(cx: Scope) -> Element {
-        let count = use_state(&cx, || 0);
-    
-        use_future(&cx, (), move |_| {
-            let count = count.to_owned();
-            let update = cx.schedule_update();
-            async move {
-                loop {
-                    count.with_mut(|f| *f += 1);
-                    tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-                    update();
-                }
+```rust
+use dioxus::prelude::*;
+
+fn main() {
+    dioxus_tui::launch(app);
+}
+
+fn app(cx: Scope) -> Element {
+    let count = use_state(&cx, || 0);
+
+    use_future(&cx, (), move |_| {
+        let count = count.to_owned();
+        let update = cx.schedule_update();
+        async move {
+            loop {
+                count.with_mut(|f| *f += 1);
+                tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
+                update();
             }
-        });
-    
-        cx.render(rsx! {
-            div { width: "100%",
-                div {
-                    width: "50%",
-                    height: "5px",
-                    background_color: "blue",
-                    justify_content: "center",
-                    align_items: "center",
-                    "Hello {count}!"
-                }
-                div {
-                    width: "50%",
-                    height: "10px",
-                    background_color: "red",
-                    justify_content: "center",
-                    align_items: "center",
-                    "Hello {count}!"
-                }
+        }
+    });
+
+    cx.render(rsx! {
+        div { width: "100%",
+            div {
+                width: "50%",
+                height: "5px",
+                background_color: "blue",
+                justify_content: "center",
+                align_items: "center",
+                "Hello {count}!"
             }
-        })
-    }
+            div {
+                width: "50%",
+                height: "10px",
+                background_color: "red",
+                justify_content: "center",
+                align_items: "center",
+                "Hello {count}!"
+            }
+        }
+    })
+}
+```
 
 ![img](/img/6b4afc-acd498f4-5230-45d9-a4b5-2cbb086bcd58.png)
 
@@ -251,49 +273,51 @@ dioxusの拡張。async関数を取って、非同期で実行してくれます
 
 `on*` を使ってイベントを処理できる。。らしい。が、dioxus-tui(0.2.2)ではpanicしてしまった。
 
-    let log_event = move |event: Event| {
-        events.write().push(event);
-    };
-    
-    
-    cx.render(rsx! {
+```rust
+let log_event = move |event: Event| {
+    events.write().push(event);
+};
+
+
+cx.render(rsx! {
+    div {
+        width: "100%",
+        height: "100%",
+        flex_direction: "column",
         div {
-            width: "100%",
-            height: "100%",
-            flex_direction: "column",
-            div {
-                width: "80%",
-                height: "50%",
-                border_width: "1px",
-                justify_content: "center",
-                align_items: "center",
-                background_color: "hsl(248, 53%, 58%)",
-    
-                onmousemove: move |event| log_event(Event::MouseMove(event.data)),
-                onclick: move |event| log_event(Event::MouseClick(event.data)),
-                ondblclick: move |event| log_event(Event::MouseDoubleClick(event.data)),
-                onmousedown: move |event| log_event(Event::MouseDown(event.data)),
-                onmouseup: move |event| log_event(Event::MouseUp(event.data)),
-    
-                onwheel: move |event| log_event(Event::Wheel(event.data)),
-    
-                onkeydown: move |event| log_event(Event::KeyDown(event.data)),
-                onkeyup: move |event| log_event(Event::KeyUp(event.data)),
-                onkeypress: move |event| log_event(Event::KeyPress(event.data)),
-    
-                onfocusin: move |event| log_event(Event::FocusIn(event.data)),
-                onfocusout: move |event| log_event(Event::FocusOut(event.data)),
-    
-                "Hover, click, type or scroll to see the info down below"
-            },
-            div {
-                width: "80%",
-                height: "50%",
-                flex_direction: "column",
-                events_rendered,
-            },
+            width: "80%",
+            height: "50%",
+            border_width: "1px",
+            justify_content: "center",
+            align_items: "center",
+            background_color: "hsl(248, 53%, 58%)",
+
+            onmousemove: move |event| log_event(Event::MouseMove(event.data)),
+            onclick: move |event| log_event(Event::MouseClick(event.data)),
+            ondblclick: move |event| log_event(Event::MouseDoubleClick(event.data)),
+            onmousedown: move |event| log_event(Event::MouseDown(event.data)),
+            onmouseup: move |event| log_event(Event::MouseUp(event.data)),
+
+            onwheel: move |event| log_event(Event::Wheel(event.data)),
+
+            onkeydown: move |event| log_event(Event::KeyDown(event.data)),
+            onkeyup: move |event| log_event(Event::KeyUp(event.data)),
+            onkeypress: move |event| log_event(Event::KeyPress(event.data)),
+
+            onfocusin: move |event| log_event(Event::FocusIn(event.data)),
+            onfocusout: move |event| log_event(Event::FocusOut(event.data)),
+
+            "Hover, click, type or scroll to see the info down below"
         },
-    })
+        div {
+            width: "80%",
+            height: "50%",
+            flex_direction: "column",
+            events_rendered,
+        },
+    },
+})
+```
 
 ![img](/img/6b4afc-30ae77b3-bf8c-4dc8-abaf-410cbbf70074.png)
 

@@ -20,11 +20,15 @@ Date: 2025-12-02
 Emacsをインストールして起動してください。
 Nixをインストールしている方は以下のコマンドでEmacsがインストールされている環境に入ることができます。
 
-    nix shell nixpkgs#emacs
+```shell
+nix shell nixpkgs#emacs
+```
 
 その後、 `emacs` で起動できます。
 
-    emacs
+```shell
+emacs
+```
 
 ![img](/img/9ad97367-e768-4a84-8d87-b6c15c23801e.png)
 
@@ -59,28 +63,32 @@ h1は `*` 、h2では `**` というように重ねて深いレベルを表現�
 なおmarkdownと同じく、改行は無視され、空行を入れることで段落分けを表現します。
 そのため、headingの間は自由な量の空行を入れることができます。
 
-    * heading 1
-    ほんぶん1
-    ** heading 1.1
-    ほんぶん1.1
-    ** heading 1.2
-    ほんぶん1.2
-    
-    * heading 2
-    ** heading 2.1
-    ** heading 2.2
+```org
+* heading 1
+ほんぶん1
+** heading 1.1
+ほんぶん1.1
+** heading 1.2
+ほんぶん1.2
+
+* heading 2
+** heading 2.1
+** heading 2.2
+```
 
 
 ## 文字装飾
 
 (本当はそのまま表示したかったけどレンダリングを止められなかったのでコードブロックで。)
 
-    | markdown     | org-mode     | rendered   |
-    |--------------+--------------+------------|
-    | =`code`=     | ==code==     | =code=     |
-    | =*emphasis*= | =/emphasis/= | /emphasis/ |
-    | =**strong**= | =*strong*=   | *strong*   |
-    | =~~strike~~= | =+strike+=   | +strike+   |
+```org
+| markdown     | org-mode     | rendered   |
+|--------------+--------------+------------|
+| =`code`=     | ==code==     | =code=     |
+| =*emphasis*= | =/emphasis/= | /emphasis/ |
+| =**strong**= | =*strong*=   | *strong*   |
+| =~~strike~~= | =+strike+=   | +strike+   |
+```
 
 
 ## リスト
@@ -89,10 +97,12 @@ markdownと同じく `-` でリストを作ることができます。
 `-` のリスト上にポインタがあるとき、 `M-RET` で追加の `-` を挿入することができます。
 headingと同じく、リスト上にポインタを置いた上で `M-←` と `M-→` でリストの深さを変更することができます。
 
-    - apple
-    - banana
-    - orange
-      - orange2
+```org
+- apple
+- banana
+- orange
+  - orange2
+```
 
 -   apple
 -   banana
@@ -117,10 +127,12 @@ markdownでは `[link text](link)` と表現するところ、org-modeでは `[[
 テーブルヘッダはあってもなくても良く、作る場合は `-` で区切ります。
 ただし、この表記を全て自分で整えなくても良く、ある程度書いたら `C-c C-c` を押すことでorg-modeに整えてもらうことができます。
 
-    | 名前    | 説明         |
-    |---------+--------------|
-    | table   | テーブル     |
-    | caption | キャプション |
+```org
+| 名前    | 説明         |
+|---------+--------------|
+| table   | テーブル     |
+| caption | キャプション |
+```
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -155,18 +167,24 @@ markdownでは `[link text](link)` と表現するところ、org-modeでは `[[
 org-modeでのコードブロックは拡張性があるがゆえにに少し冗長に感じるかもしれません。
 markdownでは `` ``` 言語 `` と `` ``` `` で囲むことによって表現しますが、org-modeでは `#+begin_src 言語` と `#+end_src` で囲うことによって表現します。
 
-    #+begin_src python
-    print("hello")
-    #+end_src
+```org
+#+begin_src python
+print("hello")
+#+end_src
+```
 
-    print("hello")
+```python
+print("hello")
+```
 
 言語の指定がなく、単にコードブロックとして表現したい場合は `#+begin_example` と `#+end_example` で囲います。
 
-    #+begin_example
-    こーど
-    ブロック
-    #+end_example
+```org
+#+begin_example
+こーど
+ブロック
+#+end_example
+```
 
     こーど
     ブロック
@@ -184,9 +202,11 @@ markdownでは `foo[^foo]` と `[^foo]: fooに対しての脚注` と書きま�
 org文書に対してタイトルなどを指定することができます。
 基本的にはファイルの先頭に書くことが多いです。
 
-    #+title: 文書のタイトル
-    #+author: conao3
-    #+date: 2025-12-02
+```org
+#+title: 文書のタイトル
+#+author: conao3
+#+date: 2025-12-02
+```
 
 設定できる項目の一覧は[ドキュメント](https://orgmode.org/manual/Export-Settings.html )にあります。
 設定できてもエクスポートに利用する形式でサポートされていないと単に無視されることもあります。
@@ -196,89 +216,91 @@ org文書に対してタイトルなどを指定することができます。
 
 ここまで学んだ文法を元にorg-modeでレポートを書いてみましょう。
 
-    #+title: C言語入門01 - プログラミングの準備
-    #+author: conao3
-    #+date: 2025-12-02
-    
-    * 演習問題回答
-    ** 演習1-1
-    #+begin_example
-    以下のプログラムをコンパイル・実行すると、どのような表示がされるか確認してください。
-    
-    #include <stdio.h>
-    
-    int main() {
-        printf("2 * 8 = %d\n", 2 * 8);
-        printf("36 = %d * %d\n", 3, 12);
-        return 0;
-    }
-    #+end_example
-    
-    回答
-    
-    #+begin_example
-    2 * 8 = 16
-    36 = 3 * 12
-    #+end_example
-    
-    ** 演習1-2
-    #+begin_example
-    以下のプログラムをコンパイルするとコンパイルエラーが発生します。
-    コンパイルエラーが発生する理由を考えて、修正方法を考えてください。
-    
-    #include <stdio.h>
-    
-    int main() {
-        printf("The quick brown fox
-                jumps over
-                the lazy dog.");
-        return 0;
-    }
-    #+end_example
-    
-    文字列の終端なしに行の終わりになっているため、エラーが発生する。
-    修正方法としては =\= を行末に置き、行継続していることを表現することでエラーを修正できる。
-    
-    #+begin_src C
-        printf("The quick brown fox\
-                jumps over\
-                the lazy dog.");
-    #+end_src
-    
-    ** 演習1-3
-    
-    #+begin_example
-    以下のプログラムと同じ表示をするプログラムをprintf 関数を
-    1 回しか使わずに記述してください。
-    
-    ヒント: \n は文字列の途中に書くこともできます。
-    
-    #include <stdio.h>
-    
-    int main() {
-        printf("%d apples\n", 4);
-        printf("%d apples\n", 9);
-        printf("%d apples\n", 16);
-        return 0;
-    }
-    #+end_example
-    
-    回答
-    
-    #+begin_src C
-    #include <stdio.h>
-    
-    int main() {
-        printf("%d apples\n%d apples\n%d apples\n", 4, 9, 16);
-        return 0;
-    }
-    #+end_src
-    
-    #+begin_example
-    4 apples
-    9 apples
-    16 apples
-    #+end_example
+```org
+#+title: C言語入門01 - プログラミングの準備
+#+author: conao3
+#+date: 2025-12-02
+
+* 演習問題回答
+** 演習1-1
+#+begin_example
+以下のプログラムをコンパイル・実行すると、どのような表示がされるか確認してください。
+
+#include <stdio.h>
+
+int main() {
+    printf("2 * 8 = %d\n", 2 * 8);
+    printf("36 = %d * %d\n", 3, 12);
+    return 0;
+}
+#+end_example
+
+回答
+
+#+begin_example
+2 * 8 = 16
+36 = 3 * 12
+#+end_example
+
+** 演習1-2
+#+begin_example
+以下のプログラムをコンパイルするとコンパイルエラーが発生します。
+コンパイルエラーが発生する理由を考えて、修正方法を考えてください。
+
+#include <stdio.h>
+
+int main() {
+    printf("The quick brown fox
+            jumps over
+            the lazy dog.");
+    return 0;
+}
+#+end_example
+
+文字列の終端なしに行の終わりになっているため、エラーが発生する。
+修正方法としては =\= を行末に置き、行継続していることを表現することでエラーを修正できる。
+
+#+begin_src C
+    printf("The quick brown fox\
+            jumps over\
+            the lazy dog.");
+#+end_src
+
+** 演習1-3
+
+#+begin_example
+以下のプログラムと同じ表示をするプログラムをprintf 関数を
+1 回しか使わずに記述してください。
+
+ヒント: \n は文字列の途中に書くこともできます。
+
+#include <stdio.h>
+
+int main() {
+    printf("%d apples\n", 4);
+    printf("%d apples\n", 9);
+    printf("%d apples\n", 16);
+    return 0;
+}
+#+end_example
+
+回答
+
+#+begin_src C
+#include <stdio.h>
+
+int main() {
+    printf("%d apples\n%d apples\n%d apples\n", 4, 9, 16);
+    return 0;
+}
+#+end_src
+
+#+begin_example
+4 apples
+9 apples
+16 apples
+#+end_example
+```
 
 
 # エクスポートしてみよう
@@ -445,23 +467,27 @@ babelはいわゆる「文芸的プログラミング」をサポートする機
 
 例えば以下のように記述することでエクスポート時にC言語ソースのコンパイルから実行まで自動で行い、結果をその↓のコードブロックとして挿入するということが実現できます。
 
-    回答
-    
-    #+begin_src C :includes stdio.h :results output :exports results
-    printf("2 * 8 = %d\n", 2 * 8);
-    printf("36 = %d * %d\n", 3, 12);
-    #+end_src
+```org
+回答
+
+#+begin_src C :includes stdio.h :results output :exports results
+printf("2 * 8 = %d\n", 2 * 8);
+printf("36 = %d * %d\n", 3, 12);
+#+end_src
+```
 
 エクスポートもしくはこのコードブロックで `C-c C-c` を押すと実行され、結果がコードブロックとして埋め込まれた状態がこちらです。
 
-    #+begin_src C :includes stdio.h :results output :exports results
-    printf("2 * 8 = %d\n", 2 * 8);
-    printf("36 = %d * %d\n", 3, 12);
-    #+end_src
-    
-    #+RESULTS:
-    : 2 * 8 = 16
-    : 36 = 3 * 12
+```org
+#+begin_src C :includes stdio.h :results output :exports results
+printf("2 * 8 = %d\n", 2 * 8);
+printf("36 = %d * %d\n", 3, 12);
+#+end_src
+
+#+RESULTS:
+: 2 * 8 = 16
+: 36 = 3 * 12
+```
 
 `:exports results` の指定をしてあるため、エクスポートした文書には結果のみが出力されます。
 レポートの回答としては結果のみが求められていたのでこれで良いですね。

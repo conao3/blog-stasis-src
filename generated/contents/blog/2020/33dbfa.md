@@ -20,24 +20,26 @@ Emacs-jpのスレッドで次のような質問があった。
 
 このような細かい挙動はアドバイスで簡単に実現できる。
 
-    (leaf simple
-      :preface
-      (defun c/advice-next-line (fn &rest args)
-        (let ((maxline (count-lines (point-min) (point-max))))
-          (if (< maxline (line-number-at-pos (line-beginning-position 2)))
-              (message "restricted! (next-line)")
-            (apply fn args))))
-      (defun c/advice-forward-char (fn &rest args)
-        (let ((maxline (count-lines (point-min) (point-max))))
-          (if (< maxline (line-number-at-pos (+ (point) 1)))
-              (message "restricted! (forward-char)")
-            (apply fn args))))
-      :advice ((:around next-line c/advice-next-line)
-               (:around forward-char c/advice-forward-char)))
-    
-    (leaf simple
-      :advice-remove ((next-line c/advice-next-line)
-                      (forward-char c/advice-forward-char)))
+```emacs-lisp
+(leaf simple
+  :preface
+  (defun c/advice-next-line (fn &rest args)
+    (let ((maxline (count-lines (point-min) (point-max))))
+      (if (< maxline (line-number-at-pos (line-beginning-position 2)))
+          (message "restricted! (next-line)")
+        (apply fn args))))
+  (defun c/advice-forward-char (fn &rest args)
+    (let ((maxline (count-lines (point-min) (point-max))))
+      (if (< maxline (line-number-at-pos (+ (point) 1)))
+          (message "restricted! (forward-char)")
+        (apply fn args))))
+  :advice ((:around next-line c/advice-next-line)
+           (:around forward-char c/advice-forward-char)))
+
+(leaf simple
+  :advice-remove ((next-line c/advice-next-line)
+                  (forward-char c/advice-forward-char)))
+```
 
 ![img](/img/33dbfa-7034ca99-0be6-4383-a914-d550bf655f4a.gif)
 
@@ -46,25 +48,27 @@ Emacs-jpのスレッドで次のような質問があった。
 
 さらに、仕様を変えて、「最終行以上にポイントを動かそうとしたときに、自動で改行を入れる」ことも簡単に実現できる。
 
-    (leaf simple
-      :preface
-      (defun c/advice-next-line (fn &rest args)
-        (let ((maxline (count-lines (point-min) (point-max))))
-          (if (< maxline (line-number-at-pos (line-beginning-position 2)))
-              (progn (goto-char (line-beginning-position 2))
-                     (save-excursion (insert "\n")))
-            (apply fn args))))
-      (defun c/advice-forward-char (fn &rest args)
-        (let ((maxline (count-lines (point-min) (point-max))))
-          (if (< maxline (line-number-at-pos (+ (point) 1)))
-              (insert "\n")
-            (apply fn args))))
-      :advice ((:around next-line c/advice-next-line)
-               (:around forward-char c/advice-forward-char)))
-    
-    (leaf simple
-      :advice-remove ((next-line c/advice-next-line)
-                      (forward-char c/advice-forward-char)))
+```emacs-lisp
+(leaf simple
+  :preface
+  (defun c/advice-next-line (fn &rest args)
+    (let ((maxline (count-lines (point-min) (point-max))))
+      (if (< maxline (line-number-at-pos (line-beginning-position 2)))
+          (progn (goto-char (line-beginning-position 2))
+                 (save-excursion (insert "\n")))
+        (apply fn args))))
+  (defun c/advice-forward-char (fn &rest args)
+    (let ((maxline (count-lines (point-min) (point-max))))
+      (if (< maxline (line-number-at-pos (+ (point) 1)))
+          (insert "\n")
+        (apply fn args))))
+  :advice ((:around next-line c/advice-next-line)
+           (:around forward-char c/advice-forward-char)))
+
+(leaf simple
+  :advice-remove ((next-line c/advice-next-line)
+                  (forward-char c/advice-forward-char)))
+```
 
 ![img](/img/33dbfa-075453fb-5dae-4c3b-b8de-df69882f4d18.gif)
 
@@ -75,8 +79,10 @@ Emacs-jpのスレッドで次のような質問があった。
 
 ただ、今回の要求については「ファイル保存時に改行がない場合、末尾改行を付加する」というオプションがあり、私はこれを使っている。
 
-    (leaf files
-      :custom `((require-final-newline . t)))
+```emacs-lisp
+(leaf files
+  :custom `((require-final-newline . t)))
+```
 
 とはいえ、このようなオプションがないときElispのアドバイスはとても便利。
 

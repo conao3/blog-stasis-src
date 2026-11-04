@@ -30,13 +30,15 @@ Emacs-26.1とEmacs-26.2はELPAからのダウンロードに問題がありま�
 
 各OSでのインストール方法は他の記事に譲り、下のような出力が得られたら次に進みます。
 
-    $ emacs --version
-    GNU Emacs 26.3
-    Copyright (C) 2019 Free Software Foundation, Inc.
-    GNU Emacs comes with ABSOLUTELY NO WARRANTY.
-    You may redistribute copies of GNU Emacs
-    under the terms of the GNU General Public License.
-    For more information about these matters, see the file named COPYING.
+```shell
+$ emacs --version
+GNU Emacs 26.3
+Copyright (C) 2019 Free Software Foundation, Inc.
+GNU Emacs comes with ABSOLUTELY NO WARRANTY.
+You may redistribute copies of GNU Emacs
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING.
+```
 
 もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味が分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
 
@@ -50,70 +52,72 @@ Emacsの設定ファイルは `~/.emacs.d/init.el` です。既にディレク�
 
 なお、現在では `leaf` のimenuインテグレーションのおかげでファイル分割しないinit.el管理がトレンドです。
 
-    ;;; init.el --- My init.el  -*- lexical-binding: t; -*-
-    
-    ;; Copyright (C) 2020  Naoya Yamashita
-    
-    ;; Author: Naoya Yamashita <conao3@gmail.com>
-    
-    ;; This program is free software: you can redistribute it and/or modify
-    ;; it under the terms of the GNU General Public License as published by
-    ;; the Free Software Foundation, either version 3 of the License, or
-    ;; (at your option) any later version.
-    
-    ;; This program is distributed in the hope that it will be useful,
-    ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-    ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    ;; GNU General Public License for more details.
-    
-    ;; You should have received a copy of the GNU General Public License
-    ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
-    ;;; Commentary:
-    
-    ;; My init.el.
-    
-    ;;; Code:
-    
-    ;; this enables this running method
-    ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
-    (eval-and-compile
-      (when (or load-file-name byte-compile-current-file)
-        (setq user-emacs-directory
-              (expand-file-name
-               (file-name-directory (or load-file-name byte-compile-current-file))))))
-    
-    (eval-and-compile
-      (customize-set-variable
-       'package-archives '(("org"   . "https://orgmode.org/elpa/")
-                           ("melpa" . "https://melpa.org/packages/")
-                           ("gnu"   . "https://elpa.gnu.org/packages/")))
-      (package-initialize)
-      (unless (package-installed-p 'leaf)
-        (package-refresh-contents)
-        (package-install 'leaf))
-    
-      (leaf leaf-keywords
-        :ensure t
-        :init
-        ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
-        (leaf hydra :ensure t)
-        (leaf el-get :ensure t)
-        (leaf blackout :ensure t)
-    
-        :config
-        ;; initialize leaf-keywords.el
-        (leaf-keywords-init)))
-    
-    ;; ここにいっぱい設定を書く
-    
-    (provide 'init)
-    
-    ;; Local Variables:
-    ;; indent-tabs-mode: nil
-    ;; End:
-    
-    ;;; init.el ends here
+```emacs-lisp
+;;; init.el --- My init.el  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2020  Naoya Yamashita
+
+;; Author: Naoya Yamashita <conao3@gmail.com>
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My init.el.
+
+;;; Code:
+
+;; this enables this running method
+;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
+(eval-and-compile
+  (when (or load-file-name byte-compile-current-file)
+    (setq user-emacs-directory
+          (expand-file-name
+           (file-name-directory (or load-file-name byte-compile-current-file))))))
+
+(eval-and-compile
+  (customize-set-variable
+   'package-archives '(("org"   . "https://orgmode.org/elpa/")
+                       ("melpa" . "https://melpa.org/packages/")
+                       ("gnu"   . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  (unless (package-installed-p 'leaf)
+    (package-refresh-contents)
+    (package-install 'leaf))
+
+  (leaf leaf-keywords
+    :ensure t
+    :init
+    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+    (leaf hydra :ensure t)
+    (leaf el-get :ensure t)
+    (leaf blackout :ensure t)
+
+    :config
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
+
+;; ここにいっぱい設定を書く
+
+(provide 'init)
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+
+;;; init.el ends here
+```
 
 
 ## init.elのバイトコンパイル
@@ -124,37 +128,41 @@ init.elのバイトコンパイルは以下のように行ないます。バイ�
 
 コンパイラのワーニングが見づらいようでしたら、もう一度実行することをお勧めします。出力がなければ正常終了であり、ワーニングなしでバイトコンパイルできたことを示します。
 
-    $ cd .emacs.d
-    $ emacs --batch -f batch-byte-compile init.el
-    Importing package-keyring.gpg...
-    Importing package-keyring.gpg...done
-    Contacting host: orgmode.org:443
-    Contacting host: orgmode.org:443
-    Contacting host: melpa.org:443
-    Contacting host: elpa.gnu.org:443
-    Package refresh done
-    Setting ‘package-selected-packages’ temporarily since "emacs -q" would overwrite customizations
-    Setting ‘package-selected-packages’ temporarily since "emacs -q" would overwrite customizations
-    Contacting host: melpa.org:443
-    Generating autoloads for leaf.el...
-    Generating autoloads for leaf.el...done
-    Wrote /home/conao/.emacs.d/elpa/leaf-20200415.417/leaf-autoloads.el
-    ...
-    Wrote /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-autoloads.el
-    Checking /home/conao/.emacs.d/elpa/blackout-20200404.1550...
-    Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-autoloads.el...
-    Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-pkg.el...
-    Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout.el...
-    Done (Total of 1 file compiled, 2 skipped)
-    
-    $ emacs --batch -f batch-byte-compile init.el
+```shell
+$ cd .emacs.d
+$ emacs --batch -f batch-byte-compile init.el
+Importing package-keyring.gpg...
+Importing package-keyring.gpg...done
+Contacting host: orgmode.org:443
+Contacting host: orgmode.org:443
+Contacting host: melpa.org:443
+Contacting host: elpa.gnu.org:443
+Package refresh done
+Setting ‘package-selected-packages’ temporarily since "emacs -q" would overwrite customizations
+Setting ‘package-selected-packages’ temporarily since "emacs -q" would overwrite customizations
+Contacting host: melpa.org:443
+Generating autoloads for leaf.el...
+Generating autoloads for leaf.el...done
+Wrote /home/conao/.emacs.d/elpa/leaf-20200415.417/leaf-autoloads.el
+...
+Wrote /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-autoloads.el
+Checking /home/conao/.emacs.d/elpa/blackout-20200404.1550...
+Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-autoloads.el...
+Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout-pkg.el...
+Compiling /home/conao/.emacs.d/elpa/blackout-20200404.1550/blackout.el...
+Done (Total of 1 file compiled, 2 skipped)
+
+$ emacs --batch -f batch-byte-compile init.el
+```
 
 
 ## Emacsの起動
 
 コマンドラインからEmacsを起動します。
 
-    emacs
+```shell
+emacs
+```
 
 `M-x leaf-available-keywords` を実行して、 `leaf` の使えるキーワードを表示できるはずです。
 
@@ -174,97 +182,101 @@ leaf.elを使うにあたって、相性の良いパッケージがいくつか�
 
 先程の `;; ここにいっぱい設定を書く` の場所に以下の設定を書きます。
 
-    (leaf leaf
-      :config
-      (leaf leaf-convert :ensure t)
-      (leaf leaf-tree
-        :ensure t
-        :custom ((imenu-list-size . 30)
-                 (imenu-list-position . 'left))))
-    
-    (leaf macrostep
-      :ensure t
-      :bind (("C-c e" . macrostep-expand)))
+```emacs-lisp
+(leaf leaf
+  :config
+  (leaf leaf-convert :ensure t)
+  (leaf leaf-tree
+    :ensure t
+    :custom ((imenu-list-size . 30)
+             (imenu-list-position . 'left))))
+
+(leaf macrostep
+  :ensure t
+  :bind (("C-c e" . macrostep-expand)))
+```
 
 迷子防止のために今回だけinit.elの全文を貼ります。一緒のコードになりましたでしょうか？
 
-    ;;; init.el --- My init.el  -*- lexical-binding: t; -*-
-    
-    ;; Copyright (C) 2020  Naoya Yamashita
-    
-    ;; Author: Naoya Yamashita <conao3@gmail.com>
-    
-    ;; This program is free software: you can redistribute it and/or modify
-    ;; it under the terms of the GNU General Public License as published by
-    ;; the Free Software Foundation, either version 3 of the License, or
-    ;; (at your option) any later version.
-    
-    ;; This program is distributed in the hope that it will be useful,
-    ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-    ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    ;; GNU General Public License for more details.
-    
-    ;; You should have received a copy of the GNU General Public License
-    ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
-    ;;; Commentary:
-    
-    ;; My init.el.
-    
-    ;;; Code:
-    
-    ;; this enables this running method
-    ;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
-    (eval-and-compile
-      (when (or load-file-name byte-compile-current-file)
-        (setq user-emacs-directory
-              (expand-file-name
-               (file-name-directory (or load-file-name byte-compile-current-file))))))
-    
-    (eval-and-compile
-      (customize-set-variable
-       'package-archives '(("org"   . "https://orgmode.org/elpa/")
-                           ("melpa" . "https://melpa.org/packages/")
-                           ("gnu"   . "https://elpa.gnu.org/packages/")))
-      (package-initialize)
-      (unless (package-installed-p 'leaf)
-        (package-refresh-contents)
-        (package-install 'leaf))
-    
-      (leaf leaf-keywords
-        :ensure t
-        :init
-        ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
-        (leaf hydra :ensure t)
-        (leaf el-get :ensure t)
-        (leaf blackout :ensure t)
-    
-        :config
-        ;; initialize leaf-keywords.el
-        (leaf-keywords-init)))
-    
-    ;; ここにいっぱい設定を書く
-    
-    (leaf leaf
-      :config
-      (leaf leaf-convert :ensure t)
-      (leaf leaf-tree
-        :ensure t
-        :custom ((imenu-list-size . 30)
-                 (imenu-list-position . 'left))))
-    
-    (leaf macrostep
-      :ensure t
-      :bind (("C-c e" . macrostep-expand)))
-    
-    
-    (provide 'init)
-    
-    ;; Local Variables:
-    ;; indent-tabs-mode: nil
-    ;; End:
-    
-    ;;; init.el ends here
+```emacs-lisp
+;;; init.el --- My init.el  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2020  Naoya Yamashita
+
+;; Author: Naoya Yamashita <conao3@gmail.com>
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; My init.el.
+
+;;; Code:
+
+;; this enables this running method
+;;   emacs -q -l ~/.debug.emacs.d/{{pkg}}/init.el
+(eval-and-compile
+  (when (or load-file-name byte-compile-current-file)
+    (setq user-emacs-directory
+          (expand-file-name
+           (file-name-directory (or load-file-name byte-compile-current-file))))))
+
+(eval-and-compile
+  (customize-set-variable
+   'package-archives '(("org"   . "https://orgmode.org/elpa/")
+                       ("melpa" . "https://melpa.org/packages/")
+                       ("gnu"   . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+  (unless (package-installed-p 'leaf)
+    (package-refresh-contents)
+    (package-install 'leaf))
+
+  (leaf leaf-keywords
+    :ensure t
+    :init
+    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+    (leaf hydra :ensure t)
+    (leaf el-get :ensure t)
+    (leaf blackout :ensure t)
+
+    :config
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
+
+;; ここにいっぱい設定を書く
+
+(leaf leaf
+  :config
+  (leaf leaf-convert :ensure t)
+  (leaf leaf-tree
+    :ensure t
+    :custom ((imenu-list-size . 30)
+             (imenu-list-position . 'left))))
+
+(leaf macrostep
+  :ensure t
+  :bind (("C-c e" . macrostep-expand)))
+
+
+(provide 'init)
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+
+;;; init.el ends here
+```
 
 編集後にはバイトコンパイルを忘れないでください。バイトコンパイルが終わったらEmacsを再起動します。
 
@@ -331,25 +343,29 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 
 問題はcustomがinit.elに次のようなダンプを出力する点です。このダンプにより、leafの `:custom` で管理している場合、2箇所を修正する必要が生じます。
 
-    (custom-set-variables
-     ;; custom-set-variables was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(ag-highligh-search t t)
-     '(ag-reuse-buffers t t)
-     '(ag-reuse-window t t)
-     ;;...
-     )
+```emacs-lisp
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ag-highligh-search t t)
+ '(ag-reuse-buffers t t)
+ '(ag-reuse-window t t)
+ ;;...
+ )
+```
 
 この動作については `custom-file` という変数を変えれば出力先を変更でき、そのファイルを `load` しないことで単に無視することができます。
 
 そのため、次のような設定を書いておくことはleafの全ユーザーに勧められます。
 
-    (leaf cus-edit
-      :doc "tools for customizing Emacs and Lisp packages"
-      :tag "builtin" "faces" "help"
-      :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+```emacs-lisp
+(leaf cus-edit
+  :doc "tools for customizing Emacs and Lisp packages"
+  :tag "builtin" "faces" "help"
+  :custom `((custom-file . ,(locate-user-emacs-file "custom.el"))))
+```
 
 なお、動的な値をleafで設定するには上記のようにバッククオートとカンマを使うことによって実現します。
 
@@ -386,16 +402,18 @@ leafには与えられたS式をそのまま展開するキーワードがあり
 
 leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば [Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula) を参考にして、下記のuse-package設定例があるとします。
 
-    (use-package doom-themes
-      :custom
-      (doom-themes-enable-italic t)
-      (doom-themes-enable-bold t)
-      :custom-face
-      (doom-modeline-bar ((t (:background "#6272a4"))))
-      :config
-      (load-theme 'doom-dracula t)
-      (doom-themes-neotree-config)
-      (doom-themes-org-config))
+```emacs-lisp
+(use-package doom-themes
+  :custom
+  (doom-themes-enable-italic t)
+  (doom-themes-enable-bold t)
+  :custom-face
+  (doom-modeline-bar ((t (:background "#6272a4"))))
+  :config
+  (load-theme 'doom-dracula t)
+  (doom-themes-neotree-config)
+  (doom-themes-org-config))
+```
 
 この場合、コード貼り付け、範囲選択、 `M-x leaf-convert-region-replace` を実行することでleafに変換できます。 `use-package` を一度展開する必要があるので、 `use-package` をインストールする必要があることに注意する必要があります。
 

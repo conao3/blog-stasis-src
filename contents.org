@@ -8,7 +8,8 @@
     (link . stasis-md-link)
     (latex-fragment . stasis-md-latex)
     (latex-environment . stasis-md-latex)
-    (footnote-reference . stasis-md-footnote-reference)))
+    (footnote-reference . stasis-md-footnote-reference)
+    (src-block . stasis-md-src-block)))
 
 (defun stasis-md-template (contents info)
   (concat
@@ -31,6 +32,17 @@
      ((not tex) value)
      (environment (format "<div class=\"math display\" data-tex=\"%s\"></div>\n" data))
      (t (format "<span class=\"math%s\" data-tex=\"%s\"></span>" (if display " display" "") data)))))
+
+(defun stasis-md-src-block (src-block _contents info)
+  (let ((language (or (org-element-property :language src-block) ""))
+        (code (org-export-format-code-default src-block info))
+        (longest 2)
+        (start 0))
+    (while (string-match "`+" code start)
+      (setq longest (max longest (length (match-string 0 code)))
+            start (match-end 0)))
+    (let ((fence (make-string (1+ longest) ?`)))
+      (format "%s%s\n%s%s" fence language code fence))))
 
 (defun stasis-md-footnote-reference (reference contents info)
   (let* ((definition (org-export-get-footnote-definition reference info))
