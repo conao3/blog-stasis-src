@@ -16464,7 +16464,7 @@ In October 2026, Nicolas Seriot showed that curl 8.12 to 8.16 could run a two-co
 Git does the same with its own config and starts no hook or alias along the way.
 Claude Opus 5.5 found this construction, and the last section tells that story.
 
-The code is at [[https://github.com/conao3/bash-git-minsky][conao3/bash-git-minsky]].
+The code is at [[https://github.com/conao3/minsky-git][conao3/minsky-git]].
 =git-minsky= compiles a small program into a repository, and plain Git runs it.
 
 ** The big picture
