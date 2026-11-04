@@ -324,6 +324,7 @@
     (stasis/empty-directory! export-dir)
     (println "Exporting...")
     (stasis/export-pages (site {:drafts? false}) "target/" stasis-config)
+    (io/copy (io/file "resources/_redirects") (io/file export-dir "_redirects"))
     (println "Export complete:")
     (stasis/report-differences old-files (load-export-dir))))
 
