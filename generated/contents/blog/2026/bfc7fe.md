@@ -5,7 +5,7 @@ Draft: true
 
 [Leanで書く証明付きの日付と税計算](https://s.conao3.com/blog/2026/5499a8) で紹介した lean-ritsuryo について、英語の論文を書いて aiXiv に投稿しました。
 論文は [aiXiv:2611.00464](https://aixiv.online/abs/2611.00464) で読めます。
-論文のページには、タイトルと要旨のほか、AI の関与の申告、版ごとの投稿の時刻、LaTeX のソースの SHA-256 が載っています。
+論文のページには、タイトルと著者のほか、AI の関与の区分 (AI-derived) などが出ます。
 
 ![img](/img/bfc7fe-aixiv-abs.png)
 
