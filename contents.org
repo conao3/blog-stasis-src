@@ -15618,7 +15618,6 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 * Nixで始めるemacsclient
 :properties:
 :export_file_name: generated/contents/blog/2026/26583e
-:export_draft: t
 :export_date: 2026-01-24
 :end:
 
@@ -15698,7 +15697,7 @@ QEMU_OPTS="-m 8192 -smp 4" nix run
 ** 設定
 =services.emacs= を有効化することで、ユーザーログイン時に自動的にEmacsサーバーが起動するようになります。
 
-configation.nix
+configuration.nix
 #+begin_src nix
 {
   services.emacs = {
@@ -15710,7 +15709,7 @@ configation.nix
 
 この設定でOS起動時に同時にemacsclientを起動することができます。
 
-さらに =defaultEditor= を設定することで =EDITOR= をemacscilentを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができます。
+さらに =defaultEditor= を設定することで =EDITOR= をemacsclientを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができます。
 
 環境変数に設定されるだけのため、 =EDITOR= を =e= として起動できるようにしておくと =e something.txt= でファイルを開くことができるようになります。
 
