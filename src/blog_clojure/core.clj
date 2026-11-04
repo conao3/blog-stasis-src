@@ -7,6 +7,7 @@
     [hiccup.page :as hiccup.page]
     [hiccup2.core :as hiccup]
     [ring.adapter.jetty :as jetty]
+    [ring.middleware.content-type :as content-type]
     [stasis.core :as stasis]))
 
 
@@ -333,5 +334,5 @@
 (defn start-server
   [& _args]
   (jetty/run-jetty
-    (stasis/serve-pages site stasis-config)
+    (content-type/wrap-content-type (stasis/serve-pages site stasis-config))
     {:port 8080 :join? false}))
