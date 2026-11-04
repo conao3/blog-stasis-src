@@ -12016,6 +12016,158 @@ docker-compose up
 
 postgresもlocaleでソート順が変わるという[[https://www.postgresql.jp/document/14/html/locale.html][罠挙動がある]]ので、それを確かめたいときなどはDockerfileを書けると便利。
 
+* COMMENT オイラーの公式から三角関数の世界を再構築できるか
+:properties:
+:export_file_name: generated/contents/blog/2023/145870
+:export_date: 2023-04-01
+:end:
+
+** はじめに
+三角関数にまつわる公式は数多くあります。
+高校数学ではとりあえず加法定理だけ覚えておいて、他の公式を導くというのをやっていたかと思いますが、
+何もないところから与えるには少し複雑すぎです。
+
+もう少し分かりやすいものから出発して、なおかつ普段の世界を構築できると良いですね。
+ということでオイラーの公式を既知として、三角関数の世界を再構築してみます。
+
+** オイラーの公式の導出
+既知にするとはいえ、オイラーの公式を導出しておきます。
+いろいろな方法がありますが、今回は私の好きな微分方程式からの導出を紹介します。
+
+まずは以下の微分方程式を考えます。
+
+\[
+\frac{\mathrm{d}^2y}{\mathrm{d}x^2} + y = 0
+\]
+
+この微分方程式の基本解は
+
+\[
+y = \begin{cases}
+\sin x \\
+\cos x \\
+\end{cases}
+\]
+
+であるため、一般解はこの基本解の線形結合により与えられる。
+
+実際、ロンスキアンは0にならない。
+
+\[
+W = \begin{vmatrix}
+\sin x & \cos x \\
+\cos x & -\sin x \\
+\end{vmatrix}
+= \cos^2 x - \sin^2 x = 1
+\]
+
+一方で、\(e^{ix}\) もこの微分方程式の解である。
+
+基本解は \(\sin x\) と \(\cos x\) であるため、\(e^{ix}\) はこれらの関数の線形結合で表される。
+
+\[
+e^{ix} = C_1 \sin x + C_2 \cos x
+\]
+
+この式の微分により
+
+\[
+ie^{ix} = C_1 \cos x - C_2 \sin x
+\]
+
+を得る。それぞれ \(x=0\) を代入し、 \(C_1 = 0\) と \(C_2 = 1\) が分かるので、つまり
+
+\[
+e^{ix} = \cos x + i \sin x
+\]
+
+を得る。これはオイラーの公式である。
+
+** 加法定理
+高校数学では加法定理から全てを構築していたので、オイラーの公式から加法定理が導ければそれでこの記事の目的は達成とも言えます。
+
+オイラーの公式において \(x = \alpha \pm \beta\) を代入すると
+
+\[
+e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
+\]
+
+一方で指数法則より
+
+\[
+\begin{split} e^{i(\alpha \pm \beta)}
+&= e^{i\alpha} e^{\pm i\beta}\\
+&= (\cos \alpha + i \sin \alpha) (\cos \beta \pm i \sin \beta)\\
+&= (\cos \alpha \cos \beta \mp \sin \alpha \sin \beta) + i (\sin \alpha \cos \beta \pm \cos \alpha \sin \beta)\\
+\end{split}
+\]
+
+なので、実部と虚部を比較して、
+
+\[
+\begin{aligned}
+\cos(\alpha \pm \beta) &= \cos \alpha \cos \beta \mp \sin \alpha \sin \beta \\
+\sin(\alpha \pm \beta) &= \sin \alpha \cos \beta \pm \cos \alpha \sin \beta
+\end{aligned}
+\]
+
+これは三角関数の加法定理である。
+
+* COMMENT キ◯トーンが作りたい/その1: 要件
+:properties:
+:export_file_name: generated/contents/blog/2023/9709e5
+:export_date: 2023-04-02
+:end:
+
+** はじめに
+私はバックエンドが好きなのですが、やはりパソコンに不慣れな人に使ってもらうにはよさげなフロントエンドが必要です。
+また、CUIで頑張るよりもやはりブラウザの力を借りてばばっと視覚化した方がパッと見で取得できる情報量が多いことがあります。
+
+ただ、DBがあってそれに対するAPIが用意っされてると仮定しても、フロントエンドはそれぞれの好みに影響されるので、うーんこの要求はもしかしたらこの人だけなんだろうかとか面倒なことになります。
+
+ということでフロントの見た目をユーザーが触れるようにすると、勝手にスケールするので便利ですねということで登場するのがキ◯トーンです。
+
+話には聞いたことがある程度で触ったことはないのですが、Youtubeとかに上がっている動画を見つつ、似たようなものを作りたいですねということです。
+
+** 目標
+これです
+
+[[https://www.youtube.com/watch?v=BrebZZvp6a4]]
+
+なんと10年前です。10年前のアプリを現代の技術でさくっと作っちゃいませんかということですね (そんなに上手くいかない)
+
+** 要件
+要件もざざっと書き出します。
+
+- high: 複数の組込みウィジェットが用意される。
+- high: ウィジェットをドラッグアンドドロップで組み合わせて画面を作ることができる。
+- high: ウィジェットの設定を変更することができる。
+- high: 画面全体の保存ができる。
+- medium: ログイン機能がある。
+- medium: ユーザーグループ機能がある。
+- medium: データベースに情報を保存できる。
+- medium: データベースに保存した情報を一覧できる。
+- low: オンライン上で編集できる。
+- low: APIで情報を取得できる。
+- low: モバイル端末から利用できる。
+
+こんなものですかね。では次回から作っていきたいと思います。
+
+* COMMENT キ◯トーンが作りたい/その2: ドラッグアンドドロップでの並び換え
+:properties:
+:export_file_name: generated/contents/blog/2023/abe9ab
+:export_date: 2023-04-03
+:end:
+
+** はじめに
+初心者が思い付くことは得てして難しいものだと思います。
+この「ドラッグアンドドロップで四角を並び換えたいなー」というのもそうだと思います。どうやってやればいいのかさっぱり分からない。
+
+何事も初めて見たものが親ということで、私は[[https://github.com/adobe/react-spectrum][react-spectrum]]を親だと思っているのですが、これのドキュメントに[[https://react-spectrum.adobe.com/react-spectrum/dnd.html][ドラッグアンドドロップ]]があるのでそれをどうにか使えないかと思っているところです。
+
+** react-spectrumのドキュメント
+a
+
 * better shellscriptとしてのdeno
 :properties:
 :export_file_name: generated/contents/blog/2023/760239
