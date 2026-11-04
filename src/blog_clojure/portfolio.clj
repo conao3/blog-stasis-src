@@ -4,13 +4,13 @@
 
 
 (def paths
-  {:en "/portfolio.html"
-   :ja "/ja/portfolio.html"})
+  {:en "/portfolio/index.html"
+   :ja "/ja/portfolio/index.html"})
 
 
 (def urls
-  {:en "/portfolio"
-   :ja "/ja/portfolio"})
+  {:en "/portfolio/"
+   :ja "/ja/portfolio/"})
 
 
 (def tech-book-fest "https://techbookfest.org/organization/b48gui73eygdZDs02kqB1C")
