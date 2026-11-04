@@ -15616,6 +15616,7 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 * Nixで始めるemacsclient
 :properties:
 :export_file_name: generated/contents/blog/2026/26583e
+:export_draft: t
 :export_date: 2026-01-24
 :end:
 
@@ -15873,6 +15874,7 @@ emacsclientに興味がありながらも上手く設定できずに悩んでい
 * Emacs posframe入門
 :properties:
 :export_file_name: generated/contents/blog/2025/ba3a31
+:export_draft: t
 :export_date: 2025-12-17
 :end:
 
@@ -15972,6 +15974,7 @@ posframe自体の装飾は常識的な範囲に滞まっているので、
 * bunsai — Docker不要、単一バイナリのAWSエミュレータをBunで書いた
 :properties:
 :export_file_name: generated/contents/blog/2026/2653f0
+:export_draft: t
 :export_date: 2026-06-14
 :end:
 
