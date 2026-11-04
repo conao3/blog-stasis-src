@@ -41,7 +41,7 @@ Emacs-jpのスレッドで次のような質問があった。
                   (forward-char c/advice-forward-char)))
 ```
 
-![img](/img/33dbfa-7034ca99-0be6-4383-a914-d550bf655f4a.gif)
+![img](../../../../resources/public/img/33dbfa-7034ca99-0be6-4383-a914-d550bf655f4a.gif)
 
 
 # 末尾にポイントを移動しようとしたら改行する
@@ -70,7 +70,7 @@ Emacs-jpのスレッドで次のような質問があった。
                   (forward-char c/advice-forward-char)))
 ```
 
-![img](/img/33dbfa-075453fb-5dae-4c3b-b8de-df69882f4d18.gif)
+![img](../../../../resources/public/img/33dbfa-075453fb-5dae-4c3b-b8de-df69882f4d18.gif)
 
 これらのアドバイスで「ファイル末尾に必ず改行がある」ことを強制できる。
 

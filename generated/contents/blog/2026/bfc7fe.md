@@ -7,7 +7,7 @@ Draft: true
 論文は [aiXiv:2611.00464](https://aixiv.online/abs/2611.00464) で読めます。
 論文のページには、タイトルと著者のほか、AI の関与の区分 (AI-derived) などが出ます。
 
-![img](/img/bfc7fe-aixiv-abs.png)
+![img](../../../../resources/public/img/bfc7fe-aixiv-abs.png)
 
 
 # 招待のメール

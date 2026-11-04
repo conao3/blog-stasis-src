@@ -71,7 +71,7 @@ cargo run
 ```
 
 起動できたら成功です! :tada:
-![img](/img/6b4afc-b58d9c16-6660-40dc-b655-03cba36e2cd9.png)
+![img](../../../../resources/public/img/6b4afc-b58d9c16-6660-40dc-b655-03cba36e2cd9.png)
 
 
 # rsx!マクロ
@@ -154,7 +154,7 @@ cx.render(rsx! (
 ```
 
 が、tuiのレンダラは上手く表示できないようです。(改行せずに上書き表示されてる？)
-![img](/img/6b4afc-5df13c92-b44b-4268-b735-9be1fc8acff9.png)
+![img](../../../../resources/public/img/6b4afc-5df13c92-b44b-4268-b735-9be1fc8acff9.png)
 
 
 ## rsx - Components
@@ -190,7 +190,7 @@ fn app(cx: Scope) -> Element {
 }
 ```
 
-![img](/img/6b4afc-fb43d7c3-2ef6-47a5-8219-ab07b80abc9e.png)
+![img](../../../../resources/public/img/6b4afc-fb43d7c3-2ef6-47a5-8219-ab07b80abc9e.png)
 
 
 # hooks
@@ -264,7 +264,7 @@ fn app(cx: Scope) -> Element {
 }
 ```
 
-![img](/img/6b4afc-acd498f4-5230-45d9-a4b5-2cbb086bcd58.png)
+![img](../../../../resources/public/img/6b4afc-acd498f4-5230-45d9-a4b5-2cbb086bcd58.png)
 
 良く見るとこのサンプル、背景赤の場所に表示されるべき文字が左に出てますね。。
 
@@ -319,7 +319,7 @@ cx.render(rsx! {
 })
 ```
 
-![img](/img/6b4afc-30ae77b3-bf8c-4dc8-abaf-410cbbf70074.png)
+![img](../../../../resources/public/img/6b4afc-30ae77b3-bf8c-4dc8-abaf-410cbbf70074.png)
 
 <https://github.com/DioxusLabs/dioxus/blob/fc2aaa7df5/packages/tui/examples/tui_all_events.rs>
 

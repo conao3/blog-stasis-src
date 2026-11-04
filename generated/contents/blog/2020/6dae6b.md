@@ -35,7 +35,7 @@ org-modeはとても大きく、私も全容を把握できていません。
 しかしつまみ食いをするだけでもとても大きなメリットがある機能があります。
 それがorgのエクスポート機能とコード実行機能<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>Eric Schulte, Dan Davison, Thomas Dye, et.al., "A Multi-Language Computing Environment for Literate Programming and Reproducible Research" <https://www.jstatsoft.org/article/view/v046i03></span></span>です。
 
-![img](/img/6dae6b-92e07c45-cc71-48c6-b009-1e7e1b7a524d.png)
+![img](../../../../resources/public/img/6dae6b-92e07c45-cc71-48c6-b009-1e7e1b7a524d.png)
 
 このようにorgドキュメントを中心として、HTMLやLaTeX、Wordドキュメント生成や、実行可能なソースコードを生成する。ドキュメントの中で任意の言語のコード実行を伴なうこともできます。
 
@@ -312,11 +312,11 @@ orgにおいて、画像を表示するにはdescriptionなしのリンクで表
 
 このように表示されます。
 
-![img](/img/6dae6b-ox-zenn.el.png)
+![img](../../../../resources/public/img/6dae6b-ox-zenn.el.png)
 
-![img](/img/6dae6b-ox-zenn.el.png)
+![img](../../../../resources/public/img/6dae6b-ox-zenn.el.png)
 
-![img](/img/6dae6b-ox-zenn.el.png)
+![img](../../../../resources/public/img/6dae6b-ox-zenn.el.png)
 
 注意点は画像っぽいリンク、正確に言えば `org-html-inline-image-rules` にマッチするリンクでないとインライン表示されず、単なるリンクになってしまいます。
 

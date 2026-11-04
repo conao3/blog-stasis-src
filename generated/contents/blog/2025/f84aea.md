@@ -30,11 +30,11 @@ nix shell nixpkgs#emacs
 emacs
 ```
 
-![img](/img/9ad97367-e768-4a84-8d87-b6c15c23801e.png)
+![img](../../../../resources/public/img/9ad97367-e768-4a84-8d87-b6c15c23801e.png)
 
 `C-x C-f (find-file)` を実行してファイルを開きます。存在しないパスを指定すると空のファイルとして開くことができます。
 
-![img](/img/c7e82a66-58d6-4e62-8145-705ad1fdeece.png)
+![img](../../../../resources/public/img/c7e82a66-58d6-4e62-8145-705ad1fdeece.png)
 
 ここでもしフォルダが存在していない場合は以下のようなメッセージが表示されます。
 
@@ -42,9 +42,9 @@ emacs
 
 この通りに実行してフォルダを作ることもできますし、保存時にフォルダを作るか尋ねられるので、そこでyと答えてもOKです。
 
-![img](/img/13c9c8c4-b7d3-4fdd-941f-1666826bcc11.png)
+![img](../../../../resources/public/img/13c9c8c4-b7d3-4fdd-941f-1666826bcc11.png)
 
-![img](/img/0fff68f2-5564-4403-8c5c-74e16fc015fe.png)
+![img](../../../../resources/public/img/0fff68f2-5564-4403-8c5c-74e16fc015fe.png)
 
 
 # org-modeの文法
@@ -318,7 +318,7 @@ int main() {
 今回は簡単にテキストフォーマットのエクスポートを試してみましょう。
 org-modeの文書を開いた状態で、 `C-c C-t (org-export-dispatch)` を実行します。
 
-![img](/img/07531bdc-3d0d-4137-8f18-c297e5d5f2d7.png)
+![img](../../../../resources/public/img/07531bdc-3d0d-4137-8f18-c297e5d5f2d7.png)
 
 そうすると現在エクスポート可能な一覧が表示されるので、今回は `t A` と入力してasciiでのテキストフォーマットにエクスポートしてみましょう。その結果がこちらです。
 
@@ -448,7 +448,7 @@ UTF-8でエクスポートした結果がこちらです。
 
 最後にHTMLでのエクスポートを試してみましょう。 `C-c C-e` の後、 `h o` でHTMLファイルで書き出してブラウザで開くところまでを実行してくれます。
 
-![img](/img/2e5a3654-004d-488b-adb9-01aba1bc9449.png)
+![img](../../../../resources/public/img/2e5a3654-004d-488b-adb9-01aba1bc9449.png)
 
 このようなスタイルのWebページを見たことはないでしょうか。もしかしたらそのページはorg-modeから書き出されたページかもしれません。
 
@@ -461,7 +461,7 @@ UTF-8でエクスポートした結果がこちらです。
 この日本語レポートが書けるようになった読者に次の一歩としておすすめなorgの機能は `babel` です。
 babelはいわゆる「文芸的プログラミング」をサポートする機能で、「[A Multi-Language Computing Environment for Literate Programming and Reproducible Research](https://www.jstatsoft.org/article/view/v046i03)」で紹介 (というかorg-modeで論文あるのすごくないか) されているところの「Code Evaluation」にあたる機能です。
 
-![img](/img/ba9bb4da-34e1-4303-8181-be1f085fdffc.png)
+![img](../../../../resources/public/img/ba9bb4da-34e1-4303-8181-be1f085fdffc.png)
 
 この機能を使うことで文書内に任意のプログラミング言語のブロックを挿入し、エクスポート時に実行することで実際のエクスポートの内容を決定するということができるようになります。
 

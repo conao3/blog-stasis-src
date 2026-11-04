@@ -50,7 +50,7 @@ MELPAの公式がツイートしてた。
 
 この投稿を受けて、MELPAにHomepageリンクの追加が提案されました。
 
-![img](/img/cbf3fd-0afef58e-178d-4706-9fea-89841b6d8958.png)
+![img](../../../../resources/public/img/cbf3fd-0afef58e-178d-4706-9fea-89841b6d8958.png)
 
 このようにHomepageというボタンが追加されました。
 

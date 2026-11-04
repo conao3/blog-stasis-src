@@ -26,7 +26,7 @@ Remark/Rehypeの関係は掴み辛いですが、「[Introduction to unified](ht
 -   `unist` から `unist` に変換する `transform` を挟むことができ、ここにプラグインを刺す
 -   `unist` 同士の変換を `remark-rehype` や `rehype-remark` で行う
 
-![img](/img/e4b3be-5cb9fde7-5834-4f66-b254-c1a6a2f78fac.png)
+![img](../../../../resources/public/img/e4b3be-5cb9fde7-5834-4f66-b254-c1a6a2f78fac.png)
 
 この一連の流れが `unified` エコシステムで整理されています。
 うーん。きれいですね。すばらしい。

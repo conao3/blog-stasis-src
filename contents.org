@@ -65,7 +65,8 @@
     (cond
      ((string= type "file")
       (let* ((path (org-element-property :path link))
-             (new-path (replace-regexp-in-string "^\\./resources/public" "" path))
+             (new-path (file-relative-name (expand-file-name path)
+                                           (file-name-directory (expand-file-name (plist-get info :output-file)))))
              (new-link (org-element-copy link)))
         (org-element-put-property new-link :path new-path)
         (org-md-link new-link desc info)))

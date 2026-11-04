@@ -40,6 +40,9 @@
   (loop [child (.getFirstChild node)]
     (when child
       (let [next-child (.getNext child)]
+        (when (or (instance? org.commonmark.node.Image child)
+                  (instance? org.commonmark.node.Link child))
+          (.setDestination child (str/replace (.getDestination child) #"^(\.\./)+resources/public/" "/")))
         (if (and (instance? org.commonmark.node.Image child)
                  (not (instance? org.commonmark.node.Link node)))
           (let [link (org.commonmark.node.Link. (.getDestination child) nil)]

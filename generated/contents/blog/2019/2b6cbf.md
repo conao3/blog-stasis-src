@@ -7,7 +7,7 @@ Date: 2019-06-15
 私の関わっているパッケージは多数ありますが、一番力を入れている `leaf.el` がやっとMELPAに仲間入りすることができたので、ダイレクトマーケティング記事を書く次第です。
 
 GitHubへのリンクはこちら
-[![img](/img/2b6cbf-leaf.el.png)](https://github.com/conao3/leaf.el)
+[![img](../../../../resources/public/img/2b6cbf-leaf.el.png)](https://github.com/conao3/leaf.el)
 
 
 # 背景
@@ -1666,7 +1666,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 
 また6月からGitHubには「毎日コミット」を行なっており、毎日空いた時間を見つけながら精力的に活動を行なっています。
 
-![img](/img/2b6cbf-Capture-2019-06-15-22.40.06.png)
+![img](../../../../resources/public/img/2b6cbf-Capture-2019-06-15-22.40.06.png)
 
 これらのパッケージにこれからも関われるように、そして更なる新しいパッケージを作るために、ぜひ[Patreonでサポート](https://www.patreon.com/conao3)をお願いします。
 

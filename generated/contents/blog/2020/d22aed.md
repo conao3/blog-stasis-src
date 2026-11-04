@@ -166,7 +166,7 @@ emacs
 
 `M-x leaf-available-keywords` を実行して、 `leaf` の使えるキーワードを表示できるはずです。
 
-![img](/img/d22aed-378842b3-64d0-4200-9d8f-3953f002bce6.gif)
+![img](../../../../resources/public/img/d22aed-378842b3-64d0-4200-9d8f-3953f002bce6.gif)
 
 
 # 便利パッケージのインストール
@@ -291,13 +291,13 @@ leaf-convertはプレーンなElispやuse-packageからleafへの変換機能を
     
     leafの第1引数は `prog1` の第1引数に渡すことで指定できます。gifではひとつのS式しか選択していませんが、複数S式を同時に選択して変換することも可能です。
     
-    ![img](/img/d22aed-1910e495-fca3-42b1-8240-d9af77bef202.gif)
+    ![img](../../../../resources/public/img/d22aed-1910e495-fca3-42b1-8240-d9af77bef202.gif)
 
 -   `M-x leaf-convert-insert-template`
     
     `package.el` が持っている情報からよさげなleafブロックを生成し、挿入します。ただ、自動生成された `:after` キーワードと引数については削除した方が事故が少ないかもしれません。
     
-    ![img](/img/d22aed-c27d723a-3ad9-434c-8419-c403e00e14fb.gif)
+    ![img](../../../../resources/public/img/d22aed-c27d723a-3ad9-434c-8419-c403e00e14fb.gif)
 
 
 ## leaf-tree
@@ -306,7 +306,7 @@ leaf.elで書かれたinit.elを開き、 `M-x leaf-tree-mode` を実行する�
 
 サイドバーのアイテムをクリックすると、そのleafブロックにジャンプします。
 
-![img](/img/d22aed-10c8a24e-cd57-4909-bf09-8ff388b4d14d.gif)
+![img](../../../../resources/public/img/d22aed-10c8a24e-cd57-4909-bf09-8ff388b4d14d.gif)
 
 
 ## macrostep
@@ -319,7 +319,7 @@ leafに限らず、マクロを1ステップごとに展開することができ
 
 leafは単なるマクロであり、雑多で典型的なS式を自動生成するためのパッケージにすぎないからです。
 
-![img](/img/d22aed-a7661d45-1eac-4b24-8967-bb0738986037.gif)
+![img](../../../../resources/public/img/d22aed-a7661d45-1eac-4b24-8967-bb0738986037.gif)
 
 
 # 実践的なあれこれ
@@ -378,7 +378,7 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 
 しかし、 **GitLabにある場合** 、きちんとリストにしてgitのurlを指定する必要があります。これはleafの使い方ではなく、どちらかというとel-getの使い方です。
 
-![img](/img/d22aed-f5d42290-fd35-4675-bc6e-c8fad8c39097.gif)
+![img](../../../../resources/public/img/d22aed-f5d42290-fd35-4675-bc6e-c8fad8c39097.gif)
 
 
 ## とりあえず:config
@@ -395,7 +395,7 @@ leafには与えられたS式をそのまま展開するキーワードがあり
 
 `:custom` で `nil` を設定する設定の変換結果は、ただのリストになってしまい、手で直す必要がありました。これは難しい問題ですが、将来的に解決したい問題ではあります。
 
-![img](/img/d22aed-85bae766-658d-42b8-a463-bf6cbd804e5f.gif)
+![img](../../../../resources/public/img/d22aed-85bae766-658d-42b8-a463-bf6cbd804e5f.gif)
 
 
 ## leaf-convertについて
@@ -421,7 +421,7 @@ leaf-convertを手に入れたおかげで、use-packageの設定例があれば
 
 ただ、 `:custom-face` の変換結果の `quote` は見た目を気にすると、手で直す必要があります。これも難しい問題ですが、将来的に解決したいです。
 
-![img](/img/d22aed-64ee7df6-6191-46e2-aa4a-dc005e1f48c7.gif)
+![img](../../../../resources/public/img/d22aed-64ee7df6-6191-46e2-aa4a-dc005e1f48c7.gif)
 
 
 # まとめ
@@ -449,7 +449,7 @@ leaf-convertを手に入れたおかげで、use-packageの設定例があれば
 
 参考として私のinit.elを読み込んだ場合、223パッケージ(elpaディレクトリには `archive` と `gnupg` ディレクトリがあるのを忘れていた)インストールされたEmacsを4.2秒で起動できています。 HDDの環境なので、測定には悪条件ですが5秒未満なら十分に耐えられます。
 
-![img](/img/d22aed-bbac83c9-1266-48e2-8e2b-73b81e7accc6.png)
+![img](../../../../resources/public/img/d22aed-bbac83c9-1266-48e2-8e2b-73b81e7accc6.png)
 
 これはleafが `prog1` に展開されて、use-packageのように `require` を標準では展開しないからだと思われます。
 
@@ -461,7 +461,7 @@ use-packageが作られた当時はきちんとautoloadをパッケージ開発�
 
 私はleaf.elやleaf-keywords、leaf-tree、leaf-convertといったleaf関連のEmacsパッケージ、他にもseml-modeやpppといったEmacsパッケージを書いています。作成した全てのパッケージと管理を手伝っているパッケージとリンクについては[Emacswikiのページ](https://www.emacswiki.org/emacs/Conao3)、アクティビティに関しては[GitHubのユーザーページ](https://github.com/conao3)を参照して頂ければと思います。
 
-![img](/img/d22aed-Screenshot_2020-04-16_05-42-42.png)
+![img](../../../../resources/public/img/d22aed-Screenshot_2020-04-16_05-42-42.png)
 
 支援を頂くことで、これまでよりも気軽にオライリーの本をポチることができ、バイトの時間を減らしコーディングの時間を増やすことができます。
 
