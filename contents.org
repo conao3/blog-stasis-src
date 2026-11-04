@@ -16591,6 +16591,12 @@ From that moment Git can no longer read =.git/config=, the next nested =git fetc
 H halt
 #+end_src
 
+=git-minsky= compiles it into the =.git/config= below.
+The gray labels show which instruction each refspec implements.
+=git fetch loop= enters at =[remotes]=, fetches =self=, and starts itself again until the halt refspec creates =.git/refs/H/=.
+
+[[./resources/public/img/1e0718-git-config.svg]]
+
 Here is the run with =a = 3=.
 The two environment variables keep my own Git configuration out of the experiment.
 
