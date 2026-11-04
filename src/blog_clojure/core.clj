@@ -225,15 +225,16 @@
 
 
 (defn render-content
-  [{:keys [title body date url]}]
+  [{:keys [title body date url post?]}]
   (hiccup/html
     [:article
      [:header
       [:h1 title]
-      [:div {:class "post-meta"}
-       [:time date]
-       [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener" :title "X でシェア" :aria-label "X でシェア"}
-        (hiccup/raw x-logo)]]]
+      (when post?
+        [:div {:class "post-meta"}
+         [:time date]
+         [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener" :title "X でシェア" :aria-label "X でシェア"}
+          (hiccup/raw x-logo)]])]
      [:div {:class "content"} (hiccup/raw body)]]))
 
 
@@ -245,6 +246,7 @@
                                    path (str (subs k 0 (- (count k) 3)) ".html")
                                    obj {:title (:title (:metadata p))
                                         :url (page-url path)
+                                        :post? (not= path "/index.html")
                                         :date (:date (:metadata p))
                                         :description (:description p)
                                         :body (:html p)}]
