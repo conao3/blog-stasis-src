@@ -70,9 +70,9 @@ make build
 
 ## Deployment
 
-The Cloudflare Pages project `blog-stasis-src` is connected to this repository. Pushing to `master` makes Cloudflare build the site and publish it at https://s.conao3.com/.
+The site is the Cloudflare Worker `blog-stasis-src`, which serves `target/` as static assets on the custom domain s.conao3.com (`wrangler.toml`). Workers Builds is connected to this repository: pushing to `master` runs `./bin/build` and then `npx wrangler deploy`.
 
-The build reads the Markdown files committed under `generated/contents/`, so a post goes live only after its exported Markdown is committed.
+The build reads the Markdown files committed under `generated/contents/`, so a post goes live only after its exported Markdown is committed. Posts and pages marked as drafts (`Draft: true` in the Markdown header, or `:export_draft: t` in `contents.org`) appear on the dev server but are left out of the build.
 
 ## Additional Commands
 
