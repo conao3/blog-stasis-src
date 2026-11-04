@@ -210,7 +210,9 @@
                         [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
                         blog-name]
                        [:nav
-                        [:a {:href "/portfolio"} "Portfolio"]]]
+                        (if (= lang "en")
+                          [:a {:href (portfolio/urls :en)} "Portfolio"]
+                          [:a {:href (portfolio/urls :ja)} "ポートフォリオ"])]]
                       [:main (hiccup/raw body)]
                       [:footer
                        [:a {:href "/"} blog-name]
@@ -266,11 +268,14 @@
                           (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)]])))]])
         contents (-> contents
                      (update-in ["/index.html" :body] #(str % blog-inx))
-                     (assoc "/portfolio.html" {:title portfolio/title
-                                               :description portfolio/description
-                                               :lang "en"
-                                               :og-type "profile"
-                                               :body (portfolio/body)}))]
+                     (merge (into {}
+                                  (map (fn [[lang path]]
+                                         [path {:title (get-in portfolio/pages [lang :title])
+                                                :description (get-in portfolio/pages [lang :description])
+                                                :lang (name lang)
+                                                :og-type "profile"
+                                                :body (portfolio/body lang)}]))
+                                  portfolio/paths)))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path page)])) contents)
        :og-images (into {}
