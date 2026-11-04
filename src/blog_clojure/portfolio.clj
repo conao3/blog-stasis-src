@@ -4,12 +4,12 @@
 
 
 (def paths
-  {:en "/portfolio/index.html"
+  {:en "/en/portfolio/index.html"
    :ja "/ja/portfolio/index.html"})
 
 
 (def urls
-  {:en "/portfolio/"
+  {:en "/en/portfolio/"
    :ja "/ja/portfolio/"})
 
 
