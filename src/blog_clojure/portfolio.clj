@@ -81,9 +81,11 @@
     :talks [["2025年からを生きるためのEmacs入門 (Tokyo Emacs Study Meeting, Aug 2024)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (Tokyo Emacs Study Meeting, Oct 2024)" "/blog/2024/5d087f"]
             ["Blog posts (Japanese)" "/"]]
-    :education ["Hiroshima University, B.Eng., Faculty of Engineering (Apr 2015 – Mar 2020)"
-                "AWS Certified Solutions Architect – Associate (Jun 2026)"
-                "Applied Information Technology Engineer (IPA, Dec 2018)"]}
+    :education ["Hiroshima University, B.Eng., Faculty of Engineering, Cluster 2 (Apr 2015 – Mar 2020)"
+                "Hiroshima University, Graduate School of Advanced Science and Engineering (Apr 2020 – Mar 2021, withdrawn)"
+                "AWS Certified Solutions Architect – Associate (Amazon Web Services, Jun 2026, valid to Jun 2029)"
+                "Applied Information Technology Engineer (IPA, Dec 2018)"
+                "Senior High School Teacher License (Japan, Mar 2020)"]}
 
    :ja
    {:title "山下 直哉"
@@ -146,9 +148,11 @@
     :talks [["2025年からを生きるためのEmacs入門 (東京Emacs勉強会、2024 年 8 月)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (東京Emacs勉強会、2024 年 10 月)" "/blog/2024/5d087f"]
             ["ブログの記事一覧" "/"]]
-    :education ["広島大学 工学部 卒業、学士 (工学) (2015 年 4 月 〜 2020 年 3 月)"
-                "AWS Certified Solutions Architect – Associate (2026 年 6 月)"
-                "応用情報技術者 (IPA、2018 年 12 月)"]}})
+    :education ["広島大学 工学部 第二類 卒業、学士 (工学) (2015 年 4 月 〜 2020 年 3 月)"
+                "広島大学大学院 先進理工系科学研究科 (2020 年 4 月 〜 2021 年 3 月、退学)"
+                "AWS Certified Solutions Architect – Associate (2026 年 6 月取得、2029 年 6 月まで有効)"
+                "応用情報技術者 (IPA、2018 年 12 月)"
+                "高等学校教諭一種免許状 (2020 年 3 月)"]}})
 
 
 (defn body
