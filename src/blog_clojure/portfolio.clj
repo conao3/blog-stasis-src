@@ -19,6 +19,9 @@
 (def shibuya-lisp "https://lisp.connpass.com/")
 
 
+(def aixiv-paper "https://aixiv.online/abs/2611.00464")
+
+
 (def pages
   {:en
    {:title "Naoya Yamashita"
@@ -39,6 +42,8 @@
                    "Declarative init.el configuration for Emacs." "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
                    "Rust CLI that shares Chrome DevTools Protocol (CDP) sessions across coding agents." nil]
+                  ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
+                   "Lean 4 library and CLI for Japanese statutory period and tax computations, each proved equal to a specification that follows the statute." nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "Parallel Emacs package manager with async installs." "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
@@ -75,7 +80,8 @@
              ["Cloud and DevOps" "AWS (Lambda, ECS, EKS, S3, RDS, SQS, EventBridge, CloudFront, IAM), AWS CDK, Docker, Kubernetes, GitHub Actions, Nix"]
              ["Frontend" "React, Next.js, ClojureScript, TanStack Query, Apollo Client, Tailwind CSS"]
              ["AI Engineering" "Model Context Protocol (MCP), AI coding agents (Claude Code, Codex, Devin)"]]
-    :books [["Published 3 Clojure books at " [:a {:href tech-book-fest} "Tech Book Fest"] "."]
+    :books [[[:a {:href aixiv-paper} "Machine-Checked Japanese Statutory Period and Tax Computations in Lean 4"] " (aiXiv:2611.00464, Nov 2026)."]
+            ["Published 3 Clojure books at " [:a {:href tech-book-fest} "Tech Book Fest"] "."]
             ["Organizing member of " [:a {:href shibuya-lisp} "Shibuya.lisp"] "."]]
     :talks [["2025年からを生きるためのEmacs入門 (Tokyo Emacs Study Meeting, Aug 2024)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (Tokyo Emacs Study Meeting, Oct 2024)" "/blog/2024/5d087f"]
@@ -105,6 +111,8 @@
                    "Emacs の宣言的な init.el 設定パッケージ。" "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
                    "複数のコーディングエージェントで Chrome DevTools Protocol (CDP) のセッションを共有する Rust 製の CLI。" nil]
+                  ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
+                   "日本法の期間計算と税額計算を、条文に沿った仕様と一致する証明を付けて実装した Lean 4 のライブラリと CLI。" nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "パッケージを並列に非同期でインストールする Emacs のパッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
@@ -141,7 +149,8 @@
              ["クラウド / DevOps" "AWS (Lambda、ECS、EKS、S3、RDS、SQS、EventBridge、CloudFront、IAM)、AWS CDK、Docker、Kubernetes、GitHub Actions、Nix"]
              ["フロントエンド" "React、Next.js、ClojureScript、TanStack Query、Apollo Client、Tailwind CSS"]
              ["AI エンジニアリング" "Model Context Protocol (MCP)、AI コーディングエージェント (Claude Code、Codex、Devin)"]]
-    :books [[[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。"]
+    :books [[[:a {:href aixiv-paper} "Machine-Checked Japanese Statutory Period and Tax Computations in Lean 4"] " (aiXiv:2611.00464、2026 年 11 月)。日本法の期間計算と税額計算を Lean 4 で検証した論文。"]
+            [[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。"]
             [[:a {:href shibuya-lisp} "Shibuya.lisp"] " の運営メンバー。"]]
     :talks [["2025年からを生きるためのEmacs入門 (東京Emacs勉強会、2024 年 8 月)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (東京Emacs勉強会、2024 年 10 月)" "/blog/2024/5d087f"]
