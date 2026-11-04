@@ -43,11 +43,10 @@
                    "Major mode for SEML, HTML authoring in S-expressions." "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
                    "Elisp package development tooling with built-in testing and CI." "33"]]
-    :maintained ["Maintainer on "
+    :maintained ["Maintainer"
                  [["cask" "https://github.com/cask/cask" "project management for Emacs" "1.3k"]
                   ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy completion in a child frame" "422"]
-                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "SKK input method for Vim/Neovim" "335"]]
-                 "."]
+                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "SKK input method for Vim/Neovim" "335"]]]
     :experience [{:heading ["Software Engineer" "Toyokumo, Inc."]
                   :period "Jun 2024 – Present (on leave)"
                   :items ["Full-stack development of \"kMailer,\" a kintone-integrated SaaS email delivery service: Clojure GraphQL API on PostgreSQL, ClojureScript and Next.js/React (TypeScript) frontend, deployed on AWS ECS."
@@ -86,7 +85,7 @@
    {:title "山下 直哉"
     :role "ソフトウェアエンジニア (バックエンド / フルスタック) · conao3"
     :description "バックエンドサービスとフルスタック Web アプリケーションの開発で 6 年以上の実務経験を持つソフトウェアエンジニア。"
-    :summary "TypeScript (Node.js)、Python、Clojure、Rust を扱い、REST / GraphQL API の設計から実装、運用までと、PostgreSQL のデータモデリング、AWS を軸に、React フロントエンドまで機能を一貫して担当できます。新しい技術スタックの習得が速く、Clojure は転向から半年でチームの相談役になりました。OSS では Rust と Emacs Lisp を書き、Claude Code、Codex、Devin を使った AI ネイティブな開発フローを実践しています。"
+    :summary "TypeScript (Node.js)、Python、Clojure、Rust を使い、AWS 上で REST / GraphQL API の設計から実装と運用、PostgreSQL のデータモデリング、React のフロントエンドまで、機能を一貫して担当できます。新しい技術スタックの習得が速く、Clojure に移って半年でチームの相談役になりました。OSS では Rust と Emacs Lisp を書いています。また、Claude Code、Codex、Devin を使った AI ネイティブな開発フローを実践しています。"
     :switch ["English" :en]
     :links [["GitHub" "https://github.com/conao3"]
             ["LinkedIn" "https://www.linkedin.com/in/conao3/"]
@@ -101,32 +100,31 @@
     :open-source [["leaf.el" "https://github.com/conao3/leaf.el"
                    "Emacs の宣言的な init.el 設定パッケージ。ELPA と MELPA で公開し、関連パッケージが 5 つあります。" "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
-                   "複数のコーディングエージェントで Chrome DevTools Protocol のセッションを共有する Rust 製の CLI。プロファイルごとのデーモンと JSON-RPC のバッチで動きます。crates.io で公開しています。" nil]
+                   "複数のコーディングエージェントが使う Chrome DevTools Protocol (CDP) のセッションを取り次ぐ Rust 製の CLI。プロファイルごとのデーモンと JSON-RPC のバッチで動きます。crates.io で公開しています。" nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
-                   "非同期にインストールする、並列の Emacs パッケージマネージャ。" "94"]
+                   "パッケージを並列に非同期でインストールする Emacs のパッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
                    "HTML を S 式で書く SEML のメジャーモード。" "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
                    "テストと CI を備えた Elisp パッケージの開発ツール。" "33"]]
-    :maintained [""
+    :maintained ["メンテナ"
                  [["cask" "https://github.com/cask/cask" "Emacs のプロジェクト管理" "1.3k"]
                   ["ivy-posframe" "https://github.com/tumashu/ivy-posframe" "ivy の候補を子フレームに表示" "422"]
-                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "Vim / Neovim の SKK 日本語入力" "335"]]
-                 " のメンテナをしています。"]
+                  ["skkeleton" "https://github.com/vim-skk/skkeleton" "Vim / Neovim の SKK 日本語入力" "335"]]]
     :experience [{:heading ["トヨクモ株式会社" "ソフトウェアエンジニア"]
                   :period "2024 年 6 月 〜 現在 (休職中)"
                   :items ["kintone 連携メール配信 SaaS「kMailer」のフルスタック開発 (Clojure の GraphQL API と PostgreSQL、ClojureScript と Next.js/React (TypeScript)、AWS ECS)。"
-                          "デザインドックで PM、デザイナ、CS と合意形成し、HTML ブロックエディタ、シナリオ配信、配信分析、A/B テストなど 10 以上の機能を実装。"
+                          "デザインドックを書いて PM、デザイナ、CS と合意を取り、HTML ブロックエディタ、シナリオ配信、配信分析、A/B テストなど 10 以上の機能を設計して実装。"
                           "デプロイの手順を揃え、チームのリリース頻度 (Release per Business Day) を 0.8 から 2.1 へ改善し、社内 6 チーム中 1 位。半年で 334 PR (55 PR/月) をマージし、チーム内最多。"
-                          "コーディングエージェント (Devin、Claude Code) のチームへの導入を主導。AWS Elastic Beanstalk から ECS (Docker) への無停止移行、JVM 11 から 21 への更新、GraphQL Codegen の生成量の 30% 削減。"]}
+                          "コーディングエージェント (Devin、Claude Code) のチームへの導入を主導。AWS Elastic Beanstalk から ECS (Docker) への無停止移行、JVM 11 から 21 への更新、GraphQL Codegen の生成量の 30% 削減も実施。"]}
                  {:heading ["オプターク合同会社" "ソフトウェアエンジニア / バックエンドチームリーダー"]
                   :period "2021 年 4 月 〜 2024 年 5 月"
                   :items ["100 店舗向けの自動発注システムを要件定義から運用まで担当。直近 30 日分、1,000 万件以上の販売実績から発注数を算出。"
-                          "Python の AWS Lambda と GraphQL API によるサーバーレスのマイクロサービス。夜間バッチは Amazon Redshift、日中の処理は Aurora PostgreSQL、20 以上のエンドポイントに Cedar のポリシーによる認可。"
+                          "Python の AWS Lambda と GraphQL API でサーバーレスのマイクロサービスを構築。夜間バッチに Amazon Redshift、日中の処理に Aurora PostgreSQL を使い、20 以上のエンドポイントの認可を Cedar のポリシーで実装。"
                           "最大 4 人のバックエンドチームをリードし、TDD、コードレビュー、CI/CD で開発。SQL のチューニングとメトリクスの監視で稼働率 99.9% を維持。"]}
                  {:heading ["フォーコード株式会社" "業務委託 (フロントエンド)"]
                   :period "2022 年 1 月 〜 2022 年 6 月"
-                  :items ["ソニーミュージック社内の、アーティストのマスタデータと CD・レコードの販売を扱う基盤の React (TypeScript) フロントエンドを開発。"]}
+                  :items ["アーティストのマスタデータと CD・レコードの販売を扱う、ソニーミュージックの社内基盤で、React (TypeScript) のフロントエンドを開発。"]}
                  {:heading ["オプターク合同会社" "アルバイト"]
                   :period "2020 年 9 月 〜 2021 年 3 月"
                   :items ["3 人のチームに CircleCI の CI/CD と自動テストを導入。副作用の多いコードを E2E テストで囲んでからリファクタリングし、テストカバレッジを 60% 以上に向上。"]}
@@ -139,7 +137,7 @@
              ["クラウド / DevOps" "AWS (Lambda、ECS、EKS、S3、RDS、SQS、EventBridge、CloudFront、IAM)、AWS CDK、Docker、Kubernetes、GitHub Actions、Nix"]
              ["フロントエンド" "React、Next.js、ClojureScript、TanStack Query、Apollo Client、Tailwind CSS"]
              ["AI エンジニアリング" "Model Context Protocol (MCP)、AI コーディングエージェント (Claude Code、Codex、Devin)"]]
-    :books [[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。Shibuya.lisp の運営。"]
+    :books [[:a {:href tech-book-fest} "技術書典"] "で Clojure の本を 3 冊頒布。Shibuya.lisp を運営。"]
     :talks [["2025年からを生きるためのEmacs入門 (東京Emacs勉強会、2024 年 8 月)" "/blog/2024/d27077"]
             ["Clojureで始めるTree-sitter (東京Emacs勉強会、2024 年 10 月)" "/blog/2024/5d087f"]
             ["ブログの記事一覧" "/"]]
@@ -153,7 +151,7 @@
   (let [{:keys [title role description summary switch links headings open-source maintained
                 experience skills books talks education]} (pages lang)
         [switch-label switch-lang] switch
-        [before projects after] maintained]
+        [maintainer projects] maintained]
     (str
       (hiccup/html
         [:article {:class "portfolio"}
@@ -172,11 +170,10 @@
           [:ul
            (for [[project href text stars] open-source]
              [:li [:a {:href href} [:strong project]] (when stars (str " (★ " stars ")")) ": " text])
-           [:li before
-            (interpose (if (= lang :ja) "、" ", ")
-                       (for [[project href text stars] projects]
-                         (list [:a {:href href} [:strong project]] " (★ " stars (if (= lang :ja) "、" ", ") text ")")))
-            after]]
+           [:li maintainer
+            [:ul
+             (for [[project href text stars] projects]
+               [:li [:a {:href href} [:strong project]] " (★ " stars "): " text])]]]
           [:h2 (:experience headings)]
           (for [{:keys [heading period items]} experience]
             (list
