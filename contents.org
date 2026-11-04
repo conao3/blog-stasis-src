@@ -16446,9 +16446,8 @@ Nix を使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行�
 * git fetch is Turing complete
 :properties:
 :export_file_name: generated/contents/blog/2026/1e0718
-:export_date: 2026-11-03
+:export_date: 2026-11-04
 :export_lang: en
-:export_draft: t
 :end:
 
 This is a program:
