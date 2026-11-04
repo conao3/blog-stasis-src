@@ -15,16 +15,22 @@ const icon = `data:image/jpeg;base64,${(await readFile("resources/public/assets/
 
 const element = (type, style, children) => ({ type, props: { style, children } });
 
-const frame = (corner) =>
+const bar = (position, direction, color, length) =>
   element("div", {
-    [`border${corner[0]}`]: "24px solid rgb(94, 170, 247)",
-    [`border${corner[1]}`]: "24px solid rgb(94, 170, 247)",
-    [corner[0].toLowerCase()]: 0,
-    [corner[1].toLowerCase()]: 0,
-    height: 220,
+    ...position,
+    backgroundImage: `linear-gradient(${direction}, ${color} 0%, ${color} 30%, ${color.replace("rgb", "rgba").replace(")", ", 0)")} 100%)`,
+    borderRadius: 6,
+    height: direction.includes("bottom") || direction.includes("top") ? length : 12,
     position: "absolute",
-    width: 360,
+    width: direction.includes("bottom") || direction.includes("top") ? 12 : length,
   });
+
+const frames = [
+  bar({ left: 36, top: 36 }, "to right", "rgb(94, 170, 247)", 420),
+  bar({ left: 36, top: 36 }, "to bottom", "rgb(94, 170, 247)", 260),
+  bar({ bottom: 36, right: 36 }, "to left", "rgb(176, 132, 250)", 420),
+  bar({ bottom: 36, right: 36 }, "to top", "rgb(176, 132, 250)", 260),
+];
 
 const card = ({ title, date, site, host }) =>
   element(
@@ -46,8 +52,7 @@ const card = ({ title, date, site, host }) =>
       width: "100%",
     },
     [
-      frame(["Top", "Left"]),
-      frame(["Bottom", "Right"]),
+      ...frames,
       element(
         "div",
         {
