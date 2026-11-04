@@ -10,6 +10,7 @@
 
 
 (def blog-name "Conao3 Notes")
+(def site-url "https://s.conao3.com")
 (def stasis-config {:stasis/ignore-nil-pages? true})
 
 
@@ -32,22 +33,38 @@
             (.put attributes "loading" "lazy")))))))
 
 
-(def highlighter
+(defn node-worker
+  [script]
   (delay
-    (let [process (-> (ProcessBuilder. ["node" "bin/highlight.mjs"])
+    (let [process (-> (ProcessBuilder. ["node" script])
                       (.redirectError java.lang.ProcessBuilder$Redirect/INHERIT)
                       .start)]
       {:writer (io/writer (.getOutputStream process))
        :reader (io/reader (.getInputStream process))})))
 
 
+(defn node-request
+  [worker request]
+  (let [{:keys [writer reader]} @worker]
+    (locking worker
+      (.write writer (str (json/write-str request) "\n"))
+      (.flush writer)
+      (json/read-str (.readLine reader) :key-fn keyword))))
+
+
+(def highlighter (node-worker "bin/highlight.mjs"))
+(def og-image-renderer (node-worker "bin/og-image.mjs"))
+
+
 (defn highlight
   [lang code]
-  (let [{:keys [writer reader]} @highlighter]
-    (locking highlighter
-      (.write writer (str (json/write-str {:lang lang :code (str/replace code #"\n$" "")}) "\n"))
-      (.flush writer)
-      (:html (json/read-str (.readLine reader) :key-fn keyword)))))
+  (:html (node-request highlighter {:lang lang :code (str/replace code #"\n$" "")})))
+
+
+(defn og-image
+  [{:keys [title date]}]
+  (.decode (java.util.Base64/getDecoder)
+           (:png (node-request og-image-renderer {:title title :date date :site blog-name :host (.getHost (java.net.URI. site-url))}))))
 
 
 (def highlighted-code-blocks
@@ -105,15 +122,39 @@
   "{\"prerender\":[{\"where\":{\"href_matches\":\"/*\"},\"eagerness\":\"moderate\"}]}")
 
 
+(defn markdown-description
+  [document]
+  (let [paragraph (->> (tree-seq some?
+                                 #(take-while some? (iterate (fn [node] (.getNext node)) (.getFirstChild %)))
+                                 document)
+                       (filter #(instance? org.commonmark.node.Paragraph %))
+                       first)
+        text (some->> paragraph
+                      (tree-seq some? #(take-while some? (iterate (fn [node] (.getNext node)) (.getFirstChild %))))
+                      (keep #(cond
+                               (instance? org.commonmark.node.Text %) (.getLiteral %)
+                               (instance? org.commonmark.node.Code %) (.getLiteral %)
+                               (instance? org.commonmark.node.SoftLineBreak %) " "))
+                      (apply str)
+                      (#(str/replace % #"(?<=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}、。）」])\s+(?=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}（「])" ""))
+                      str/trim)]
+    (cond
+      (str/blank? text) nil
+      (< 120 (count text)) (str (subs text 0 119) "…")
+      :else text)))
+
+
 (defn parse-markdown
   [s]
   (let [[header body] (str/split s #"\n\n" 2)
         metadata (->> (str/split-lines header)
                       (keep #(re-matches #"(\w+):\s*(.*)" %))
                       (map (fn [[_ k v]] [(keyword (str/lower-case k)) v]))
-                      (into {}))]
+                      (into {}))
+        document (.parse markdown-parser (or body ""))]
     {:metadata metadata
-     :html (.render markdown-renderer (.parse markdown-parser (or body "")))}))
+     :description (markdown-description document)
+     :html (.render markdown-renderer document)}))
 
 
 (defn slurp-binary-directory
@@ -130,13 +171,33 @@
        (into {})))
 
 
+(defn page-url
+  [path]
+  (str site-url (str/replace path #"(index)?\.html$" "")))
+
+
+(defn og-image-path
+  [path]
+  (str "/og" (str/replace path #"\.html$" ".png")))
+
+
 (defn render-page
-  [{:keys [title body]}]
+  [path {:keys [title body description]}]
   (hiccup.page/html5 {:lang "ja"}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
+                      (when description
+                        [:meta {:name "description" :content description}])
+                      [:meta {:property "og:title" :content title}]
+                      [:meta {:property "og:type" :content (if (= path "/index.html") "website" "article")}]
+                      [:meta {:property "og:url" :content (page-url path)}]
+                      [:meta {:property "og:image" :content (str site-url (og-image-path path))}]
+                      [:meta {:property "og:site_name" :content blog-name}]
+                      (when description
+                        [:meta {:property "og:description" :content description}])
+                      [:meta {:name "twitter:card" :content "summary_large_image"}]
                       [:style (hiccup/raw (inline-style))]
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
@@ -167,6 +228,7 @@
                              (let [p (parse-markdown v)
                                    obj {:title (:title (:metadata p))
                                         :date (:date (:metadata p))
+                                        :description (:description p)
                                         :body (:html p)}]
                                [(str (subs k 0 (- (count k) 3)) ".html")
                                 (assoc obj :body (render-content obj))])))
@@ -182,9 +244,12 @@
         contents (update-in contents ["/index.html" :body]
                             #(str % blog-inx))]
     (stasis/merge-page-sources
-      {:contents (-> contents
-                     (update-vals render-page)
-                     (->> (into {})))
+      {:contents (into {} (map (fn [[path page]] [path (render-page path page)])) contents)
+       :og-images (into {}
+                        (map (fn [[path page]]
+                               [(og-image-path path)
+                                (fn [_] (og-image (if (= path "/index.html") {:title blog-name} page)))]))
+                        contents)
        :public (slurp-binary-directory "resources/public" #"\.[^.]+$")
        :spectrum (-> (stasis/slurp-directory "generated/spectrum" #"\.[^.]+$")
                      (update-keys (partial str "/assets/spectrum")))})))

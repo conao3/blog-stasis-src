@@ -16,6 +16,9 @@
     "undici": "^8.12.3"
   },
   "dependencies": {
+    "@expo-google-fonts/noto-sans-jp": "^0.4.4",
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.63.2",
     "shiki": "^4.6.0"
   }
 }
