@@ -15,22 +15,29 @@ const icon = `data:image/jpeg;base64,${(await readFile("resources/public/assets/
 
 const element = (type, style, children) => ({ type, props: { style, children } });
 
-const bar = (position, direction, color, length) =>
-  element("div", {
-    ...position,
-    backgroundImage: `linear-gradient(${direction}, ${color} 0%, ${color} 30%, ${color.replace("rgb", "rgba").replace(")", ", 0)")} 100%)`,
-    borderRadius: 6,
-    height: direction.includes("bottom") || direction.includes("top") ? length : 12,
-    position: "absolute",
-    width: direction.includes("bottom") || direction.includes("top") ? 12 : length,
-  });
+const frameColors = ["#2BB59A", "#1C8FBF", "#3563D9"];
 
-const frames = [
-  bar({ left: 36, top: 36 }, "to right", "rgb(94, 170, 247)", 420),
-  bar({ left: 36, top: 36 }, "to bottom", "rgb(94, 170, 247)", 260),
-  bar({ bottom: 36, right: 36 }, "to left", "rgb(176, 132, 250)", 420),
-  bar({ bottom: 36, right: 36 }, "to top", "rgb(176, 132, 250)", 260),
-];
+const frameSvg = ({ width, height, flip }) => {
+  const thickness = 38;
+  const radius = 40;
+  const path = `M 0 0 H ${width} V ${thickness} H ${thickness + radius} A ${radius} ${radius} 0 0 0 ${thickness} ${thickness + radius} V ${height} H 0 Z`;
+  const stops = [
+    `<stop offset="0" stop-color="${frameColors[0]}" stop-opacity="0"/>`,
+    `<stop offset="0.14" stop-color="${frameColors[0]}"/>`,
+    `<stop offset="0.5" stop-color="${frameColors[1]}"/>`,
+    `<stop offset="0.86" stop-color="${frameColors[2]}"/>`,
+    `<stop offset="1" stop-color="${frameColors[2]}" stop-opacity="0"/>`,
+  ].join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="${height}" x2="${width}" y2="0">${stops}</linearGradient></defs><path d="${path}" fill="url(#g)"${flip ? ` transform="rotate(180 ${width / 2} ${height / 2})"` : ""}/></svg>`;
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+};
+
+const frame = (position, width, height, flip) => ({
+  type: "img",
+  props: { src: frameSvg({ width, height, flip }), width, height, style: { position: "absolute", ...position } },
+});
+
+const frames = [frame({ left: 0, top: 0 }, 760, 420, false), frame({ right: 0, bottom: 0 }, 400, 220, true)];
 
 const card = ({ title, date, site, host }) =>
   element(
