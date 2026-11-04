@@ -63,7 +63,7 @@
                           "Led a backend team of up to 4 engineers with test-driven development (TDD), code review, and CI/CD; SQL tuning and metrics monitoring kept the system at 99.9% uptime."]}
                  {:heading ["Contract Frontend Engineer" "Forcode Inc."]
                   :period "Jan 2022 – Jun 2022"
-                  :items ["Built the React (TypeScript) frontend of Sony Music's internal platform for artist master data and CD/record sales."]}
+                  :items ["Built the React (TypeScript) frontend of a major music company's internal platform for artist master data and CD/record sales."]}
                  {:heading ["Part-time Software Engineer" "Optarc LLC"]
                   :period "Sep 2020 – Mar 2021"
                   :items ["Set up CI/CD (CircleCI) with automated tests for a 3-person team and lifted test coverage past 60% by wrapping side-effect-heavy code in end-to-end tests before refactoring."]}
@@ -130,7 +130,7 @@
                           "最大 4 人のバックエンドチームをリードし、TDD、コードレビュー、CI/CD で開発。SQL のチューニングとメトリクスの監視で稼働率 99.9% を維持。"]}
                  {:heading ["フォーコード株式会社" "業務委託 (フロントエンド)"]
                   :period "2022 年 1 月 〜 2022 年 6 月"
-                  :items ["アーティストのマスタデータと CD・レコードの販売を扱う、ソニーミュージックの社内基盤で、React (TypeScript) のフロントエンドを開発。"]}
+                  :items ["アーティストのマスタデータと CD・レコードの販売を扱う、大手音楽会社の社内基盤で、React (TypeScript) のフロントエンドを開発。"]}
                  {:heading ["オプターク合同会社" "アルバイト"]
                   :period "2020 年 9 月 〜 2021 年 3 月"
                   :items ["3 人のチームに CircleCI の CI/CD と自動テストを導入。副作用の多いコードを E2E テストで囲んでからリファクタリングし、テストカバレッジを 60% 以上に向上。"]}
