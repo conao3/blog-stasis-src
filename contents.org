@@ -16667,7 +16667,6 @@ Each command output in this post comes from a real run, pasted as is.
 :properties:
 :export_file_name: generated/contents/blog/2026/bfc7fe
 :export_date: 2026-11-04
-:export_draft: t
 :end:
 
 [[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo について、英語の論文を書いて aiXiv に投稿しました。
