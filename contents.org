@@ -16671,6 +16671,9 @@ Each command output in this post comes from a real run, pasted as is.
 
 [[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo について、英語の論文を書いて aiXiv に投稿しました。
 論文は [[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]] で読めます。
+論文のページには、タイトルと要旨のほか、AI の関与の申告、版ごとの投稿の時刻、LaTeX のソースの SHA-256 が載っています。
+
+[[./resources/public/img/bfc7fe-aixiv-abs.png]]
 
 ** 招待のメール
 きっかけは aiXiv の運営から届いた 1 通のメールです。
