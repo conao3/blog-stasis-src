@@ -183,19 +183,22 @@
 
 
 (defn render-page
-  [path {:keys [title body description lang og-type draft? portfolio-href]}]
+  [path {:keys [title body description lang og-type draft? portfolio-href not-found?]}]
   (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
                       [:link {:rel "icon" :href "/assets/icon.jpg"}]
+                      (when not-found?
+                        [:meta {:name "robots" :content "noindex"}])
                       (when description
                         [:meta {:name "description" :content description}])
                       [:meta {:property "og:title" :content title}]
                       [:meta {:property "og:type" :content (or og-type (if (= path "/index.html") "website" "article"))}]
                       [:meta {:property "og:url" :content (page-url path)}]
-                      [:meta {:property "og:image" :content (str site-url (og-image-path path))}]
+                      (when-not not-found?
+                        [:meta {:property "og:image" :content (str site-url (og-image-path path))}])
                       [:meta {:property "og:site_name" :content blog-name}]
                       (when description
                         [:meta {:property "og:description" :content description}])
@@ -289,13 +292,24 @@
                           (sort-by (comp :date second))
                           reverse
                           (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))]])
-        contents (update-in contents ["/index.html" :body] #(str % blog-inx))]
+        contents (-> contents
+                     (update-in ["/index.html" :body] #(str % blog-inx))
+                     (assoc "/404.html" {:title "ページが見つかりません"
+                                         :not-found? true
+                                         :body (hiccup/html
+                                                 [:article
+                                                  [:header [:h1 "ページが見つかりません"]]
+                                                  [:div {:class "content"}
+                                                   [:p "お探しのページは、移動したか削除された可能性があります。"]
+                                                   [:p {:lang "en"} "The page you are looking for may have been moved or deleted."]
+                                                   [:p [:a {:href "/"} "トップページへ"] " / " [:a {:href (portfolio/urls :ja)} "ポートフォリオ"] " / " [:a {:href (portfolio/urls :en) :lang "en"} "Portfolio"]]]])}))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
        :og-images (into {}
-                        (map (fn [[path page]]
+                        (keep (fn [[path page]]
+                               (when-not (:not-found? page)
                                [(og-image-path path)
-                                (fn [_] (og-image (if (= path "/index.html") {:title blog-name} page)))]))
+                                (fn [_] (og-image (if (= path "/index.html") {:title blog-name} page)))])))
                         contents)
        :public (slurp-binary-directory "resources/public" #"\.[^.]+$")
        :spectrum (-> (stasis/slurp-directory "generated/spectrum" #"\.[^.]+$")
