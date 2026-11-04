@@ -20,15 +20,12 @@ const frameColors = ["#2BB59A", "#1C8FBF", "#3563D9"];
 const frameSvg = ({ width, height, flip }) => {
   const thickness = 38;
   const radius = 40;
-  const path = `M 0 0 H ${width} V ${thickness} H ${thickness + radius} A ${radius} ${radius} 0 0 0 ${thickness} ${thickness + radius} V ${height} H 0 Z`;
-  const stops = [
-    `<stop offset="0" stop-color="${frameColors[0]}" stop-opacity="0"/>`,
-    `<stop offset="0.14" stop-color="${frameColors[0]}"/>`,
-    `<stop offset="0.5" stop-color="${frameColors[1]}"/>`,
-    `<stop offset="0.86" stop-color="${frameColors[2]}"/>`,
-    `<stop offset="1" stop-color="${frameColors[2]}" stop-opacity="0"/>`,
-  ].join("");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="${height}" x2="${width}" y2="0">${stops}</linearGradient></defs><path d="${path}" fill="url(#g)"${flip ? ` transform="rotate(180 ${width / 2} ${height / 2})"` : ""}/></svg>`;
+  const fade = 0.25;
+  const corner = thickness + radius;
+  const path = `M 0 0 H ${width} V ${thickness} H ${corner} A ${radius} ${radius} 0 0 0 ${thickness} ${corner} V ${height} H 0 Z`;
+  const stops = frameColors.map((color, i) => `<stop offset="${i / (frameColors.length - 1)}" stop-color="${color}"/>`).join("");
+  const fadeStops = `<stop offset="0" stop-color="#fff"/><stop offset="${1 - fade}" stop-color="#fff"/><stop offset="1" stop-color="#000"/>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="${height}" x2="${width}" y2="0">${stops}</linearGradient><linearGradient id="fx" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${width}" y2="0">${fadeStops}</linearGradient><linearGradient id="fy" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${height}">${fadeStops}</linearGradient><mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}"><rect width="${width}" height="${corner}" fill="url(#fx)"/><rect width="${corner}" height="${height}" fill="url(#fy)"/><rect width="${corner}" height="${corner}" fill="#fff"/></mask></defs><path d="${path}" fill="url(#g)" mask="url(#m)"${flip ? ` transform="rotate(180 ${width / 2} ${height / 2})"` : ""}/></svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 };
 
@@ -43,7 +40,7 @@ const card = ({ title, date, site, host }) =>
   element(
     "div",
     {
-      backgroundColor: "rgb(29, 29, 29)",
+      backgroundColor: "rgb(14, 14, 14)",
       boxSizing: "border-box",
       color: "rgb(235, 235, 235)",
       display: "flex",
