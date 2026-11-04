@@ -74,7 +74,7 @@
                  {:heading ["Software Engineering Intern" "pixiv Inc."]
                   :period "Sep 2020 (2 weeks)"
                   :items ["Migrated the pixiv Encyclopedia PHP application (100,000+ monthly users) to PSR-7/15/17 standards, turning 15+ global-state modules into unit-testable functions."]}]
-    :skills [["Languages" "TypeScript / JavaScript, Python, Clojure, Rust, SQL"]
+    :skills [["Languages" "TypeScript / JavaScript, Python, Clojure, Rust, Lean 4, SQL"]
              ["Backend" "Node.js, REST and GraphQL APIs, microservices, serverless, OAuth 2.0 / JWT, Cedar, Amazon Cognito"]
              ["Databases" "PostgreSQL (Aurora), Redis, DynamoDB, Amazon Redshift, data modeling, query tuning"]
              ["Cloud and DevOps" "AWS (Lambda, ECS, EKS, S3, RDS, SQS, EventBridge, CloudFront, IAM), AWS CDK, Docker, Kubernetes, GitHub Actions, Nix"]
@@ -143,7 +143,7 @@
                  {:heading ["ピクシブ株式会社" "インターン"]
                   :period "2020 年 9 月 (2 週間)"
                   :items ["月間 10 万人以上が使うピクシブ百科事典の PHP アプリケーションを PSR-7/15/17 に沿って移行し、グローバル状態に依存する 15 以上のモジュールを単体テストできる関数に整理。"]}]
-    :skills [["言語" "TypeScript / JavaScript、Python、Clojure、Rust、SQL"]
+    :skills [["言語" "TypeScript / JavaScript、Python、Clojure、Rust、Lean 4、SQL"]
              ["バックエンド" "Node.js、REST / GraphQL API の設計と実装、マイクロサービス、サーバーレス、OAuth 2.0 / JWT、Cedar、Amazon Cognito"]
              ["データベース" "PostgreSQL (Aurora)、Redis、DynamoDB、Amazon Redshift、データモデリング、クエリチューニング"]
              ["クラウド / DevOps" "AWS (Lambda、ECS、EKS、S3、RDS、SQS、EventBridge、CloudFront、IAM)、AWS CDK、Docker、Kubernetes、GitHub Actions、Nix"]
