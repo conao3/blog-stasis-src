@@ -346,8 +346,19 @@
     (stasis/report-differences old-files (load-export-dir))))
 
 
+(defn- wrap-extensionless
+  [handler]
+  (fn [req]
+    (let [uri (:uri req)
+          html-req (when (and (not= uri "/") (not (re-find #"\.[^/]*$" uri)))
+                     (assoc req :uri (str (str/replace uri #"/$" "") ".html")))
+          res (when html-req (handler html-req))]
+      (if (and res (= 200 (:status res)))
+        res
+        (handler req)))))
+
 (defn start-server
   [& _args]
   (jetty/run-jetty
-    (content-type/wrap-content-type (stasis/serve-pages site stasis-config))
+    (content-type/wrap-content-type (wrap-extensionless (stasis/serve-pages site stasis-config)))
     {:port 8080 :join? false}))
