@@ -34,9 +34,9 @@
                :writing "Writing and Talks"
                :education "Education and Certifications"}
     :open-source [["leaf.el" "https://github.com/conao3/leaf.el"
-                   "Declarative init.el configuration for Emacs. On ELPA and MELPA with 5 companion packages." "556"]
+                   "Declarative init.el configuration for Emacs." "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
-                   "Rust CLI that brokers Chrome DevTools Protocol (CDP) sessions across coding agents, with a per-profile daemon and JSON-RPC batches. Published on crates.io." nil]
+                   "Rust CLI that shares Chrome DevTools Protocol (CDP) sessions across coding agents." nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "Parallel Emacs package manager with async installs." "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
@@ -98,9 +98,9 @@
                :writing "執筆・登壇"
                :education "学歴・資格"}
     :open-source [["leaf.el" "https://github.com/conao3/leaf.el"
-                   "Emacs の宣言的な init.el 設定パッケージ。ELPA と MELPA で公開し、関連パッケージが 5 つあります。" "556"]
+                   "Emacs の宣言的な init.el 設定パッケージ。" "556"]
                   ["chrome-devtools" "https://github.com/conao3/rust-chrome-devtools"
-                   "複数のコーディングエージェントが使う Chrome DevTools Protocol (CDP) のセッションを取り次ぐ Rust 製の CLI。プロファイルごとのデーモンと JSON-RPC のバッチで動きます。crates.io で公開しています。" nil]
+                   "複数のコーディングエージェントで Chrome DevTools Protocol (CDP) のセッションを共有する Rust 製の CLI。" nil]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "パッケージを並列に非同期でインストールする Emacs のパッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
