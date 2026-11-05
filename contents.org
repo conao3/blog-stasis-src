@@ -4341,10 +4341,6 @@ init.elに下記のleafを書きます。
     (load-theme 'solarized-zenburn-dark 'no-confirm))
 #+end_src
 
-すると、このようになりました。いい感じ!
-
-[[./img/solarized-zenburn-1.png]]
-
 * [2019年アップデート] leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする
 :properties:
 :export_file_name: generated/contents/blog/2019/3279ec
