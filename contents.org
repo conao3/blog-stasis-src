@@ -5721,7 +5721,7 @@ defun した関数は (function hoge) の様にするのみなので、これは
 :end:
 
 
-[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを初める第一歩]]
+[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを始める第一歩]]
 
 * COMMENT mewが遅い件について
 :properties:
@@ -6616,7 +6616,7 @@ use-packageが作られた当時はきちんとautoloadをパッケージ開発�
 
 [fn:2] : leafのインストールコードには書いてませんが、別途 =user-emacs-directory= の設定を加えました。理由はコメントのような起動方法ができるからです。参考ブログ: [[http://peccu.hatenablog.com/entry/20130218/trial_init][Emacsでお試しinit.elの指針 - peccu.hatenablog]]
 
-* Netlify + Hugo + ox-hugoでブログを初める第一歩
+* Netlify + Hugo + ox-hugoでブログを始める第一歩
 :properties:
 :export_file_name: generated/contents/blog/2020/0a23fb
 :export_date: 2020-05-05
@@ -6823,7 +6823,7 @@ Webで情報を公開するにあたって、パーマリンクの設計は将�
 
 しかしこのブログは今のところ死ぬまで付き合うつもりであり、それが出来るようにコンテンツの少ない今、設計する必要があります。
 
-ブログ管理の裏側については「[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを初める第一歩]]」に書きましたが、パーマリンクの設計は表側の設計であり、ブログの人生の中で途中で変えることは許されていません。
+ブログ管理の裏側については「[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを始める第一歩]]」に書きましたが、パーマリンクの設計は表側の設計であり、ブログの人生の中で途中で変えることは許されていません。
 
 もし無理矢理変えれば、これまでシェアしてもらったURLの意味は失くなり、404ページに多くの読者を案内してしまうことになります。
 
@@ -6936,7 +6936,7 @@ URLから得られる情報もありますし、後述するランダム値の�
 ** Intro
 下記のブログの記事で考えて、ようやく記事を新規作成するために必要な情報が整いました。
 
-- 「[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを初める第一歩]]」
+- 「[[https://s.conao3.com/blog/2020/0a23fb][Netlify + Hugo + ox-hugoでブログを始める第一歩]]」
 - 「[[https://s.conao3.com/blog/2020/0bc44c][個人ブログのパーマリンクに関する最適戦略について]]」
 - 「[[https://s.conao3.com/blog/2020/9383f3][誕生日のパラドックスから考察する、個人ブログURLに必要なランダムビット数]]」
 
