@@ -16940,11 +16940,11 @@ $ plamo-tr-local text translate-text --text 今日はいい天気ですね。
 #+end_src
 
 標準入力から読むときは =--text= を省きます。
-=--query= (JMESPath の式) と =--output text= を付けると、訳文だけを取り出せます。
+訳文だけを取り出すときは、出力の JSON を =jq= に渡します。
 
 #+begin_src console
 $ echo "Since it's raining today, I think I'll relax at home and read a book." \
-    | plamo-tr-local text translate-text --query TranslatedText --output text
+    | plamo-tr-local text translate-text | jq -r .TranslatedText
 今日は雨だから、家でゆっくり本を読んでいようと思う。
 #+end_src
 
@@ -16952,7 +16952,7 @@ $ echo "Since it's raining today, I think I'll relax at home and read a book." \
 
 #+begin_src console
 $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
-    --glossary Source=owner,Target=担当者 --writing-style polite --query TranslatedText --output text
+    --glossary Source=owner,Target=担当者 --writing-style polite | jq -r .TranslatedText
 担当者でタスクを絞り込みます。
 #+end_src
 
@@ -16962,7 +16962,7 @@ $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
 
 ** AWS CLI 型のコマンド体系
 コマンド体系は AWS CLI 型にしました。
-=<コマンド> <サブコマンド>= の後に名前付きの引数を並べ、 =--query= ・ =--output= ・ =--cli-input-json= も受け付けます。
+=<コマンド> <サブコマンド>= の後に、名前付きの引数を並べます。
 
 ** PFML3 のプロンプトを組む
 PLaMo 3 Translate へ渡すプロンプトの形式は PFML3 です。
@@ -17036,6 +17036,8 @@ rustflags = ["-C", "target-cpu=x86-64-v3"]
 |         10 | 2.9 秒             | 9.3 秒              | 15.9 秒 |
 |         14 | 2.7 秒             | 10.4 秒             | 16.8 秒 |
 
+[[./resources/public/img/33d2c2-threads.svg]]
+
 入力を読むのは 14 スレッドがもっとも速く、出力の生成は 10 スレッドがもっとも速くなりました。
 8・9・11・12 スレッドも測りましたが、出力の生成は 10 スレッドより遅くなりました。
 14 スレッドでは、出力の生成が 7 スレッドより遅くなりました。
@@ -17048,7 +17050,7 @@ MIT ライセンスの本文 (英語 169 語、252 トークンのプロンプ�
 各段階の時間は =--debug= が出す値です。
 
 #+begin_src console
-$ plamo-tr-local text translate-text --text file://LICENSE --query TranslatedText --output text
+$ plamo-tr-local text translate-text --text file://LICENSE | jq -r .TranslatedText
 #+end_src
 
 | モデル | 読み込み | 最初のトークンまで | 出力の速さ       | 全体    |
@@ -17056,7 +17058,10 @@ $ plamo-tr-local text translate-text --text file://LICENSE --query TranslatedTex
 | 0.8b   | 2.8 秒   | 0.7 秒             | 71 トークン/秒 | 6.9 秒  |
 | 2b     | 3.4 秒   | 2.9 秒             | 23 トークン/秒 | 15.9 秒 |
 
+[[./resources/public/img/33d2c2-speed.svg]]
+
 「最初のトークンまで」はモデルを読み込んだあと、プロンプトを読んで最初のトークンを出すまでの時間です。
+グラフの「読み込みなど」は、全体から「最初のトークンまで」と出力の生成の時間を引いた残りで、モデルの読み込みを含みます。
 訳文は 0.8b が 229 トークン、2b が 214 トークンでした。
 2b の訳文は次のとおりです。
 
