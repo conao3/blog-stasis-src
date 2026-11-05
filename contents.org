@@ -16894,7 +16894,7 @@ Workers の静的アセットで配りたいけれど、Cloudflare のトーク�
 :export_draft: t
 :end:
 
-Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重みが、2026-11-05 (日本時間) に公開されました。
+Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重みが、2026-11-05 に公開されました。
 このモデルを手元の PC で動かし、シェルのパイプで文章を訳すコマンド =plamo-tr-local= を作りました。
 リポジトリは [[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]] (public) で、ライセンスは Apache-2.0 です。
 この記事では、使い方と、作るときに当たったことを紹介します。
@@ -16961,10 +16961,9 @@ $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
 =--model-size= には =0.8b= ・ =2b= ・ =8b= ・ =31b= を指定でき、既定は =2b= です。
 小さいモデルほど速く訳し、大きいモデルほど訳の質が上がります。
 
-** plamo-tr と同じコマンド体系にした
-コマンド体系は、PLaMo 翻訳のサービスで訳す CLI [[https://github.com/conao3/rust-plamo-tr][plamo-tr]] と同じ AWS CLI 型にしました。
+** AWS CLI 型のコマンド体系にした
+コマンド体系は AWS CLI 型にしました。
 =<コマンド> <サブコマンド>= の後に名前付きの引数を並べ、出力は JSON で、 =--query= ・ =--output= ・ =--cli-input-json= を受け付けます。
-そのため、 =plamo-tr= を =plamo-tr-local= に置き換えるだけで、同じスクリプトが動きます。
 
 ** PFML3 のプロンプトを組む
 PLaMo 3 Translate へ渡すプロンプトの形式は PFML3 です。
