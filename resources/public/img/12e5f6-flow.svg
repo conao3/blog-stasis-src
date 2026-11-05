@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="480" viewBox="0 0 1080 480" font-family="'Noto Sans JP', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1080" height="480" rx="16" fill="#fff"/>
+  <rect x="30" y="30" width="640" height="420" rx="12" fill="#f4f6f8" stroke="#8a96a3" stroke-dasharray="6 4"/>
+  <text x="50" y="68" font-size="21" font-weight="bold" fill="#333">GitHub (public)</text>
+  <rect x="760" y="30" width="290" height="420" rx="12" fill="#fdf4ec" stroke="#c8915c" stroke-dasharray="6 4"/>
+  <text x="780" y="68" font-size="21" font-weight="bold" fill="#333">Cloudflare</text>
+
+  <g font-size="22" fill="#222">
+    <rect x="50" y="100" width="240" height="100" rx="10" fill="#fff" stroke="#333" stroke-width="2"/>
+    <text x="170" y="140" text-anchor="middle" font-weight="bold">Actions</text>
+    <text x="170" y="174" text-anchor="middle" font-family="monospace" font-size="19">Update</text>
+
+    <rect x="420" y="100" width="230" height="100" rx="10" fill="#fff" stroke="#333" stroke-width="2"/>
+    <text x="535" y="140" text-anchor="middle" font-weight="bold">Release site</text>
+    <text x="535" y="174" text-anchor="middle" font-family="monospace" font-size="19">dist.tar.zst</text>
+
+    <rect x="50" y="320" width="240" height="100" rx="10" fill="#fff" stroke="#333" stroke-width="2"/>
+    <text x="170" y="360" text-anchor="middle" font-weight="bold">master</text>
+    <text x="170" y="394" text-anchor="middle" font-family="monospace" font-size="19">SITE_SHA256</text>
+
+    <rect x="780" y="320" width="250" height="100" rx="10" fill="#fff" stroke="#333" stroke-width="2"/>
+    <text x="905" y="360" text-anchor="middle" font-weight="bold">Workers Builds</text>
+    <text x="905" y="394" text-anchor="middle" font-family="monospace" font-size="19">make fetch-site</text>
+
+    <rect x="780" y="100" width="250" height="100" rx="10" fill="#fff" stroke="#333" stroke-width="2"/>
+    <text x="905" y="140" text-anchor="middle" font-weight="bold">Worker</text>
+    <text x="905" y="174" text-anchor="middle" font-family="monospace" font-size="19">emacs-doc.conao3.com</text>
+  </g>
+
+  <g stroke="#333" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+    <line x1="290" y1="150" x2="418" y2="150"/>
+    <line x1="170" y1="200" x2="170" y2="318"/>
+    <line x1="290" y1="370" x2="778" y2="370"/>
+    <line x1="620" y1="200" x2="800" y2="318"/>
+    <line x1="905" y1="320" x2="905" y2="202"/>
+  </g>
+
+  <g font-size="19" fill="#222">
+    <text x="300" y="138">① 上書き</text>
+    <text x="182" y="256">② SHA-256 を</text>
+    <text x="182" y="282">commit・push</text>
+    <text x="330" y="358">③ push でビルドが始まる</text>
+    <text x="430" y="250">④ curl で取り、</text>
+    <text x="430" y="276">SHA-256 を照らす</text>
+    <text x="915" y="266">⑤ deploy</text>
+  </g>
+</svg>

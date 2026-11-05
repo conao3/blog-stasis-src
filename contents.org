@@ -16755,6 +16755,139 @@ lean-ritsuryo のように、AI を使って書いたコードと証明をまと
 
 論文は [[https://aixiv.online/abs/2611.00464]] 、リポジトリは [[https://github.com/conao3/lean-ritsuryo]] です。
 
+* APIトークンを持たずにGitHub ActionsのビルドをCloudflare Workersへデプロイする
+:properties:
+:export_file_name: generated/contents/blog/2026/12e5f6
+:export_date: 2026-11-04
+:export_draft: t
+:end:
+
+GNU Emacs のマニュアルを日本語に機械翻訳したサイト [[https://emacs-doc.conao3.com]] を、Cloudflare Workers で公開しています。
+リポジトリは [[https://github.com/conao3/emacs-doc][conao3/emacs-doc]] (public) です。
+このサイトは GitHub にも Cloudflare にも API トークンを置かずにデプロイしています。
+ビルドは GitHub Actions で行い、生成物は GitHub の Release の添付ファイルとして置きます。
+デプロイは Cloudflare の Workers Builds が、その添付ファイルを取って行います。
+この記事では、この構成とその性質を紹介します。
+
+[[./resources/public/img/12e5f6-flow.svg]]
+
+** よくある方法はトークンを Secrets に置く
+GitHub Actions から Workers へデプロイする方法は、Cloudflare の公式の手順 ([[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions]]) に書かれています。
+この手順では、 =CLOUDFLARE_API_TOKEN= と =CLOUDFLARE_ACCOUNT_ID= をリポジトリの Secrets に置き、 =cloudflare/wrangler-action= に渡します。
+po4a で文書を翻訳してサイトを作る [[https://github.com/Netatalk/netatalk.io][Netatalk/netatalk.io]] も、同じようにトークンを Secrets に置いてデプロイしています。
+
+GitHub の OIDC を使えば、クラウドによってはトークンを置かずに済みます。
+しかし、Cloudflare は GitHub の OIDC を受け付けません。
+
+** Workers Builds では emacs-doc をビルドできない
+Workers Builds は Cloudflare の Git 連携の機能です。
+GitHub のリポジトリとつなぐと、監視するブランチへの push のたびに、Cloudflare 側で build command と deploy command (既定は =npx wrangler deploy=) を実行します。
+GitHub 側に Cloudflare のトークンを置く必要はありません。
+
+ただし、emacs-doc のサイトは Workers Builds の環境ではビルドできません。
+emacs-doc のビルドでは、Texinfo のマニュアルを =makeinfo --html= で HTML にし、po4a で訳を差し込みます。
+Workers Builds のビルドイメージ ([[https://developers.cloudflare.com/workers/ci-cd/builds/build-image/][Build image]]) は Ubuntu 24.04 で、Node や Python は入っていますが、texinfo・po4a・gettext は入っていません。
+また、1 回のビルドは 20 分までです ([[https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/][Limits & pricing]])。
+emacs-doc では、 =make pot= と =make site= だけでそれぞれ約 5 分かかります。
+
+** ビルドとデプロイを分ける
+そこで、ビルドは GitHub Actions、デプロイは Workers Builds に分けました。
+2 つをつなぐのは、固定の名前のリリース =site= の添付ファイル =dist.tar.zst= と、その SHA-256 を書いたファイル =SITE_SHA256= です。
+
+*** 1. Actions がサイトを作って Release に上げる
+Actions の =Update= ワークフローは手動 (=workflow_dispatch=) で回します。
+サイトを =dist/= に作ったあと、 =make package= で tar にします。
+
+#+begin_src makefile
+package:
+	mkdir -p build
+	tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --pax-option=delete=atime,delete=ctime \
+	  -C $(DIST_DIR) -cf build/dist.tar .
+	zstd -q -19 -f --rm -o $(SITE_ARCHIVE) build/dist.tar
+	sha256sum $(SITE_ARCHIVE) | cut -d" " -f1 > SITE_SHA256
+#+end_src
+
+tar のオプションは同じファイルから同じバイト列を作るためのものです。
+ファイルを名前の順に並べ、更新時刻と所有者・グループを 0 に固定し、pax ヘッダーからアクセス時刻 (atime) と状態の変更時刻 (ctime) を外します。
+手元で作った tar と Actions で作った tar の SHA-256 は一致しました。
+
+できた tar で、リリース =site= の添付ファイルを上書きします。
+
+#+begin_src yaml
+- name: Upload the site to the release
+  env:
+    GH_TOKEN: ${{ github.token }}
+  run: |
+    gh release view site >/dev/null 2>&1 || gh release create site --title site \
+      --notes "The site deployed by Workers Builds (make fetch-site)." --latest=false
+    gh release upload site build/dist.tar.zst --clobber
+#+end_src
+
+ワークフローの権限は =contents: write= で、Actions が自動で発行する =GITHUB_TOKEN= だけで足ります。
+
+*** 2. SHA-256 を master に commit する
+続けて、 =SITE_SHA256= を master に commit して push します。
+tar の中身が前回と同じなら =SITE_SHA256= も変わらないので、commit は作りません。
+次のステップは PO ファイルの扱いを省いて抜粋したものです。
+
+#+begin_src yaml
+- name: Commit the catalogs and the checksum of the site
+  run: |
+    git config user.name "github-actions[bot]"
+    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    git add EMACS_REVISION SITE_SHA256 po/*.ja.po
+    if ! git diff --cached --quiet; then
+      git commit -m "Update the site for Emacs $(cut -c1-10 EMACS_REVISION)"
+      git push
+    fi
+#+end_src
+
+*** 3. Workers Builds が tar を取ってデプロイする
+Worker =emacs-doc= は Workers Builds で GitHub の master とつないでいます。
+build command は =make fetch-site= 、deploy command は =npx wrangler deploy= です。
+
+#+begin_src makefile
+SITE_URL := https://github.com/conao3/emacs-doc/releases/download/site/dist.tar.zst
+
+fetch-site:
+	mkdir -p build
+	curl -fsSL --retry 3 -o $(SITE_ARCHIVE) $(SITE_URL)
+	echo "$$(cat SITE_SHA256)  $(SITE_ARCHIVE)" | sha256sum --check
+	rm -rf $(DIST_DIR)
+	mkdir $(DIST_DIR)
+	tar --zstd -xf $(SITE_ARCHIVE) -C $(DIST_DIR)
+#+end_src
+
+public のリポジトリの Release の添付ファイルは、認証なしの curl で取れます。
+取った tar を =sha256sum --check= で =SITE_SHA256= と照らし、 =dist/= に展開します。
+=wrangler.jsonc= の =assets.directory= が =./dist= なので、 =npx wrangler deploy= は =dist/= を Worker の静的アセットとして上げます。
+curl、sha256sum、tar、zstd はどれもビルドイメージに入っているコマンドなので、Workers Builds の環境で動きます。
+デプロイが終わると、GitHub の commit に =Workers Builds: emacs-doc= の check run が付きます。
+
+** この構成の性質
+- GitHub の Secrets は空で、Cloudflare の API トークンをどこにも置きません。Actions が使うのは =GITHUB_TOKEN= だけです。
+- 生成物を git の履歴に入れません。サイトは 2,240 ファイルで、tar にすると 49 MB、zstd で圧縮すると 4.7 MB になります。サイトについて履歴に入るのは、64 文字の SHA-256 だけです。
+- tar は同じファイルから同じバイト列になります。サイトの中身が変わらなければ =SITE_SHA256= も変わらず、Actions は commit を作らないので、デプロイも走りません。
+- README の修正など、 =SITE_SHA256= を変えない push でも Workers Builds は動きます。このときは同じ tar を取って、同じサイトをデプロイし直します。
+- =SITE_SHA256= と Release の tar が食い違うと、 =sha256sum --check= が失敗して build command も失敗します。このとき deploy command は実行されないので、公開中のサイトは前のままです。公開されるのは、 =SITE_SHA256= と一致した tar だけです。
+
+一方で、Release に置く tar は常に最新の 1 つだけです。
+古い commit をデプロイし直そうとしても、その commit の =SITE_SHA256= は今の tar と合わないので、ビルドが失敗します。
+同じ理由で、Actions が tar を上げてから =SITE_SHA256= を push するまでの間に別の push があると、そのビルドも失敗します。
+元に戻すには、元の状態でサイトを作り直して上げるしかありません。
+
+** 似た構成の実例
+トークンを置かずに Actions の生成物を公開する実例は、GitHub Pages に多くあります。
+=actions/upload-pages-artifact= で生成物を artifact に上げ、 =actions/deploy-pages= が =id-token: write= の OIDC で公開する構成です。
+po4a で訳した FreeBSD の文書を公開する [[https://github.com/fierceX/freebsd-doc-cn][fierceX/freebsd-doc-cn]] や、makeinfo でマニュアルを作る [[https://github.com/r0man/beads.el][r0man/beads.el]] がこの形です。
+
+Release の添付ファイルを Workers Builds が取ってデプロイする構成は、GitHub のコード検索と Web 検索では実例が見つかりませんでした。
+
+** おわりに
+Workers Builds の環境でビルドできないサイトでも、ビルドを Actions に任せ、生成物を public の Release に置けば、トークンを持たずに Workers へデプロイできます。
+ビルドとデプロイの間を SHA-256 でつないでいるので、公開されるのは master の =SITE_SHA256= と一致した tar だけです。
+Workers の静的アセットで配りたいけれど、Cloudflare のトークンを GitHub に置きたくないときに使えます。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
