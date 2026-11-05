@@ -16891,7 +16891,6 @@ Workers の静的アセットで配りたいけれど、Cloudflare のトーク�
 :properties:
 :export_file_name: generated/contents/blog/2026/33d2c2
 :export_date: 2026-11-05
-:export_draft: t
 :end:
 
 Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重みが、2026-11-05 に公開されました。
