@@ -150,7 +150,7 @@ my/stasis-new
 
 これはEmacs-22でも動く =use-package= もどきを作るしかないじゃないかということで[[https://github.com/conao3/leaf.el][leaf.el]]なるパッケージを作り始めました。
 標準添付テスターのertもEmacs-24からですし、パッケージマネージャのpackage.elもEmacs-23からの対応なので、それぞれEmacs-22から動作する[[https://github.com/conao3/cort.el][cort.el]]、[[https://github.com/conao3/feather.el][feather.el]]を作成することになります。
-手元でレガシーEmacsの挙動を確かめるためには複数バージョンのEmacsを飼うのが一番手っ取り早いわけで、その特殊な状況の.emacs.dの構成であることを了承いただけばと思います。
+手元でレガシーEmacsの挙動を確かめるためには複数バージョンのEmacsを飼うのが一番手っ取り早いわけで、その特殊な状況の.emacs.dの構成であることを了承いただければと思います。
 [[https://github.com/conao3/dotfiles/commit/fd06cea5dd040ec1fb34225a3f3202200e00801e][8月]]から試行錯誤を繰り返してようやく完成が見え始めましたので書き記す次第です。
 
 ** 他の人のディレクトリ構造の調査
@@ -175,10 +175,10 @@ my/stasis-new
 └── info/           -> infoファイル用ディレクトリ
 #+end_example
 
-(改定新板で更新があったのかは手元にないので分からないです。。)
+(改訂新版で更新があったのかは手元にないので分からないです。。)
 
 *** [[https://github.com/jwiegley/dot-emacs][jwiegley/dot-emacs]]
-use-pacakge作者、jwiegleyさんの.emacs.d。省略あり。
+use-package作者、jwiegleyさんの.emacs.d。省略あり。
 
 基本的な「パッケージの設定」はルートディレクトリ、「自作パッケージ」は =lisp/= 、
 「package.elでダウンロードしたパッケージ」は =elpa/= に入れるようになっているようです。
@@ -330,7 +330,7 @@ localディレクトリやbuildディレクトリの存在しない場合をケ�
 ;;; init.el ends here
 #+end_src
 
-=user-emacs-directory= を現在起動中のEmacsバージョンを利用して設定し直すことで、バージョンごとにEmacsから見えるディレクトリ完全に分離できます。
+=user-emacs-directory= を現在起動中のEmacsバージョンを利用して設定し直すことで、バージョンごとにEmacsから見えるディレクトリを完全に分離できます。
 
 [[http://peccu.hatenablog.com/entry/20130218/trial_init][お試しinit.el]]のテクニックで得られた起動時に動的に与えることのできるルートフォルダから更に =local/[ver]= とディレクトリを掘り、その場所を =user-emacs-directory= としています。
 
@@ -339,7 +339,7 @@ localディレクトリやbuildディレクトリの存在しない場合をケ�
 バイトコンパイルされたelに詳しくないのですが、メジャーバージョンが異なるEmacs同士で正常に実行できるか保証されていないようなので、複数バージョンのEmacsを飼う場合このような運用は必須です。
 
 ** Makefile
-=make= はC++やC#で作られた超巨大建築物に対して使用するものだと思っていましたが、実は並べたコマンドを実行するだけの一般的なツールで、定形作業をジョブとして保存しておき簡単に呼び出すことが出来ます。
+=make= はC++やC#で作られた超巨大建築物に対して使用するものだと思っていましたが、実は並べたコマンドを実行するだけの一般的なツールで、定型作業をジョブとして保存しておき簡単に呼び出すことが出来ます。
 
 もちろん強力な依存関係解決能力を持っており、必要な作業を必要なだけ行うことが出来ます。またすべての依存関係を解決した後に作業に移るので、ジョブの独立性も把握でき、 =-j[d]= オプション(dは整数)を付けるだけで、最大d個のコマンドを並列に実行してくれます。
 
@@ -555,7 +555,7 @@ $(LOCAL_TEMPLETES): $(TEMPLETEDIR)
         ln -s ../../$(@F) $(LOCALDIR)/$(call STRCUTREV,$@,'/',1)/
 #+end_src
 
-**** LOCAL_MIXEXCFILES
+**** LOCAL_MIXELCFILES
 =LOCAL_MIXELCFILES= は =conao-mixed.el= のコンパイルによりできますが、この作業はローカルに =conao-mixed.el= が存在することと、site-lispの各ディレクトリに依存しています。
 
 つまりsite-lispのどれかのファイルが変わったら =conao-mixed.el= は再コンパイルされるわけです！すごい！
@@ -743,7 +743,7 @@ clean:
         @$(call ECHO_CYAN,"make job:clean completed!!","\n","\n")
 #+end_src
 
-* EmacsのパッケージもTravis Clしてbuild:passingしたい！
+* EmacsのパッケージもTravis CIしてbuild:passingしたい！
 :properties:
 :export_file_name: generated/contents/blog/2018/48bb55
 :export_date: 2018-12-08
@@ -762,9 +762,9 @@ clean:
 
 テストとマージを短い間隔で行う開発手法を「継続的インテグレーション」と呼ぶ？あまり詳しくないので避けると、とりあえずテストケースは正常に動くことが保証されたソフトが開発できます。
 
-Travis Clを使いますが、使っているのはただ単にGitHubのトップページに「build:passing」のバッチがついてるとかっこいいなと思うからです。はい動機終わり。
+Travis CIを使いますが、使っているのはただ単にGitHubのトップページに「build:passing」のバッジがついてるとかっこいいなと思うからです。はい動機終わり。
 
-なお、個人のEmacsのパッケージ等はビルドとテストにかかる時間も短いので、私は「すべてのコミットの前にターゲットバージョンですべてのテストが通る」ことを確認しています。そんなコミットする前にいちいちテストの終了を待つなんて意識高いなと思わないでください。ただ単にTravis Clでfailした履歴を残したくないだけです。
+なお、個人のEmacsのパッケージ等はビルドとテストにかかる時間も短いので、私は「すべてのコミットの前にターゲットバージョンですべてのテストが通る」ことを確認しています。そんなコミットする前にいちいちテストの終了を待つなんて意識高いなと思わないでください。ただ単にTravis CIでfailした履歴を残したくないだけです。
 
 ** Ertとの違い
 EmacsにはEmacs-24から標準添付されているErtというユニットテストフレームワークが存在します。leaf.elは初期の段階ではErtを使用しており、Emacs-23とEmacs-22のテストはまた後で考えればいいやと思っていました。
@@ -831,7 +831,7 @@ GUIからインタラクティブにテスト実行できるのですが、テ�
 パッケージのテストを行う時は、ほとんどの方が「-q」や「-Q」オプションを付けられていると思います。これは自分のローカル設定を読み込まず、起動を早くする側面もあると思いますが、第一には問題の切り分けをしやすくするためだと思います。
 
 その点、cort.elは1ファイルで完結しており、ごてごてしたパッケージをパッケージマネージャでダウンロードして、、、という過程を踏む必要がありません。
-基本的にはcort.elをユーザーの方のレポジトリに放り込んでもらうことを想定してます。もちろんsubmoudleで持ってもいいんですが、たかだか1ファイルにそこまでする？という思いがします。
+基本的にはcort.elをユーザーの方のレポジトリに放り込んでもらうことを想定してます。もちろんsubmoduleで持ってもいいんですが、たかだか1ファイルにそこまでする？という思いがします。
 
 ** build:passingしたい！
 とりあえず =build:passing= したい！という方もいると思うので、まずは場面設定から。
@@ -956,7 +956,7 @@ cort.elが検証するテストケースをつらつら書きます。キーワ�
 
 =:cort-if= や =:cort-eamcs= キーワードを除いて、結構読みやすいテストケース定義が実現できていると思います。条件分岐キーワードは慣れないと見づらいかもしれません。cort.elのテストケースでも、クオートがついているS式はその値のまま保存され、クオートのついていないS式は評価されます。
 
-こうやってcort.elと設定ファイル2つを準備することによって、Travis Clで自動テストさせることが出来ます。Travis Clの使い方やバッチの貼り方などは他の人の記事に譲り、cort.elのシンタックスを説明したいと思います。
+こうやってcort.elと設定ファイル2つを準備することによって、Travis CIで自動テストさせることが出来ます。Travis CIの使い方やバッジの貼り方などは他の人の記事に譲り、cort.elのシンタックスを説明したいと思います。
 
 ** シンタックス
 *** はじめに
@@ -1260,7 +1260,7 @@ make test
 
 この画像の通り、Org-Modeはそれ自身が高性能なマークアップ言語でありながら、[[http://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][任意の言語のコード実行]]、さらには[[http://lioon.net/org-table-tutorial][表計算]]！などを用いて文書を作成し、それを[[https://orgmode.org/manual/Exporting.html][任意のフォーマットへのアウトプット]]が可能で、すべての文書のハブともいうべき存在になっています。これを万能文書と呼ぶことにします。（21フォーマットのエクスポーターが標準添付（contrib）され、MELPAにはさらに29種ものエクスポーターが登録されています）
 
-例えば現代においてばHTMLをタグ直書きで文書を書いている人はほとんどいないと思います。なぜならHTMLタグは人間が書くには冗長すぎる他（閉じタグなど）、本質的でないメタ情報が文書中に散らばり（head, id, class）、文書の再利用性が極端に低くなるからです。
+例えば現代においてはHTMLをタグ直書きで文書を書いている人はほとんどいないと思います。なぜならHTMLタグは人間が書くには冗長すぎる他（閉じタグなど）、本質的でないメタ情報が文書中に散らばり（head, id, class）、文書の再利用性が極端に低くなるからです。
 
 よって賢明な方ならばPHPのようなテンプレート言語で生成したり、マークダウンから[[https://pandoc.org/][pandoc]]で変換したりすると思います。これによりメタ情報部と文書部が分離でき、再利用性が上がり、保守性も向上します。
 
@@ -1793,8 +1793,8 @@ zkさんの =key-chord= を読み込んでいる場合、melpaの =key-chord= �
 
 命名は「設定の『葉っぱ』を設定できるパッケージ」に由来します。Melpaに登録する時、分かりづらいので変えてくれと言われたら変わるかもしれません。
 
-use-packageはpackageの設定を行うことを念頭に置いているのでその命名になっていますが、私の使い方ではpackageだけにとどまりまっていません。
-前述のように何か一つの目的のために多くの行を咲くようであったら、それをleafで囲みますし、また別の区切りもあるかもしれません。
+use-packageはpackageの設定を行うことを念頭に置いているのでその命名になっていますが、私の使い方ではpackageだけにとどまっていません。
+前述のように何か一つの目的のために多くの行を割くようであったら、それをleafで囲みますし、また別の区切りもあるかもしれません。
 
 現在の私のinit.elではCソース1ファイルずつにleafを割り当てて設定を行っています。
 
@@ -1808,7 +1808,7 @@ use-packageはpackageの設定を行うことを念頭に置いているので�
 use-packageから離れる原因となった大きな理由を解消します。実際、lispなのでEmacs-22で動くようなコードを書くことはあまり障害になりません。
 
 *** feather.elとの連携（開発中）
-前段でpackage.elの不満点が出てきました。そういえばpackage.elはダウンロードするバージョンの固定ができないし、なぜか1つづつダウンロードするし、なぜかコンパイルする間、次のパッケージをダウンロードしません。
+前段でpackage.elの不満点が出てきました。そういえばpackage.elはダウンロードするバージョンの固定ができないし、なぜか1つずつダウンロードするし、なぜかコンパイルする間、次のパッケージをダウンロードしません。
 
 ということで新しいパッケージマネージャの開発に着手しました。tadsanさんに教えていただいたのですが、PHPでもこういう思想で作られた[[http://blog.tojiru.net/article/432944706.html][ソフトがある]]ようです。
 
@@ -1819,7 +1819,7 @@ feather.elは依存関係をきちんと考慮した上で、並列にパッケ�
 leaf.elはfeather.elをデフォルトで =:ensure= キーワードのバックエンドとして使用し、ユーザーとしては =use-package= を =leaf= に置換するだけでfeather.elのパワフルなパッケージマネージメントを利用できるようになる予定です。
 
 *** ユーザーによる自由なキーワード追加
-use-packageはキーワードの引数をnormarizeとhandlerの2つの関数で管理していますが、それが処理が見づらい原因になっていると思います。
+use-packageはキーワードの引数をnormalizeとhandlerの2つの関数で管理していますが、それが処理が見づらい原因になっていると思います。
 
 leaf.elはhandlerの一つだけの関数で処理を行っており、とても素直な実装になっています。
 さらにhandlerは必ずリストを返し、受け取り側では必ず =,@= でリストを開いて結合するルールになっており、統一性のあるコードになっていると思います。マクロ展開なので、バッククオートとカンマが多く、マクロに慣れていないと読みづらい可能性があります。。
@@ -1937,7 +1937,7 @@ Elispの場合、C言語で実装されている関数はすべてスペシャ�
 3. コンパイラマクロ
 
 ** leaf.elの概略
-[[https://github.com/conao3/leaf.el][leaf.el]]はjwiegley氏の[[https://github.com/jwiegley/use-package][use-package]]と同様に、Emacsのinie.elで頻出のイディオムを隠蔽し、編集しやすく、そして管理しやすくするものです。
+[[https://github.com/conao3/leaf.el][leaf.el]]はjwiegley氏の[[https://github.com/jwiegley/use-package][use-package]]と同様に、Emacsのinit.elで頻出のイディオムを隠蔽し、編集しやすく、そして管理しやすくするものです。
 ~use-package~ はとても良く出来ていて、愛用していたのですが、問題もありました。（省略するので、別途[[https://s.conao3.com/blog/2018/8aa938][Qiita記事]]を参照）
 
 - ~:if~ ~:disabled~ で無効化されているパッケージがなぜか読み込まれている。
@@ -2008,7 +2008,7 @@ Elispの場合、C言語で実装されている関数はすべてスペシャ�
 ** Footnotes
 [fn:1] 東京大学 - [[http://www.jsk.t.u-tokyo.ac.jp/~inamura/lecture/download/20051205_soft3_lisp1.pdf][ソフトウェア第三 講義資料 - Lisp処理系, リスト処理]]
 [fn:2] Paren-holic - [[https://booth.pm/ja/items/1317263][3つのLisp 3つの世界]]
-[fn:3] STUART C. SHAPIRO - [[https://cse.buffalo.edu/~shapiro/Commonlisp/commonLisp.pdf][Common lisp - An Interacive approach]]
+[fn:3] STUART C. SHAPIRO - [[https://cse.buffalo.edu/~shapiro/Commonlisp/commonLisp.pdf][Common lisp - An Interactive approach]]
 [fn:4] Harold Abelson 他 著 和田 栄一 訳 - [[https://sicp.iijlab.net/fulltext/xcont.html][計算機プログラムの構造と解釈]]
 [fn:5] Richard Stallman 他 著 Ayatakesi 訳 - [[https://ayatakesi.github.io/lispref/24.5/elisp.html#Evaluation][GNU Emacs Lisp Reference Manual]]
 
@@ -2587,7 +2587,7 @@ Spacemacsは使っていないのですが、言語毎、目的毎に =Layer= �
              ("C-M-a" . sp-beginning-of-sexp)
              ("C-M-e" . sp-end-of-sexp))
             (:lisp-mode-map                          ; lisp-mode-mapへの割り当ての開始
-             :pacakge lisp-mode
+             :package lisp-mode
              ("C-c s" . smartparens-strict-mode)))))
 ;; => (prog1 'smartparens
 ;;      (autoload #'smartparens-mode "smartparens" nil t)
@@ -2702,7 +2702,7 @@ leafの[[https://github.com/conao3/leaf.el][README]]は =leaf= のtestファイ�
      (prog1 'leaf))))
 #+end_src
 
-つまり、leaf--nameはleaf--nameを省略された引数のデフォルト値として使うキーワード(後述)を使わない限り、自由につけていいということです。
+つまり、 =leaf--name= は =leaf--name= を省略された引数のデフォルト値として使うキーワード(後述)を使わない限り、自由につけていいということです。
 
 しかし無用のトラブルを避けるために、単に =leaf= をまとめるためだけの =leaf= の名前はアスタリスク =*= を付与し、 =:config= キーワードのみを使うようにしたほうが良いと思います。
 
@@ -2750,7 +2750,7 @@ leafの[[https://github.com/conao3/leaf.el][README]]は =leaf= のtestファイ�
 
 =leaf= では =require= 文を生成させるために =:require= キーワードを使う必要があります。これは =use-package= において =require= 文を生成しないように =:no-require= キーワードを使用することと全く逆です。
 
-なお、 =t= を指定した場合はleaf--nameを =require= します。複数のパッケージを =require= したい場合は、単にシンボルを書き連ねていけば良いです。
+なお、 =t= を指定した場合は =leaf--name= を =require= します。複数のパッケージを =require= したい場合は、単にシンボルを書き連ねていけば良いです。
 
 #+begin_src emacs-lisp
 (cort-deftest-with-macroexpand leaf/require
@@ -2791,7 +2791,7 @@ leafの[[https://github.com/conao3/leaf.el][README]]は =leaf= のtestファイ�
 **** :ensure, :package, :el-get, :straight
 =use-package= と同様に =:ensure= キーワードを使って、Emacs付属のパッケージマネージャ =package.el= を用いてパッケージをインストールすることができます。
 
-=:require= と同じように =t= はleaf--nameと解釈し、シンボルが与えられた場合、そのパッケージをインストールします。個人的には使いどころが分かりませんが、複数のシンボルも受理でき、それぞれをインストールできます。(ただ、依存関係はパッケージマネージャが解決してくれるので、本当に使いどころが分からない。)
+=:require= と同じように =t= は =leaf--name= と解釈し、シンボルが与えられた場合、そのパッケージをインストールします。個人的には使いどころが分かりませんが、複数のシンボルも受理でき、それぞれをインストールできます。(ただ、依存関係はパッケージマネージャが解決してくれるので、本当に使いどころが分からない。)
 
 #+begin_src emacs-lisp
 (cort-deftest-with-macroexpand leaf/package
@@ -2856,9 +2856,9 @@ leafの[[https://github.com/conao3/leaf.el][README]]は =leaf= のtestファイ�
 
 この復帰動作は =use-package= が出力するコードに含まれていません。Emacs起動時にパッケージインストールに失敗して、手動でレシピを更新した後にEmacsを再起動した経験は一度や二度ではないと思います。 =leaf= ではそのようなことは起こりません。
 
-また、 =leaf= は元々 =:ensure= キーワードで =package.el= のみをサポートしていましたが、leaf-keywordsパッケージによるキーワード追加の恩恵を得ることで =:el-get=, =:straight= のキーワードを使用することができるようになりました。そのため =pacakge.el= 専用のキーワードとして =:package= というキーワードを用意しました。
+また、 =leaf= は元々 =:ensure= キーワードで =package.el= のみをサポートしていましたが、leaf-keywordsパッケージによるキーワード追加の恩恵を得ることで =:el-get=, =:straight= のキーワードを使用することができるようになりました。そのため =package.el= 専用のキーワードとして =:package= というキーワードを用意しました。
 
-=:pacakge= キーワードは =:ensure= キーワードと全く同じです。 =package.el= を使うことを強くアピールしたい時はこのキーワードを使うことができます。ただ将来的に =:ensure= キーワードを「パッケージをインストールする」という意味の汎用的なキーワードにして、処理するバックエンドをカスタマイズできるようにするかもしれません。その場合でも =:ensure= を処理するデフォルトのパッケージは =package.el= にするので、動作が意図せず変わることはないです。
+=:package= キーワードは =:ensure= キーワードと全く同じです。 =package.el= を使うことを強くアピールしたい時はこのキーワードを使うことができます。ただ将来的に =:ensure= キーワードを「パッケージをインストールする」という意味の汎用的なキーワードにして、処理するバックエンドをカスタマイズできるようにするかもしれません。その場合でも =:ensure= を処理するデフォルトのパッケージは =package.el= にするので、動作が意図せず変わることはないです。
 
 さて、 =el-get= と =straight= の使い方は他の記事に譲りますが、 =leaf= はこれらの全機能を =leaf= から使用することができます。
 
@@ -3044,7 +3044,7 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 
 「善いパッケージ」はユーザーがエントリーポイントとして実行する関数についてきちんとマジックコメントを記載し、パッケージマネージャに指示を与えますが、メンテナンス状況が良くないパッケージなどはそのマジックコメントが正しく記載されていない場合があります。
 
-その限られた場合にこのキーワードを使い、leaf--nameの関数としてautoloadを設定します。
+その限られた場合にこのキーワードを使い、 =leaf--name= の関数としてautoloadを設定します。
 
 また、後述しますが、バインド系のキーワードに設定された関数は全て =:commands= と同じ形式でautoloadを設定されます。さらに言えば、このautoloadがきちんと設定される副作用を目的として、 =leaf= のキーワードを使うメリットがあります。
 
@@ -3064,7 +3064,7 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 #+end_src
 
 **** :after
-パッケージにはそれぞれ、動作するための前提条件があり、他のパッケージに依存するパッケージは極めて一般的です。その場合、lazy-laodを考慮した上で、あるパッケージが読み込まれた「後に」ロードや設定を行う必要があることがあります。
+パッケージにはそれぞれ、動作するための前提条件があり、他のパッケージに依存するパッケージは極めて一般的です。その場合、lazy-loadを考慮した上で、あるパッケージが読み込まれた「後に」ロードや設定を行う必要があることがあります。
 
 =:after= キーワードは単に数個のシンボルを指定するだけで、強力な =eval-after-load= 文を生成します。
 
@@ -3274,10 +3274,10 @@ Emacsには関数のアドバイス機構が用意されており、advice-add�
 
 =:setq= や =:pre-setq= キーワードも用意されていますが、 =defvar= で宣言された変数も =custom-set-variables= を使って有効化できるので、簡単に =:custom= キーワードを使って設定できます。
 
-**** :mode, :interperter, :magic, :magic-fallback
+**** :mode, :interpreter, :magic, :magic-fallback
 現在、パッケージ作者がきちんと =auto-mode-alist= の設定を行ってくれているので、このキーワードを使用する機会は少ないかもしれませんが、普通の割り当てではない割り当てを行う場面では必要になるかもしれません。
 
-私のinit.elでは =web-mode= のみがこのキーワードを使用しています。通常ドット対を期待しますが、ドット対のcdrを省略した場合、leaf--nameを指定されたものとして変換します。
+私のinit.elでは =web-mode= のみがこのキーワードを使用しています。通常ドット対を期待しますが、ドット対のcdrを省略した場合、 =leaf--name= を指定されたものとして変換します。
 
 #+begin_src emacs-lisp
 (cort-deftest-with-macroexpand leaf/mode
@@ -3321,7 +3321,7 @@ Emacsには関数のアドバイス機構が用意されており、advice-add�
 **** :hook
 hookを設定するキーワードです。 =use-package= *とは違って、* hookの全体のシンボルを指定する必要があります。これは =use-package-hook-name-suffix= が =""= に設定してある場合の挙動と同じです。これは定義ジャンプをしやすくする効果があります。
 
-=:mode= などと同じように、ドット対を期待してますが、ドット対のcdrを省略した場合、leaf--nameを指定されたものとして変換します。
+=:mode= などと同じように、ドット対を期待してますが、ドット対のcdrを省略した場合、 =leaf--name= を指定されたものとして変換します。
 
 #+begin_src emacs-lisp
 (cort-deftest-with-macroexpand leaf/hook
@@ -3498,7 +3498,7 @@ leafブロックを指定されたキーワードに対応する関数でくく�
 **** :defun, :defvar
 init.elをバイトコンパイルする際にワーニングが出る場合は =declare-function= と =defvar= によってワーニングを抑制する必要があります。
 
-=:defun= もドット対(やそのリスト)を期待していますが、ドット対のcdrを省略した場合はleaf--nameの関数として登録を行います。
+=:defun= もドット対(やそのリスト)を期待していますが、ドット対のcdrを省略した場合は =leaf--name= の関数として登録を行います。
 
 =:defvar= はただ変数を定義するだけなので、シンボル(のリスト)を期待します。
 
@@ -3661,7 +3661,7 @@ with values for these keywords."
 #+end_src
 
 **** :leaf-autoload
-=leaf= はキーバインドのキーワードなどで、関数をleaf--nameの関数として自動的に =autoload= として登録するようにコードを生成します。
+=leaf= はキーバインドのキーワードなどで、関数を =leaf--name= の関数として自動的に =autoload= として登録するようにコードを生成します。
 
 このキーワードを =nil= に設定すると、この機能をオフにします。個人的に使いどころが分かりません。。
 
@@ -3713,7 +3713,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 - リリースしたもの
   - [[https://github.com/conao3/leaf.el/blob/master/leaf.el][leaf.el]]: use-packageを発展させた、シンプルで拡張性の高い、パッケージ設定のためのパッケージ
   - [[https://github.com/conao3/leaf-keywords.el][leaf-keywords.el]]: leaf.elのための外部パッケージに関する追加キーワード
-  - [[https://github.com/conao3/seml-mode.el][seml-mote.el]]: S式からHTMLを生成するジェネレータとそのメジャーモード
+  - [[https://github.com/conao3/seml-mode.el][seml-mode.el]]: S式からHTMLを生成するジェネレータとそのメジャーモード
   - [[https://github.com/conao3/ddskk-posframe.el][ddskk-posframe.el]]: ddskkの変換ポップアップをposframeで表示
   - [[https://github.com/conao3/cort-test.el][cort-test.el]]: Elispパッケージのための、シンプルなテストフレームワーク
 - メンテナンスを行っているもの
@@ -3797,7 +3797,7 @@ Emacsはあなたにも少なからざるものを与えてくれると信じて
 
 さらに、体感ですが、Travis CIよりJobの起動が早い気がします。バックエンドとしてGCPでなくAzureを使っている影響かもしれません。
 
-Emacs畑でも、MELPAの管理をしているpurcelさんがActionsでEmacsが使えるようにする、[[https://github.com/purcell/setup-emacs][setup-emacs]]を作成したりと盛り上がっています。
+Emacs畑でも、MELPAの管理をしているpurcellさんがActionsでEmacsが使えるようにする、[[https://github.com/purcell/setup-emacs][setup-emacs]]を作成したりと盛り上がっています。
 
 ** 出来上がったもの
 完成形を示します。新しいプロジェクトでActionsを使うときは、下記手順を踏むことで簡単に複数バージョンでのCIが走ります。すごい!!
@@ -3931,7 +3931,7 @@ jobs:
 *** setup-caskの作成
 今回作成した =setup-cask= は[[https://github.com/conao3/setup-cask][こちら]]に置いてあります。
 
-まず[[https://github.com/actions/setup-python][setup-python]]をフォークし、それとpurcelさんの[[https://github.com/purcell/setup-emacs][setup-emacs]]と見比べながら作成しました。
+まず[[https://github.com/actions/setup-python][setup-python]]をフォークし、それとpurcellさんの[[https://github.com/purcell/setup-emacs][setup-emacs]]と見比べながら作成しました。
 
 なおCask本体はバージョニングされていますが、依存関係のバージョニングはされておらず、常に最新版に依存することになっています。そのためキャッシュ機能を省くことにしました。結果として簡単にPython用の =setup-python= からCask用に変換することができました。
 
@@ -4193,13 +4193,13 @@ emacs-jpの有志によって大量のカラーテーマが変換されました
 
 MELPAで「theme」と検索すると現在[[https://melpa.org/#/?q=theme][257パッケージがヒット]]します。それぞれにこの定義が書いてあるというのは恐ろしいと思います。管理できないし、報われない。。
 
-** solarized-zenbarn
+** solarized-zenburn
 「[[https://pawelbx.github.io/emacs-theme-gallery/][Emacs Theme Gallery]]」から1位のzenburnをsolarizedのAPIを使って再現してみます。
 
 私も作りながら記事を書いているので、ぜひ一緒に作ってみるとどうやって使うのか分かりやすいと思います。
 
 *** コアパレットの用意
-zenbarnは[[https://github.com/bbatsov/zenburn-emacs][bbatsov/zenburn-emacs]]に置かれており、色の定義は[[https://github.com/bbatsov/zenburn-emacs/blob/cf3b33c6807a6d72172a5b2164e3513c70dc7b28/zenburn-theme.el#L104-L157][こちら]]です。
+zenburnは[[https://github.com/bbatsov/zenburn-emacs][bbatsov/zenburn-emacs]]に置かれており、色の定義は[[https://github.com/bbatsov/zenburn-emacs/blob/cf3b33c6807a6d72172a5b2164e3513c70dc7b28/zenburn-theme.el#L104-L157][こちら]]です。
 #+begin_src emacs-lisp
   (defvar zenburn-default-colors-alist
     '(("zenburn-fg-1"     . "#656555")
@@ -4357,7 +4357,7 @@ init.elに下記のleafを書きます。
 まだ空きがあるので、ぜひ参加頂ければと思います!
 
 ** leafについて
-[[https://github.com/conao3/leaf.el][leaf.el]]はjwiwgleyさんの[[https://github.com/jwiegley/use-package][use-package]]を2.5年使った上で、私が感じていたストレスを解消するためにスクラッチから開発したパッケージです。Qiitaでもプレリリースとリリース時に記事を書きましたが、半年経つと新機能も増えてきます。
+[[https://github.com/conao3/leaf.el][leaf.el]]はjwiegleyさんの[[https://github.com/jwiegley/use-package][use-package]]を2.5年使った上で、私が感じていたストレスを解消するためにスクラッチから開発したパッケージです。Qiitaでもプレリリースとリリース時に記事を書きましたが、半年経つと新機能も増えてきます。
 
 - プレリリース記事: [[https://s.conao3.com/blog/2018/8aa938][use-packageからの移行のすゝめ - leaf.elでバージョン安全なinit.elを書く]]
 - リリース記事: [[https://s.conao3.com/blog/2019/2b6cbf][{正式リリース}leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする]]
@@ -4614,7 +4614,7 @@ use-packageにもあるみたいですが、どうやらバグっているとの
 
 目玉機能その2です。機密情報をEmacsの外に保存して、動的に復号し、Emacsの中で使う =auth-sources= のleafキーワードです。
 
-この機能についてはちょっと説明が必要なので、別記事にし +てAdvent Calenarの穴埋めをし+ ます。
+この機能についてはちょっと説明が必要なので、別記事にし +てAdvent Calendarの穴埋めをし+ ます。
 
 *** Add leaf-key-bindlist visualization
 - [[https://github.com/conao3/leaf.el/issues/289][#289 Add leaf-key-bindlist visualization]]
@@ -4623,7 +4623,7 @@ use-packageにもあるみたいですが、どうやらバグっているとの
 
 これも、もともとuse-packageに実装されている =describe-personal-bindings= の移植です。
 
-しかし、use-packageでは単にbufferにフォーマットされた文字列を表示するだけですが、 =leaf-key-describe-bindings= ではEmacsビルドインの表データ表示ライブラリ、 =tabulated-list= を使用して表示します。
+しかし、use-packageでは単にbufferにフォーマットされた文字列を表示するだけですが、 =leaf-key-describe-bindings= ではEmacsビルトインの表データ表示ライブラリ、 =tabulated-list= を使用して表示します。
 
 [[./resources/public/img/3279ec-leaf-bind-list.png]]
 
@@ -4756,7 +4756,7 @@ leaf-keywords.elの追加機能です。leaf-keywords.elによって出力され
     :hook (t . other-mode))
   #+end_src
 
-leafは結構大きなDSL解析器になっていて、デバックも大変になってきています。とりあえず、テストケースは全部通ることを確認しているので、見つけ次第追加していくしかないですね。。
+leafは結構大きなDSL解析器になっていて、デバッグも大変になってきています。とりあえず、テストケースは全部通ることを確認しているので、見つけ次第追加していくしかないですね。。
 
 なお、Readmeや私が書くleafの記事で紹介しているものはテストケースから抜き出したものなので、動くことが保証されています。
 
@@ -4905,7 +4905,7 @@ Elispはバイトコンパイルすることができ、通常の =.el= から =
 しかしleaf.elを使っている場合、そのままではバイトコンパイルできません。なお、[[https://github.com/conao3/leaf.el][leaf.elのReadme]]でもバイトコンパイルのことには全く触れていません。[[https://github.com/conao3/leaf.el#byte-compile-keywords][バイトコンパイルキーワード]]として実装されていることは紹介していますが、実際どのようにしたらいいのか書いてないのです。その方法を解説するものです。
 
 ** leaf.elとは
-[[https://github.com/conao3/leaf.el][leaf.el]]はjwiwgleyさんの[[https://github.com/jwiegley/use-package][use-package]]を2.5年使った上で、私が感じていたストレスを解消するためにスクラッチから開発したパッケージです。本体の説明はQiitaに何回か記事を書いたので、そちらを参照してください
+[[https://github.com/conao3/leaf.el][leaf.el]]はjwiegleyさんの[[https://github.com/jwiegley/use-package][use-package]]を2.5年使った上で、私が感じていたストレスを解消するためにスクラッチから開発したパッケージです。本体の説明はQiitaに何回か記事を書いたので、そちらを参照してください
 
 - プレリリース記事: [[https://s.conao3.com/blog/2018/8aa938][use-packageからの移行のすゝめ - leaf.elでバージョン安全なinit.elを書く]]
 - リリース記事: [[https://s.conao3.com/blog/2019/2b6cbf][{正式リリース}leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする]]
@@ -4997,7 +4997,7 @@ Elispはバイトコンパイルすることができ、通常の =.el= から =
 
 [[./resources/public/img/6c5374-leaf-bytecompile--before.png]]
 
-とりあえずやってみるということなので、バイトコンパイルしてみます。バイトコンパイルはいろいろな方法がありますが、簡単には外部のコンソールからバッジ処理モードでEmacsを起動してバイトコンパイルすることです。
+とりあえずやってみるということなので、バイトコンパイルしてみます。バイトコンパイルはいろいろな方法がありますが、簡単には外部のコンソールからバッチ処理モードでEmacsを起動してバイトコンパイルすることです。
 
 #+begin_src shell
 $ emacs --version
@@ -5093,7 +5093,7 @@ modified   el/.debug.emacs.d/leaf/init.el
      :config
 #+end_src
 
-このように修正しました。バイトコンパイルしてみます。一度目はleafやleaf-keywords, hydraのインストールなどが行なわれると思います。出力が見ずらいので、2回目を引用すると以下のようになります。
+このように修正しました。バイトコンパイルしてみます。一度目はleafやleaf-keywords, hydraのインストールなどが行なわれると思います。出力が見づらいので、2回目を引用すると以下のようになります。
 
 #+begin_src shell
 $ emacs -Q --batch -f batch-byte-compile init.el
@@ -5322,7 +5322,7 @@ leaf.elを使っているinit.elをバイトコンパイルする方法を紹介
 - site-lispは全バージョンで同じディレクトリを使用する。(開発中のパッケージを置いてるので、いちいちコピーするのが面倒)
 - Emacsパッケージが保存するセンシティブな情報を一括で.gitignoreできる。
 
-去年は気づいていませんでいませんでしたが、特に最後の特徴は重要な意味を持つことに気付きました。データの永続化のために =user-emacs-directory= (通常は =$HOME/.emacs.d= )にファイルを保存するEmacsパッケージは多く存在しており、その情報は取り扱いに注意が必要なものもあります。
+去年は気づいていませんでしたが、特に最後の特徴は重要な意味を持つことに気付きました。データの永続化のために =user-emacs-directory= (通常は =$HOME/.emacs.d= )にファイルを保存するEmacsパッケージは多く存在しており、その情報は取り扱いに注意が必要なものもあります。
 
 やばそう(普通他人に見せない)なものの代表例はこちらです。
 
@@ -5542,8 +5542,8 @@ $(SYMS):
 
 この構造にメリットを見いだす人はわずかだとは思いますが、備忘録として残しておきます。
 
-なお、Emacs-27からは =early-init.el= のロード追加されており、[[https://www.reddit.com/r/emacs/comments/7yns85/emacs_adds_support_for_a_second_read_earlier_init/][クラスタは色めきあって]]います。さらにEmacs-27から[[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html][XDG Base Directory Specification]]にのっとり、 =.config/emacs/init.el= を最優先で読み込むようになっているようです。([[https://github.com/emacs-mirror/emacs/commit/4118297ae2fab4886b20d193ba511a229637aea3][該当コミット]] / [[https://github.com/emacs-mirror/emacs/blob/4118297ae2fab4886b20d193ba511a229637aea3/etc/NEWS#L135-L142][NEWS]])
-(tomoyaさんが最初の報告、コミットとNEWSはelimさんが探してくだだり、[[https://emacs-jp.github.io/][emacs-jpのSlack]]で共有して頂いた情報です。)
+なお、Emacs-27からは =early-init.el= のロードが追加されており、[[https://www.reddit.com/r/emacs/comments/7yns85/emacs_adds_support_for_a_second_read_earlier_init/][クラスタは色めきあって]]います。さらにEmacs-27から[[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html][XDG Base Directory Specification]]にのっとり、 =.config/emacs/init.el= を最優先で読み込むようになっているようです。([[https://github.com/emacs-mirror/emacs/commit/4118297ae2fab4886b20d193ba511a229637aea3][該当コミット]] / [[https://github.com/emacs-mirror/emacs/blob/4118297ae2fab4886b20d193ba511a229637aea3/etc/NEWS#L135-L142][NEWS]])
+(tomoyaさんが最初の報告、コミットとNEWSはelimさんが探してくださり、[[https://emacs-jp.github.io/][emacs-jpのSlack]]で共有して頂いた情報です。)
 
 [[https://wiki.archlinux.jp/index.php/XDG_Base_Directory_%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88][ArchのWiki]]でもEmacsは「ハードコードされているソフトウェア」にリストされていますが、修正が必要になるかもしれません。
 
@@ -6200,7 +6200,7 @@ under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING.
 #+end_src
 
-もし =M-x leaf-available-keywords= と記事に書かれていたときにどういう意味が分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹[fn:1]な気はありますが、「[[https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740][Emacs教習所に行ってきた(チートシート付き) - Qiita]]」が参考になるかもしれません。
+もし =M-x leaf-available-keywords= と記事に書かれていたときにどういう意味か分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹[fn:1]な気はありますが、「[[https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740][Emacs教習所に行ってきた(チートシート付き) - Qiita]]」が参考になるかもしれません。
 
 ** Emacs設定ファイル
 *** init.elの作成
@@ -6510,7 +6510,7 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 なお、動的な値をleafで設定するには上記のようにバッククオートとカンマを使うことによって実現します。
 
 *** パッケージインストーラについて
-基本的に =M-x leaf-convert-insert-template= の出力を参考にします。MELPAかELPAに存在するパッケージは自動的に =:ensure t= が展開されます。 =:ensure= はpacakge.elを使用してパッケージをインストールする設定です。
+基本的に =M-x leaf-convert-insert-template= の出力を参考にします。MELPAかELPAに存在するパッケージは自動的に =:ensure t= が展開されます。 =:ensure= はpackage.elを使用してパッケージをインストールする設定です。
 
 存在しないパッケージの場合は、 =:el-get {user}/{repo}= が展開されるので、 *GitHubにある場合* 、 ={user}= を調べて置換するだけで設定が完了します。例えば、point-undoは =emacsmirror/point-undo= にあるので、 =emacsmirror= を追加するだけで大丈夫です。
 
@@ -6771,7 +6771,7 @@ filesのlinkは「[[https://pxaka.tokyo/blog/2018/a-test-of-images/][画像の�
 
 =netlify-src/static= はレポジトリ肥大化を避けて[[https://github.com/conao3/netlify-src][conao3/netlify-src]]から[[https://github.com/conao3/netlify-src-blob][conao3/netlify-src-blob]]に切り出し、submoduleで持つことにします。
 
-参考記事ではfilesのリンクをURLで設定していましたが、「[[https://qiita.com/takaxp/items/96629bbcc4a9403f0213][Org Modeのリンク機能で情報集約 | Qiita]]」を参考に =fils+sys:= 指定を使うとorgの画像インライン表示もできますし、きちんとox-hugoによってリンクが修正され、正しいマークダウンが出力されました。
+参考記事ではfilesのリンクをURLで設定していましたが、「[[https://qiita.com/takaxp/items/96629bbcc4a9403f0213][Org Modeのリンク機能で情報集約 | Qiita]]」を参考に =file+sys:= 指定を使うとorgの画像インライン表示もできますし、きちんとox-hugoによってリンクが修正され、正しいマークダウンが出力されました。
 
 - Input
   #+begin_src org
@@ -6795,7 +6795,7 @@ NetlifyのデプロイはGitHubにpushするだけです!
 
 Hugoのビルドはとても早く、pushしてNetlifyのログを見に行くともう終わっています。
 
-ビルドできたら個人Slackに通知飛したりするのをまた今度やりたいと思っています。
+ビルドできたら個人Slackに通知飛ばしたりするのをまた今度やりたいと思っています。
 
 ** Conclusion
 Netlify + Hugo + ox-hugoで快適なブログ執筆環境を整えることができました!
@@ -6904,7 +6904,7 @@ Webで情報を公開するにあたって、パーマリンクの設計は将�
 まず、私はとてもものぐさなので、記事ごとにショートタイトルを与える方法は難しいです。
 いくらSEOやURLシェアの観点から最良の選択だと言っても、記事を書くモチベーションを失っては元も子もありません。
 
-タイトルをそのまま付ける方法は、記事ごとに自動で決定できるので魅力的ですがきびしいです。各見出しの =id= は日本語をURLエンコードしたものをしかたなく使うとして、2つの要素をURLエンコードすると簡単に256文字を超えます。もちろん現代ではURLの流さに制限はないですが、限度はあると思います。
+タイトルをそのまま付ける方法は、記事ごとに自動で決定できるので魅力的ですがきびしいです。各見出しの =id= は日本語をURLエンコードしたものをしかたなく使うとして、2つの要素をURLエンコードすると簡単に256文字を超えます。もちろん現代ではURLの長さに制限はないですが、限度はあると思います。
 
 カテゴリー管理も同じような階層が現われ、破綻することが目に見えています。
 実は前回のブログはそれで破綻したのです。 =/emacs/= と =/blog/emacs/=, =blog/advent/emacs/= などが乱立し、新たな記事をどの階層に作ればよいのか混乱する要因になりました。
@@ -7351,7 +7351,7 @@ Emacsのカラーテーマはこれらパッケージが提供する =face= を�
 
 このようにカラーテーマごとに「対応しているパッケージ」が異なっており、メンテナンスされていないカラーテーマを使っていると、パッケージが決めたデフォルトの色がそのまま表示されることになります。
 
-そのため「色が暗い」「色がビビットすぎる」「そもそも見えない」などの問題が発生します。
+そのため「色が暗い」「色がビビッドすぎる」「そもそも見えない」などの問題が発生します。
 
 ** Solarized
 *** Solarizedのface定義
@@ -7494,7 +7494,7 @@ yellow orange red magenta violet blue cyan green
 ** まとめ
 現在ではSolarizedの資産を生かし、簡単にカラーテーマを作成することができます。
 
-ぜひ独創的かつ目にやさしいカラーテーマを作っていただき、日々のEmacs生活がよりよりものになれば良いなと思っています。
+ぜひ独創的かつ目にやさしいカラーテーマを作っていただき、日々のEmacs生活がよりよいものになれば良いなと思っています。
 
 * Archのrsyncで転送できないときに確認すること
 :properties:
@@ -7845,7 +7845,7 @@ Emacsは良いエディタで、Elispは強力ですが、GitをElispで実装�
 ** Intro
 [[https://github.com/melpa/melpa/pull/6892][MELPA]]のレビューが遅い。
 
-MELPAのメンテナの方には感謝してしきれないが、実際のところ、レシピ追加PRを出して2週間から3週間音沙汰ないまま放置されたり、先方のレビューを反映して修正しても、そこから2週間、3週間待たされることがままあり、ストレスを抱えていました。
+MELPAのメンテナの方には感謝してもしきれないが、実際のところ、レシピ追加PRを出して2週間から3週間音沙汰ないまま放置されたり、先方のレビューを反映して修正しても、そこから2週間、3週間待たされることがままあり、ストレスを抱えていました。
 
 私はあまりinit.elを大きくしたくなく、ある程度の大きさになるとパッケージで切りだして =(leaf hoge)= で簡単にアクティベートしたいと考えているため、MELPAに入れてもらえないと =el-get= で取ってこないといけませんでした。
 
@@ -7938,7 +7938,7 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 ** まとめ
 振り返ってみるとMELPAをCELPAとして動かせるように修正するのは簡単でした。
 
-やはりミスが許されず、時間がかかるのは秘密鍵/権限回りで、その部分で半分以上の時間を費しました。
+やはりミスが許されず、時間がかかるのは秘密鍵/権限回りで、その部分で半分以上の時間を費やしました。
 
 レシピを直接pushできるというのはMELPAを使っていた頃には考えられない快適さです。
 
@@ -7964,7 +7964,7 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 
 さらに[[https://github.com/online-judge-tools/template-generator][oj-template]]は入出力サンプルからそれっぽいcppとpythonファイルを生成してくれます。
 
-また、 =oj-prepare= はコンテストURLを指定すると、そのコンテストの全ての問題について =oj donwload= と =oj-template= をしてくれます。
+また、 =oj-prepare= はコンテストURLを指定すると、そのコンテストの全ての問題について =oj download= と =oj-template= をしてくれます。
 
 コンテスト中は時間との戦いなので、これらのコマンドによる時短は大きなものになると思います。
 
@@ -7983,7 +7983,7 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 
 単に関数にバインドしただけでなく、多少の改善を入れています。
 
-例えば =oj= はダウンロードするためにURL全体を指定する必要がありますが、 =oj-default-online-judge= で設定されているオンラインジャッジを規定のものと考え、入力を省略できるようにしています。
+例えば =oj= はダウンロードするためにURL全体を指定する必要がありますが、 =oj-default-online-judge= で設定されているオンラインジャッジを既定のものと考え、入力を省略できるようにしています。
 (CLIツールとしての[[https://online-judge-tools.readthedocs.io/en/master/introduction.ja.html#id7][方針]]と干渉するものではなく、エディタの拡張としての求められる機能として盛りこんだものです。)
 
 例えば =atcoder= デフォルトに設定されている状況で、 =M-x oj-prepare= に =abc167= を入力すると下記コマンドが実行されます。
@@ -8581,7 +8581,7 @@ MELPAの公式がツイートしてた。
 #+end_export
 
 どうやらこの[[https://github.com/melpa/melpa/commit/02163bf1d920d076f927803796b0f86e3f13ef9b][コミット]]らしい。この[[https://github.com/melpa/melpa/issues/6914][issue]]が引用されています。
-さらにこの[[https://lists.gnu.org/archive/html/emacs-devel/2020-05/msg02470.html][ML]]の投稿がリンクされている。投稿者は[[https://www.gnu.org/software/emms/][Emms]]のメンテナであるYuniさん。
+さらにこの[[https://lists.gnu.org/archive/html/emacs-devel/2020-05/msg02470.html][ML]]の投稿がリンクされている。投稿者は[[https://www.gnu.org/software/emms/][Emms]]のメンテナであるYoniさん。
 
 ポイントは以下。
 #+begin_example
@@ -8890,7 +8890,7 @@ jobs:
 ** 背景
 ~setf~ という便利な関数があります。
 
-これは汎変数に対する ~setq~ と説明できるのですが、この短かい紹介では表せないほどの汎用性と利便性を提供してくれます。
+これは汎変数に対する ~setq~ と説明できるのですが、この短い紹介では表せないほどの汎用性と利便性を提供してくれます。
 
 汎変数についてはkawabataさんの神記事([[https://qiita.com/kawabata@github/items/9a1a1e211c57a56578d8#%E6%B1%8E%E5%A4%89%E6%95%B0%E3%81%AE%E5%AE%9A%E7%BE%A9%E6%96%B9%E6%B3%95][Qiita - Emacs Lispの汎変数（とその他）]])があるので、まずそちらを参照していただければと思います。
 
@@ -9416,7 +9416,7 @@ VARS is used internally for recursive calls."
 ノベルティもたくさん頂きました。
 現地で参加できれば、このパーカーを着て作業していたらしいですが。。とても残念!
 
-世界的な疫病の拡大により、インターンに係る全ての作業はリモートで行なわれ、始めてのインターンではあるものの不思議な感覚でした。。
+世界的な疫病の拡大により、インターンに係る全ての作業はリモートで行なわれ、初めてのインターンではあるものの不思議な感覚でした。。
 
 そもそも広島からのリモートでのインターン参加を認めて下さったこと、さらにはインターネットの不調により急遽モバイルルータを手配して頂くなど、手厚いサポートを頂きました。
 
@@ -9448,7 +9448,7 @@ Org-mode はノートの保存、TODOリストの管理、プロジェクト計�
 
 「プレーンテキスト」はロックインを避けるための究極の選択肢です。
 
-「org-mode」にロックインしてるじゃないか。という手痛い指摘が飛んできそうですが、それには当たりません。なぜならorg-modeが編集の対象にしているのは「プレーンテキスト」であり、もしorg-modeが明日なくなったとしても普通のエディタで編集や読み書きができ、様々なUnixコマンドによる処理が容易できるからです。
+「org-mode」にロックインしてるじゃないか。という手痛い指摘が飛んできそうですが、それには当たりません。なぜならorg-modeが編集の対象にしているのは「プレーンテキスト」であり、もしorg-modeが明日なくなったとしても普通のエディタで編集や読み書きができ、様々なUnixコマンドによる処理が容易にできるからです。
 
 *** 万能のドキュメントソース
 org-modeはとても大きく、私も全容を把握できていません。
@@ -9916,7 +9916,7 @@ PRを送りたいだけなのに、なぜこんなに待たないといけない
 
 といいつつ、CommonLisperの方には「[[https://g000001.cddddr.org/3692638429][#:g1: Emacs LispのEIEIOはCLOSではない]]」という記事を書かれてしまっているので、CLOSとしてのEIEIOというよりEIEIOをそのまま受け入れた方がいいのかもしれません。
 
-EIEIOのドキュメントは短かいので、この章ではそれ(と補足)を駆け足で再編成して紹介します。
+EIEIOのドキュメントは短いので、この章ではそれ(と補足)を駆け足で再編成して紹介します。
 
 [[https://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E6%8C%87%E5%90%91%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0][オブジェクト指向プログラミング]](OOP)は「カプセル化 (encapsulation)」、「継承 (inheritance)」、「多態性 (polymorphism)」に特徴付けられるらしいので、その観点でまとめます。
 (この分野、全く詳しくないので、間違いがあれば教えて下さい。)
@@ -10187,7 +10187,7 @@ leafを使っていらっしゃる方も、use-packageからの移行を悩ん�
 
 ただ、Emacsの設定をアップロード/ダウンロードするとかは結構(というかかなり)セキュリティに問題がある気がしたので断念した結果、その特殊なキーワードを既存の[[https://github.com/conao3/leaf-keywords.el][leaf-keywords]]に入れるということで当初の目的の8割ぐらいを実現したものになります。
 
-(こういうきっかけがあるので、この記事や他で言及するときは「leaf-defauts」として言及しますが、特にそういう名前のパッケージがあるわけではないです。leaf-keywordsの中に実装された一つのキーワードです。)
+(こういうきっかけがあるので、この記事や他で言及するときは「leaf-defaults」として言及しますが、特にそういう名前のパッケージがあるわけではないです。leaf-keywordsの中に実装された一つのキーワードです。)
 
 *** ユースケース
 私はEmacsを使いながら、Emacsのパッケージを趣味で書いていますし、気に入ったパッケージがあればその紹介記事を書いたりすることもあります。「[[https://emacs-jp.github.io/tips/emacs-in-2020.html][2020年代のEmacs入門 - Emacs-jp]]」とかは分散していたおすすめ入門パッケージを一つにした記事ですね。
@@ -10195,7 +10195,7 @@ leafを使っていらっしゃる方も、use-packageからの移行を悩ん�
 この記事、書く方は、まぁ順当に大変なのですが、読む方も結構大変だと思います。
 実際、私が最近新しい環境に放り込まれたので、この記事を見ながらEmacsの最小限のセットアップをしたのですが、コードブロックが分かれていてコピペが非常に面倒でした。
 
-leaf-deafultsを使えば、このように書けます!
+leaf-defaultsを使えば、このように書けます!
 
 #+begin_src emacs-lisp
 (leaf leaf-keywords-defaults
@@ -10431,7 +10431,7 @@ leafが提供する設定例を変えたい場合、色々な方法で変える�
      :custom ((company-idle-delay . 0))
      :global-minor-mode global-company-mode)
 
-   (leaf company :defautls t)              ; 上書きした設定を読み込み
+   (leaf company :defaults t)              ; 上書きした設定を読み込み
    #+end_src
 
 4. PRで変える
@@ -10945,7 +10945,7 @@ Danger, callouts will really improve your writing.
 
 *** Astro Islands
 Astroには[[https://docs.astro.build/ja/concepts/islands/][Astroアイランド]]という概念がある。
-これによりページの一部のコンポーネントのみインタラクティブ (jsあり) の領域を作ることできる。
+これによりページの一部のコンポーネントのみインタラクティブ (jsあり) の領域を作ることができる。
 
 アイランドはそれぞれ独立しており、それぞれは異なるUIフレームワークを使うことができる。
 (Spotifyの[[https://engineering.mercari.com/blog/entry/2018-12-06-162827/][マイクロフロントエンド]]みたいなのを想像している)
@@ -11260,7 +11260,7 @@ OSSでも =poetry.lock= が置いてあるプロジェクトは本当に貢献�
 
 提案のvenvなら使えたかもしれない。
 
-仮想環境に入るのを忘れて =pip install= したらもれなくグローバルのPythonにインストールされるのも心象が悪かった。
+仮想環境に入るのを忘れて =pip install= したらもれなくグローバルのPythonにインストールされるのも心証が悪かった。
 
 さらに =. .venv/bin/activate= で仮想環境に入って、出るときは =deactivate= を実行するという非対称性にも耐えられなかった。
 =. .venv/bin/deactivate= ならまだ許容できたが、まぁ歴史あるものはしょうがない面もある。
@@ -11671,7 +11671,7 @@ print(user1.json())
 pnpmは彗星の如く現れたよさげなパッケージマネージャなのですが、これも詳細は 「[[https://zenn.dev/azukiazusa/articles/pnpm-feature][pnpm の特徴 - Zenn]]」などを見てもらうとして、
 個人的に気に入ってるのは「厳格なパッケージ管理」のところです。
 
-簡単に言うとAがBに依存してるとき、npmやyarnの場合node_module内でAとBが同じ階層に配置されるので、Bもまたinclude可能になるのですが、
+簡単に言うとAがBに依存してるとき、npmやyarnの場合node_modules内でAとBが同じ階層に配置されるので、Bもまたinclude可能になるのですが、
 AがBに依存しなくなったとき、Bをincludeしてたら死ぬよねということです。
 Bをincludeしたかったらpackage.jsonに依存を書きなさいと。なるほど。良さそうですね。
 
@@ -11829,7 +11829,7 @@ SSRに対応してないのかな？ということで =client:only= を指定�
 :end:
 
 ** はじめに
-Webで数式組版をしたい場合、MathJaxを使うというのが常識でしたが、前回のhugoブログを作った時点でKaTeXの方が早くて良いぞという話になっていました。
+Webで数式組版をしたい場合、MathJaxを使うというのが常識でしたが、前回のhugoブログを作った時点でKaTeXの方が速くて良いぞという話になっていました。
 今回のAstroブログでもどうにか数式を表示したいということで、さくっと調べてみたのですが、あまり情勢は変わってないようだったので、KaTeXを導入することにします。
 
 ** Remark / Rehype
@@ -12552,7 +12552,7 @@ $ pnpm run gen
 ✔ Generate outputs
 #+end_src
 
-そうすると =__generated__= ファルダが生成されます。
+そうすると =__generated__= フォルダが生成されます。
 
 =__generated__= の =gql= を使うことで型が付きます。便利。
 
@@ -13511,7 +13511,7 @@ pdm publish --no-build
 
 PyPIにリリースできたら、今回のレポジトリに権限を絞ったトークンを作成できるので作成します。
 
-GitHubの当該レポジトリの [Settings] -> [Secrets and variabes] -> [Actions] -> [New repository secret] で登録します。キーの名前は =PYPI_API_TOKEN= です。
+GitHubの当該レポジトリの [Settings] -> [Secrets and variables] -> [Actions] -> [New repository secret] で登録します。キーの名前は =PYPI_API_TOKEN= です。
 
 先程の手動リリースで =v0.1.0= が消費されたので、 =v0.1.1= とします。
 
@@ -13783,7 +13783,7 @@ Emacs と Clojure の相性はとても良いです。
 正確には Clojure hacker たちの時間が大量に Emacs とそのエコシステムに投下されていることにより、この環境があります。
 
 Ref: [[https://batsov.com/articles/2024/02/27/m-x-reloaded-the-second-golden-age-of-emacs/][M-x Reloaded: The Second Golden Age of Emacs - bbatsov]]
-  - bbatsov: Robocop, cider, projectile作者
+  - bbatsov: RuboCop, cider, projectile作者
 
 #+begin_quote
 Yesterday I wrote that I think Emacs is currently experiencing its (second) Golden Age.
@@ -14985,7 +14985,7 @@ test
 この記事は[[https://qiita.com/advent-calendar/2025/emacs][Emacs Advent Calendar 2025]]の4日目の記事です。
 
 [[https://orgmode.org/][org-mode]]は言わずと知れたEmacsのキラーフィーチャーですが、Emacsの学習曲線もさることながら、org-modeの学習曲線も同様に急峻であるため入門したくても踏み切れないという初心者の方がたくさん居るという声を聞きます。
-しかし、タイトルにもありますが、日本語レポートから始めるorg-modeでゆるやかにorg-mode、しいてはEmacsに入門するのは私がとてもおすすめしている入門経路で、実は私もこの経路でorg-modeとEmacsに入門しています。
+しかし、タイトルにもありますが、日本語レポートから始めるorg-modeでゆるやかにorg-mode、ひいてはEmacsに入門するのは私がとてもおすすめしている入門経路で、実は私もこの経路でorg-modeとEmacsに入門しています。
 
 ぜひ怖がらずに入門してみましょう。
 
@@ -15104,7 +15104,7 @@ markdownでは =[link text](link)= と表現するところ、org-modeでは =[[
 | caption | キャプション |
 
 *** コードブロック
-org-modeでのコードブロックは拡張性があるがゆえにに少し冗長に感じるかもしれません。
+org-modeでのコードブロックは拡張性があるがゆえに少し冗長に感じるかもしれません。
 markdownでは =``` 言語= と =```= で囲むことによって表現しますが、org-modeでは =#+begin_src 言語= と =#+end_src= で囲うことによって表現します。
 
 #+begin_src org
@@ -15438,7 +15438,7 @@ printf("36 = %d * %d\n", 3, 12);
 tangleの利用例についてはたけてぃが最近は活発に記事を書いてくれているので興味があればぜひ。
 https://www.google.com/search?q=tangle+site%253Ahttps%253A%252F%252Fwww.takeokunn.org
 
-org-modeの機能は今回扱った文書としての使い方が大きなものではありますが、同じくらい大きな機能として本格的なGTD (Get Things Done) での利用に耐えうる程のタスク管理機能があります。
+org-modeの機能は今回扱った文書としての使い方が大きなものではありますが、同じくらい大きな機能として本格的なGTD (Getting Things Done) での利用に耐えうる程のタスク管理機能があります。
 正直筆者もまだ使いこなせていないので手に馴染んだらまた紹介しようと思います。
 
 ** まとめ
@@ -15768,21 +15768,21 @@ e something.txt
 #+end_src
 
 *** emacsclientの主要オプション
-**** -c (--create-frame)
+**** -c (=--create-frame=)
 新しいフレームを作成して開きます。
 
 #+begin_src shell
 e -c file.txt
 #+end_src
 
-**** -t (--tty)
+**** -t (=--tty=)
 ターミナル内でEmacsを開きます。
 
 #+begin_src shell
 e -t file.txt
 #+end_src
 
-**** -n (--no-wait)
+**** -n (=--no-wait=)
 ファイルを開いた後、すぐにシェルに制御を返します。
 デフォルトではemacsclientは編集が終わるまで待機しますが、このオプションを付けることでバックグラウンドで開くことができます。
 

@@ -40,7 +40,7 @@ under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING.
 ```
 
-もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味が分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
+もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味か分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
 
 
 # Emacs設定ファイル
@@ -372,7 +372,7 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 
 ## パッケージインストーラについて
 
-基本的に `M-x leaf-convert-insert-template` の出力を参考にします。MELPAかELPAに存在するパッケージは自動的に `:ensure t` が展開されます。 `:ensure` はpacakge.elを使用してパッケージをインストールする設定です。
+基本的に `M-x leaf-convert-insert-template` の出力を参考にします。MELPAかELPAに存在するパッケージは自動的に `:ensure t` が展開されます。 `:ensure` はpackage.elを使用してパッケージをインストールする設定です。
 
 存在しないパッケージの場合は、 `:el-get {user}/{repo}` が展開されるので、 **GitHubにある場合** 、 `{user}` を調べて置換するだけで設定が完了します。例えば、point-undoは `emacsmirror/point-undo` にあるので、 `emacsmirror` を追加するだけで大丈夫です。
 

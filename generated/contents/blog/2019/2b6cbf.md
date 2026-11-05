@@ -459,7 +459,7 @@ Spacemacsは使っていないのですが、言語毎、目的毎に `Layer` �
              ("C-M-a" . sp-beginning-of-sexp)
              ("C-M-e" . sp-end-of-sexp))
             (:lisp-mode-map                          ; lisp-mode-mapへの割り当ての開始
-             :pacakge lisp-mode
+             :package lisp-mode
              ("C-c s" . smartparens-strict-mode)))))
 ;; => (prog1 'smartparens
 ;;      (autoload #'smartparens-mode "smartparens" nil t)
@@ -584,7 +584,7 @@ leafの[README](https://github.com/conao3/leaf.el)は `leaf` のtestファイル
      (prog1 'leaf))))
 ```
 
-つまり、leaf&ndash;nameはleaf&ndash;nameを省略された引数のデフォルト値として使うキーワード(後述)を使わない限り、自由につけていいということです。
+つまり、 `leaf--name` は `leaf--name` を省略された引数のデフォルト値として使うキーワード(後述)を使わない限り、自由につけていいということです。
 
 しかし無用のトラブルを避けるために、単に `leaf` をまとめるためだけの `leaf` の名前はアスタリスク `*` を付与し、 `:config` キーワードのみを使うようにしたほうが良いと思います。
 
@@ -634,7 +634,7 @@ leafの[README](https://github.com/conao3/leaf.el)は `leaf` のtestファイル
 
 `leaf` では `require` 文を生成させるために `:require` キーワードを使う必要があります。これは `use-package` において `require` 文を生成しないように `:no-require` キーワードを使用することと全く逆です。
 
-なお、 `t` を指定した場合はleaf&ndash;nameを `require` します。複数のパッケージを `require` したい場合は、単にシンボルを書き連ねていけば良いです。
+なお、 `t` を指定した場合は `leaf--name` を `require` します。複数のパッケージを `require` したい場合は、単にシンボルを書き連ねていけば良いです。
 
 ```emacs-lisp
 (cort-deftest-with-macroexpand leaf/require
@@ -677,7 +677,7 @@ leafの[README](https://github.com/conao3/leaf.el)は `leaf` のtestファイル
 
 `use-package` と同様に `:ensure` キーワードを使って、Emacs付属のパッケージマネージャ `package.el` を用いてパッケージをインストールすることができます。
 
-`:require` と同じように `t` はleaf&ndash;nameと解釈し、シンボルが与えられた場合、そのパッケージをインストールします。個人的には使いどころが分かりませんが、複数のシンボルも受理でき、それぞれをインストールできます。(ただ、依存関係はパッケージマネージャが解決してくれるので、本当に使いどころが分からない。)
+`:require` と同じように `t` は `leaf--name` と解釈し、シンボルが与えられた場合、そのパッケージをインストールします。個人的には使いどころが分かりませんが、複数のシンボルも受理でき、それぞれをインストールできます。(ただ、依存関係はパッケージマネージャが解決してくれるので、本当に使いどころが分からない。)
 
 ```emacs-lisp
 (cort-deftest-with-macroexpand leaf/package
@@ -742,9 +742,9 @@ leafの[README](https://github.com/conao3/leaf.el)は `leaf` のtestファイル
 
 この復帰動作は `use-package` が出力するコードに含まれていません。Emacs起動時にパッケージインストールに失敗して、手動でレシピを更新した後にEmacsを再起動した経験は一度や二度ではないと思います。 `leaf` ではそのようなことは起こりません。
 
-また、 `leaf` は元々 `:ensure` キーワードで `package.el` のみをサポートしていましたが、leaf-keywordsパッケージによるキーワード追加の恩恵を得ることで `:el-get`, `:straight` のキーワードを使用することができるようになりました。そのため `pacakge.el` 専用のキーワードとして `:package` というキーワードを用意しました。
+また、 `leaf` は元々 `:ensure` キーワードで `package.el` のみをサポートしていましたが、leaf-keywordsパッケージによるキーワード追加の恩恵を得ることで `:el-get`, `:straight` のキーワードを使用することができるようになりました。そのため `package.el` 専用のキーワードとして `:package` というキーワードを用意しました。
 
-`:pacakge` キーワードは `:ensure` キーワードと全く同じです。 `package.el` を使うことを強くアピールしたい時はこのキーワードを使うことができます。ただ将来的に `:ensure` キーワードを「パッケージをインストールする」という意味の汎用的なキーワードにして、処理するバックエンドをカスタマイズできるようにするかもしれません。その場合でも `:ensure` を処理するデフォルトのパッケージは `package.el` にするので、動作が意図せず変わることはないです。
+`:package` キーワードは `:ensure` キーワードと全く同じです。 `package.el` を使うことを強くアピールしたい時はこのキーワードを使うことができます。ただ将来的に `:ensure` キーワードを「パッケージをインストールする」という意味の汎用的なキーワードにして、処理するバックエンドをカスタマイズできるようにするかもしれません。その場合でも `:ensure` を処理するデフォルトのパッケージは `package.el` にするので、動作が意図せず変わることはないです。
 
 さて、 `el-get` と `straight` の使い方は他の記事に譲りますが、 `leaf` はこれらの全機能を `leaf` から使用することができます。
 
@@ -934,7 +934,7 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 
 「善いパッケージ」はユーザーがエントリーポイントとして実行する関数についてきちんとマジックコメントを記載し、パッケージマネージャに指示を与えますが、メンテナンス状況が良くないパッケージなどはそのマジックコメントが正しく記載されていない場合があります。
 
-その限られた場合にこのキーワードを使い、leaf&ndash;nameの関数としてautoloadを設定します。
+その限られた場合にこのキーワードを使い、 `leaf--name` の関数としてautoloadを設定します。
 
 また、後述しますが、バインド系のキーワードに設定された関数は全て `:commands` と同じ形式でautoloadを設定されます。さらに言えば、このautoloadがきちんと設定される副作用を目的として、 `leaf` のキーワードを使うメリットがあります。
 
@@ -956,7 +956,7 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 
 ### :after
 
-パッケージにはそれぞれ、動作するための前提条件があり、他のパッケージに依存するパッケージは極めて一般的です。その場合、lazy-laodを考慮した上で、あるパッケージが読み込まれた「後に」ロードや設定を行う必要があることがあります。
+パッケージにはそれぞれ、動作するための前提条件があり、他のパッケージに依存するパッケージは極めて一般的です。その場合、lazy-loadを考慮した上で、あるパッケージが読み込まれた「後に」ロードや設定を行う必要があることがあります。
 
 `:after` キーワードは単に数個のシンボルを指定するだけで、強力な `eval-after-load` 文を生成します。
 
@@ -1177,11 +1177,11 @@ Emacsには関数のアドバイス機構が用意されており、advice-add�
 `:setq` や `:pre-setq` キーワードも用意されていますが、 `defvar` で宣言された変数も `custom-set-variables` を使って有効化できるので、簡単に `:custom` キーワードを使って設定できます。
 
 
-### :mode, :interperter, :magic, :magic-fallback
+### :mode, :interpreter, :magic, :magic-fallback
 
 現在、パッケージ作者がきちんと `auto-mode-alist` の設定を行ってくれているので、このキーワードを使用する機会は少ないかもしれませんが、普通の割り当てではない割り当てを行う場面では必要になるかもしれません。
 
-私のinit.elでは `web-mode` のみがこのキーワードを使用しています。通常ドット対を期待しますが、ドット対のcdrを省略した場合、leaf&ndash;nameを指定されたものとして変換します。
+私のinit.elでは `web-mode` のみがこのキーワードを使用しています。通常ドット対を期待しますが、ドット対のcdrを省略した場合、 `leaf--name` を指定されたものとして変換します。
 
 ```emacs-lisp
 (cort-deftest-with-macroexpand leaf/mode
@@ -1227,7 +1227,7 @@ Emacsには関数のアドバイス機構が用意されており、advice-add�
 
 hookを設定するキーワードです。 `use-package` **とは違って、** hookの全体のシンボルを指定する必要があります。これは `use-package-hook-name-suffix` が `""` に設定してある場合の挙動と同じです。これは定義ジャンプをしやすくする効果があります。
 
-`:mode` などと同じように、ドット対を期待してますが、ドット対のcdrを省略した場合、leaf&ndash;nameを指定されたものとして変換します。
+`:mode` などと同じように、ドット対を期待してますが、ドット対のcdrを省略した場合、 `leaf--name` を指定されたものとして変換します。
 
 ```emacs-lisp
 (cort-deftest-with-macroexpand leaf/hook
@@ -1416,7 +1416,7 @@ leafブロックを指定されたキーワードに対応する関数でくく�
 
 init.elをバイトコンパイルする際にワーニングが出る場合は `declare-function` と `defvar` によってワーニングを抑制する必要があります。
 
-`:defun` もドット対(やそのリスト)を期待していますが、ドット対のcdrを省略した場合はleaf&ndash;nameの関数として登録を行います。
+`:defun` もドット対(やそのリスト)を期待していますが、ドット対のcdrを省略した場合は `leaf--name` の関数として登録を行います。
 
 `:defvar` はただ変数を定義するだけなので、シンボル(のリスト)を期待します。
 
@@ -1591,7 +1591,7 @@ with values for these keywords."
 
 ### :leaf-autoload
 
-`leaf` はキーバインドのキーワードなどで、関数をleaf&ndash;nameの関数として自動的に `autoload` として登録するようにコードを生成します。
+`leaf` はキーバインドのキーワードなどで、関数を `leaf--name` の関数として自動的に `autoload` として登録するようにコードを生成します。
 
 このキーワードを `nil` に設定すると、この機能をオフにします。個人的に使いどころが分かりません。。
 
@@ -1653,7 +1653,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 -   リリースしたもの
     -   [leaf.el](https://github.com/conao3/leaf.el/blob/master/leaf.el): use-packageを発展させた、シンプルで拡張性の高い、パッケージ設定のためのパッケージ
     -   [leaf-keywords.el](https://github.com/conao3/leaf-keywords.el): leaf.elのための外部パッケージに関する追加キーワード
-    -   [seml-mote.el](https://github.com/conao3/seml-mode.el): S式からHTMLを生成するジェネレータとそのメジャーモード
+    -   [seml-mode.el](https://github.com/conao3/seml-mode.el): S式からHTMLを生成するジェネレータとそのメジャーモード
     -   [ddskk-posframe.el](https://github.com/conao3/ddskk-posframe.el): ddskkの変換ポップアップをposframeで表示
     -   [cort-test.el](https://github.com/conao3/cort-test.el): Elispパッケージのための、シンプルなテストフレームワーク
 -   メンテナンスを行っているもの

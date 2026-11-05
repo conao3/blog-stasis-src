@@ -7,7 +7,7 @@ MELPAの公式がツイートしてた。
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">We changed the MELPA website&#39;s package pages so that &quot;Homepage&quot; links go to the URL named in the package&#39;s Homepage or URL header, instead of directly to the source code. Hope that helps you explore more conveniently!</p>&mdash; MELPA (@melpa&#95;emacs) <a href="https://twitter.com/melpa&#95;emacs/status/1265125454282801153?ref&#95;src=twsrc%5Etfw">May 26, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 どうやらこの[コミット](https://github.com/melpa/melpa/commit/02163bf1d920d076f927803796b0f86e3f13ef9b)らしい。この[issue](https://github.com/melpa/melpa/issues/6914)が引用されています。
-さらにこの[ML](https://lists.gnu.org/archive/html/emacs-devel/2020-05/msg02470.html)の投稿がリンクされている。投稿者は[Emms](https://www.gnu.org/software/emms/)のメンテナであるYuniさん。
+さらにこの[ML](https://lists.gnu.org/archive/html/emacs-devel/2020-05/msg02470.html)の投稿がリンクされている。投稿者は[Emms](https://www.gnu.org/software/emms/)のメンテナであるYoniさん。
 
 ポイントは以下。
 
