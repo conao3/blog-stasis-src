@@ -16939,12 +16939,12 @@ $ plamo-tr-local text translate-text --text 今日はいい天気ですね。
 }
 #+end_src
 
-標準入力から読むときは =--text file:///dev/stdin= と書きます。
+標準入力から読むときは =--text= を省きます。
 =--query= (JMESPath の式) と =--output text= を付けると、訳文だけを取り出せます。
 
 #+begin_src console
 $ echo "Since it's raining today, I think I'll relax at home and read a book." \
-    | plamo-tr-local text translate-text --text file:///dev/stdin --query TranslatedText --output text
+    | plamo-tr-local text translate-text --query TranslatedText --output text
 今日は雨だから、家でゆっくり本を読んでいようと思う。
 #+end_src
 
