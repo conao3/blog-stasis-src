@@ -16759,7 +16759,6 @@ lean-ritsuryo のように、AI を使って書いたコードと証明をまと
 :properties:
 :export_file_name: generated/contents/blog/2026/12e5f6
 :export_date: 2026-11-04
-:export_draft: t
 :end:
 
 GNU Emacs のマニュアルを日本語に機械翻訳したサイト [[https://emacs-doc.conao3.com]] を、Cloudflare Workers で公開しています。
