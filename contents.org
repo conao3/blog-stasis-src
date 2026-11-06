@@ -17115,6 +17115,165 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 ** おわりに
 文章を端末の外に出さずに訳したいときに使ってください。
 
+* AWS CLI v2と出力が同じで100倍以上速いawsrをRustで作った
+:properties:
+:export_file_name: generated/contents/blog/2026/f681b9
+:export_date: 2026-11-05
+:export_draft: t
+:end:
+
+AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返す CLI =awsr= を Rust で作りました。
+リポジトリは [[https://github.com/conao3/rust-awscli][conao3/rust-awscli]] で、ライセンスは Apache-2.0 です。
+=awsr sts get-caller-identity= は 6.0ms で終わり、同じ PC で本家の =aws= (2.39.3) は 659ms かかります。
+110 倍の差です。
+help ページは 380〜550 倍速く出ます。
+=awsr= は AWS の公式の製品ではありません。
+
+[[./resources/public/img/f681b9-speed.svg]]
+
+** 使い方
+=aws= を =awsr= に置き換えて使います。
+
+#+begin_src console
+$ awsr sts get-caller-identity
+$ awsr dynamodb list-tables --output table
+$ awsr ec2 describe-instances \
+    --query 'Reservations[].Instances[].InstanceId' --output text
+#+end_src
+
+設定ファイル (=~/.aws/config= と =~/.aws/credentials= )、SSO のトークンのキャッシュ、環境変数は本家と同じものを読みます。
+json、text、table の出力も =--query= の結果も本家と同じバイト列になるので、 =aws= を呼んでいるシェルスクリプトの出力は変わりません。
+
+=awsr= は本家の 2.39.3 が同梱する botocore のモデルを取り込んでいて、そこにある全サービスの全操作を =awsr <サービス> <操作>= の形で呼べます。
+=s3 cp= や =s3 sync= などの高レベルのコマンド、 =configure= 、 =sso login= も本家から移植しました。
+
+** 速さ
+手元の PC (Intel Core Ultra 5 225U) で、 =hyperfine -N= を使って平均の実行時間を測りました。
+API を呼ぶコマンドはローカルのスタブのサーバーに =--endpoint-url= で向け、静的な認証情報で動かしています。
+=awsr= は nix の flake のパッケージ (静的リンク)、本家は公式の Linux 向けのインストーラで入れた 2.39.3 です。
+
+| コマンド                      |  awsr | aws 2.39.3 |     比 |
+|-------------------------------+-------+------------+--------|
+| =--version=                   | 1.3ms |      497ms | 380 倍 |
+| =sts get-caller-identity=     | 6.0ms |      659ms | 110 倍 |
+| =dynamodb list-tables=        | 5.3ms |      728ms | 140 倍 |
+| =ec2 describe-regions=        | 5.0ms |      936ms | 190 倍 |
+| =help=                        | 1.9ms |      759ms | 400 倍 |
+| =ec2 help=                    | 1.9ms |     1052ms | 550 倍 |
+| =ec2 describe-instances help= | 3.5ms |     1346ms | 380 倍 |
+
+比べる下限として、同じ PC で C の hello world を動かすと、動的リンクで 1.1ms、静的リンクで 0.7ms かかります。
+API を呼ぶコマンドの残りの数 ms は、プロセスの起動、エンドポイントのルールの評価、HTTP の送受信にかかっています。
+
+本家は Python で書かれていて、呼ぶたびにインタプリタを起動し、多くのモジュールを import し、plugin を登録し、サービスのモデルの JSON を読み込みます。
+=aws= をループで何百回も呼ぶスクリプトや CI では、この 0.5〜1 秒が呼ぶ回数だけ積み重なります。
+
+** 起動を速くする仕組み
+=awsr= は、本家が実行のたびに行う準備 (API の呼び出しではモデルの解析、help ではページの整形) をビルド時に済ませておきます。
+
+[[./resources/public/img/f681b9-build.svg]]
+
+*** モデルを解析済みの形で埋め込む
+botocore は各サービスの API を JSON のモデル (=service-2.json= など) で表していて、本家は呼ぶたびにこれを読み込んで解析します。
+モデルが最大の ec2 は、JSON で 3.5MB あります。
+
+=awsr= はビルド時にモデルを、オフセットでたどれる木と、重複を除いた文字列の表からなる形式に変換し、圧縮せずにバイナリへ埋め込みます。
+オブジェクトのキーには並べ替えた索引を付け、二分探索で引きます。
+実行時は JSON の解析も展開もせず、呼んだ操作が使う shape だけを読むので、ec2 の操作も sts の操作と同じくらいの時間で終わります。
+
+サービスごとの Rust のコードは生成しません。
+公式の AWS SDK for Rust はサービスごとに型付きのコードを生成していて、aws-sdk-ec2 だけでビルドに 150〜250 秒かかります ([[https://github.com/awslabs/aws-sdk-rust/issues/113][awslabs/aws-sdk-rust#113]])。
+=awsr= はモデルを実行時に解釈するので、Rust のコンパイルの量はサービスの数によって変わりません。
+
+ほかにも起動を速くするために、次のようにしています。
+
+- 引数の解析とエンドポイントのルールの評価では、正規表現をコンパイルせずに照合します。
+- tokio のランタイムは最初のリクエストを送るときに作ります。 =--version= と help では作りません。
+- 配布するバイナリは glibc を静的リンクし、起動時に動的ローダーを動かしません。
+- メモリの割り当てには glibc の malloc を使います。mimalloc に替えたビルドは、どのコマンドも 1.4〜2.3 倍遅くなりました。
+
+*** help ページを groff で整形して埋め込む
+本家の =aws help= は、モデルと文書から reStructuredText を組み立て、docutils で man 形式に変換し、groff で整形してページャに渡します。
+=awsr= はこの文書の組み立てと docutils の変換を Rust に移植しましたが、整形には本家と同じく手元の groff を使います。
+groff を毎回起動すると、 =ec2 help= に 107ms かかります。
+
+そこで、配布するバイナリにはビルド時に groff で整形した全 20,448 ページを埋め込んでいます。
+整形したページは合計 732MB (最大は =quicksight update-template= の 36MB) あります。
+これを、16 ページに 1 ページを標本にして学習した zstd の辞書を使ってレベル 19 で圧縮すると、35.8MB になります。
+埋め込みのページを含めて、flake のパッケージのバイナリは 150MiB です。
+
+groff の出力は groff のバージョンによって変わります。
+=awsr= は =PATH= にある groff のバージョン (=groff -v= の 1 行目) を整形に使ったバージョンと比べ、同じで =GROFF= で始まる環境変数もなければ、埋め込みのページを展開して出します。
+=groff -v= の結果は groff の実行ファイルごとにキャッシュするので、groff を起動するのはその PC で最初の 1 回だけです (このときの =ec2 help= は 3.8ms)。
+GitHub Releases のバイナリは Ubuntu の groff 1.23.0 で、flake のパッケージは nixpkgs の groff で整形しています。
+バージョンが違うときは本家と同じく手元の groff で整形し、結果を =~/.cache/awsr/help= に保存して、2 回目からはそれを出します。
+
+** 本家と出力が一致することの確かめ方
+*** 差分テスト
+出力を本家と一致させるには、Python の値の書式まで合わせる必要があります。
+たとえば、浮動小数点数は Python の =repr= と同じ書式 (=1e-05= や =1.0=) で出し、text の出力の真偽値は =True= と =False= にします。
+table の出力の文字幅は、本家が同梱する Python の =unicodedata.east_asian_width= に従って数えます。
+
+このような規則を移植した結果を確かめるために、差分テストの道具 =awsr-difftest= を作りました。
+=awsr-difftest= は同じコマンドラインで =awsr= と本家を動かし、stdout、stderr、終了コード、ストリーミングで書き出したファイル、スタブのサーバーが受けたリクエストを比べます。
+本家は公式のインストーラ (2.39.3) を nix で取り込み、同梱の Python まで含めてバージョンを固定しています。
+
+スタブのサーバーは操作の出力の shape からシード付きの乱数で応答を作ります。
+値には、出力の規則が分かれるもの (=1.50= 、 =1e2= 、 =-0= 、多倍長の整数、 =NaN= 、オフセットの異なるタイムスタンプ、全角文字など) を必ず混ぜます。
+署名の値のように実行のたびに変わるヘッダーは、比べる対象から外しています。
+
+全サービスの全操作を、シード 4 つと json、text、table の 3 つの出力形式で回すと 233,880 件になり、233,040 件が本家と一致し、一致しない件はありません。
+残りの 840 件はスタブのサーバーでは比べられない操作です (CLI のコマンドにならない 552 件、本物のエンドポイントに向かう 144 件、 =session-manager-plugin= を起動する 24 件、イベントストリームの 12 件など)。
+除いた理由は [[https://github.com/conao3/rust-awscli/blob/master/difftest/exclusions.txt][difftest/exclusions.txt]] に書いてあります。
+本家の実行結果はキャッシュしておき、キャッシュがあれば全件を 2〜5 分で回せます。
+
+*** help の全ページ比較
+help は =scripts/compare-help.sh= で本家と比べます。
+本家の help のコマンドラインを全部 (20,482 個) 並べて =awsr= と本家で実行し、stdout、stderr、終了コードをバイト単位で比べます。
+ビルド時に整形したページを埋め込んだ =awsr= で比べると、20,482 個のすべてが本家と一致しました。
+
+** 配布
+GitHub Releases に Linux (x86_64、x86_64 の musl、aarch64) と macOS (x86_64、aarch64) のバイナリを置いています。
+nix と Cargo でも入れられます。
+
+#+begin_src console
+$ nix profile install github:conao3/rust-awscli
+$ cargo install awsr
+#+end_src
+
+=cargo install= ではビルド時に help ページを整形しないので、help は最初に開いたときに手元の groff で整形します。
+
+*** crates.io の 10MB の上限
+crates.io に上げる .crate は 1 つあたり 10MB までです。
+=awsr= が埋め込むモデルは zstd で圧縮しても計 11.4MB あり、1 つの crate には収まりません。
+crates.io に上限の引き上げを頼みましたが、認められませんでした。
+
+そこで、モデルをファイルとそのディレクトリだけを持つ 3 つのデータ crate に分けました。
+
+| crate                      | 中身                                             | 大きさ |
+|----------------------------+--------------------------------------------------+--------|
+| =awsr-models=              | CLI のデータ、エンドポイント、例、help の入力など | 2.1MiB |
+| =awsr-models-services-a-l= | 頭文字が a〜l のサービスのモデル                 | 5.2MiB |
+| =awsr-models-services-m-z= | 頭文字が m〜z のサービスのモデル                 | 3.7MiB |
+| =awsr=                     | 本体                                             | 3.1MiB |
+
+=awsr= は 3 つのデータ crate を build-dependency に取り、 =build.rs= が各 crate のディレクトリのファイルを読んで埋め込みます。
+データ crate のバージョンは本家のバージョン (2.39.3) にそろえ、本家のバージョンを上げたときだけ新しいバージョンを出します。
+分けたあとも埋め込むデータは分ける前とバイト単位で同じなので、速さも変わりません。
+7 つのコマンドを分ける前のバイナリと並べて測ると差は ±0.3ms 以内で、測る順番を入れ替えると速い側も入れ替わりました。
+
+*** trusted publishing で公開する
+crates.io への公開は、GitHub Actions の trusted publishing (OIDC) で行っています。
+=Publish= の workflow で [[https://github.com/rust-lang/crates-io-auth-action][rust-lang/crates-io-auth-action]] が一時的なトークンを取るので、crates.io の API トークンをリポジトリの secret に置かずに済みます。
+workflow は 3 つのデータ crate、 =awsr= の順に、crates.io にまだないバージョンだけを =cargo publish= します。
+
+リリースは =Release= の workflow を手で起動するだけです。
+=Release= は =Cargo.toml= のバージョンを上げて commit とタグを push し、5 つのターゲットのバイナリを作って GitHub のリリースに付け、最後に =Publish= を起動します。
+crates.io の各バージョンのページには、公開した GitHub Actions の run が記録されます。
+
+** おわりに
+=aws= を何度も呼ぶスクリプトや CI で、 =aws= を =awsr= に置き換えて使ってください。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
