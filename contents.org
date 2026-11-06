@@ -17804,6 +17804,12 @@ Lean の =Array= は Clojure の永続ベクタと意味が合い、要素の更
 =Nat= の計算は =+'= で =BigInt= に切り替わり、Lean のクロージャは =IFn= を実装した Clojure の値にできます。
 JIT がバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
 
+実行時に動くのは JVM だけです。
+Lean が動くのは =deflean= のブロックを展開するときと、CLI でモジュールを変換するときだけで、実行時は Lean の C の runtime の代わりに、その関数を Clojure で書き直した runtime を使います。
+Lean のプロセスも FFI も別のヒープもないので、2 つの runtime のあいだで状態を共有する場面はありません。
+Clojure と生成したコードのあいだで受け渡す値はどれも immutable です。
+Lean の可変な状態は Clojure の仕組みで動きます。 =IO.Ref= は atom、 =Task= は future、 =Thunk= は delay になり、標準出力は =*out*= に書くので =binding= で差し替えられます。
+
 生成した Clojure が正しいことは、Lean の C backend との差分テストで確かめています。
 同じテスト用の関数を、C backend がビルドした実行ファイルと、生成した Clojure の両方で実行し、出力の 182 行を比べます。
 浮動小数点数の無限大を、C は =inf= 、Java は =Infinity= と表示する違いも、このテストで見つかりました。
@@ -18140,6 +18146,11 @@ lean-clj emits Clojure source, not Java source or JVM bytecode.
 lean-clj maps Lean's =Array= to Clojure's persistent vector, where updating an element takes O(log n).
 =Nat= arithmetic moves to =BigInt= through =+'=, and Lean closures become Clojure values that implement =IFn=.
 The JIT optimizes the bytecode anyway, so emitting bytecode directly would gain little speed.
+
+At run time, only the JVM runs.
+Lean runs only when a =deflean= block expands or when the CLI compiles a module, and a Clojure reimplementation of Lean's runtime functions replaces the C runtime.
+No Lean process, FFI, or second heap takes part, so there is no state for two runtimes to share.
+The values that cross between Clojure and the generated code are immutable, and Lean's mutable state runs on Clojure's own: =IO.Ref= is an atom, =Task= a future, =Thunk= a delay, and the standard output =*out*=, which =binding= redirects.
 
 A differential test against Lean's C backend checks the generated Clojure.
 The test runs the same functions as an executable that the C backend builds and as generated Clojure, and compares 182 lines of output.
