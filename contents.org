@@ -131,7 +131,7 @@
   "Create a new blog post heading with properties."
   (interactive "sTitle: ")
   (let* ((random-id (mapconcat (lambda (_) (format "%x" (random 16))) (make-list 6 nil) ""))
-         (date (format-time-string "%Y-%m-%d"))
+         (date (format-time-string "%Y-%m-%d %H:%M"))
          (year (format-time-string "%Y"))
          (file-name (format "generated/contents/blog/%s/%s" year random-id)))
     (goto-char (point-max))
@@ -16204,7 +16204,7 @@ Issue / PR大歓迎です。
 * Leanで書く証明付きの日付と税計算
 :properties:
 :export_file_name: generated/contents/blog/2026/5499a8
-:export_date: 2026-11-03
+:export_date: 2026-11-03 04:36
 :end:
 
 控訴期間の末日や所得税の額は、条文を読めば計算の手順が決まります。
@@ -16509,7 +16509,7 @@ Nix を使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行�
 * git fetch is Turing complete
 :properties:
 :export_file_name: generated/contents/blog/2026/1e0718
-:export_date: 2026-11-04
+:export_date: 2026-11-04 01:59
 :export_lang: en
 :end:
 
@@ -16730,7 +16730,7 @@ Each command output in this post comes from a real run, pasted as is.
 * Leanの論文をaiXivに投稿した
 :properties:
 :export_file_name: generated/contents/blog/2026/bfc7fe
-:export_date: 2026-11-04
+:export_date: 2026-11-04 14:43
 :end:
 
 [[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo について、英語の論文を書いて aiXiv に投稿しました。
@@ -16824,7 +16824,7 @@ lean-ritsuryo のように、AI を使って書いたコードと証明をまと
 * APIトークンを持たずにGitHub ActionsのビルドをCloudflare Workersへデプロイする
 :properties:
 :export_file_name: generated/contents/blog/2026/12e5f6
-:export_date: 2026-11-04
+:export_date: 2026-11-04 20:32
 :end:
 
 GNU Emacs のマニュアルを日本語に機械翻訳したサイト [[https://emacs-doc.conao3.com]] を、Cloudflare Workers で公開しています。
@@ -16956,7 +16956,7 @@ Workers の静的アセットで配りたいけれど、Cloudflare のトーク�
 * PLaMo 3 Translateを手元で動かしてパイプで訳すCLI plamo-tr-localを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/33d2c2
-:export_date: 2026-11-05
+:export_date: 2026-11-05 02:00
 :end:
 
 Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重みが、2026-11-05 に公開されました。
@@ -17186,7 +17186,7 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 * AWS CLI v2と出力が同じで最大550倍速いawsrをRustで作った
 :properties:
 :export_file_name: generated/contents/blog/2026/f681b9
-:export_date: 2026-11-05
+:export_date: 2026-11-05 18:21
 :end:
 
 AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返す CLI =awsr= を Rust で作りました。
@@ -17346,7 +17346,7 @@ crates.io の各バージョンのページには、公開した GitHub Actions 
 * awsr: the AWS CLI v2 in Rust, with the same output and up to 550 times the speed
 :properties:
 :export_file_name: generated/contents/blog/2026/87e5cb
-:export_date: 2026-11-05
+:export_date: 2026-11-05 18:56
 :export_lang: en
 :end:
 
@@ -17510,7 +17510,7 @@ If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 * Lean 4で証明した関数をClojureから呼べるlean-cljを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/4e5aa2
-:export_date: 2026-11-05
+:export_date: 2026-11-05 20:05
 :export_draft: t
 :end:
 
@@ -17845,7 +17845,7 @@ Issue / PR 大歓迎です。
 * lean-clj: call Lean 4 functions from Clojure, and prove Clojure functions in Lean
 :properties:
 :export_file_name: generated/contents/blog/2026/311be4
-:export_date: 2026-11-05
+:export_date: 2026-11-05 20:05
 :export_lang: en
 :export_draft: t
 :end:

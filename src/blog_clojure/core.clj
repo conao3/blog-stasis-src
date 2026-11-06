@@ -255,14 +255,14 @@
 
 
 (defn render-content
-  [{:keys [title body date url post?]}]
+  [{:keys [title body date datetime url post?]}]
   (hiccup/html
     [:article
      [:header
       [:h1 title]
       (when post?
         [:div {:class "post-meta"}
-         [:time date]
+         [:time {:datetime datetime} date]
          [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
           (hiccup/raw x-logo)
           "ポスト"]])]
@@ -282,7 +282,8 @@
                                    obj {:title (:title (:metadata p))
                                         :url (page-url path)
                                         :post? (not= path "/index.html")
-                                        :date (:date (:metadata p))
+                                        :date (some-> (:date (:metadata p)) (subs 0 10))
+                                        :datetime (some-> (:date (:metadata p)) (str/replace " " "T"))
                                         :lang (:lang (:metadata p))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
@@ -311,9 +312,9 @@
                     [:ul
                      (->> (dissoc contents "/index.html")
                           (remove (comp :portfolio? second))
-                          (sort-by (comp :date second))
+                          (sort-by (fn [[k v]] [(:datetime v) k]))
                           reverse
-                          (map (fn [[k v]] [:li [:time (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))]])
+                          (map (fn [[k v]] [:li [:time {:datetime (:datetime v)} (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))]])
         contents (-> contents
                      (update-in ["/index.html" :body] #(str % blog-inx))
                      (assoc "/404.html" {:title "ページが見つかりません"
