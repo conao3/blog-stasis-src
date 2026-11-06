@@ -17507,6 +17507,681 @@ The page of each version on crates.io links to the GitHub Actions run that publi
 ** Wrapping up
 If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 
+* Lean 4で証明した関数をClojureから呼べるlean-cljを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/4e5aa2
+:export_date: 2026-11-05
+:export_draft: t
+:end:
+
+Lean 4 で書いて証明した関数を Clojure から呼び、Clojure で書いた関数の性質を Lean で証明するためのライブラリとして lean-clj を作りました。
+リポジトリは [[https://github.com/conao3/lean-clj][conao3/lean-clj]] で、ライセンスは Apache-2.0 です。
+Clojars に =io.github.conao3/lean-clj= として公開していて、この記事は 0.3.0 をもとに書いています。
+
+lean-clj は Lean のコンパイラの中間表現 (IR) を Clojure のソースに変換します。
+JVM の上では、Lean の C backend がビルドするのと同じプログラムから型と証明を消したものが動きます。
+
+[[github:conao3/lean-clj::Clojure][Lean 4 IR to Clojure backend and Lean embedded in Clojure via S-expressions]]
+
+** 3 つの使い方
+lean-clj には次の 3 つの使い方があります。
+
+[[./resources/public/img/4e5aa2-uses.svg]]
+
+1. Clojure のファイルの中に Lean で関数と定理を書き、Clojure から呼ぶ ( =deflean= )。
+2. 既存の Lean のプロジェクト (lake のプロジェクト) を、Clojure の namespace の集まりに変換する (CLI)。
+3. Clojure で書いた関数を Lean のモデルに変換し、その性質を Lean で証明する ( =lean-clj.typed= )。
+
+1 と 2 は Lean から Clojure への向き、3 は Clojure から Lean への向きです。
+以下、この順に例を挙げます。
+
+** Lean で書いて Clojure から呼ぶ
+=deps.edn= に lean-clj を追加します。
+
+#+begin_src clojure
+{:deps {io.github.conao3/lean-clj {:mvn/version "0.3.0"}}}
+#+end_src
+
+=deflean= のブロックを最初に展開するときは、Lean 4.35.0 ( =lean= と =lake= ) と =lean-clj= の CLI が =PATH= に要ります。
+CLI は nix でインストールできます。
+
+#+begin_src console
+$ nix profile install github:conao3/lean-clj/v0.3.0
+#+end_src
+
+=deflean= の本体には Lean の構文を S 式にしたものを書きます。
+
+#+begin_src clojure
+(ns demo.core
+  (:refer-clojure :exclude [double])
+  (:require [lean-clj.core :refer [deflean]]))
+
+(deflean arith
+  (def double [n Nat] Nat
+    (+ n n))
+
+  (theorem double_eq [n Nat] (= (double n) (* 2 n))
+    (by (unfold double) omega))
+
+  (structure Account [owner String balance Nat])
+
+  (def deposit [a Account n Nat] Account
+    (with a {:balance (+ (.balance a) n)})))
+#+end_src
+
+=def= で関数を、 =theorem= で定理を定義し、 =(by ...)= の中に証明を書きます。
+=double_eq= では、 =double= の定義を展開してから、自然数と整数の線形算術を解くタクティク =omega= で等式を示しています。
+namespace を読み込むと、lean-clj はブロックを Lean のソースに変換して =lake build= を実行し、証明まで検査します。
+検査が通ると、ブロックの関数がその namespace の Clojure の関数になります。
+structure の値は keyword を key に持つ map として受け渡します。
+
+#+begin_src clojure
+(double 21)                                ;=> 42
+(deposit {:owner "ann" :balance 10} 5)     ;=> {:owner "ann", :balance 15}
+#+end_src
+
+証明が通らないと、namespace のコンパイルが止まります。
+定理の右辺を =(* 3 n)= に書き換えて namespace を読み込むと、次のエラーになります。
+
+#+begin_src text
+Syntax error macroexpanding deflean at (demo/wrong.clj:5:1).
+lean-clj: Lean rejected deflean arith
+error: demo/wrong.clj:9: deflean arith:3:75: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  a ≥ 1
+where
+ a := ↑n
+
+Lean source of the block:
+   1 | def double (n : Nat) : Nat := (n + n)
+   2 |
+   3 | theorem double_eq (n : Nat) : ((double n) = (3 * n)) := (by unfold double; omega)
+#+end_src
+
+エラーのメッセージには Clojure のファイルと行 ( =demo/wrong.clj:9= ) と、ブロックから作った Lean のソースが含まれます。
+
+S 式で書けない構文は =(lean "...")= で Lean のソースを文字列のまま混ぜて書けます。
+サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/word-count][word-count]] は、 =do= 記法の関数をこの形で書いています。
+生成した Clojure のコードは =.lean-clj/cache/= に保存されます。
+ブロックを変えなければ、2 回目からは Lean を呼ばずにキャッシュから展開するので、キャッシュをリポジトリに入れておけば Lean の無い環境でも動きます。
+
+** Lean のプロジェクトを Clojure の namespace にする
+lake のプロジェクトとして書いた Lean のコードも、CLI で Clojure の namespace に変換できます。
+サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]] は、整数とローマ数字の変換を Lean で書き、1〜999 の数をローマ数字にして戻すと元の数になることを証明しています。
+
+#+begin_src lean
+def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
+
+def fromRoman (s : String) : Option Nat :=
+  if s.isEmpty then none else fromRomanAux s.toList
+
+theorem roundtrip : ∀ n, n < 1000 → fromRoman (toRoman n) = if n = 0 then none else some n := by
+  decide +kernel
+#+end_src
+
+=lake build= で証明を検査したあと、CLI で module を namespace に変換します。
+
+#+begin_src console
+$ lean-clj module generate-namespace --module-name Roman --namespace roman.core \
+    --search-path lean/.lake/build/lib/lean --output-file src/roman/core.clj
+#+end_src
+
+公開している関数は名前を kebab-case にした Clojure の関数になります。
+=Option= の値は =some= の中身か =nil= になります。
+
+#+begin_src clojure
+(require '[roman.core :as roman])
+
+(roman/to-roman 1994)        ;=> "MCMXCIV"
+(roman/from-roman "MMXXVI")  ;=> 2026
+(roman/from-roman "hello")   ;=> nil
+#+end_src
+
+生成した =src/roman/core.clj= は普通の Clojure のファイルなので、リポジトリに commit すれば、使う側に Lean は要りません。
+プロジェクトの module をまとめて変換するときは =lean-clj project generate= を使います。
+
+** Clojure で書いて Lean で証明する
+3 つ目の使い方では、実装を Clojure で書きます。
+次の例では、0 から n までの和を閉じた式で計算する Clojure の関数が、和の定義どおりに再帰する Lean の仕様と等しいことを証明します。
+
+#+begin_src clojure
+(ns demo.sum
+  (:require [lean-clj.core :refer [deflean]]
+            [lean-clj.typed :as lt]))
+
+(lt/defn sum-to-fast [n Nat] Nat
+  (quot (* n (inc n)) 2))
+
+(deflean sums
+  (clojure sum-to-fast)
+
+  (def sum-to [n Nat] Nat
+    (match n
+      0 0
+      (+ k 1) (+ (sum-to k) (+ k 1))))
+
+  (theorem two-sum-to [n Nat] (= (* 2 (sum-to n)) (* n (+ n 1)))
+    (by (on-all (induction n) (simp only [sum-to Nat.mul_add Nat.add_mul] at *) omega)))
+
+  (theorem sum-to-fast-eq [n Nat] (= (sum-to-fast n) (sum-to n))
+    (by (simp only [sum-to-fast Clj.quot_nat Clj.mul_nat Clj.inc_nat])
+        "have := twoSumTo n"
+        omega))
+
+  (theorem ^{:attrs [csimp]} sum-to-eq [] (= (the (-> Nat Nat) sum-to) sum-to-fast)
+    (by (funext n) (exact (.symm (sum-to-fast-eq n))))))
+#+end_src
+
+=lt/defn= は普通の Clojure の関数を定義し、引数と戻り値の Lean の型 (signature) を var に記録します。
+ブロックの中の =(clojure sum-to-fast)= は、その関数を Lean の定義に変換します。
+この記事では、変換した Lean の定義をモデルと呼びます。
+=quot= や =inc= のような =clojure.core= の関数のモデルは、lean-clj に同梱した Lean のライブラリ =Clj= にあります。
+
+=sum-to-eq= に付けた =@[csimp]= は、 =sum-to= をコンパイルするときに =sum-to-fast= へ置き換えることを Lean に許す属性です。
+置き換えてよい根拠は、2 つの関数が等しいという証明です。
+そのため、Clojure から =sum-to= を呼ぶと、再帰ではなく Clojure の =sum-to-fast= が実行されます。
+
+#+begin_src clojure
+(sum-to 1000000)  ;=> 500000500000
+#+end_src
+
+この形は [[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo の書き方を、Clojure の実装に当てはめたものです。
+実装と仕様の関係ごとに、次のサンプルがあります。
+
+| 実装と仕様の関係                         | lean-clj での書き方                                    | サンプル                                    |
+|------------------------------------------+--------------------------------------------------------+---------------------------------------------|
+| 仕様をそのまま実行する                   | =deflean= の定義を呼ぶ                                 | todo-cli                                    |
+| 速い実装がすべての入力で仕様と一致する   | 等しいことを証明し、 =@[csimp]= で置き換える          | verified-clojure ( =sum-to= )               |
+| 速い実装が仮定のもとで仕様と一致する     | 仮定付きで証明し、仮定を満たす呼び出し側が実装を呼ぶ | sorted-search                               |
+| 実装が結果の条件を満たす                 | 条件を定理にして証明する                               | verified-clojure (挿入ソート)、inventory    |
+
+*** 本物の関数とモデルを生成テストで比べる
+証明が示すのはモデルの性質です。
+モデルの挙動が Clojure の関数と食い違っていれば、本物の関数では成り立たない定理も証明できてしまいます。
+そこで、 =lt/check= を使って本物の関数とモデルを同じ入力で呼び、結果を比べます。
+
+#+begin_src clojure
+(lt/check #'sum-to-fast {:seed 1})
+;=> {:result true, :pass? true, :num-tests 100, :time-elapsed-ms 7, :seed 1}
+#+end_src
+
+=lt/check= は signature から、テストの入力を作る test.check の generator を生成します。
+結果が食い違ったときは、引数と両方の戻り値を =:counterexample= に入れて返します。
+=lt/defcheck= を使うと、同じ検査を =clojure.test= のテストとして定義できます。
+lean-clj のテストでも、 =Clj= のモデルを =clojure.core= の関数と生成テストで照合していて、照合の表は 156 行あります。
+
+定理は Clojure の関数が値を返す呼び出しについて成り立ちます。
+=Long= の overflow、0 での除算、範囲外の index のように例外を投げる呼び出しは、モデルの対象外です。
+
+** 生成テストで見つかったモデルの誤り
+照合の生成テストで、モデルの誤りがいくつも見つかりました。
+誤りの一部は、本物の関数では成り立たない定理を証明できるものでした。
+
+*** 多相の関数の真偽
+次の =member?= は、任意の型 =α= のリスト =xs= に =x= があるかを調べます。
+
+#+begin_src clojure
+(lt/defn member?
+  [(implicit α Type) (inst (BEq α)) x α xs (List α)]
+  Bool
+  (if-let [y (first xs)]
+    (or (= x y) (member? x (rest xs)))
+    false))
+#+end_src
+
+Clojure の =if-let= は、束縛した値が =false= か =nil= のときに else の分岐を取ります。
+そのため、 =false= だけのリストで =false= を探すと =false= を返します。
+
+#+begin_src clojure
+(member? 1 [1])          ;=> true
+(member? false [false])  ;=> false
+#+end_src
+
+以前のモデルは、型の変数 =α= の値を真偽の判定で常に真として扱っていました。
+=Nat= や =String= の値は Clojure でも常に真なので、多くの型ではこの扱いで結果が Clojure と同じになります。
+しかし =α = Bool= のときは =false= が偽になるので、モデルと Clojure の関数の結果が食い違います。
+このモデルでは、「先頭に =x= があれば =member?= は =true= を返す」という次の定理が、すべての =α= について証明できました。
+
+#+begin_src clojure
+(theorem member-head [(implicit α Type) (inst (BEq α)) (inst (LawfulBEq α)) (inst (Clj.Truthy α)) x α xs (List α)]
+  (= (member? x (cons x xs)) true)
+  (by (rw [member?]) simp))
+#+end_src
+
+=x = false= のとき、Clojure の関数は =false= を返すので、この定理は本物の関数では成り立ちません。
+
+いまのモデルは、型の変数ごとに =[Clj.Truthy α]= という instance を引数に取り、 =α= に入る具体的な型の instance で値の真偽を決めます。
+同じ定理を証明しようとすると、 =x= が真であることを示すゴールが残り、証明が失敗します。
+
+#+begin_src text
+error: demo/member.clj:15: deflean proofs:3:128: unsolved goals
+...
+x : α
+xs : List α
+⊢ Clj.truthy x = true
+#+end_src
+
+サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/generic-search][generic-search]] は、 =nil= だけを偽とする =if-some= で =member?= を書き、同じ定理を証明しています。
+
+*** そのほかの誤り
+ほかにも、生成テストで次の 3 つの Clojure の挙動がモデルと食い違いました。
+
+#+begin_src clojure
+(:k {:k nil} 0)                  ;=> nil
+(str [12345678901234567890N])    ;=> "[12345678901234567890N]"
+(get [0 1] 4294967297)           ;=> 1
+#+end_src
+
+- =(:k m default)= は、key があって値が =nil= なら =nil= を返します。default を返すのは key が無いときだけです。モデルは =nil= のときにも default を返していました。
+- =str= は vector の中の =BigInt= に =N= を付けます。モデルは =N= を付けていませんでした。generator は =Long= に収まらない整数も作るので、この違いが見つかりました。
+- vector の =get= は、index を =int= の下位 32 bit に切り詰めます。 =4294967297= は =2^32 + 1= なので、index 1 の要素を返します。
+
+どれも、モデルを Clojure の挙動に合わせて直しました。
+
+** 作らなかったもの
+=Long= の overflow まで含めて、関数が例外を投げないことも証明するモード ( =^:total= ) は作りませんでした。
+このモードでは、式全体を =Option= のような例外を表す型の計算として書き直す必要があります。
+この書き直しを Lean の =do= 記法で行うと、評価の順序が Clojure と食い違います。
+
+#+begin_src lean
+def half (n : Nat) : Option Nat :=
+  if n % 2 == 0 then some (n / 2) else none
+
+def g (n : Nat) : Option Bool := do
+  pure (n == 1 || (← half n) == 0)
+
+#eval g 1  -- none
+#+end_src
+
+Clojure の ~(or (= n 1) ...)~ は、 =n= が 1 なら右辺を評価せずに =true= を返します。
+Lean は =(← half n)= を式の外へ出して先に実行するので、右辺の =half 1= が失敗し、 =g 1= は =none= になります。
+=and= や =or= のように途中で評価をやめる式を、すべて Clojure と同じ順序で書き直す必要があり、このモードは変換の手間に見合わないと判断しました。
+
+overflow を避けるには任意精度の =+'= の系列を使い、見つけるには =lt/check= に =:throws :fail= を渡して、例外を投げる入力を失敗として数えます。
+
+** 仕組み
+生成するコードの形式には、Java のソースや JVM のバイトコードではなく Clojure のソースを選びました。
+Lean の =Array= は Clojure の永続ベクタと意味が合い、要素の更新が O(log n) で済みます。
+=Nat= の計算は =+'= で =BigInt= に切り替わり、Lean のクロージャは =IFn= を実装した Clojure の値にできます。
+JIT がバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
+
+生成した Clojure が正しいことは、Lean の C backend との差分テストで確かめています。
+同じテスト用の関数を、C backend がビルドした実行ファイルと、生成した Clojure の両方で実行し、出力の 182 行を比べます。
+浮動小数点数の無限大を、C は =inf= 、Java は =Infinity= と表示する違いも、このテストで見つかりました。
+
+生成したコードが、JVM の 1 メソッドあたり 64KB という上限を超えたこともありました。
+Lean の IR の join point (関数の中で複数の分岐が合流する先) を呼び出し箇所ごとに展開していたため、生成したコードが 36,000 行に膨らみ、 =Std.Format= の関数の読み込みが「Method code too large!」で失敗しました。
+いまは呼び出しが 1 か所の join point だけを展開し、2 か所以上のものは =letfn= にしています。
+自己末尾呼び出しは =loop= と =recur= に、相互再帰は =trampoline= にして、スタックを積まずに実行します。
+
+** Clojure の型のライブラリとの関係
+Clojure には、clojure.spec、malli、Plumatic Schema のように、値を実行時に検査するスキーマのライブラリがあります。
+これらは値を検査する述語を組み合わせて書く仕組みで、型の変数を持たず、map は既定で開いていて、整数の固定精度と任意精度を区別しません。
+Typed Clojure と clj-kondo の型検査は、それぞれ独自の型の言語と、 =clojure.core= の関数の型の注釈を持っています。
+
+lean-clj では型を Lean で書き、その型から malli のスキーマ、test.check の generator、clj-kondo の型を生成します。
+=deflean= で定義した structure =Account= からは、次の malli のスキーマができます。
+
+#+begin_src clojure
+(require '[lean-clj.types :as t])
+
+(t/malli-schema 'Account)
+;=> [:map {:closed true} [:owner :string] [:balance [:and integer? [:>= 0]]]]
+#+end_src
+
+=Nat= は 0 以上の整数に、structure は同じ key を持つ閉じた map になります。
+証明を書かなくても、signature からこれらを使えます (サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/typed-schemas][typed-schemas]])。
+
+近い領域のプロジェクトに、whilo さんの [[https://github.com/replikativ/ansatz][ansatz]] があります。
+ansatz は Lean のカーネルを Java で実装し、JVM だけで型の検査を済ませます。
+lean-clj は本物の Lean で検査し、Lean の構文と標準ライブラリ、既存の lake のプロジェクトをそのまま使います。
+その代わり、 =deflean= の初回の展開には Lean の toolchain が要ります。
+
+** おわりに
+lean-clj は Clojars の =io.github.conao3/lean-clj= から入手できます。
+[[https://github.com/conao3/lean-clj/tree/master/samples][samples]] には使い方ごとの小さなサンプルがあり、 =deflean= は todo-cli から、Clojure の関数の検証は verified-clojure から読むのがおすすめです。
+Issue / PR 大歓迎です。
+
+* lean-clj: call Lean 4 functions from Clojure, and prove Clojure functions in Lean
+:properties:
+:export_file_name: generated/contents/blog/2026/311be4
+:export_date: 2026-11-05
+:export_lang: en
+:export_draft: t
+:end:
+
+I wrote lean-clj, a library that lets you call functions written and proved in Lean 4 from Clojure, and prove properties of Clojure functions in Lean.
+The repository is [[https://github.com/conao3/lean-clj][conao3/lean-clj]], under Apache-2.0.
+You can get it from Clojars as =io.github.conao3/lean-clj=, and this post uses version 0.3.0.
+
+lean-clj compiles the intermediate representation (IR) of the Lean compiler to Clojure source.
+The JVM runs the same program that Lean's C backend builds, with types and proofs erased.
+
+[[github:conao3/lean-clj::Clojure][Lean 4 IR to Clojure backend and Lean embedded in Clojure via S-expressions]]
+
+** Three ways to use it
+lean-clj supports three uses.
+
+[[./resources/public/img/311be4-uses.svg]]
+
+1. Write functions and theorems in Lean inside a Clojure file, and call the functions from Clojure (=deflean=).
+2. Compile an existing Lean project (a lake project) to a set of Clojure namespaces (the CLI).
+3. Translate a function written in Clojure into a Lean model, and prove its properties in Lean (=lean-clj.typed=).
+
+The first two go from Lean to Clojure, and the third goes from Clojure to Lean.
+Each section below gives an example, in the same order.
+
+** Write in Lean, call from Clojure
+Add lean-clj to =deps.edn=:
+
+#+begin_src clojure
+{:deps {io.github.conao3/lean-clj {:mvn/version "0.3.0"}}}
+#+end_src
+
+To expand a =deflean= block for the first time, you need Lean 4.35.0 (=lean= and =lake=) and the =lean-clj= CLI on your =PATH=.
+Install the CLI with nix:
+
+#+begin_src console
+$ nix profile install github:conao3/lean-clj/v0.3.0
+#+end_src
+
+Inside =deflean=, you write Lean syntax as S-expressions:
+
+#+begin_src clojure
+(ns demo.core
+  (:refer-clojure :exclude [double])
+  (:require [lean-clj.core :refer [deflean]]))
+
+(deflean arith
+  (def double [n Nat] Nat
+    (+ n n))
+
+  (theorem double_eq [n Nat] (= (double n) (* 2 n))
+    (by (unfold double) omega))
+
+  (structure Account [owner String balance Nat])
+
+  (def deposit [a Account n Nat] Account
+    (with a {:balance (+ (.balance a) n)})))
+#+end_src
+
+=def= defines a function, =theorem= states a theorem, and =(by ...)= holds its proof.
+The proof of =double_eq= unfolds =double= and then closes the goal with =omega=, the tactic for linear arithmetic over natural numbers and integers.
+When the namespace loads, lean-clj turns the block into Lean source, runs =lake build=, and checks the proofs.
+If the check passes, lean-clj defines the functions of the block as Clojure functions in the namespace.
+You pass and receive a structure as a map with keyword keys.
+
+#+begin_src clojure
+(double 21)                                ;=> 42
+(deposit {:owner "ann" :balance 10} 5)     ;=> {:owner "ann", :balance 15}
+#+end_src
+
+If a proof fails, the namespace does not compile.
+Change the theorem to =(* 3 n)=, and you get this error:
+
+#+begin_src text
+Syntax error macroexpanding deflean at (demo/wrong.clj:5:1).
+lean-clj: Lean rejected deflean arith
+error: demo/wrong.clj:9: deflean arith:3:75: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  a ≥ 1
+where
+ a := ↑n
+
+Lean source of the block:
+   1 | def double (n : Nat) : Nat := (n + n)
+   2 |
+   3 | theorem double_eq (n : Nat) : ((double n) = (3 * n)) := (by unfold double; omega)
+#+end_src
+
+The error gives the Clojure file and line (=demo/wrong.clj:9=) and shows the Lean source that lean-clj generated from the block.
+
+For syntax that the S-expressions do not cover, you can pass Lean source as a string with =(lean "...")=.
+The [[https://github.com/conao3/lean-clj/tree/master/samples/word-count][word-count]] sample uses it to write a function in =do= notation.
+lean-clj stores the generated Clojure code in =.lean-clj/cache/=.
+As long as the block does not change, later expansions read the cache and skip Lean.
+If you commit the cache, the code runs on machines without Lean.
+
+** Compile a Lean project to Clojure namespaces
+The CLI compiles the Lean code of a lake project to Clojure namespaces.
+The [[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]] sample converts numbers to and from Roman numerals in Lean, and proves that converting a number from 1 to 999 and back returns the same number.
+
+#+begin_src lean
+def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
+
+def fromRoman (s : String) : Option Nat :=
+  if s.isEmpty then none else fromRomanAux s.toList
+
+theorem roundtrip : ∀ n, n < 1000 → fromRoman (toRoman n) = if n = 0 then none else some n := by
+  decide +kernel
+#+end_src
+
+After =lake build= checks the proofs, the CLI compiles the module to a namespace:
+
+#+begin_src console
+$ lean-clj module generate-namespace --module-name Roman --namespace roman.core \
+    --search-path lean/.lake/build/lib/lean --output-file src/roman/core.clj
+#+end_src
+
+The CLI turns each public function into a Clojure function with a kebab-case name.
+An =Option= turns into the wrapped value or =nil=.
+
+#+begin_src clojure
+(require '[roman.core :as roman])
+
+(roman/to-roman 1994)        ;=> "MCMXCIV"
+(roman/from-roman "MMXXVI")  ;=> 2026
+(roman/from-roman "hello")   ;=> nil
+#+end_src
+
+The generated =src/roman/core.clj= is an ordinary Clojure file.
+If you commit it, the code that uses it runs without Lean.
+=lean-clj project generate= compiles all the modules of a project at once.
+
+** Write in Clojure, prove in Lean
+In the third use, you write the implementation in Clojure.
+The next example takes a Clojure function that computes the sum from 0 to n in closed form, and proves that it equals a Lean specification that follows the recursive definition of the sum.
+
+#+begin_src clojure
+(ns demo.sum
+  (:require [lean-clj.core :refer [deflean]]
+            [lean-clj.typed :as lt]))
+
+(lt/defn sum-to-fast [n Nat] Nat
+  (quot (* n (inc n)) 2))
+
+(deflean sums
+  (clojure sum-to-fast)
+
+  (def sum-to [n Nat] Nat
+    (match n
+      0 0
+      (+ k 1) (+ (sum-to k) (+ k 1))))
+
+  (theorem two-sum-to [n Nat] (= (* 2 (sum-to n)) (* n (+ n 1)))
+    (by (on-all (induction n) (simp only [sum-to Nat.mul_add Nat.add_mul] at *) omega)))
+
+  (theorem sum-to-fast-eq [n Nat] (= (sum-to-fast n) (sum-to n))
+    (by (simp only [sum-to-fast Clj.quot_nat Clj.mul_nat Clj.inc_nat])
+        "have := twoSumTo n"
+        omega))
+
+  (theorem ^{:attrs [csimp]} sum-to-eq [] (= (the (-> Nat Nat) sum-to) sum-to-fast)
+    (by (funext n) (exact (.symm (sum-to-fast-eq n))))))
+#+end_src
+
+=lt/defn= defines an ordinary Clojure function and records the Lean types of its parameters and result on the var.
+Inside the block, =(clojure sum-to-fast)= translates the function into a Lean definition, which this post calls the function's model.
+=Clj=, a Lean library that ships with lean-clj, provides models of =clojure.core= functions such as =quot= and =inc=.
+
+The =@[csimp]= attribute on =sum-to-eq= lets Lean replace =sum-to= with =sum-to-fast= when it compiles a call.
+Lean permits the replacement because you proved that the two are equal.
+As a result, a call of =sum-to= from Clojure runs the Clojure =sum-to-fast= instead of the recursion.
+
+#+begin_src clojure
+(sum-to 1000000)  ;=> 500000500000
+#+end_src
+
+lean-ritsuryo, which I introduced in [[https://s.conao3.com/blog/2026/5499a8][a post in Japanese]], relates implementations to specifications in several ways, and lean-clj applies the same ways to implementations in Clojure.
+Each relation has a sample:
+
+| How the implementation relates to the specification              | How to write it in lean-clj                                                | Sample                                          |
+|------------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------|
+| The specification runs as it is                                  | Call the =deflean= definition                                              | todo-cli                                        |
+| A faster implementation equals the specification on every input | Prove the equality, and replace with =@[csimp]=                            | verified-clojure (=sum-to=)                     |
+| A faster implementation equals it under an assumption            | Prove it under the assumption; callers that meet it call the implementation | sorted-search                                   |
+| The implementation satisfies a property of its result            | State the property as a theorem and prove it                               | verified-clojure (insertion sort), inventory    |
+
+*** Compare the function with its model on generated inputs
+Lean proves theorems about the model.
+If the model departs from what Clojure does, you can still prove a theorem that the real function breaks.
+=lt/check= calls the real function and its model on the same inputs and compares the results:
+
+#+begin_src clojure
+(lt/check #'sum-to-fast {:seed 1})
+;=> {:result true, :pass? true, :num-tests 100, :time-elapsed-ms 7, :seed 1}
+#+end_src
+
+=lt/check= builds test.check generators from the types of the signature.
+If the results differ, it returns the arguments and both values in =:counterexample=.
+=lt/defcheck= defines the same check as a =clojure.test= test.
+lean-clj's own tests compare the =Clj= models with the =clojure.core= functions the same way, in a table of 156 rows.
+
+A theorem holds for the calls where the Clojure function returns a value.
+Calls that throw, such as a =Long= overflow, a division by zero, or an index out of range, fall outside what the models describe.
+
+** Model errors that generated tests found
+The comparison tests found several errors in the models.
+Some of them let Lean prove theorems that do not hold.
+
+*** Truthiness in polymorphic functions
+This =member?= checks whether =x= is in a list of elements of any type =α=:
+
+#+begin_src clojure
+(lt/defn member?
+  [(implicit α Type) (inst (BEq α)) x α xs (List α)]
+  Bool
+  (if-let [y (first xs)]
+    (or (= x y) (member? x (rest xs)))
+    false))
+#+end_src
+
+Clojure's =if-let= takes the else branch when the bound value is =false= or =nil=.
+So on a list of =false=, the function returns =false=:
+
+#+begin_src clojure
+(member? 1 [1])          ;=> true
+(member? false [false])  ;=> false
+#+end_src
+
+The models treated every value of a type variable =α= as truthy.
+Values of =Nat= and =String= are always truthy in Clojure, so this is right for most types.
+At =α = Bool=, though, =false= is falsy, so the model and the Clojure function give different results.
+With that model, you could prove the next theorem, "if =x= is the head, =member?= returns =true=", for every =α=:
+
+#+begin_src clojure
+(theorem member-head [(implicit α Type) (inst (BEq α)) (inst (LawfulBEq α)) (inst (Clj.Truthy α)) x α xs (List α)]
+  (= (member? x (cons x xs)) true)
+  (by (rw [member?]) simp))
+#+end_src
+
+At =x = false=, the Clojure function returns =false=, so the theorem does not hold for the real function.
+
+Each type variable of a polymorphic model now comes with a =[Clj.Truthy α]= instance argument, so a test of an =α= value behaves as it does at the caller's type.
+The same proof now stops, because it has to show that =x= is truthy:
+
+#+begin_src text
+error: demo/member.clj:15: deflean proofs:3:128: unsolved goals
+...
+x : α
+xs : List α
+⊢ Clj.truthy x = true
+#+end_src
+
+The [[https://github.com/conao3/lean-clj/tree/master/samples/generic-search][generic-search]] sample writes =member?= with =if-some=, which treats only =nil= as false, and proves the same theorem.
+
+*** Other errors
+The generated tests also found models that disagreed with these three behaviors of Clojure:
+
+#+begin_src clojure
+(:k {:k nil} 0)                  ;=> nil
+(str [12345678901234567890N])    ;=> "[12345678901234567890N]"
+(get [0 1] 4294967297)           ;=> 1
+#+end_src
+
+- =(:k m default)= returns =nil= when the key is there with the value =nil=. The default applies only when the key is missing. The model returned the default for =nil= too.
+- =str= adds an =N= to a =BigInt= inside a vector. The model did not. The tests found this because the generators also produce integers beyond =Long=.
+- =get= on a vector truncates the index to the low 32 bits of an =int=. =4294967297= is =2^32 + 1=, so the call returns the element at index 1.
+
+Each model now follows what Clojure does.
+
+** What lean-clj does not do
+lean-clj has no mode (=^:total=) that also proves that a function never throws, including on =Long= overflow.
+Such a mode would have to rewrite every expression as a computation in a type that represents failure, such as =Option=.
+If you write that with Lean's =do= notation, the order of evaluation differs from Clojure's:
+
+#+begin_src lean
+def half (n : Nat) : Option Nat :=
+  if n % 2 == 0 then some (n / 2) else none
+
+def g (n : Nat) : Option Bool := do
+  pure (n == 1 || (← half n) == 0)
+
+#eval g 1  -- none
+#+end_src
+
+Clojure's ~(or (= n 1) ...)~ returns =true= without evaluating the right side when =n= is 1.
+Lean lifts =(← half n)= out of the expression and runs it first, so =half 1= fails and =g 1= is =none=.
+The translation would have to rewrite each expression that skips evaluation, like =and= and =or=, to keep Clojure's order, and I decided it was not worth that cost.
+
+To avoid overflow, use the arbitrary-precision =+'= family.
+To find it, pass =:throws :fail= to =lt/check=, which then counts an input that throws as a failure.
+
+** How it works
+lean-clj emits Clojure source, not Java source or JVM bytecode.
+lean-clj maps Lean's =Array= to Clojure's persistent vector, where updating an element takes O(log n).
+=Nat= arithmetic moves to =BigInt= through =+'=, and Lean closures become Clojure values that implement =IFn=.
+The JIT optimizes the bytecode anyway, so emitting bytecode directly would gain little speed.
+
+A differential test against Lean's C backend checks the generated Clojure.
+The test runs the same functions as an executable that the C backend builds and as generated Clojure, and compares 182 lines of output.
+This test found that C prints an infinite float as =inf= and Java as =Infinity=.
+
+The backend also ran into the JVM limit of 64 KB per method.
+It expanded each join point of Lean's IR (a merge point inside a function) at every jump to it.
+The generated code grew to 36,000 lines, and loading the functions of =Std.Format= failed with "Method code too large!".
+Now it expands only the join points with one jump, and turns the others into =letfn=.
+Self tail calls become =loop= and =recur=, and mutual recursion runs through =trampoline=, so neither grows the stack.
+
+** Clojure's type and schema libraries
+Clojure has schema libraries that check values at run time, such as clojure.spec, malli, and Plumatic Schema.
+They describe values with predicates: they have no type variables, their maps are open by default, and their integers do not tell fixed precision from arbitrary precision.
+Typed Clojure and clj-kondo's type checking each have their own type language and their own annotations of =clojure.core=.
+
+In lean-clj, you write types in Lean, and lean-clj derives malli schemas, test.check generators, and clj-kondo types from them.
+For the structure =Account= in the =deflean= block above, it derives this schema:
+
+#+begin_src clojure
+(require '[lean-clj.types :as t])
+
+(t/malli-schema 'Account)
+;=> [:map {:closed true} [:owner :string] [:balance [:and integer? [:>= 0]]]]
+#+end_src
+
+=Nat= becomes a non-negative integer, and a structure becomes a closed map with the same keys.
+You get these from the signatures alone, without writing proofs (the [[https://github.com/conao3/lean-clj/tree/master/samples/typed-schemas][typed-schemas]] sample).
+
+A related project is whilo's [[https://github.com/replikativ/ansatz][ansatz]].
+ansatz implements Lean's kernel in Java and completes type checking on the JVM.
+lean-clj checks with the real Lean, and uses Lean's syntax, its standard library, and existing lake projects as they are.
+In exchange, you need the Lean toolchain the first time you expand a =deflean= block.
+
+** Wrapping up
+lean-clj is on Clojars as =io.github.conao3/lean-clj=.
+The [[https://github.com/conao3/lean-clj/tree/master/samples][samples]] directory holds a small program for each use.
+Start with todo-cli for =deflean=, and with verified-clojure for verifying Clojure functions.
+I welcome issues and pull requests.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
