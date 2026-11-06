@@ -17119,7 +17119,6 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 :properties:
 :export_file_name: generated/contents/blog/2026/f681b9
 :export_date: 2026-11-05
-:export_draft: t
 :end:
 
 AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返す CLI =awsr= を Rust で作りました。
