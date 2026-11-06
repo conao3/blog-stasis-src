@@ -256,6 +256,49 @@ article > header .post-meta {
     width: fit-content;
 }
 
+.github-card {
+    margin: 0 0 var(--spacing-300);
+}
+
+.github-card a {
+    align-items: center;
+    background-color: var(--gray-75);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: var(--corner-radius-200);
+    color: var(--gray-800);
+    display: flex;
+    gap: var(--spacing-300);
+    padding: var(--spacing-300);
+    text-decoration: none;
+}
+
+.github-card a:hover {
+    background-color: var(--gray-200);
+}
+
+.github-card svg {
+    fill: var(--gray-900);
+    flex-shrink: 0;
+    height: 32px;
+    width: 32px;
+}
+
+.github-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-75);
+    min-width: 0;
+}
+
+.github-card-name {
+    color: var(--gray-900);
+}
+
+.github-card-description {
+    color: var(--gray-700);
+    font-size: var(--body-size-s);
+}
+
 code {
     font-family: var(--code-font-family), ui-monospace, "SFMono-Regular", Menlo, monospace;
     font-variant-emoji: text;
