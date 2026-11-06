@@ -17511,7 +17511,6 @@ If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 :properties:
 :export_file_name: generated/contents/blog/2026/4e5aa2
 :export_date: 2026-11-05 20:05
-:export_draft: t
 :end:
 
 Lean 4 で書いて証明した関数を Clojure から呼び、Clojure で書いた関数の性質を Lean で証明するためのライブラリとして lean-clj を作りました。
@@ -17847,7 +17846,6 @@ Issue / PR 大歓迎です。
 :export_file_name: generated/contents/blog/2026/311be4
 :export_date: 2026-11-05 20:05
 :export_lang: en
-:export_draft: t
 :end:
 
 I wrote lean-clj, a library that lets you call functions written and proved in Lean 4 from Clojure, and prove properties of Clojure functions in Lean.
