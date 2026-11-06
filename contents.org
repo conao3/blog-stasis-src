@@ -18205,6 +18205,11 @@ I welcome issues and pull requests.
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
+次の画像は、2.39.5 が出たときに workflow が作った PR です。
+移植する前の比較の結果が、表に並んでいます。
+
+[[./resources/public/img/7fe084-pr.png]]
+
 ** バージョンを上げると変わるもの
 =awsr= は本家の決まった 1 つのバージョンに合わせて作っていて、そのバージョンを =models/VERSION= に書いています。
 =flake.nix= は、同じバージョンの本家のソースと公式の Linux 向けのインストーラを nix で取り込みます。
