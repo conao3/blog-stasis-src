@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" font-family="Noto Sans JP, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+<rect x="0" y="0" width="1100" height="560" rx="16" fill="#ffffff"/>
+<text x="20" y="52" font-size="22" font-weight="bold" fill="#d9622b">Reference workflow (毎日 12:00 UTC)</text>
+<rect x="20" y="80" width="320" height="110" rx="10" fill="#fbe3d6" stroke="#d9622b" stroke-width="2"/>
+<text x="180" y="127" font-size="19" text-anchor="middle" fill="#222">本家の最新のタグが</text>
+<text x="180" y="157" font-size="19" text-anchor="middle" fill="#222">models/VERSION より新しいか</text>
+<rect x="390" y="80" width="320" height="110" rx="10" fill="#fbe3d6" stroke="#d9622b" stroke-width="2"/>
+<text x="550" y="127" font-size="19" text-anchor="middle" fill="#222">update-reference.sh で</text>
+<text x="550" y="157" font-size="19" text-anchor="middle" fill="#222">モデルと期待値を作り直す</text>
+<rect x="760" y="80" width="320" height="210" rx="10" fill="#fbe3d6" stroke="#d9622b" stroke-width="2"/>
+<text x="920" y="118" font-size="20" font-weight="bold" text-anchor="middle" fill="#222">本家と比べる</text>
+<text x="780" y="158" font-size="19" fill="#222">・make check</text>
+<text x="780" y="190" font-size="19" fill="#222">・変わったサービスの差分テスト</text>
+<text x="780" y="222" font-size="19" fill="#222">・そのサービスの help ページ</text>
+<text x="780" y="254" font-size="19" fill="#222">・シナリオと認証の比較</text>
+<line x1="340" y1="135" x2="388" y2="135" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<line x1="710" y1="135" x2="758" y2="135" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<rect x="760" y="340" width="320" height="110" rx="10" fill="#fbe3d6" stroke="#d9622b" stroke-width="2"/>
+<text x="920" y="387" font-size="19" text-anchor="middle" fill="#222">PR を作る</text>
+<text x="920" y="417" font-size="19" text-anchor="middle" fill="#222">失敗か移植があれば draft</text>
+<line x1="920" y1="290" x2="920" y2="338" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="20" y="330" font-size="22" font-weight="bold" fill="#555">PR を受けてから (手で行う)</text>
+<rect x="390" y="340" width="320" height="110" rx="10" fill="#ececec" stroke="#888" stroke-width="2"/>
+<text x="550" y="387" font-size="19" text-anchor="middle" fill="#222">changelog の項目を読んで</text>
+<text x="550" y="417" font-size="19" text-anchor="middle" fill="#222">移植の commit を積む</text>
+<rect x="20" y="340" width="320" height="110" rx="10" fill="#ececec" stroke="#888" stroke-width="2"/>
+<text x="180" y="387" font-size="19" text-anchor="middle" fill="#222">比較がすべて通ったら</text>
+<text x="180" y="417" font-size="19" text-anchor="middle" fill="#222">merge する</text>
+<line x1="760" y1="395" x2="712" y2="395" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<line x1="390" y1="395" x2="342" y2="395" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="20" y="510" font-size="19" fill="#555">移植が要らないバージョンは、比較が通れば PR をそのまま merge できる</text>
+</svg>
