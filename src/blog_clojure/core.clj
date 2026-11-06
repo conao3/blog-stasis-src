@@ -225,7 +225,9 @@
                       [:style (hiccup/raw (inline-style))]
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
-                        [:script {:src "/assets/math.js" :defer true}])]
+                        [:script {:src "/assets/math.js" :defer true}])
+                      (when (str/includes? body "class=\"github-card\"")
+                        [:script {:src "/assets/github-card.js" :defer true}])]
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"}
