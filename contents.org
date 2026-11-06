@@ -18199,13 +18199,13 @@ I welcome issues and pull requests.
 
 [[https://s.conao3.com/blog/2026/f681b9][前の記事]]で紹介した =awsr= は、AWS CLI v2 とバイト単位で同じ出力を返す Rust 製の CLI です。
 同じ出力を返し続けるには、本家の新しいバージョンが出るたびに =awsr= も同じバージョンへ上げる必要があります。
-本家は 2026-09-30 から 2026-11-05 までの 36 日間に 20 回リリースしていて、平日はほぼ毎日新しいバージョンが出ます。
+本家は 2026-09-30 から 2026-11-05 までの 36 日間に [[https://github.com/aws/aws-cli/tags][20 回リリース]]していて、平日はほぼ毎日新しいバージョンが出ます。
 そこで、本家の新しいバージョンへの追従を GitHub Actions で毎日回すようにしました。
 新しいバージョンが出ると、workflow がバージョンを上げる変更を作って本家と比べ、結果を載せた PR を作ります。
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
-次の画像は、2.39.5 が出たときに workflow が作った PR です。
+次の画像は、2.39.5 が出たときに [[https://github.com/conao3/rust-awscli/pull/6][workflow が作った PR]] です。
 移植する前の比較の結果が、表に並んでいます。
 
 [[./resources/public/img/7fe084-pr.png]]
@@ -18217,12 +18217,12 @@ I welcome issues and pull requests.
 
 - botocore のモデル: =awsr= がバイナリに埋め込む、サービスと操作の定義です。
 - テストの期待値: コマンドの表、引数の表のハッシュ、help の文書、waiter の説明は、本家のモデルとソースから作っています。
-- 本家のコードの変更: 独自の処理を持つコマンドや、認証の処理の変更です。本家の changelog では =api-change= 以外の項目 (=enhancement= や =bugfix=) にあたります。
+- 本家のコードの変更: 独自の処理を持つコマンドや、認証の処理の変更です。本家の [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]] では =api-change= 以外の項目 (=enhancement= や =bugfix=) にあたります。
 
 モデルと期待値は本家から機械で作れますが、本家のコードの変更は Rust へ移植する必要があります。
 
 ** バージョンを上げるスクリプト
-機械で作れる部分は =scripts/update-reference.sh= で作り直します。
+機械で作れる部分は [[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]] で作り直します。
 
 #+begin_src console
 $ scripts/update-reference.sh 2.39.5
@@ -18238,11 +18238,11 @@ $ scripts/update-reference.sh 2.39.5
 期待値を作るスクリプトは、2.39.3 のソースで動かすと commit 済みの期待値と同じ中身になることを確かめてから使っています。
 
 ** 毎日回す workflow
-=Reference= の workflow は、毎日 12:00 UTC に本家の最新のタグを調べます。
+[[https://github.com/conao3/rust-awscli/blob/master/.github/workflows/reference.yml][=Reference= の workflow]] は、毎日 12:00 UTC に本家の最新のタグを調べます。
 =models/VERSION= より新しいバージョンがあれば、上のスクリプトでバージョンを上げてから、次の 4 つで本家と比べます。
 
 - =make check= (fmt、clippy、テスト)
-- 差分テスト: モデルが変わったサービスの全操作を =awsr= と本家の両方で動かし、出力とリクエストを比べる。
+- [[https://github.com/conao3/rust-awscli/tree/master/difftest][差分テスト]]: モデルが変わったサービスの全操作を =awsr= と本家の両方で動かし、出力とリクエストを比べる。
 - help の比較: 同じサービスの help ページを、バイト単位で比べる。
 - シナリオと認証の比較: 手で書いたシナリオ、 =s3= コマンドのシナリオ、 =configure= や =sso login= などの認証まわりのコマンドを比べる。
 
@@ -18255,16 +18255,16 @@ PR の本文には本家の changelog のうち =api-change= 以外の項目も�
 ** 変わったサービスだけを比べる
 差分テストを全件回すと、23 万件を超える組み合わせを本家と比べることになります。
 本家の実行結果のキャッシュがないと、手元の 14 コアの PC で約 100 分かかりました。
-公開リポジトリで使う GitHub Actions の =ubuntu-latest= は 4 コアなので、全件を毎日回すのは現実的ではありません。
+公開リポジトリで使う GitHub Actions の =ubuntu-latest= は [[https://docs.github.com/en/actions/reference/runners/github-hosted-runners][4 コア]]なので、全件を毎日回すのは現実的ではありません。
 
 そこで、毎日の比較はモデルが変わったサービスに絞ります。
 2.39.3 から 2.39.5 では 34 サービスのモデルが変わっていて、その全操作の組み合わせは 48,504 件でした。
-このバージョンに上げたときの run は全体で約 71 分かかりました。
+このバージョンに上げたときの [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] は全体で約 71 分かかりました。
 そのうち差分テストが release ビルドを含めて約 44 分、help の 4,189 ページの比較が約 18 分です。
 
 ** 2.39.5 で移植したもの
 2.39.3 から 2.39.5 に上げた PR は [[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]] です。
-2.39.4 と 2.39.5 の changelog には、 =api-change= 以外の項目が 9 つありました。
+2.39.4 と 2.39.5 の [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]] には、 =api-change= 以外の項目が 9 つありました。
 そのうち =awsr= に移植したのは、次の 4 つです。
 
 - Bearer 認証のトークンを、HTTPS 以外の endpoint へ送らない。
@@ -18285,14 +18285,14 @@ PR のブランチに master を merge し、その上に移植の commit を積
 足したシナリオがタグを確かに比べていることは、 =awsr= のタグを付ける処理を一時的に外し、upload の 4 つが失敗することで確かめています。
 
 ** runner の上でだけ見つかった差分
-2.39.5 の PR を作った run では、 =deploy install= と =deploy uninstall= のシナリオが 3 つ失敗しました。
+2.39.5 の PR を作った [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] では、 =deploy install= と =deploy uninstall= のシナリオが 3 つ失敗しました。
 同じシナリオは手元の PC では一致します。
 
 =deploy install= は、EC2 のインスタンスの上では動かないように作られていて、 =169.254.169.254= のメタデータのサービスに問い合わせて EC2 の上かを調べます。
 本家は Python の =urlopen= で HTTP の GET を送り、エラーの応答を受けたときは EC2 ではないと判断します。
 =awsr= は TCP でつながるかだけを見ていたので、このアドレスに何かのサービスが応答する環境では EC2 の上だと判断していました。
-GitHub Actions の runner は Azure か AWS の上で動き、Azure のメタデータのサービスも同じアドレスを使います。
-Azure のメタデータのサービスは、 =Metadata: true= のヘッダーがない要求を拒みます。
+[[https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners][GitHub Actions の runner]] は Azure か AWS の上で動き、Azure のメタデータのサービスも同じアドレスを使います。
+[[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service][Azure のメタデータのサービス]]は、 =Metadata: true= のヘッダーがない要求を拒みます。
 
 =awsr= も HTTP の GET を送り、応答のステータスが 400 未満のときだけ EC2 の上と判断するように直しました。
 手元では、 =unshare -rnm= で作った user namespace の中に =169.254.169.254= で 400 か 200 を返すサーバーを立て、 =/etc/lsb-release= を Ubuntu のものに差し替えて、本家と =awsr= の出力が同じになることを確かめています。
