@@ -62,18 +62,34 @@
 
 (org-link-set-parameters "github")
 
-(defconst stasis-md-github-mark
-  "<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656\"/></svg>")
+(defconst stasis-md-github-repo-icon
+  "<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z\"/></svg>")
 
-(defun stasis-md-github-card (repo desc)
-  (let ((owner (car (split-string repo "/")))
-        (name (cadr (split-string repo "/"))))
-    (format "<div class=\"github-card\"><a href=\"https://github.com/%s\">%s<span class=\"github-card-text\"><span class=\"github-card-name\">%s/<strong>%s</strong></span>%s</span></a></div>"
-            repo stasis-md-github-mark owner name
-            (if desc
-                (format "<span class=\"github-card-description\">%s</span>"
-                        (org-html-encode-plain-text (string-trim desc)))
-              ""))))
+(defconst stasis-md-github-language-colors
+  '(("Emacs Lisp" . "#c065db")
+    ("Rust" . "#dea584")
+    ("Shell" . "#89e051")
+    ("TypeScript" . "#3178c6")))
+
+(defun stasis-md-github-card (path desc)
+  (let* ((parts (split-string path "::"))
+         (repo (car parts))
+         (language (cadr parts))
+         (color (cdr (assoc language stasis-md-github-language-colors)))
+         (owner (car (split-string repo "/")))
+         (name (cadr (split-string repo "/"))))
+    (concat
+     (format "<div class=\"github-card\"><a href=\"https://github.com/%s\">" repo)
+     (format "<span class=\"github-card-name\">%s<span>%s/<strong>%s</strong></span></span>" stasis-md-github-repo-icon owner name)
+     (if desc
+         (format "<span class=\"github-card-description\">%s</span>" (org-html-encode-plain-text (string-trim desc)))
+       "")
+     (if language
+         (format "<span class=\"github-card-language\"><span class=\"github-card-language-color\"%s></span>%s</span>"
+                 (if color (format " style=\"background-color: %s\"" color) "")
+                 language)
+       "")
+     "</a></div>")))
 
 (defun stasis-md-link (link desc info)
   (let ((type (org-element-property :type link)))
@@ -1587,7 +1603,7 @@ AMP対応してGoogleのサーバーにホスティングしてもらうのも�
 前日は@hyaktさんの「[[https://qiita.com/hyakt/items/f4468facec0478e06f7a][Dashboardで起動画面を素敵にしよう✨]]」でした。
 翌日は@gongoさんの「[[http://gongo.hatenablog.com/entry/2018/12/22/190540][Emacs で NES エミュレータを実装している話]]」です。
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** モチベーション
 私は[[https://github.com/conao3/dotfiles/commit/fd06cea5dd040ec1fb34225a3f3202200e00801e][8月]]から.emacs.d/init.elの大改革を行っており、その副産物としての成果物をEmacs Advent Calendarで共有させていただいていました。
@@ -2166,7 +2182,7 @@ Emacs初心者の方でもleafを使うことで、「パッケージの設定�
 GitHubへのリンクはこちら
 [[https://github.com/conao3/leaf.el][file:./resources/public/img/2b6cbf-leaf.el.png]]
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** 背景
 Emacsを使っている方ならば、自分のinit.elに採用するかはさておき、jwiegleyさんの[[https://github.com/jwiegley/use-package][use-package]]というパッケージの存在を知っていらっしゃると思います。
@@ -4156,7 +4172,7 @@ GitHubのバッジより豊富なスタイル指定ができることが特徴�
 
 まだ空きがあるので、ぜひ参加頂ければと思います!
 
-[[github:bbatsov/solarized-emacs][The Solarized colour theme, ported to Emacs.]]
+[[github:bbatsov/solarized-emacs::Emacs Lisp][The Solarized colour theme, ported to Emacs.]]
 
 ** Emacsのカラーテーマについて
 Emacsは「An extensible, customizable, free/libre text editor」です。
@@ -4375,7 +4391,7 @@ init.elに下記のleafを書きます。
 
 まだ空きがあるので、ぜひ参加頂ければと思います!
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** leafについて
 [[https://github.com/conao3/leaf.el][leaf.el]]はjwiegleyさんの[[https://github.com/jwiegley/use-package][use-package]]を2.5年使った上で、私が感じていたストレスを解消するためにスクラッチから開発したパッケージです。Qiitaでもプレリリースとリリース時に記事を書きましたが、半年経つと新機能も増えてきます。
@@ -4918,7 +4934,7 @@ dashの関数を既に大量に使っている場合は[[https://github.com/bbat
 
 まだ空きがあるので、ぜひ参加頂ければと思います!
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** バイトコンパイルとは
 Elispはバイトコンパイルすることができ、通常の =.el= から =.elc= にコンパイルすることができます[fn:1]。
@@ -6204,7 +6220,7 @@ leafが設定の簡略化をしてくれるとはいえ、基本的なEmacsの�
 
 気に入ってもらえればレポジトリのスターとleafのダウンロードをしていただければ泣いて喜びます!
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** Emacsのインストール
 まずEmacs-26.3をどうにかしてインストールします。もしEmacs-22とかいう化石を使っている場合はすぐEmacs-26.3に移行してください。(自戒)
@@ -7882,7 +7898,7 @@ init.elを自分で全てコントロールしていたとしても、おまじ�
 
 [[./resources/public/img/7b1dc7-3975a5a8-95a2-4364-b37c-c2ee7d87032e.png]]
 
-[[github:conao3/celpa][Conao3’s Emacs Lisp Package Archive]]
+[[github:conao3/celpa::Emacs Lisp][Conao3’s Emacs Lisp Package Archive]]
 
 ** MELPAの仕組み
 [[https://melpa.org/#/][MELPA]]は単に利用するもので、自分でMELPAを作りたい場合、どこから手をつけたら良いか分かりませんでした。
@@ -7982,7 +7998,7 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 
 どうやら[[https://github.com/online-judge-tools/oj][oj]]、[[https://github.com/online-judge-tools/template-generator][oj-template]]という便利なツールがあるようなので、Emacsから簡単に実行できるよう[[https://github.com/conao3/oj.el][oj.el]]というパッケージを作成しました。
 
-[[github:conao3/oj.el][Competitive programming tools client for AtCoder, Codeforces]]
+[[github:conao3/oj.el::Emacs Lisp][Competitive programming tools client for AtCoder, Codeforces]]
 
 ** oj, oj-template
 [[https://github.com/online-judge-tools/oj][oj]]は多数のオンラインジャッジに対応しているCLIツールです。
@@ -9461,7 +9477,7 @@ VARS is used internally for recursive calls."
 - [[https://github.com/conao3/ox-zenn.el][ox-zenn]]というorgからZenn flavored markdownを生成するパッケージを書きました。
 - Zennマークダウンは独自記法があるので、orgファイルとの対応について少し注意することがある。
 
-[[github:conao3/ox-zenn.el]]
+[[github:conao3/ox-zenn.el::Emacs Lisp]]
 
 ** org-modeとは
 *** 概要
@@ -10192,7 +10208,7 @@ magitは[[https://github.com/tarsius][tarsius]]さんの代表的なパッケー
 今回、[[https://github.com/conao3/leaf.el][leaf]]という自作パッケージに新しいキーワードを追加したので、その紹介をするものです。
 (スター200越えました...! やる気に影響するので、よさげなツールだなぁと思っていただければ、ぜひスターを頂ければと...!)
 
-[[github:conao3/leaf-keywords.el][Additional leaf.el keywords for external packages]]
+[[github:conao3/leaf-keywords.el::Emacs Lisp][Additional leaf.el keywords for external packages]]
 
 ** leafの紹介
 leafを使っていらっしゃる方も、use-packageからの移行を悩んでおられる方も、素のElispでEmacsの設定をされている方もおられるかと思います。
@@ -12809,7 +12825,7 @@ leafがどのように作られているのかを参考に、マクロに親し�
 
 この記事で実装される =config= の全文は[[https://github.com/conao3-playground/elisp-config][conao3-playground/elisp-config]]に置いてあります。
 
-[[github:conao3/leaf.el][Flexible, declarative, and modern init.el package configuration]]
+[[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** 目標設定
 leafの全ての機能を実装することはこの記事では難しいので、leafのサブセットを考えることにします。 leafのサブセット =config= は以下のように動作します。
@@ -16020,7 +16036,7 @@ Docker daemonを立てて、 =localstack/localstack= を =docker run= して、 
 このやり方の不満をBunで全部書き直したのが [[https://github.com/conao3/bun-bunsai][bunsai]] です。
 本記事ではv1.3.0 ( =@conao3/bunsai@1.3.0= )を題材に、何ができて何が違うかを実機で確認しながら紹介します。
 
-[[github:conao3/bun-bunsai][Local AWS API emulator built with Bun (LocalStack alternative)]]
+[[github:conao3/bun-bunsai::TypeScript][Local AWS API emulator built with Bun (LocalStack alternative)]]
 
 ** 何が違うのか
 LocalStackと比べた構造的な差は次の3点です。
@@ -16197,7 +16213,7 @@ CLI もこの関数を呼んで計算します。
 扱う計算は民法の期間計算、祝日の判定、控訴期間などの期限、所得税、相続税、消費税、延滞税、利子税、加算税の税額と、国税の端数処理です。
 以下の出力はどれも v0.5.0 の =ritsuryo= で実行した結果です。
 
-[[github:conao3/lean-ritsuryo][Japanese statutory period computations (民法 期間計算, 年齢計算, 祝日) in Lean 4 with proofs on the shipped functions, and the ritsuryo CLI]]
+[[github:conao3/lean-ritsuryo::Lean][Japanese statutory period computations (民法 期間計算, 年齢計算, 祝日) in Lean 4 with proofs on the shipped functions, and the ritsuryo CLI]]
 
 ** 使ってみる
 CLI の引数は AWS CLI と同じ文法で書きます。
@@ -16509,7 +16525,7 @@ Claude Opus 5.5 found this construction, and the last section tells that story.
 The code is at [[https://github.com/conao3/minsky-git][conao3/minsky-git]].
 =git-minsky= compiles a small program into a repository, and plain Git runs it.
 
-[[github:conao3/minsky-git][A two-counter Minsky machine that runs on git fetch refspecs]]
+[[github:conao3/minsky-git::Shell][A two-counter Minsky machine that runs on git fetch refspecs]]
 
 ** The big picture
 
@@ -16945,7 +16961,7 @@ Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重�
 
 [[./resources/public/img/33d2c2-flow.svg]]
 
-[[github:conao3/rust-plamo-tr-local][Translate text from the command line with PLaMo 3 Translate running on your machine]]
+[[github:conao3/rust-plamo-tr-local::Rust][Translate text from the command line with PLaMo 3 Translate running on your machine]]
 
 ** きっかけ
 PLaMo 3 Translate は 0.8B・2B・8B・31B の 4 つの大きさで公開され、llama.cpp 向けの GGUF や MLX 向けの量子化版もそろっています ([[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][PFN のテックブログ]])。
@@ -17175,7 +17191,7 @@ AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイ
 help ページは 380〜550 倍速く出ます。
 =awsr= は AWS の公式の製品ではありません。
 
-[[github:conao3/rust-awscli][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
+[[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
 ** 使い方
 =aws= を =awsr= に置き換えて使います。
@@ -17336,7 +17352,7 @@ On the same PC, the official =aws= (2.39.3) takes 659 ms, 110 times as long.
 Help pages come up 380 to 550 times faster.
 =awsr= is not an AWS product.
 
-[[github:conao3/rust-awscli][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
+[[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
 ** Usage
 Type =awsr= where you typed =aws=.

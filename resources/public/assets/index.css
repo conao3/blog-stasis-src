@@ -261,42 +261,55 @@ article > header .post-meta {
 }
 
 .github-card a {
-    align-items: center;
     background-color: var(--gray-75);
     border: var(--border-width-100) solid var(--gray-300);
     border-radius: var(--corner-radius-200);
-    color: var(--gray-800);
+    box-sizing: border-box;
+    color: var(--gray-700);
     display: flex;
-    gap: var(--spacing-300);
+    flex-direction: column;
+    font-size: var(--body-size-s);
+    gap: var(--spacing-200);
+    max-width: 440px;
+    min-height: 120px;
     padding: var(--spacing-300);
     text-decoration: none;
 }
 
 .github-card a:hover {
-    background-color: var(--gray-200);
-}
-
-.github-card svg {
-    fill: var(--gray-900);
-    flex-shrink: 0;
-    height: 32px;
-    width: 32px;
-}
-
-.github-card-text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-75);
-    min-width: 0;
+    border-color: var(--gray-500);
 }
 
 .github-card-name {
-    color: var(--gray-900);
+    align-items: center;
+    color: var(--blue-900);
+    display: flex;
+    gap: var(--spacing-100);
+}
+
+.github-card-name svg {
+    fill: var(--gray-700);
+    flex-shrink: 0;
+    height: 16px;
+    width: 16px;
 }
 
 .github-card-description {
-    color: var(--gray-700);
-    font-size: var(--body-size-s);
+    flex-grow: 1;
+}
+
+.github-card-language {
+    align-items: center;
+    display: flex;
+    font-size: var(--body-size-xs);
+    gap: var(--spacing-75);
+}
+
+.github-card-language-color {
+    background-color: var(--gray-600);
+    border-radius: 50%;
+    height: 12px;
+    width: 12px;
 }
 
 code {
