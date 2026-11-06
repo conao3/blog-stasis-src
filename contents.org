@@ -17128,8 +17128,6 @@ AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイ
 help ページは 380〜550 倍速く出ます。
 =awsr= は AWS の公式の製品ではありません。
 
-[[./resources/public/img/f681b9-speed.svg]]
-
 ** 使い方
 =aws= を =awsr= に置き換えて使います。
 
@@ -17150,6 +17148,8 @@ json、text、table の出力も =--query= の結果も本家と同じバイト�
 手元の PC (Intel Core Ultra 5 225U) で、 =hyperfine -N= を使って平均の実行時間を測りました。
 API を呼ぶコマンドはローカルのスタブのサーバーに =--endpoint-url= で向け、静的な認証情報で動かしています。
 =awsr= は nix の flake のパッケージ (静的リンク)、本家は公式の Linux 向けのインストーラで入れた 2.39.3 です。
+
+[[./resources/public/img/f681b9-speed.svg]]
 
 | コマンド                      |  awsr | aws 2.39.3 |     比 |
 |-------------------------------+-------+------------+--------|
@@ -17287,8 +17287,6 @@ On the same PC, the official =aws= (2.39.3) takes 659 ms, 110 times as long.
 Help pages come up 380 to 550 times faster.
 =awsr= is not an AWS product.
 
-[[./resources/public/img/87e5cb-speed.svg]]
-
 ** Usage
 Type =awsr= where you typed =aws=.
 
@@ -17309,6 +17307,8 @@ I also ported the high-level commands such as =s3 cp= and =s3 sync=, =configure=
 I measured the mean wall time with =hyperfine -N= on my PC (Intel Core Ultra 5 225U).
 The commands that call an API ran against a local stub server through =--endpoint-url=, with static credentials.
 For =awsr= I used the nix flake package (statically linked), and for =aws= the official Linux installer of 2.39.3.
+
+[[./resources/public/img/87e5cb-speed.svg]]
 
 | Command                       |   awsr | aws 2.39.3 | Speedup |
 |-------------------------------+--------+------------+---------|
