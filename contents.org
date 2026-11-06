@@ -17115,7 +17115,7 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 ** おわりに
 文章を端末の外に出さずに訳したいときに使ってください。
 
-* AWS CLI v2と出力が同じで100倍以上速いawsrをRustで作った
+* AWS CLI v2と出力が同じで最大550倍速いawsrをRustで作った
 :properties:
 :export_file_name: generated/contents/blog/2026/f681b9
 :export_date: 2026-11-05
