@@ -18195,7 +18195,6 @@ I welcome issues and pull requests.
 :properties:
 :export_file_name: generated/contents/blog/2026/7fe084
 :export_date: 2026-11-06 04:27
-:export_draft: t
 :end:
 
 [[https://s.conao3.com/blog/2026/f681b9][前の記事]]で紹介した =awsr= は、AWS CLI v2 とバイト単位で同じ出力を返す Rust 製の CLI です。
@@ -18259,6 +18258,7 @@ PR の本文には本家の changelog のうち =api-change= 以外の項目も�
 そのうち差分テストが release ビルドを含めて約 44 分、help の 4,189 ページの比較が約 18 分です。
 
 ** 2.39.5 で移植したもの
+2.39.3 から 2.39.5 に上げた PR は [[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]] です。
 2.39.4 と 2.39.5 の changelog には、 =api-change= 以外の項目が 9 つありました。
 そのうち =awsr= に移植したのは、次の 4 つです。
 
