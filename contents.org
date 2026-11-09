@@ -19019,7 +19019,6 @@ LeanでPythonの関数を書けるようにし、Leanの型をpydanticのmodel�
 :properties:
 :export_file_name: generated/contents/blog/2026/ccc5ed
 :export_date: 2026-11-09 17:30
-:export_draft: t
 :end:
 
 エディタと言語サーバーはLanguage Server Protocol、略してLSPで通信します。

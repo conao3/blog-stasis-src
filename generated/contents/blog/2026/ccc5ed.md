@@ -1,6 +1,5 @@
 Title: Leanで仕様に厳格なLSPのクライアントとサーバーを作り、既存のOSSに仕様違反を見つけた
 Date: 2026-11-09 17:30
-Draft: true
 
 
 エディタと言語サーバーはLanguage Server Protocol、略してLSPで通信します。
