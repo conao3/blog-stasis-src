@@ -18301,7 +18301,6 @@ PRのブランチにmasterをmergeし、その上に移植のcommitを積んで�
 :properties:
 :export_file_name: generated/contents/blog/2026/b43a06
 :export_date: 2026-11-09 09:58
-:export_draft: t
 :end:
 
 Lean 4で書いて証明した関数をRustから呼べるようにする、lean-rsを作りました。
