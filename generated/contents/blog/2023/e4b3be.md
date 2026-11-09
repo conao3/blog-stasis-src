@@ -13,7 +13,7 @@ Webで数式組版をしたい場合、MathJaxを使うというのが常識で�
 
 AstroはMarkdownをHTMLにレンダリングする際、Remark/Rehypeを利用しているようです。(ref: [MarkdownとMDXの設定](https://docs.astro.build/ja/guides/markdown-content/#markdown%E3%81%A8mdx%E3%81%AE%E8%A8%AD%E5%AE%9A))
 
-Remark/Rehypeの関係は掴み辛いですが、「[Introduction to unified](https://unifiedjs.com/learn/guide/introduction-to-unified/)」や「[Remark で広げる Markdown の世界](https://vivliostyle.github.io/vivliostyle_doc/ja/vivliostyle-user-group-vol2/spring-raining/index.html)」が分かりやすかったので紹介します。
+Remark/Rehypeの関係は掴み辛いですが、「[Introduction to unified](https://unifiedjs.com/learn/guide/introduction-to-unified/)」や「[Remarkで広げるMarkdownの世界](https://vivliostyle.github.io/vivliostyle_doc/ja/vivliostyle-user-group-vol2/spring-raining/index.html)」が分かりやすかったので紹介します。
 
 こんな感じの理解をしてます。
 

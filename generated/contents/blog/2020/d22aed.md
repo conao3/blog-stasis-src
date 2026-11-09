@@ -333,7 +333,7 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 
 -   [defcustomで定義された変数はcustom-set-variablesで変更すべき？ - 2012-01-04](https://memo.sugyan.com/entry/20120104/1325604433)
 -   [defcustomで定義された変数はsetqではなくcustom-set-variablesで設定すべき理由 - 2013-11-03](http://kawamuray.hatenablog.com/entry/2013/11/03/180543)
--   [custom-set-variables は使わない方が良いかもしれない - 2013-12-30](https://abicky.net/2013/12/30/184239/)
+-   [custom-set-variablesは使わない方が良いかもしれない - 2013-12-30](https://abicky.net/2013/12/30/184239/)
 
 しかし時代は変わりました。「ユーザーが変更できる変数」はほとんどの場合で `defcustom` で宣言され、 `defvar` で宣言されたものは「パッケージの内部変数である」という慣習を多くのパッケージ開発者が守っています。
 
@@ -402,7 +402,7 @@ leafには与えられたS式をそのまま展開するキーワードがあり
 
 ## leaf-convertについて
 
-leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば [Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula) を参考にして、下記のuse-package設定例があるとします。
+leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば[Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula)を参考にして、下記のuse-package設定例があるとします。
 
 ```emacs-lisp
 (use-package doom-themes
@@ -449,7 +449,7 @@ leaf-convertを手に入れたおかげで、use-packageの設定例があれば
     > 起動が早くなった気がします
     > init-loaderをやめたからなのかわかりませんが,何故か起動が早くなった気がします.
 
-参考として私のinit.elを読み込んだ場合、223パッケージ(elpaディレクトリには `archive` と `gnupg` ディレクトリがあるのを忘れていた)インストールされたEmacsを4.2秒で起動できています。 HDDの環境なので、測定には悪条件ですが5秒未満なら十分に耐えられます。
+参考として私のinit.elを読み込んだ場合、223パッケージ(elpaディレクトリには `archive` と `gnupg` ディレクトリがあるのを忘れていた)インストールされたEmacsを4.2秒で起動できています。HDDの環境なので、測定には悪条件ですが5秒未満なら十分に耐えられます。
 
 ![img](../../../../resources/public/img/d22aed-bbac83c9-1266-48e2-8e2b-73b81e7accc6.png)
 

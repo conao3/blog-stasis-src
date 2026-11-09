@@ -16,7 +16,7 @@ GitHubへのリンクはこちら
 
 Emacsを使っている方ならば、自分のinit.elに採用するかはさておき、jwiegleyさんの[use-package](https://github.com/jwiegley/use-package)というパッケージの存在を知っていらっしゃると思います。
 
-Qiitaでは @kai2nenobu さんの「[use-packageで可読性の高いinit.elを書く](https://qiita.com/kai2nenobu/items/5dfae3767514584f5220)」というとても分かりやすい記事がありますし、るびきちさんも「[use-package.el: Emacsの世界的権威が行っている最先端ラクラクinit.el整理術](http://emacs.rubikitch.com/use-package-2/)」という記事を書いていらっしゃいます。
+Qiitaでは @kai2nenobuさんの「[use-packageで可読性の高いinit.elを書く](https://qiita.com/kai2nenobu/items/5dfae3767514584f5220)」というとても分かりやすい記事がありますし、るびきちさんも「[use-package.el: Emacsの世界的権威が行っている最先端ラクラクinit.el整理術](http://emacs.rubikitch.com/use-package-2/)」という記事を書いていらっしゃいます。
 
 私もこれらの記事を見ながらinit.elを書きなおしたのですが、init.elは個性の塊であるがゆえに、次第にjwiegleyさんが想定していない方法で `use-package` を使うようになってしまいました。そして `use-package` に自分が欲しいキーワードを自由に追加したいと思うようになりました。
 
@@ -1051,11 +1051,11 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 Emacsに新しいキーバインドを提供するパッケージは多数あり、それらに関するキーワードです。selectedは専用の関数が用意されていないためキーワードはありませんが、selected専用のキーマップに登録することで設定できます。
 
 -   hydra: [小指を酷使せず、かつキーバインドのガイドを出す &ndash; hydra - Emacsモダン化計画 -かわEmacs編-](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E5%B0%8F%E6%8C%87%E3%82%92%E9%85%B7%E4%BD%BF%E3%81%9B%E3%81%9A%E3%81%8B%E3%81%A4%E3%82%AD%E3%83%BC%E3%83%90%E3%82%A4%E3%83%B3%E3%83%89%E3%81%AE%E3%82%AC%E3%82%A4%E3%83%89%E3%82%92%E5%87%BA%E3%81%99----hydra)
--   hydra: [Hydra のススメ](https://medium.com/@mopemope/hydra-%E3%81%AE%E3%82%B9%E3%82%B9%E3%83%A1-88a4168f945c)
+-   hydra: [Hydraのススメ](https://medium.com/@mopemope/hydra-%E3%81%AE%E3%82%B9%E3%82%B9%E3%83%A1-88a4168f945c)
 -   key-chord: [物覚えが悪いから同時に押す](https://qiita.com/tadsan/items/9cc262e1772edb630dd9)
 -   smartrep: [highlight-symbolをsmartrepを使ってキー消費を抑えながらバインドする](https://qiita.com/ongaeshi/items/5bf6c4a623290752ed70)
--   key-combo: [ソースコードを書いているときに "=" の前後にスペースを自動で挿入してくれる key-combo.el](https://qiita.com/yynozk/items/0141c92dca0992732af8)
--   selected: [selected.el で「選択して右クリック」的な概念を](https://qiita.com/takaxp/items/00245794d46c3a5fcaa8)
+-   key-combo: [ソースコードを書いているときに "=" の前後にスペースを自動で挿入してくれるkey-combo.el](https://qiita.com/yynozk/items/0141c92dca0992732af8)
+-   selected: [selected.elで「選択して右クリック」的な概念を](https://qiita.com/takaxp/items/00245794d46c3a5fcaa8)
 
 それぞれについての設定例はleaf-keywords.elのREADMEを参照してもらえればと思います。
 

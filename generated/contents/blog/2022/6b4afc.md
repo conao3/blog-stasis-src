@@ -8,9 +8,9 @@ Date: 2022-12-16
 この記事はRustアドベントカレンダー16日目の記事です。
 昨日はyukinaritさんの「[PGOでRustで書かれた広告サーバを早くする](https://zenn.dev/yukinarit/articles/71bb4a01a8e58e)」でした。
 
-RustでTUIアプリケーションを作りたいなーっと思っていろいろ探していると dioxus-tui というライブラリを見つけたので、使ってみた記事を書きます。
+RustでTUIアプリケーションを作りたいなーっと思っていろいろ探しているとdioxus-tuiというライブラリを見つけたので、使ってみた記事を書きます。
 
-今回の記事で作ったレポジトリは [conao3/rust-dioxus-tui-sample](https://github.com/conao3/rust-dioxus-tui-sample) に置いてあります。
+今回の記事で作ったレポジトリは[conao3/rust-dioxus-tui-sample](https://github.com/conao3/rust-dioxus-tui-sample)に置いてあります。
 
 
 # dioxusとは
@@ -19,7 +19,7 @@ TUIアプリケーション専用ではなく、仮想DOMを使ってWebフロ�
 
 日本語記事ではここらへんを参照
 
--   [dioxus web やってみる - Zenn/mizchi](https://zenn.dev/mizchi/scraps/449f0591e2cee9)
+-   [dioxus webやってみる - Zenn/mizchi](https://zenn.dev/mizchi/scraps/449f0591e2cee9)
 -   [Rust UIライブラリ「Dioxus」をReact+Typescriptと比較してみた - Qiita/uwattotaitai](https://qiita.com/uwattotaitai/items/4d262e46c2165e01f477)
 
 この記事ではdioxusを使ってTUIアプリを作ってみます。

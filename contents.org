@@ -164,7 +164,7 @@ my/stasis-new
 :end:
 
 ** はじめに
-この記事は [[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]] の7日目の記事です。
+この記事は[[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]]の7日目の記事です。
 前日はtadsanさんの「[[https://qiita.com/tadsan/items/f23d6db8efc0fcdcd225][カーソルを変更する]]」でした。
 
 ** モチベーション
@@ -173,8 +173,8 @@ my/stasis-new
 そして +ネタかぶりしてます+ 。頻繁に語られる活発な話題と思ってもらえればと。。
 
 - [[https://qiita.com/ytkt/items/2df2e2e93fb0a066a7de][ぼくのかんがえたさいきょうの.emacs.d - Qiita]]
-- [[https://qiita.com/yynozk/items/7dce94f770e6f3f0b26c][.emacs.d を公開しました - Qiita]]
-- [[http://www.sakito.com/2009/12/emacsd.html][.emacs.d の利用 - 技術的生存報告記]]
+- [[https://qiita.com/yynozk/items/7dce94f770e6f3f0b26c][.emacs.dを公開しました - Qiita]]
+- [[http://www.sakito.com/2009/12/emacsd.html][.emacs.dの利用 - 技術的生存報告記]]
 
 最終的に好みなディレクトリ構造をそれぞれ見つけていくと思うんですが、今回は「ぼくのかんがえたさいきょうの.emacs.dのディレクトリ構造」を提案するとともにMakeでそのディレクトリ構造を生成するMakefileを紹介します。
 
@@ -196,7 +196,7 @@ my/stasis-new
 最も信頼できるソースですが、init.elをどこから探すか。という話題に注力していて、.emacs.dディレクトリを採用する場合のそのディレクトリ構造を示したりはしていないようです。
 （ちなみにここらへんの話題についてはtadsanさんの[[https://qiita.com/tadsan/items/4f5743de21b7aa06ca35][Emacsを起動する - Qiita]]が詳しいです。）
 
-*** [[https://www.oreilly.co.jp/books/9784873112770/][入門 GNU Emacs 第3版]] - O'Reilly
+*** [[https://www.oreilly.co.jp/books/9784873112770/][入門GNU Emacs第3版]] - O'Reilly
 最も参考にしたい本ですが、2007年の本で.emacsファイルを使用することになっています。残念。
 
 *** [[http://gihyo.jp/book/2017/978-4-7741-9235-2][Emacs実践入門]] - [[http://d.hatena.ne.jp/tomoya/][id:tomoya]]
@@ -385,9 +385,9 @@ localディレクトリやbuildディレクトリの存在しない場合をケ�
 
 大きなジョブを作成してしまうと依存関係が大きくなり、小さな粒度で再コンパイルなどができなくなります。
 「仕事」で考えるのではなく「ファイル」単位で考えることが大切だと先週ぐらいに気づきました。
-私のような無駄な試行錯誤をしないためにもオライリーの「[[https://github.com/jr4qpv/GNU_Make_3rd_jp][GNU Make 第3版]]」は時間を作って見たほうが良いです。素晴らしいことに無料です。有志の方が各章を結合したPDFを作ってくださっています。
+私のような無駄な試行錯誤をしないためにもオライリーの「[[https://github.com/jr4qpv/GNU_Make_3rd_jp][GNU Make第3版]]」は時間を作って見たほうが良いです。素晴らしいことに無料です。有志の方が各章を結合したPDFを作ってくださっています。
 
-*** Makefunc.mk ファイル
+*** Makefunc.mkファイル
 他のMakefileを編集するときの助けになりそうな関数群は、切り出してインポートする形にするほうが良いです。私はそのような関数群をMakefunc.mkというファイル名で保存して利用しています。
 
 とりあえず貼ります。
@@ -788,7 +788,7 @@ clean:
 :end:
 
 ** はじめに
-この記事は [[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]] の8日目の記事です。
+この記事は[[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]]の8日目の記事です。
 前日は私の「[[https://s.conao3.com/blog/2018/07b41c][Makefileで.emacs.dの理想的なディレクトリ構造を生成する話]]」でした。
 
 [[./resources/public/img/48bb55-Untitled2.gif]]
@@ -1286,8 +1286,8 @@ make test
 :end:
 
 ** はじめに
-この記事は [[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]] の14日目の記事です。
-前日はtakuchalleさんの「[[https://blog.takuchalle.me/post/2018/12/13/emacs_dart_setup/][Emacs で Dart 開発環境をセットアップ]]」でした。
+この記事は[[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]]の14日目の記事です。
+前日はtakuchalleさんの「[[https://blog.takuchalle.me/post/2018/12/13/emacs_dart_setup/][EmacsでDart開発環境をセットアップ]]」でした。
 
 ** モチベーション
 私はOrg-Modeで日常のほとんどすべての文書作成を行っており、そもそも私は「Org-Modeを使うためにEmacs入門した」ほど大きな存在です。
@@ -1399,7 +1399,7 @@ RewriteRule ^(/archives/.*)$ $1.html [L]
 もちろん文書間リンクや画像リンクなどはいつもどおり書いたものをorg-publishがWebで表示できるように、よしなに変更してくれます。具体的には =.org= へのリンクは =.html= へのリンクに変更され、メディアはそのままターゲットディレクトリの対応するパスにコピーします。（orglyth.elでは =orglyth-html-default-resources-option= で制御してます）
 
 ** init.elの設定
-私は今init.elの大改革（[[https://s.conao3.com/blog/2018/07b41c][.emacs.dの構造から見直したり]]、 [[https://github.com/conao3/leaf.el][use-packageの別実装を作ったり]]（Qiita記事は21日目に予約済み）、[[https://s.conao3.com/blog/2018/48bb55][新しいテストフレームワークを作ったり]]）を行っていて、init.elの編集まで作業が追いついていないのですがとりあえずOrg-Modeに関する今の設定は以下です。
+私は今init.elの大改革（[[https://s.conao3.com/blog/2018/07b41c][.emacs.dの構造から見直したり]]、[[https://github.com/conao3/leaf.el][use-packageの別実装を作ったり]]（Qiita記事は21日目に予約済み）、[[https://s.conao3.com/blog/2018/48bb55][新しいテストフレームワークを作ったり]]）を行っていて、init.elの編集まで作業が追いついていないのですがとりあえずOrg-Modeに関する今の設定は以下です。
 
 新しいパッケージマネージャ(feather.el)の開発が終わり次第、シームレスに設定できるようになりますが、現状では伝統的なパッケージ管理のように =site-lisp= にレポジトリをクローンして =load-path= を通す必要があります。
 
@@ -1604,9 +1604,9 @@ AMP対応してGoogleのサーバーにホスティングしてもらうのも�
 :end:
 
 ** はじめに
-この記事は [[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]] の21日目の記事です。
+この記事は[[https://qiita.com/advent-calendar/2018/emacs][Emacs Advent Calendar 2018 - Qiita]]の21日目の記事です。
 前日は@hyaktさんの「[[https://qiita.com/hyakt/items/f4468facec0478e06f7a][Dashboardで起動画面を素敵にしよう✨]]」でした。
-翌日は@gongoさんの「[[http://gongo.hatenablog.com/entry/2018/12/22/190540][Emacs で NES エミュレータを実装している話]]」です。
+翌日は@gongoさんの「[[http://gongo.hatenablog.com/entry/2018/12/22/190540][EmacsでNESエミュレータを実装している話]]」です。
 
 [[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
@@ -1623,7 +1623,7 @@ AMP対応してGoogleのサーバーにホスティングしてもらうのも�
 
 また現状考えられる最古のバージョンである、Emacs-22という化石にも対応しているため、Emacs-22でもほどほどに使うことが出来ます。
 
-[[http://dotfiles.conao3.com/]] というURLでインストール用のシェルスクリプトをホスティングしているので、押し付けられたパソコンで実行するべきは =curl dotfiles.conao3.com | sh= というワンライナーでいつもの環境が整うことになります。（上記URLはshのMIMEタイプをhtmlにしているのでブラウザで表示できます。これもTipsとしては面白い話題かと思います。）
+[[http://dotfiles.conao3.com/]]というURLでインストール用のシェルスクリプトをホスティングしているので、押し付けられたパソコンで実行するべきは =curl dotfiles.conao3.com | sh= というワンライナーでいつもの環境が整うことになります。（上記URLはshのMIMEタイプをhtmlにしているのでブラウザで表示できます。これもTipsとしては面白い話題かと思います。）
 
 私のinit.elの大改革は今年中に終わらないと思います。。そして副産物の各パッケージもまだまだ発展途上ですが、開発を続けるので暇な時に覗いていただければと思います。
 
@@ -1715,7 +1715,7 @@ S式を折りたたむ、[[http://syohex.hatenablog.com/entry/20110706/130996528
 *** use-packageの（に付随する）問題点
 このように私のinit.elはuse-packageに深く依存していて、実際その文法は大好きでした。しかし不満点は出てくるもので、それは以下のようなものです。
 
-**** :if や :disabled キーワードの直感に反した動作
+**** :ifや :disabledキーワードの直感に反した動作
 =ob-ipython= や =migemo= のように外部コマンドに依存するパッケージは、use-packageに =:if= キーワードが用意してあるので 次のように書けます。
 
 #+begin_src emacs-lisp
@@ -1776,7 +1776,7 @@ scratchバッファで =macroexpand= してもきちんと =nil= になってお
 結局 =(add-to-list 'use-package-keywords= でGitHub全体を検索して、同じことをしている人の[[https://github.com/0x7c48/emacs.d/blob/c3f020d2e38f0f13a95a426e819cdd0216b589c1/emacs-lisp/system/_use-package.el][コード]]を見つけることができました。
 
 **** あるパッケージだけ違うディストリビューションからダウンロード出来ない
-これはuse-packageというよりpackage.elの問題です。パッケージはすべて =:ensure t= でmelpaからダウンロードしていたのですが、例えば「[[https://qiita.com/zk_phi/items/e70bc4c69b5a4755edd6][{Emacs} key-chord.el を改良してキーバインドし放題になった話]]」という記事を読んで、zkさんのフォーク版の =key-chord= を使いたい！と思ったとします。
+これはuse-packageというよりpackage.elの問題です。パッケージはすべて =:ensure t= でmelpaからダウンロードしていたのですが、例えば「[[https://qiita.com/zk_phi/items/e70bc4c69b5a4755edd6][{Emacs} key-chord.elを改良してキーバインドし放題になった話]]」という記事を読んで、zkさんのフォーク版の =key-chord= を使いたい！と思ったとします。
 
 package.elはGitHubからのダウンロードができない？ので =:init= 節に =el-get= を用いてダウンロードします。
 
@@ -2049,10 +2049,10 @@ Elispの場合、C言語で実装されている関数はすべてスペシャ�
 [fn:1] 東京大学 - [[http://www.jsk.t.u-tokyo.ac.jp/~inamura/lecture/download/20051205_soft3_lisp1.pdf][ソフトウェア第三 講義資料 - Lisp処理系, リスト処理]]
 [fn:2] Paren-holic - [[https://booth.pm/ja/items/1317263][3つのLisp 3つの世界]]
 [fn:3] STUART C. SHAPIRO - [[https://cse.buffalo.edu/~shapiro/Commonlisp/commonLisp.pdf][Common lisp - An Interactive approach]]
-[fn:4] Harold Abelson 他 著 和田 栄一 訳 - [[https://sicp.iijlab.net/fulltext/xcont.html][計算機プログラムの構造と解釈]]
-[fn:5] Richard Stallman 他 著 Ayatakesi 訳 - [[https://ayatakesi.github.io/lispref/24.5/elisp.html#Evaluation][GNU Emacs Lisp Reference Manual]]
+[fn:4] Harold Abelson他著、和田 栄一訳 - [[https://sicp.iijlab.net/fulltext/xcont.html][計算機プログラムの構造と解釈]]
+[fn:5] Richard Stallman他著、Ayatakesi訳 - [[https://ayatakesi.github.io/lispref/24.5/elisp.html#Evaluation][GNU Emacs Lisp Reference Manual]]
 
-* COMMENT 続・leaf.elを使おう
+* COMMENT続・leaf.elを使おう
 :properties:
 :export_file_name: generated/contents/blog/2019/69b273
 :export_date: 2019-05-31
@@ -2192,7 +2192,7 @@ GitHubへのリンクはこちら
 ** 背景
 Emacsを使っている方ならば、自分のinit.elに採用するかはさておき、jwiegleyさんの[[https://github.com/jwiegley/use-package][use-package]]というパッケージの存在を知っていらっしゃると思います。
 
-Qiitaでは @kai2nenobu さんの「[[https://qiita.com/kai2nenobu/items/5dfae3767514584f5220][use-packageで可読性の高いinit.elを書く]]」というとても分かりやすい記事がありますし、るびきちさんも「[[http://emacs.rubikitch.com/use-package-2/][use-package.el: Emacsの世界的権威が行っている最先端ラクラクinit.el整理術]]」という記事を書いていらっしゃいます。
+Qiitaでは @kai2nenobuさんの「[[https://qiita.com/kai2nenobu/items/5dfae3767514584f5220][use-packageで可読性の高いinit.elを書く]]」というとても分かりやすい記事がありますし、るびきちさんも「[[http://emacs.rubikitch.com/use-package-2/][use-package.el: Emacsの世界的権威が行っている最先端ラクラクinit.el整理術]]」という記事を書いていらっしゃいます。
 
 私もこれらの記事を見ながらinit.elを書きなおしたのですが、init.elは個性の塊であるがゆえに、次第にjwiegleyさんが想定していない方法で =use-package= を使うようになってしまいました。そして =use-package= に自分が欲しいキーワードを自由に追加したいと思うようになりました。
 
@@ -3195,11 +3195,11 @@ Emacsには起動を早くするために、起動時にはある「エントリ
 Emacsに新しいキーバインドを提供するパッケージは多数あり、それらに関するキーワードです。selectedは専用の関数が用意されていないためキーワードはありませんが、selected専用のキーマップに登録することで設定できます。
 
 - hydra: [[https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E5%B0%8F%E6%8C%87%E3%82%92%E9%85%B7%E4%BD%BF%E3%81%9B%E3%81%9A%E3%81%8B%E3%81%A4%E3%82%AD%E3%83%BC%E3%83%90%E3%82%A4%E3%83%B3%E3%83%89%E3%81%AE%E3%82%AC%E3%82%A4%E3%83%89%E3%82%92%E5%87%BA%E3%81%99----hydra][小指を酷使せず、かつキーバインドのガイドを出す -- hydra - Emacsモダン化計画 -かわEmacs編-]]
-- hydra: [[https://medium.com/@mopemope/hydra-%E3%81%AE%E3%82%B9%E3%82%B9%E3%83%A1-88a4168f945c][Hydra のススメ]]
+- hydra: [[https://medium.com/@mopemope/hydra-%E3%81%AE%E3%82%B9%E3%82%B9%E3%83%A1-88a4168f945c][Hydraのススメ]]
 - key-chord: [[https://qiita.com/tadsan/items/9cc262e1772edb630dd9][物覚えが悪いから同時に押す]]
 - smartrep: [[https://qiita.com/ongaeshi/items/5bf6c4a623290752ed70][highlight-symbolをsmartrepを使ってキー消費を抑えながらバインドする]]
-- key-combo: [[https://qiita.com/yynozk/items/0141c92dca0992732af8][ソースコードを書いているときに "=" の前後にスペースを自動で挿入してくれる key-combo.el]]
-- selected: [[https://qiita.com/takaxp/items/00245794d46c3a5fcaa8][selected.el で「選択して右クリック」的な概念を]]
+- key-combo: [[https://qiita.com/yynozk/items/0141c92dca0992732af8][ソースコードを書いているときに "=" の前後にスペースを自動で挿入してくれるkey-combo.el]]
+- selected: [[https://qiita.com/takaxp/items/00245794d46c3a5fcaa8][selected.elで「選択して右クリック」的な概念を]]
 
 それぞれについての設定例はleaf-keywords.elのREADMEを参照してもらえればと思います。
 
@@ -3777,7 +3777,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 
 MELPAで公開されたので導入のハードルも極めて低くなりました。ぜひ =leaf= を使って、整然として編集しやすいinit.elを書きましょう!
 
-* COMMENT そうは言ってもちょっと気になる人のための、ゆるやかなEmacs再入門
+* COMMENTそうは言ってもちょっと気になる人のための、ゆるやかなEmacs再入門
 :properties:
 :export_file_name: generated/contents/blog/2019/3f8b40
 :export_date: 2019-06-17
@@ -4185,8 +4185,8 @@ Emacsは「An extensible, customizable, free/libre text editor」です。
 
 。。。しかし、細かすぎるのです。そして細かすぎるがゆえにどうやって好みの色にしていくのか設定箇所も多岐に渡ります。
 
-その状況をどのように脱却するかについて @zk-phi さんが興味深い考察と実践をされています。
-- {Emacs} メタ・カラースキームとしての solarized
+その状況をどのように脱却するかについて @zk-phiさんが興味深い考察と実践をされています。
+- {Emacs} メタ・カラースキームとしてのsolarized
 - カラースキームスキームとしてのカラースキーム
 
 そのアイデアを元にsolarized-emacsにこれらのPRを送り、無事(大小の衝突がありつつ、、)マージされました。
@@ -4895,7 +4895,7 @@ leafを使用したinit.elをバイトコンパイルしたときにワーニン
 ** まとめ
 leafはIssueやPRを放置することなく、後方互換性を保った上で精力的に機能拡張を行なっています。ぜひこの記事や[[https://s.conao3.com/blog/2019/2b6cbf][リリース記事]]を参考にして、leafで快適なEmacs生活を送って頂ければと思います。
 
-なお、12/18には「[[https://qiita.com/advent-calendar/2019/emacs][Emacs Advent Calendar 2019]]」の18日目の記事として @keita44_f4 さんによるleafの記事がでるようなので、それも参考にしていただければと思います。
+なお、12/18には「[[https://qiita.com/advent-calendar/2019/emacs][Emacs Advent Calendar 2019]]」の18日目の記事として @keita44_f4さんによるleafの記事がでるようなので、それも参考にしていただければと思います。
 
 最後になりますが、Patreonでご支援を頂ける方を募集しています。普段はleafなどのElispパッケージなどを中心にOSS活動をしつつ、学生をしています。ぜひよろしくお願いします。
 
@@ -4916,15 +4916,15 @@ leafはIssueやPRを放置することなく、後方互換性を保った上で
 ** dashとは
 dashとはmagnarsさんによって作られ、現在は主にFuco1さんによってメンテナンスされています。
 [[https://qiita.com/pogin503/items/01005402dc7cfd375b55][Emacsのモダンなライブラリ4+1選 (2013年版)]]にも取り上げられる他、 その使いやすさから[[https://melpa.org/#/dash][440のパッケージ]]から参照されており、
-[[https://melpa.org/#/?sort=downloads&asc=false][ダウンロードランキング]]では唯一100万ダウンロードを達成し、 4000を越えるElispパッケージの堂々たる頂点に君臨しています。
+[[https://melpa.org/#/?sort=downloads&asc=false][ダウンロードランキング]]では唯一100万ダウンロードを達成し、4000を越えるElispパッケージの堂々たる頂点に君臨しています。
 
 しかし、dashは本当に依存すべきパッケージなのでしょうか。
 あなたのElispパッケージがdashに依存することによって、どれだけのメリットを生んでいるのでしょうか。
 dashがもし仕様変更したとき、あなたのElispパッケージが壊れるデメリットを甘受できるでしょうか。
 
 dashの理念はプレフィックスのない関数を数多く宣言してしまう悪名高い =ci= パッケージに依存しないということでした。
-しかし =ci= パッケージは =ci-lib= パッケージとして整理され、 Emacsビルトインの =subr= パッケージも大きく進化しています。
-一方でdashはMELPA登録パッケージが解決すべきであるpackage-lint/checkdocのエラー/ワーニングを[[https://github.com/magnars/dash.el/pull/327][470件も放置し]]、 [[https://github.com/magnars/dash.el/pull/328][CIは一ヶ月前から通っていません]]。
+しかし =ci= パッケージは =ci-lib= パッケージとして整理され、Emacsビルトインの =subr= パッケージも大きく進化しています。
+一方でdashはMELPA登録パッケージが解決すべきであるpackage-lint/checkdocのエラー/ワーニングを[[https://github.com/magnars/dash.el/pull/327][470件も放置し]]、[[https://github.com/magnars/dash.el/pull/328][CIは一ヶ月前から通っていません]]。
 
 dashの関数を既に大量に使っている場合は[[https://github.com/bbatsov/projectile/pull/1046][こんな感じで大変]]ですが、これからのElispパッケージを作る場合はdash非依存で作ってみてはいかがでしょうか。
 
@@ -4955,7 +4955,7 @@ Elispはバイトコンパイルすることができ、通常の =.el= から =
 - リリース記事: [[https://s.conao3.com/blog/2019/2b6cbf][{正式リリース}leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする]]
 - 2019年アップデート記事: [[https://s.conao3.com/blog/2019/3279ec][{2019年アップデート} leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする]]
 
-** let's バイトコンパイル
+** let'sバイトコンパイル
 *** お題について
 お題のinit.elを紹介します。私はこのinit.elを =/.debug.emacs.d/leaf/init.el= に保存しました。
 
@@ -5229,7 +5229,7 @@ leaf.elを使っているinit.elをバイトコンパイルする方法を紹介
 [[https://www.patreon.com/conao3]]
 
 ** Footnotes
-[fn:1] GNU Emacs Lisp Reference Manual - バイトコンパイル [[https://ayatakesi.github.io/lispref/24.5/elisp-ja.html#Byte-Compilation]]
+[fn:1] GNU Emacs Lisp Reference Manual - バイトコンパイル[[https://ayatakesi.github.io/lispref/24.5/elisp-ja.html#Byte-Compilation]]
 
 * Re: Makefileで.emacs.dの理想的なディレクトリ構造を生成する話
 :properties:
@@ -5607,7 +5607,7 @@ $(SYMS):
 
 ** はじめに
 この記事は「[[https://qiita.com/advent-calendar/2019/emacs][Emacs Advent Calendar 2019]]」の23日目の記事として書いたものです。
-昨日は @maebaru さんの「[[https://qiita.com/maebaru/items/f7163b70625865b32e68][Emacsユーザ向けChrome拡張機能を公開してみた]]」でした。
+昨日は @maebaruさんの「[[https://qiita.com/maebaru/items/f7163b70625865b32e68][Emacsユーザ向けChrome拡張機能を公開してみた]]」でした。
 
 ** pp.elについて
 Elispに限らず、様々な言語
@@ -5708,7 +5708,7 @@ https://twitter.com/shima_tetsuo/status/1056030917284622336
 ちなみに、シンボルに対しては (quote symbol) (function symbol) は単にシンボルを返すだけだから、全く同じです。
 #+end_example
 
-defun した関数は (function hoge) の様にするのみなので、これは単にシンボル hoge が返るだけですね。
+defunした関数は (function hoge) の様にするのみなので、これは単にシンボルhogeが返るだけですね。
 ちなみに、ソース(C言語)を見てみると
 
 #+begin_src C
@@ -5775,10 +5775,10 @@ defun した関数は (function hoge) の様にするのみなので、これは
 
 
 nom  12:24
-もうずっと Mew を使っていますが，IMAP の fetch は確かに遅い気がします．
-サーバが Gmail の場合，読むのは Web UI で，返事書くのを Mew で書いたりすることもあります．
+もうずっとMewを使っていますが，IMAPのfetchは確かに遅い気がします．
+サーバがGmailの場合，読むのはWeb UIで，返事書くのをMewで書いたりすることもあります．
 nom  12:40
-最新100件だけ fetch するのであれば， i (inc) ではなく，s (scan) して，range に last:100 のようにする方法がありますね．
+最新100件だけfetchするのであれば，i (inc) ではなく，s (scan) して，rangeにlast:100のようにする方法がありますね．
 
 * COMMENT Lispとは何なのか。LISt Processerの力
 :properties:
@@ -5845,7 +5845,7 @@ Lispを触ったことのない人に「Lispとは何か」を紹介し、魅力
 *** Emacsに一生入門できねえ2020[fn:0bb7dc-4]
 [[./resources/public/img/0bb7dc-aa844ea0-3307-4fe9-9712-714695a7a1b9.png]]
 
-*** 風になりたい奴だけがEmacsを使えばいい 2020[fn:0bb7dc-5]
+*** 風になりたい奴だけがEmacsを使えばいい2020[fn:0bb7dc-5]
 [[./resources/public/img/0bb7dc-b9d84fe7-6a57-48e0-8a61-f17e938c95b7.png]]
 
 *** 最近のEmacsJP
@@ -5880,7 +5880,7 @@ https://zenn.dev/
 *** org-mode
 - markdown的なstructuredプレーンテキスト
 - Emacsでプレーンテキストを扱うならこれ
-- org-tangle, org-export, org-publish, org-agenda, org-clock, org-capture, org-table 等々の便利機能
+- org-tangle, org-export, org-publish, org-agenda, org-clock, org-capture, org-table等々の便利機能
   - Emacs界のキラーパッケージ
   - (しかしでかすぎて全容を把握できない)
 - @@html:<div style="margin-top:2rem;"></div>@@org-export周辺だけでも、とても便利!
@@ -5932,7 +5932,7 @@ org-tangle: org文書からプログラムを出力
 #+attr_html: :width 80%
 [[./resources/public/img/0bb7dc-fde6fd6b-6b70-4605-b4e3-0edf32d3c11b.png]]
 
-**** COMMENT サンプル
+**** COMMENTサンプル
 
 - numpy.random.randint(low, high=None, size=None, dtype='l')
   - Return random integers from low (inclusive) to high (exclusive).
@@ -6004,14 +6004,14 @@ https://emacs-jp.slack.com
 #+attr_html: :style font-size:1.5rem
 1. 2020年代のEmacs入門 - https://emacs-jp.github.io/tips/emacs-in-2020.html
 2. Emacsに一生入門できねえ2020 - https://anond.hatelabo.jp/20200921040234
-3. 風になりたい奴だけがEmacsを使えばいい 2020 - https://blog.tomoya.dev/posts/only-those-who-want-to-be-the-wind-should-use-emacs-2020/
+3. 風になりたい奴だけがEmacsを使えばいい2020 - https://blog.tomoya.dev/posts/only-those-who-want-to-be-the-wind-should-use-emacs-2020/
 4. Zenn needs help - https://catnose99.com/zenn-needs-help/
 5. Eric Schulte, Dan Davison, Thomas Dye, et.al., "A Multi-Language Computing Environment for Literate Programming and Reproducible Research" https://www.jstatsoft.org/article/view/v046i03
 6. ox-zennの使い方 - https://s.conao3.com/blog/2020/6dae6b
 
 [fn:0bb7dc-3] 2020年代のEmacs入門 - https://emacs-jp.github.io/tips/emacs-in-2020.html
 [fn:0bb7dc-4] Emacsに一生入門できねえ2020 - https://anond.hatelabo.jp/20200921040234
-[fn:0bb7dc-5] 風になりたい奴だけがEmacsを使えばいい 2020 - https://blog.tomoya.dev/posts/only-those-who-want-to-be-the-wind-should-use-emacs-2020/
+[fn:0bb7dc-5] 風になりたい奴だけがEmacsを使えばいい2020 - https://blog.tomoya.dev/posts/only-those-who-want-to-be-the-wind-should-use-emacs-2020/
 [fn:0bb7dc-6] Zenn needs help - https://catnose99.com/zenn-needs-help/
 [fn:0bb7dc-7] ox-zennの使い方 - https://s.conao3.com/blog/2020/6dae6b
 [fn:0bb7dc-8] Eric Schulte, Dan Davison, Thomas Dye, et.al., "A Multi-Language Computing Environment for Literate Programming and Reproducible Research" https://www.jstatsoft.org/article/view/v046i03
@@ -6024,7 +6024,7 @@ https://emacs-jp.slack.com
 
 http://cocu.hatenablog.com/entry/2016/07/19/225308
 
-* COMMENT Emacs-26.3新機能 add-variable-watcherを使ってみる
+* COMMENT Emacs-26.3新機能add-variable-watcherを使ってみる
 :properties:
 :export_file_name: generated/contents/blog/2020/e6f3b1
 :export_date: 2020-01-01
@@ -6051,7 +6051,7 @@ chuntaro  16:58
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Watching-Variables.html
 
 chuntaro  17:00
-add-variable-watcher を使うと、setq だけで処理を進められる邪悪なコーディングが出来てしまうから、あくまでもデバッグ目的で使うのが良いのかもね。
+add-variable-watcherを使うと、setqだけで処理を進められる邪悪なコーディングが出来てしまうから、あくまでもデバッグ目的で使うのが良いのかもね。
 ただ、ビューアー的なものを作る場合は特定の変数の変化に対応出来るから便利かもしれない。
 
 * COMMENT serch-forwardについて
@@ -6062,19 +6062,19 @@ add-variable-watcher を使うと、setq だけで処理を進められる邪悪
 
 
 roswell  22:23
-"point がある行で、引数で指定した文字列の先頭に pointを移動"
+"pointがある行で、引数で指定した文字列の先頭にpointを移動"
 というような処理が必要なので、以下のような関数で動作確認はできたのですが ...
-point がある行を読み取るのは、 (thing-at-point 'line) でもできますが、もっと適切な関数等ありますでしょうか？
-文字列検索 search-forward , word-search-forward は、文字列の最後に point 移動するので、string-match を使いましたが、指定文字列の先頭に point 移動するような関数ありますでしょうか？
+pointがある行を読み取るのは、 (thing-at-point 'line) でもできますが、もっと適切な関数等ありますでしょうか？
+文字列検索search-forward , word-search-forwardは、文字列の最後にpoint移動するので、string-matchを使いましたが、指定文字列の先頭にpoint移動するような関数ありますでしょうか？
 1.,2. 組み合わせれば、もっと簡潔な記述できるような気がしていますが、もっと簡潔な記述ありますでしょうか？
 (defun my-move-point-to-begining-of-string-in-line (string)
   (interactive "sSearch String: ")
-  (let ((pos (string-match string (thing-at-point 'line)))) ; point がある行の、引数で指定した文字列の先頭に pointを移動
+  (let ((pos (string-match string (thing-at-point 'line)))) ; pointがある行の、引数で指定した文字列の先頭にpointを移動
     (if pos
 	(move-to-column pos))))
 
 zk-phi  11:15
-2. について、 `search-forward` した後は `match-beginning` で開始位置がとれるので、そこに `goto-char` してしまう手はありそうです。すると 1. の「 point のある行を文字列として切り出す」必要がなくなるぶん、気持ち簡潔になりますかね…？
+2. について、 `search-forward` した後は `match-beginning` で開始位置がとれるので、そこに `goto-char` してしまう手はありそうです。すると1. の「pointのある行を文字列として切り出す」必要がなくなるぶん、気持ち簡潔になりますかね…？
 (and (search-forward string (point-at-eol) nil t)
      (goto-char (match-beginning 0))
 でもこれくらいしか思いつかないです （編集済み）
@@ -6087,7 +6087,7 @@ zk-phi  11:15
 
 roswell  14:36
 list  の指定した位置のセルとセルの間に、セルを追加する場合、
-例えば、下記の (0 1 2 3) の 1 と 2 の間に、 'a を追加する場合、
+例えば、下記の (0 1 2 3) の1と2の間に、 'aを追加する場合、
 (setq xlist '(0 1 2 3))
 => (0 1 2 3)
 (setcdr (nthcdr 1 xlist) (cons 'a (nthcdr 2 xlist)))
@@ -6113,10 +6113,10 @@ smzht  16:52
 （編集済み）
 
 roswell  17:32
-@smzht さんご教示ありがとうございます。
-defmacro の例より push の方が簡単に記述できるので
+@smzhtさんご教示ありがとうございます。
+defmacroの例よりpushの方が簡単に記述できるので
 気に入りました。
-info だと
+infoだと
  (setq l '(a b))
                ⇒ (a b)
           (push 'c l)
@@ -6129,7 +6129,7 @@ info だと
 
 kosh  18:55
 http://www.ic.unicamp.br/~meidanis/courses/mc336/2006s2/funcional/L-99_Ninety-Nine_Lisp_Problems.html
-L-99 の21問目が参考になるかも（ちょっとしたリスト遊びや再帰の勉強にもなる
+L-99の21問目が参考になるかも（ちょっとしたリスト遊びや再帰の勉強にもなる
 lisp
 (insert-at 'alfa '(a b c d) 2) ;=> (A ALFA B C D)
 
@@ -6141,7 +6141,7 @@ push is a Lisp macro in `subr.el'.
 Add NEWELT to the list stored in the generalized variable PLACE.
 This is morally equivalent to (setf PLACE (cons NEWELT PLACE)),
 except that PLACE is only evaluated once (after NEWELT).
-とのことなので、 setf が使える対象には push も使えるみたいですね。これでちゃんとリストが繋がるのは、あとはコンスセルの構造を考えれば分かります。
+とのことなので、setfが使える対象にはpushも使えるみたいですね。これでちゃんとリストが繋がるのは、あとはコンスセルの構造を考えれば分かります。
 
 * COMMENT EmacsでHTMLをいい感じにバッファに表示する方法
 :properties:
@@ -6157,8 +6157,8 @@ shr-render-buffer/shr-render-region
 :export_date: 2020-01-01
 :end:
 
-https://atcoder.jp/contests/abc086/standings/json にアクセスするとAC状況が見れる。
-情報源はこのブログ http://tatsumack.hatenablog.com/entry/2018/12/09/113908 。* man
+https://atcoder.jp/contests/abc086/standings/jsonにアクセスするとAC状況が見れる。
+情報源はこのブログ http://tatsumack.hatenablog.com/entry/2018/12/09/113908。* man
 
 * COMMENT Test
 :properties:
@@ -6170,7 +6170,7 @@ test test test
 
 test test test
 
-平方根の高さを揃える $\sqrt{g}$ に \$\sqrt{h}$ は \mathstrut と \smash コマンドを使って $\ssqrt{g}$ と $\ssqrt{h}$ のように表示できる。
+平方根の高さを揃える $\sqrt{g}$ に \$\sqrt{h}$ は \mathstrutと \smashコマンドを使って $\ssqrt{g}$ と $\ssqrt{h}$ のように表示できる。
 
 test
 
@@ -6184,7 +6184,7 @@ $$\sin(\frac{a}{b})$$
 
 $$a \between b$$
 
-* COMMENT 競技プログラミングのためのC++リファレンス
+* COMMENT競技プログラミングのためのC++リファレンス
 :properties:
 :export_file_name: generated/contents/blog/2020/5afd3d
 :export_date: 2020-01-01
@@ -6194,7 +6194,7 @@ cppは得意ではありませんが、競技プログラミングにおいて�
 特にClangの最適化の恩恵を得られることは大きいです。
 コンテスト中にあちこちを見て回るのは時間の無駄なので、過去問演習中に必要だった情報をまとめておきます。
 
-* COMMENT スクリーンショットコマンドscrot(1)のオプションと使い方
+* COMMENTスクリーンショットコマンドscrot(1)のオプションと使い方
 :properties:
 :export_file_name: generated/contents/blog/2020/5c7232
 :export_date: 2020-01-01
@@ -6517,7 +6517,7 @@ leafは単なるマクロであり、雑多で典型的なS式を自動生成す
 
 - [[https://memo.sugyan.com/entry/20120104/1325604433][defcustomで定義された変数はcustom-set-variablesで変更すべき？ - 2012-01-04]]
 - [[http://kawamuray.hatenablog.com/entry/2013/11/03/180543][defcustomで定義された変数はsetqではなくcustom-set-variablesで設定すべき理由 - 2013-11-03]]
-- [[https://abicky.net/2013/12/30/184239/][custom-set-variables は使わない方が良いかもしれない - 2013-12-30]]
+- [[https://abicky.net/2013/12/30/184239/][custom-set-variablesは使わない方が良いかもしれない - 2013-12-30]]
 
 しかし時代は変わりました。「ユーザーが変更できる変数」はほとんどの場合で =defcustom= で宣言され、 =defvar= で宣言されたものは「パッケージの内部変数である」という慣習を多くのパッケージ開発者が守っています。
 
@@ -6580,7 +6580,7 @@ leafには与えられたS式をそのまま展開するキーワードがあり
 [[./resources/public/img/d22aed-85bae766-658d-42b8-a463-bf6cbd804e5f.gif]]
 
 *** leaf-convertについて
-leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば [[https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula][Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ]] を参考にして、下記のuse-package設定例があるとします。
+leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば[[https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula][Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ]]を参考にして、下記のuse-package設定例があるとします。
 
 #+begin_src emacs-lisp
 (use-package doom-themes
@@ -6633,7 +6633,7 @@ leaf-convertを手に入れたおかげで、use-packageの設定例があれば
   init-loaderをやめたからなのかわかりませんが,何故か起動が早くなった気がします.
   #+end_quote
 
-参考として私のinit.elを読み込んだ場合、223パッケージ(elpaディレクトリには =archive= と =gnupg= ディレクトリがあるのを忘れていた)インストールされたEmacsを4.2秒で起動できています。 HDDの環境なので、測定には悪条件ですが5秒未満なら十分に耐えられます。
+参考として私のinit.elを読み込んだ場合、223パッケージ(elpaディレクトリには =archive= と =gnupg= ディレクトリがあるのを忘れていた)インストールされたEmacsを4.2秒で起動できています。HDDの環境なので、測定には悪条件ですが5秒未満なら十分に耐えられます。
 
 [[./resources/public/img/d22aed-bbac83c9-1266-48e2-8e2b-73b81e7accc6.png]]
 
@@ -7413,7 +7413,7 @@ Solarizedも内部では基本となる10色を定義し、その色で =face= �
 
 では、基本となる10色を外部から指定できるようにしたらSolarizedの仕組みに乗った上で簡単にカラーテーマが作れるのではないか。
 
-それを提案したのがzk_phiさんの「[[https://qiita.com/zk_phi/items/35097fbb3dde4253d428][[Emacs] メタ・カラースキームとしての solarized]]」であり、私のパッチはそれを本家で実現したものです。
+それを提案したのがzk_phiさんの「[[https://qiita.com/zk_phi/items/35097fbb3dde4253d428][[Emacs] メタ・カラースキームとしてのsolarized]]」であり、私のパッチはそれを本家で実現したものです。
 
 *** Solarizedから作るカラーテーマ
 SolarizedのAPIで使いやすいのは =solarized-create-theme-file-with-palette= です。
@@ -7720,7 +7720,7 @@ rsyncを使ってサイトをGitHub Actionsからデプロイできるように�
 ** 参考
 - [[https://jyn.jp/rsync-daemon-over-ssh/][rsync+sshはdaemonモードを使うと更に安全になる - 純規の暇人趣味ブログ]]
 - [[https://qiita.com/shimataro999/items/b05a251c93fe6843cc16][GitHub ActionsでSSHを使う - Qiita]]
-- [[https://amasuda.xyz/post/2019-07-27-ssh-keygen-openssh-to-pem/][ssh-keygen で生成された OPENSSH フォーマットの秘密鍵を pem フォーマットへ変換する - Think Abstract]]
+- [[https://amasuda.xyz/post/2019-07-27-ssh-keygen-openssh-to-pem/][ssh-keygenで生成されたOPENSSHフォーマットの秘密鍵をpemフォーマットへ変換する - Think Abstract]]
 - [[https://machua.hatenadiary.org/entry/20110809/1312899353][SSHの秘密鍵について - 禿散らかしてました]]
 
 * Emacsで最終行にポイントを動かさないようにするアドバイス
@@ -8058,7 +8058,7 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 
 こういう方向のパッケージもお手軽で良いですね。
 
-* Emacs Lisp の文字列操作まとめ
+* Emacs Lispの文字列操作まとめ
 :properties:
 :export_file_name: generated/contents/blog/2020/8e5d61
 :export_date: 2020-05-26
@@ -8068,7 +8068,7 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 
 -----
 
-基本的には Emacs Lisp の Info を読むと何となくパーツはそろっていることは分かる。
+基本的にはEmacs LispのInfoを読むと何となくパーツはそろっていることは分かる。
 ただ、パーツが特殊だったりしてよく使い方を忘れるのでよく見る情報をメモ。
 
 ** 基本的情報源
@@ -8078,23 +8078,23 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
   - 4. 文字列と文字
   - 文字列の操作、比較、変換など
 - Info 32.2 Examining Buffer Contents
-  - 31.2 バッファの内容を調べる
+  - 31.2バッファの内容を調べる
   - バッファの文字列取得
 - Info 32.19 Text Properties
-  - 31.19 テキスト属性
+  - 31.19テキスト属性
   - テキストプロパティ（テキスト属性）のいろいろ
 - Info 34 Searching and Matching
   - 33. 探索と一致
   - 探索、正規表現
 - Info 38.10 Width
-  - 38.9 表示幅
-  - 非 ASCII 文字列を含む文字や文字列の幅（画面上の長さ）、端っこ切る
-- 逆引き Emacs Lisp 文字列
+  - 38.9表示幅
+  - 非ASCII文字列を含む文字や文字列の幅（画面上の長さ）、端っこ切る
+- 逆引きEmacs Lisp文字列
   - それなりに数が多い
 - no title
   - 実は必要なことはここに大体書いてあったりする
 
-** Ruby との文字列操作対応表
+** Rubyとの文字列操作対応表
 参照: 文字列操作の比較表: Ruby, Python, JavaScript, Perl, C++ - bkブログ
 基本的に破壊的操作は無し。
 
@@ -8102,26 +8102,26 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 |-----------------------+------------------------------------------------------------+--------------------------------------------------------------------------------------|
 | s = "abc"             | (setq s "abc")                                             | 変数にバインドするならlet使う方が一般的                                              |
 | s = x + y             | (concat x y)                                               |                                                                                      |
-| s == x                | (equal s x)                                                | string-equal が正式                                                                  |
+| s == x                | (equal s x)                                                | string-equalが正式                                                                  |
 | s % [x, y]            |                                                            |                                                                                      |
 | sprintf(s, x, y)      | (format s x y)                                             |                                                                                      |
 | [x, y, z].join(s)     | (mapconcat 'identity (list x y z) s)                       | 単に結合するなら (apply 'concat (list x y z)) もアリ                                 |
 | s.capitalize          | (capitalize s)                                             |                                                                                      |
 | s.capitalize!         |                                                            |                                                                                      |
-| s.center(x)           | (cfw:render-center x s)                                    | calfw.el 参照                                                                        |
+| s.center(x)           | (cfw:render-center x s)                                    | calfw.el参照                                                                        |
 | s.chomp               | (regexp-in-string "[\n\r]+$" "" s)                         |                                                                                      |
 | s.chomp!              |                                                            |                                                                                      |
 | s.chop                | (substring s 0 -1)                                         | 改行文字の扱いが違う                                                                 |
 | s.chop!               |                                                            |                                                                                      |
 | s.clear               | (clear-string s)                                           |                                                                                      |
 | s.concat(x)           |                                                            |                                                                                      |
-| s.count(x)            |                                                            | ループで回すか、一時バッファを使ってre-search-forward で回数を数えるとか             |
-| s.crypt(x)            |                                                            | rot13-string とか、 EPA とか                                                         |
+| s.count(x)            |                                                            | ループで回すか、一時バッファを使ってre-search-forwardで回数を数えるとか             |
+| s.crypt(x)            |                                                            | rot13-stringとか、EPAとか                                                         |
 | EzCrypt               |                                                            |                                                                                      |
 | s.delete!(x)          | (regexp-in-string x "" s)                                  | 破壊的には行えない                                                                   |
 | s.downcase            | (downcase s)                                               |                                                                                      |
 | s.downcase!           |                                                            |                                                                                      |
-| s.each_byte { x ... ) | (loop for x across s do … )                                | 文字単位でループ、xは文字コード（数値）文字コードからstringにするには char-to-string |
+| s.each_byte { x ... ) | (loop for x across s do … )                                | 文字単位でループ、xは文字コード（数値）文字コードからstringにするにはchar-to-string |
 | s.each_line { x ... ) | (loop for x in (split-string s "[\n\r]") do … )            |                                                                                      |
 | s.empty?              | (= 0 (length s))                                           | nullチェックが必要                                                                   |
 | s.end_with?(x)        | (string-match (concat x "$") s)                            | sに改行が入らないことが前提                                                          |
@@ -8133,14 +8133,14 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 | s.index(x)            | (string-match x s)                                         |                                                                                      |
 | s.insert(i, x)        |                                                            | 一時バッファでやるか、自分でちぎってつなげるか                                       |
 | s.intern              |                                                            |                                                                                      |
-| s.to_sym              | (intern s)                                                 | シンボルテーブルに登録したくなければ make-symbol                                     |
+| s.to_sym              | (intern s)                                                 | シンボルテーブルに登録したくなければmake-symbol                                     |
 | s.length              |                                                            |                                                                                      |
 | s.size                | (length s)                                                 | 文字数が返る                                                                         |
-| s.ljust(x)            | (cfw:render-left x s)                                      | calfw.el 参照                                                                        |
+| s.ljust(x)            | (cfw:render-left x s)                                      | calfw.el参照                                                                        |
 | s.lstrip              | (regexp-in-string "^[ \t]+" "" s)                          | sに改行が入らないことが前提                                                          |
 | s.lstrip!             |                                                            |                                                                                      |
 | s.match(x)            |                                                            |                                                                                      |
-| x.match(s)            | (string-match x s)                                         | マッチ結果はグローバルに保持している match-string, match-beginning, match-end 等参照 |
+| x.match(s)            | (string-match x s)                                         | マッチ結果はグローバルに保持しているmatch-string, match-beginning, match-end等参照 |
 | s.next!               |                                                            |                                                                                      |
 | s.succ!               |                                                            |                                                                                      |
 | s.oct                 |                                                            |                                                                                      |
@@ -8149,14 +8149,14 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 | s.replace(x)          |                                                            |                                                                                      |
 | s.reverse             | (apply 'string (reverse (append s nil)))                   |                                                                                      |
 | s.reverse!            |                                                            |                                                                                      |
-| s.rindex(x)           |                                                            | 一時バッファで search-backward 等を使う                                              |
-| s.rjust(x)            | (cfw:render-right x s)                                     | calfw.el 参照                                                                        |
+| s.rindex(x)           |                                                            | 一時バッファでsearch-backward等を使う                                              |
+| s.rjust(x)            | (cfw:render-right x s)                                     | calfw.el参照                                                                        |
 | s.rpartition(x)       |                                                            | string-matchで自分でちぎる                                                           |
 | s.rstrip              | (regexp-in-string "[ \t]+$" "" s)                          | sに改行が入らないことが前提                                                          |
 | s.rstrip!             |                                                            |                                                                                      |
-| s.scan(x) { ... }     |                                                            | 一時バッファで re-search-forward 等を使う                                            |
+| s.scan(x) { ... }     |                                                            | 一時バッファでre-search-forward等を使う                                            |
 | s[i]                  |                                                            |                                                                                      |
-| s.slice(i)            | (aref s i)                                                 | 文字コード（数値）が返ってくる文字コードからstringにするには char-to-string          |
+| s.slice(i)            | (aref s i)                                                 | 文字コード（数値）が返ってくる文字コードからstringにするにはchar-to-string          |
 | s[i..-1]              |                                                            |                                                                                      |
 | s.slice(i..-1)        | (substring s i)                                            |                                                                                      |
 | s[i, l]               |                                                            |                                                                                      |
@@ -8169,7 +8169,7 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 | s.start_with?(x)*4    | (string-match (concat "^" x) s)                            | sに改行が入らないことが前提                                                          |
 | s.strip               | (regexp-in-string "\\(^[ \t\n\r]+\\  [ \t\n\r]+$\\)" "" s) | sに改行が入らないことが前提                                                          |
 | s.strip!              |                                                            |                                                                                      |
-| s.sub(x, y)           |                                                            | string-match を使って自分で初回を取ってくる                                          |
+| s.sub(x, y)           |                                                            | string-matchを使って自分で初回を取ってくる                                          |
 | s.sub!(x, y)          |                                                            |                                                                                      |
 | s.swapcase            |                                                            |                                                                                      |
 | s.to_f                | (string-to-number s)                                       | 整数に見える場合は整数が返る                                                         |
@@ -8186,14 +8186,14 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 ※もし間違いを見つけたら教えてください。
 
 *** 表示幅について
-format の桁指定（"%5s" など）で表示幅のパディングが出来るが、あふれた文字列は切り落とされずに全部表示されてしまう。
+formatの桁指定（"%5s" など）で表示幅のパディングが出来るが、あふれた文字列は切り落とされずに全部表示されてしまう。
 
 指定幅で切り取りたい場合は、自分であらかじめ文字列の長さを見て切り落と(truncate)しておく必要がある。
 
-切り落としには substring とかではなくて、全角文字などについても適切に幅を見てくれる truncate-string-to-width を使うと良い感じ。
+切り落としにはsubstringとかではなくて、全角文字などについても適切に幅を見てくれるtruncate-string-to-widthを使うと良い感じ。
 
 *** 文字列内の複雑な検索、置換など
-replace-regexp-in-string を使えば大抵のことが出来る。関数も取れるので Ruby の gsub 相当も出来る。
+replace-regexp-in-stringを使えば大抵のことが出来る。関数も取れるのでRubyのgsub相当も出来る。
 
 ただ、複雑な正規表現をこねくり回したい場合は以下のように一時バッファを使う。
 
@@ -8211,27 +8211,27 @@ replace-regexp-in-string を使えば大抵のことが出来る。関数も取�
 #+end_src
 
 *** テキストプロパティについて
-HTML の DOM オブジェクトに独自属性を付加するように、自由に属性を入れることが出来る。
-HTML とは違って1文字単位でプロパティが設定できるが、大抵はまとまった領域にプロパティを設定する。
+HTMLのDOMオブジェクトに独自属性を付加するように、自由に属性を入れることが出来る。
+HTMLとは違って1文字単位でプロパティが設定できるが、大抵はまとまった領域にプロパティを設定する。
 
 テキスト属性を使えるようになると、かなり複雑なアプリケーションが作れるようになる（と思う）。
 
 *** アプリケーションからの利用
 テキストプロパティに必要な値をごっそり入れておき、キー操作でカーソル上の文字列からテキストプロパティを取ってきて必要なアクションを行うというような方法が一般的に行われている。大抵は、行全体や必要な領域全体にプロパティをつけておいて、キー操作で取得するときは行頭の1文字目のプロパティを見るということがよく行われている。
 
-Dired や orgmode など、多くのプログラムがこのような設計になっている。しかしながら、場当たり的にテキストプロパティを使い始めると、テキストプロパティを舞台にしたスパゲティコードになるため、本格的に使う場合はあらかじめ構造化したデータを代表して入れておく等の工夫をした方がよいと考えている。
+Diredやorgmodeなど、多くのプログラムがこのような設計になっている。しかしながら、場当たり的にテキストプロパティを使い始めると、テキストプロパティを舞台にしたスパゲティコードになるため、本格的に使う場合はあらかじめ構造化したデータを代表して入れておく等の工夫をした方がよいと考えている。
 
 *** はまりポイントなど
-属性は文字列の操作などでもそのままコピーされてしまうので、欲しくない場合は substring-no-properties などで消す。
+属性は文字列の操作などでもそのままコピーされてしまうので、欲しくない場合はsubstring-no-propertiesなどで消す。
 
 属性の操作は破壊的なので、うっかり変えてはいけないところまで変えてしまうことがある。また、ソースコードリテラルの文字列オブジェクトには属性の操作ができない。なので、外から来た文字列に対して属性を操作する場合は、文字列をコピーしておくと安全。
 
-font-lock が有効なバッファで face に何か入れても速攻でクリアされてしまう。そんなときは font-lock-face に入れる。
+font-lockが有効なバッファでfaceに何か入れても速攻でクリアされてしまう。そんなときはfont-lock-faceに入れる。
 
 テキスト属性のループパターン
-バッファの中の特定のテキストプロパティについてループを書きたいときがある。そんなときは next-property-change または next-single-property-change などを使う。 Info の next-property-change にループのサンプルがある。
+バッファの中の特定のテキストプロパティについてループを書きたいときがある。そんなときはnext-property-changeまたはnext-single-property-changeなどを使う。Infoのnext-property-changeにループのサンプルがある。
 
-以下は face の付いている領域についてループするイディオム。
+以下はfaceの付いている領域についてループするイディオム。
 
 #+begin_src emacs-lisp
   (defun iterate-text-prop (prop func)
@@ -8248,7 +8248,7 @@ font-lock が有効なバッファで face に何か入れても速攻でクリ�
       (and val (message ">> %S : %S" val (buffer-substring-no-properties begin end)))))
 #+end_src
 
-N オーダーではあるけどもなかなか高速に動作するので、 O(N^2) のアルゴリズムでなければ問題なさそう。
+Nオーダーではあるけどもなかなか高速に動作するので、O(N^2) のアルゴリズムでなければ問題なさそう。
 
 * Emacsに存在するwithプレフィックスのマクロ一覧
 :properties:
@@ -8428,7 +8428,7 @@ ppp, promise, asyncに依存して、次のコード片を実行すれば調べ�
 
 [[./resources/public/img/40023a-ab13cfa3-d618-4e84-836a-d4a272a0e1c8.png]]
 
-Info の 22.8 Searching the Active Keymaps, 22.9 Controlling the Active Keymaps などから。
+Infoの22.8 Searching the Active Keymaps, 22.9 Controlling the Active Keymapsなどから。
 
 「belong」は誰がその変数を管理するかとか、変数の所属先という感じ。
 
@@ -8438,7 +8438,7 @@ Info の 22.8 Searching the Active Keymaps, 22.9 Controlling the Active Keymaps 
 マイナーモードはまとめて =minor-mode-map-alist= に入っていて、マイナーモードの変数が =on= か =off= で有効無効が決まる。
 このリストの順番も重要。
 
-テキストには文字単位で keymap と言う属性をつけて、キーバインドを設定できる。
+テキストには文字単位でkeymapと言う属性をつけて、キーバインドを設定できる。
 
 あと、これらのどれにもヒットしなければ、 =local-function-key-map= でキーの変換が行われる。
 例えば、環境によって =C-i= （タブ文字） と =<tab>= は区別されているが、実質は同じと見なした方が便利なのでここで変換される。
@@ -8446,19 +8446,19 @@ Info の 22.8 Searching the Active Keymaps, 22.9 Controlling the Active Keymaps 
 優先順位は見たまま。 =text-property 'keymap= > =minor-mode-map-alist= > =local-map= > =global-map= > =local-function-key-map=
 
 ** override
-この優先順位を少し覆すことが出来るしくみが overriding 関係。
-CSS の =important!= のような感じ。
+この優先順位を少し覆すことが出来るしくみがoverriding関係。
+CSSの =important!= のような感じ。
 
 まず、メジャーモードよりマイナーモードの方が優先されてしまうので、これを覆す仕組みが =minor-mode-overriding-map-alist= 。
 ただ、覆そうとしているマイナーモードの名前を知らないといけない。
 
-次に、文字単位の keymap をメジャーモードやマイナーモードから覆す仕組みが =overriding-local-map= 。
+次に、文字単位のkeymapをメジャーモードやマイナーモードから覆す仕組みが =overriding-local-map= 。
 
 最後に、端末入力の最上位で入力を乗っ取る仕組みが =overriding-terminal-local-map= 。
 これは影響範囲がその端末だけ。
 
 =emulation-mode-map-alists= は他のメジャーモードやマイナーモードが別のモードのキーマップを乗っ取ったり、 =remap= で挙動を変えたりする場合に使うもの。
-検索してもあまり情報がない (cua, viper とかぐらい)。
+検索してもあまり情報がない (cua, viperとかぐらい)。
 
 * Emacsでプレフィックスキーにバインドする方法
 :properties:
@@ -8952,7 +8952,7 @@ jobs:
 今回は ~plist~ に対して ~setf~ を使えるようにすることを目的とします。
 
 ** 汎変数の定義
-magit などの大きな(そして注意深く実装されている)パッケージを読んでいると、いきなり ~gv-~ から始まるS式を見ることがあります。
+magitなどの大きな(そして注意深く実装されている)パッケージを読んでいると、いきなり ~gv-~ から始まるS式を見ることがあります。
 
 これが汎変数の定義であり、標準で提供されていない汎変数を独自に定義することができます。
 
@@ -9945,7 +9945,7 @@ ox-zennを使うことでorgドキュメントからZenn拡張の含まれたマ
 
 さて、最近ゴリラさんのgh.vimに触発されて、はちゃめちゃ便利そうだったのでEmacsでも使いたいなと思い、細々と[[https://github.com/conao3/reforge.el][reforge]]というパッケージを開発しています。
 
-実は既にForgeというパッケージがある(「[[https://qiita.com/eggc/items/5ce3de89fa4234fe9bbe][Emacs forge 入門 - Qiita]]」)のですが、GitHubから全ての情報を一度に取ってこようとするため[[https://github.com/melpa/melpa][melpa/melpa]]などのまぁまぁ大きなレポジトリだと初回フェッチに5分くらいEmacsがハングするという残念な仕様になっています。
+実は既にForgeというパッケージがある(「[[https://qiita.com/eggc/items/5ce3de89fa4234fe9bbe][Emacs forge入門 - Qiita]]」)のですが、GitHubから全ての情報を一度に取ってこようとするため[[https://github.com/melpa/melpa][melpa/melpa]]などのまぁまぁ大きなレポジトリだと初回フェッチに5分くらいEmacsがハングするという残念な仕様になっています。
 
 #+begin_quote
 一方の不満点はレスポンスの遅さ、サクサク感が足りないところです。
@@ -10208,7 +10208,7 @@ magitは[[https://github.com/tarsius][tarsius]]さんの代表的なパッケー
 :end:
 
 この記事は[[https://qiita.com/advent-calendar/2020/emacs][Emacs Advent Calendar 2020]]の16日目の記事です。投稿日時は見てはいけません()
-前日はTakesxiSximadaさんの「EmacsでPlantUMLを使う」、翌日はfiboさんの「[[https://qiita.com/fibo/items/174898ffc447542f7786][emacs -nw のコピペ事情]]」でした。
+前日はTakesxiSximadaさんの「EmacsでPlantUMLを使う」、翌日はfiboさんの「[[https://qiita.com/fibo/items/174898ffc447542f7786][emacs -nwのコピペ事情]]」でした。
 
 今回、[[https://github.com/conao3/leaf.el][leaf]]という自作パッケージに新しいキーワードを追加したので、その紹介をするものです。
 (スター200越えました...! やる気に影響するので、よさげなツールだなぁと思っていただければ、ぜひスターを頂ければと...!)
@@ -10510,16 +10510,16 @@ leaf-defaultsについて紹介しました。2年前から構想はしていた
 この記事はRustアドベントカレンダー16日目の記事です。
 昨日はyukinaritさんの「[[https://zenn.dev/yukinarit/articles/71bb4a01a8e58e][PGOでRustで書かれた広告サーバを早くする]]」でした。
 
-RustでTUIアプリケーションを作りたいなーっと思っていろいろ探していると dioxus-tui というライブラリを見つけたので、使ってみた記事を書きます。
+RustでTUIアプリケーションを作りたいなーっと思っていろいろ探しているとdioxus-tuiというライブラリを見つけたので、使ってみた記事を書きます。
 
-今回の記事で作ったレポジトリは [[https://github.com/conao3/rust-dioxus-tui-sample][conao3/rust-dioxus-tui-sample]] に置いてあります。
+今回の記事で作ったレポジトリは[[https://github.com/conao3/rust-dioxus-tui-sample][conao3/rust-dioxus-tui-sample]]に置いてあります。
 
 ** dioxusとは
 TUIアプリケーション専用ではなく、仮想DOMを使ってWebフロントエンド、デスクトップアプリ、モバイルアプリを書き出すクレート。
 
 日本語記事ではここらへんを参照
 
-- [[https://zenn.dev/mizchi/scraps/449f0591e2cee9][dioxus web やってみる - Zenn/mizchi]]
+- [[https://zenn.dev/mizchi/scraps/449f0591e2cee9][dioxus webやってみる - Zenn/mizchi]]
 - [[https://qiita.com/uwattotaitai/items/4d262e46c2165e01f477][Rust UIライブラリ「Dioxus」をReact+Typescriptと比較してみた - Qiita/uwattotaitai]]
 
 この記事ではdioxusを使ってTUIアプリを作ってみます。
@@ -11054,7 +11054,7 @@ conao3.comをNetlifyのDNSに置いて、そのままNetlifyを向くように�
 
 [[./resources/public/img/b81579-31448b5e-7760-47de-9d3a-c10809fc7424.png]]
 
-将来的にはNetlifyに置いてあるブログを h.conao3.com くらいで見れるようにしたらいいのかなと思う。 (=h= は =hugo= の =h=)
+将来的にはNetlifyに置いてあるブログをh.conao3.comくらいで見れるようにしたらいいのかなと思う。 (=h= は =hugo= の =h=)
 
 ついでにドメインをNetlifyからCloudflareに引っ越しすると良いかもしれない。リダイレクトの設定が面倒なので、また時間が取れるときにやる。
 
@@ -11113,7 +11113,7 @@ anyenv install --init
 これで =anyenv= が使えるようになった。
 
 *** anyenv-updateのインストール
-[[https://github.com/znz/anyenv-update][znz/anyenv-update]] をインストールする。
+[[https://github.com/znz/anyenv-update][znz/anyenv-update]]をインストールする。
 これは =anyenv update= でインストールされている =*env= をアップデートできるようにするプラグイン。
 
 アップデートしないと新しいPythonをインストールできないので、インストール前にはこのサブコマンドが使えると便利。
@@ -11151,7 +11151,7 @@ $ pyenv install -l | sed -E 's/^ +//' | grep -E '^3\.9\.[0-9]+$' | tail -n1
 3.9.16
 #+end_src
 
-さてインストール。。の前に [[https://github.com/pyenv/pyenv/wiki][pyenvのwiki]] にOS別の依存パッケージインストール方法が記載されているのでそれを実行する。
+さてインストール。。の前に[[https://github.com/pyenv/pyenv/wiki][pyenvのwiki]]にOS別の依存パッケージインストール方法が記載されているのでそれを実行する。
 
 私はArchlinuxを使っているので =pacman= の手順を実行した。
 
@@ -11177,7 +11177,7 @@ pyenv global 3.11.2 3.10.10 3.9.16
 それでもできなかったらおとなしくOSからクリーンインストールした方が早い。
 
 *** poetryのインストール
-[[https://python-poetry.org/docs/][poetry]] はPythonのプロジェクト管理ツールである。
+[[https://python-poetry.org/docs/][poetry]]はPythonのプロジェクト管理ツールである。
 プロジェクトに合ったPythonを選んだり、依存関係を解決したり、一回解決したものをロックファイルとして保存/共有することができる。
 
 公式ページのインストール手順に従ってインストールする。
@@ -11510,7 +11510,7 @@ Person(name='John', age=30)
 「はじめに」にも書きましたが、ざざっと書いたものというのは結構助けになります。
 
 私はこういうplaygroundを上げる専用の一人orgを作っていて、そこにpushしています。
-今回は [[https://github.com/conao3-playground/python-dataclasses][conao3-playground/python-dataclasses]] にpushしました。
+今回は[[https://github.com/conao3-playground/python-dataclasses][conao3-playground/python-dataclasses]]にpushしました。
 
 ** まとめ
 私が最近試しているplaygroundというやり方を紹介しました。
@@ -11525,15 +11525,15 @@ Person(name='John', age=30)
 
 ** はじめに
 [[https://docs.pydantic.dev/][Pydantic]]は私が一番好きなPythonのパッケージです。
-イメージとしては、builtinの [[https://docs.python.org/ja/3/library/dataclasses.html][dataclasses]] に実行時バリデーションを追加したものです。
+イメージとしては、builtinの[[https://docs.python.org/ja/3/library/dataclasses.html][dataclasses]]に実行時バリデーションを追加したものです。
 
 「型は飾り」のPythonにおいて、実行時においても型に守られるのはとても嬉しいです。
 データの型変換とバリデーションが同時に行われる他、デフォルト値の補完もpydanticに任せることができます。
 そのため外界とのインターフェイスにpydanticを置くことで、安心してデータを扱うことができます。
 
-現在は [[https://fastapi.tiangolo.com/ja/][FastAPI]] や [[https://strawberry.rocks/][Strawberry]] などと統合され、人気パッケージとなっています。
+現在は[[https://fastapi.tiangolo.com/ja/][FastAPI]]や[[https://strawberry.rocks/][Strawberry]]などと統合され、人気パッケージとなっています。
 
-サンプルコードは [[https://github.com/conao3-playground/python-pydantic-blog][conao3-playground/python-pydantic-blog]] にあります。
+サンプルコードは[[https://github.com/conao3-playground/python-pydantic-blog][conao3-playground/python-pydantic-blog]]にあります。
 
 ** 基本的な使用方法
 *** モデルの定義
@@ -11699,7 +11699,7 @@ print(user1.json())
 インターフェースが決まれば、後はどう見せるかを考えます。
 まぁ普通に有向グラフになるので、そこはそこでいいかなと思います。
 
-というか [[https://help.obsidian.md/Plugins/Graph+view][obsidian]] の見せ方がおしゃれすぎるので、こんな感じにしたい。
+というか[[https://help.obsidian.md/Plugins/Graph+view][obsidian]]の見せ方がおしゃれすぎるので、こんな感じにしたい。
 
 ** まとめ
 とりとめのない話でしたが、こういうのを考えているという備忘録でした。
@@ -11720,9 +11720,9 @@ print(user1.json())
 どうやらv2で独自路線に振りすぎたのをv3で揺り戻した？みたいになっているらしく、
 そもそも私も今使っているyarnのバージョンが良く分からない。。
 結局使っていたのはv1だったのですが、もうこの時点で面倒くさいことになっている。
-詳細は 「[[https://zenn.dev/mizchi/articles/yarn-v1-to-v3][yarn v3 の独自機能を避けつつ yarn v1 から v3 へのアップグレードをする - Zenn]]」などを参考。
+詳細は 「[[https://zenn.dev/mizchi/articles/yarn-v1-to-v3][yarn v3の独自機能を避けつつyarn v1からv3へのアップグレードをする - Zenn]]」などを参考。
 
-pnpmは彗星の如く現れたよさげなパッケージマネージャなのですが、これも詳細は 「[[https://zenn.dev/azukiazusa/articles/pnpm-feature][pnpm の特徴 - Zenn]]」などを見てもらうとして、
+pnpmは彗星の如く現れたよさげなパッケージマネージャなのですが、これも詳細は 「[[https://zenn.dev/azukiazusa/articles/pnpm-feature][pnpmの特徴 - Zenn]]」などを見てもらうとして、
 個人的に気に入ってるのは「厳格なパッケージ管理」のところです。
 
 簡単に言うとAがBに依存してるとき、npmやyarnの場合node_modules内でAとBが同じ階層に配置されるので、Bもまたinclude可能になるのですが、
@@ -11889,7 +11889,7 @@ Webで数式組版をしたい場合、MathJaxを使うというのが常識で�
 ** Remark / Rehype
 AstroはMarkdownをHTMLにレンダリングする際、Remark/Rehypeを利用しているようです。(ref: [[https://docs.astro.build/ja/guides/markdown-content/#markdown%E3%81%A8mdx%E3%81%AE%E8%A8%AD%E5%AE%9A][MarkdownとMDXの設定]])
 
-Remark/Rehypeの関係は掴み辛いですが、「[[https://unifiedjs.com/learn/guide/introduction-to-unified/][Introduction to unified]]」や「[[https://vivliostyle.github.io/vivliostyle_doc/ja/vivliostyle-user-group-vol2/spring-raining/index.html][Remark で広げる Markdown の世界]]」が分かりやすかったので紹介します。
+Remark/Rehypeの関係は掴み辛いですが、「[[https://unifiedjs.com/learn/guide/introduction-to-unified/][Introduction to unified]]」や「[[https://vivliostyle.github.io/vivliostyle_doc/ja/vivliostyle-user-group-vol2/spring-raining/index.html][Remarkで広げるMarkdownの世界]]」が分かりやすかったので紹介します。
 
 こんな感じの理解をしてます。
 
@@ -12074,7 +12074,7 @@ docker-compose up
 
 postgresもlocaleでソート順が変わるという[[https://www.postgresql.jp/document/14/html/locale.html][罠挙動がある]]ので、それを確かめたいときなどはDockerfileを書けると便利。
 
-* COMMENT オイラーの公式から三角関数の世界を再構築できるか
+* COMMENTオイラーの公式から三角関数の世界を再構築できるか
 :properties:
 :export_file_name: generated/contents/blog/2023/145870
 :export_date: 2023-04-01
@@ -12171,7 +12171,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 
 これは三角関数の加法定理である。
 
-* COMMENT キ◯トーンが作りたい/その1: 要件
+* COMMENTキ◯トーンが作りたい/その1: 要件
 :properties:
 :export_file_name: generated/contents/blog/2023/9709e5
 :export_date: 2023-04-02
@@ -12211,7 +12211,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 
 こんなものですかね。では次回から作っていきたいと思います。
 
-* COMMENT キ◯トーンが作りたい/その2: ドラッグアンドドロップでの並び換え
+* COMMENTキ◯トーンが作りたい/その2: ドラッグアンドドロップでの並び換え
 :properties:
 :export_file_name: generated/contents/blog/2023/abe9ab
 :export_date: 2023-04-03
@@ -12295,7 +12295,7 @@ $ deno run https://deno.land/std/examples/welcome.ts
 Welcome to Deno!
 #+end_src
 
-私のブログでもstaticファイルとして置いています。ファイル一覧は [[https://a.conao3.com/static/deno][/static/deno]] で確認できます。
+私のブログでもstaticファイルとして置いています。ファイル一覧は[[https://a.conao3.com/static/deno][/static/deno]]で確認できます。
 
 #+begin_src sh
 $ deno run https://a.conao3.com/static/deno/hello-world.v1.ts
@@ -12551,7 +12551,7 @@ export function LaunchesList() {
 #+end_src
 
 *** TypeScript統合
-[[https://www.apollographql.com/docs/react/development-testing/static-typing][TypeScript with Apollo Client]] を参考にTypeScriptと統合します。
+[[https://www.apollographql.com/docs/react/development-testing/static-typing][TypeScript with Apollo Client]]を参考にTypeScriptと統合します。
 
 #+begin_src bash
 $ pnpm add -D typescript @graphql-codegen/cli @graphql-codegen/client-preset
@@ -12664,7 +12664,7 @@ export function LaunchesList() {
 
 ** プロジェクト作成
 ライブラリなので、他のプロジェクトにimportして便利に使えるような機能を考える。
-今回はClojureの [[https://clojuredocs.org/clojure.core/-%3E%3E][->>(thread-last)]] をPythonで実装して公開するライブラリを作ってみることにした。
+今回はClojureの[[https://clojuredocs.org/clojure.core/-%3E%3E][->>(thread-last)]]をPythonで実装して公開するライブラリを作ってみることにした。
 
 #+begin_example
 mkdir python-thread-last
@@ -12833,7 +12833,7 @@ leafがどのように作られているのかを参考に、マクロに親し�
 [[github:conao3/leaf.el::Emacs Lisp][Flexible, declarative, and modern init.el package configuration]]
 
 ** 目標設定
-leafの全ての機能を実装することはこの記事では難しいので、leafのサブセットを考えることにします。 leafのサブセット =config= は以下のように動作します。
+leafの全ての機能を実装することはこの記事では難しいので、leafのサブセットを考えることにします。leafのサブセット =config= は以下のように動作します。
 
 #+begin_src lisp
 (ppp-macroexpand
@@ -12909,14 +12909,14 @@ configはマクロです。マクロについて恐怖心がある方もいる�
 ;;=> 42
 #+end_src
 
-マクロとして宣言されたまま展開後のS式を確認する方法はあるのでしょうか。 あります。 =macroexpand= です。 ただ、標準の =macroexpand= は指定するマクロをクオートする必要があったり、展開後のS式がフォーマットされず、見辛いので、 [[https://github.com/conao3/ppp.el][ppp]] をおすすめします。
+マクロとして宣言されたまま展開後のS式を確認する方法はあるのでしょうか。 あります。 =macroexpand= です。 ただ、標準の =macroexpand= は指定するマクロをクオートする必要があったり、展開後のS式がフォーマットされず、見辛いので、[[https://github.com/conao3/ppp.el][ppp]]をおすすめします。
 
 #+begin_src lisp
 (ppp-macroexpand (add-macro 1 2 3))
 ;;=> (+ 1 2 3)
 #+end_src
 
-他には [[http://emacs.rubikitch.com/macrostep/][macrostep]] も便利です。 これを使う場合、scratchバッファで評価するのではなく、キーバインドで展開できます。
+他には[[http://emacs.rubikitch.com/macrostep/][macrostep]]も便利です。 これを使う場合、scratchバッファで評価するのではなく、キーバインドで展開できます。
 
 さらに、少々詰め込みすぎですが、マクロの中身は普通の関数なので、マクロの実装には関数やマクロを使うことができます。 となると =add-macro= の実装として =add-macro-fn= を使うことができます。
 
@@ -13165,7 +13165,7 @@ plistのソートは今回はこのように実装しました。 =push= して 
 良いですね。
 
 ** まとめ
-駆け足ですが当初の目標は達成できました。 lispのマクロの強力さを感じることができたのではないでしょうか。 このように目的に合わせたDSLを自由に作れるのがlispの強みです。
+駆け足ですが当初の目標は達成できました。lispのマクロの強力さを感じることができたのではないでしょうか。 このように目的に合わせたDSLを自由に作れるのがlispの強みです。
 
 読み返してみると =normalizer= は何もしていないので、いらなかったかなと思いましたが、どんどん =config= が発展していくに従って引数の操作部分だけ複数のキーワードで共有したいという場面が出てくるのでそのままにしておきます。
 
@@ -13626,7 +13626,7 @@ cargo add cedar-policy
 #+end_src
 
 後は =src/lib.rs= でPythonとのインターフェースを追加します。
-バインディングで =pyo3= を選択したので、実際には [[https://pyo3.rs/v0.20.2/module][=pyo3= のドキュメント]]を参考にしながら実装することになります。
+バインディングで =pyo3= を選択したので、実際には[[https://pyo3.rs/v0.20.2/module][=pyo3= のドキュメント]]を参考にしながら実装することになります。
 
 =src/lib.rs= は以下のようになります。いろいろお手軽実装になっていますが、一旦動作はします。
 
@@ -13798,7 +13798,7 @@ assert authorizer.is_authorized(request, policy_set) == True
 :export_date: 2024-08-04
 :end:
 
-[[https://tokyo-emacs.connpass.com/event/321255/][東京Emacs勉強会 サマーフェスティバル2024]] の登壇資料です。
+[[https://tokyo-emacs.connpass.com/event/321255/][東京Emacs勉強会 サマーフェスティバル2024]]の登壇資料です。
 
 ** 自己紹介 - Conao3
 #+attr_org: :width 300
@@ -13808,7 +13808,7 @@ assert authorizer.is_authorized(request, policy_set) == True
   - 広島 → 目黒
   - Pythonista → Clojurian
   - せっかく上京してきたので遊んでくれる人募集してます！
-    - 具体的にはVim-jpの #event-ramen で「ラーメン行きたい」と呟くと召喚できます！
+    - 具体的にはVim-jpの #event-ramenで「ラーメン行きたい」と呟くと召喚できます！
 
 - 趣味
   - EmacsLisp
@@ -13818,7 +13818,7 @@ assert authorizer.is_authorized(request, policy_set) == True
 - 興味
   - Lisp, Type, Compiler, GraphQL
 
-** 2020年代の Emacs 入門
+** 2020年代のEmacs入門
 #+attr_org: :width 1500
 [[./resources/public/img/d27077-781ef476-d00d-4cad-82b8-f327f8242f15.png]]
 
@@ -13826,17 +13826,17 @@ assert authorizer.is_authorized(request, policy_set) == True
   - =ivy=, =flycheck=, =company=
 
 公開時、 =vertico= が新進気鋭で盛り上がっていましたが、あえて保守的なパッケージ選定をしました。
-そのおかげか Emacs 入門記事としてはヒットし、 Google 検索でも公式の直後に表示されるようになりました。
-(Emacs-JP 名義だったことも多分に影響しています)
+そのおかげかEmacs入門記事としてはヒットし、Google検索でも公式の直後に表示されるようになりました。
+(Emacs-JP名義だったことも多分に影響しています)
 
 #+attr_org: :width 1500
 [[./resources/public/img/d27077-d0b36cb2-afec-4e42-a1b7-0a3b830a7365.png]]
 
-** Emacs で始める Clojure 入門
+** Emacsで始めるClojure入門
 #+attr_org: :width 1000
 [[./resources/public/img/d27077-b8b1d680-f47d-42c6-b5ff-dae53e7a32fa.png]]
-Emacs と Clojure の相性はとても良いです。
-正確には Clojure hacker たちの時間が大量に Emacs とそのエコシステムに投下されていることにより、この環境があります。
+EmacsとClojureの相性はとても良いです。
+正確にはClojure hackerたちの時間が大量にEmacsとそのエコシステムに投下されていることにより、この環境があります。
 
 Ref: [[https://batsov.com/articles/2024/02/27/m-x-reloaded-the-second-golden-age-of-emacs/][M-x Reloaded: The Second Golden Age of Emacs - bbatsov]]
   - bbatsov: RuboCop, cider, projectile作者
@@ -13853,43 +13853,43 @@ I’m reasonably sure that Clojure played a major role in the success of Emacs i
 私は、Clojureが新しいユーザーと新しい貢献者の両方をプロジェクトに引き寄せることによって、近年のEmacsの成功に大きな役割を果たしたと確信している。
 #+end_quote
 
-実際のところ、 Emacs Lisp を覚えた次に Lisp を使ってなにかスタンドアロンのアプリを作りたいとき、 Clojure はとても良い選択肢になります。
-Clojure は イミュータブルなデータ構造を持つ言語として設計されており、 JVM の資産を使いつつ、REPL を通して対話的に爆速開発することができます。
+実際のところ、Emacs Lispを覚えた次にLispを使ってなにかスタンドアロンのアプリを作りたいとき、Clojureはとても良い選択肢になります。
+Clojureは イミュータブルなデータ構造を持つ言語として設計されており、JVMの資産を使いつつ、REPLを通して対話的に爆速開発することができます。
 
-** さて、、 Emacs 使っているよ! という人
+** さて、、Emacs使っているよ! という人
 
-** 風になりたい奴だけが Emacs を使えばいい
+** 風になりたい奴だけがEmacsを使えばいい
 #+attr_org: :width 1500
 [[./resources/public/img/d27077-11f37e05-5bfa-43fe-9edf-83293ad76e01.png]]
 
-私選おすすめ tomoya さん記事。
+私選おすすめtomoyaさん記事。
 
-確かに Emacs の初期学習コストは高い。
+確かにEmacsの初期学習コストは高い。
 しかし、そのコストを乗り越えて余るほどの力を与えてくれます。
 
 風になるかどうか決めるのはあなた次第です！
 
-** Emacs で始める Clojure 入門
-*** → Clojure で始める Emacs 入門 (2025年からを生きるためのEmacs入門)
-[[https://emacs-jp.github.io/tips/emacs-in-2020][2020年代のEmacs入門]] はプログラミングも初めてですという人向けにあえて保守的なパッケージを選定していました。
+** Emacsで始めるClojure入門
+*** → Clojureで始めるEmacs入門 (2025年からを生きるためのEmacs入門)
+[[https://emacs-jp.github.io/tips/emacs-in-2020][2020年代のEmacs入門]]はプログラミングも初めてですという人向けにあえて保守的なパッケージを選定していました。
 一方で、私が既に移行を終えているパッケージがおすすめされており、コミュニティでのサポート時に多少の心苦しさを感じていました。
 
-今回は中級者 (プログラミング経験あり&多少のトラブルは歓迎(?)) を想定し、私が実際に使っているパッケージを紹介し、2025年からのモダン Emacs 環境を構築します。
-なお、この記事では [[https://emacs-jp.github.io/tips/emacs-in-2020][2020年代のEmacs入門]] の「Emacs設定ファイル」に対応するところから進めますので、それ以前の章については先の記事を参照して頂ければと思います。
+今回は中級者 (プログラミング経験あり&多少のトラブルは歓迎(?)) を想定し、私が実際に使っているパッケージを紹介し、2025年からのモダンEmacs環境を構築します。
+なお、この記事では[[https://emacs-jp.github.io/tips/emacs-in-2020][2020年代のEmacs入門]]の「Emacs設定ファイル」に対応するところから進めますので、それ以前の章については先の記事を参照して頂ければと思います。
 
-なお、この記事のスニペットをコピペしてできあがる =init.el= は [[https://github.com/conao3/.emacs.d.2025][conao3/.emacs.d.2025]] に置いてあります。
+なお、この記事のスニペットをコピペしてできあがる =init.el= は[[https://github.com/conao3/.emacs.d.2025][conao3/.emacs.d.2025]]に置いてあります。
 
 ** Build Emacs
-Emacs をビルドします。
+Emacsをビルドします。
 この方法が一番確実に動きます。
 
 具体的には、Elispの定義ジャンプでEmacsのコアであるC言語のソースに飛ぶ挙動が設定なしで動く。
 また、自分でビルドするので、TreesitterやXWidgets、NativeCompile、ImageMagick統合など楽しい機能を有効にできます。
 
-=~/.local/work= を作業ディレクトリとして、 Emacs をビルドします。
-=emacs= というフォルダに Emacs のソースツリーをキャッシュとして持っておき、日付付きのフォルダにコピーしてそのフォルダでビルドします。
+=~/.local/work= を作業ディレクトリとして、Emacsをビルドします。
+=emacs= というフォルダにEmacsのソースツリーをキャッシュとして持っておき、日付付きのフォルダにコピーしてそのフォルダでビルドします。
 
-ビルド後、 Mac の場合はソースツリーの =nextstep= というフォルダに =Emacs.app= ができているはずなので、適宜 =/Applications= 配下にコピーしてインストールします。
+ビルド後、Macの場合はソースツリーの =nextstep= というフォルダに =Emacs.app= ができているはずなので、適宜 =/Applications= 配下にコピーしてインストールします。
 
 #+begin_src bash
 mkdir -p ~/.local/work
@@ -13931,7 +13931,7 @@ echo '=== Build Complete ==='
 #+end_src
 
 ** leaf - modern =use-package=
-Emacs29から =use-package= が builtin になったため、 =leaf= がインストールしやすくなりました (えっ)
+Emacs29から =use-package= がbuiltinになったため、 =leaf= がインストールしやすくなりました (えっ)
 
 #+begin_src elisp :tangle "~/dev/repo/.emacs.d.2025/init.el"
 (eval-and-compile
@@ -13956,7 +13956,7 @@ Emacs29から =use-package= が builtin になったため、 =leaf= がイン�
 ** builtinパッケージの設定
 現代のソフトウェアとして求められている挙動に近づくように設定する。
 
-*** cus-edit - customize の設定
+*** cus-edit - customizeの設定
 #+begin_src elisp :tangle "~/dev/repo/.emacs.d.2025/init.el"
 (leaf cus-edit
   :doc "tools for customizing Emacs and Lisp packages"
@@ -14105,7 +14105,7 @@ Emacs29から =use-package= が builtin になったため、 =leaf= がイン�
                                     (ns-transparent-titlebar . t)))))
 #+end_src
 
-** vertico - 新時代 fuzzy-finder
+** vertico - 新時代fuzzy-finder
 Anything/Helm → ivy → vertico and friends
 
 *** vertico - 補完候補を縦に並べる
@@ -14218,8 +14218,8 @@ Anything/Helm → ivy → vertico and friends
 #+end_src
 
 ** eglot - LSPクライアント
-Emacs builtin になった =eglot= を利用します。
-[[https://github.com/jdtsmith/eglot-booster][eglot-booster]] というRustのプロジェクトをビルドしてPATHを通すと爆速になります。言語サーバーとのJSON-RPC通信のJSONをバイトコンパイルしてくれる。
+Emacs builtinになった =eglot= を利用します。
+[[https://github.com/jdtsmith/eglot-booster][eglot-booster]]というRustのプロジェクトをビルドしてPATHを通すと爆速になります。言語サーバーとのJSON-RPC通信のJSONをバイトコンパイルしてくれる。
 
 eglotには言語サーバーの自動インストール機能はないため、Emacs外で自分でインストールして、 =PATH= を通す必要があります。
 この点については私が自動インストール機能を提供するソフトウェアを書く予定なので、完成したら追加します。
@@ -14286,7 +14286,7 @@ Clojure要素を入れないと。。(義務感)
 ciderを少し使ってみます。
 
 軽量Clojureである =babashka= をインストールします。
-インストール方法は [[https://github.com/babashka/babashka#installation][公式]] を参照してください。
+インストール方法は[[https://github.com/babashka/babashka#installation][公式]]を参照してください。
 
 *** プロジェクトの作成
 #+begin_src bash
@@ -14328,9 +14328,9 @@ sys 0.01
 
 ** Happy hacking, with Emacs
 Emacsこわくないよ！
-なにか質問等あれば Emacs-jp or Vim-jp(#tech-emacs) にて！
+なにか質問等あればEmacs-jp or Vim-jp(#tech-emacs) にて！
 
-近々Clojureの勉強会をしようと思っているので、興味がある方はVim-jpの #tech-lisp にぜひぜひ参加お願いします!
+近々Clojureの勉強会をしようと思っているので、興味がある方はVim-jpの #tech-lispにぜひぜひ参加お願いします!
 
 - スライド(記事) :: https://s.conao3.com/blog/2024/d27077
 - スライド(元ソース) :: [[https://github.com/conao3/blog-astro-src/blob/master/src/content/blog/2024/_7c7c265.org][https://github.com/conao3/blog-astro-src/.../src/content/blog/2024/_7c7c265.org]]
@@ -14341,7 +14341,7 @@ Emacsこわくないよ！
 :export_date: 2024-10-18
 :end:
 
-[[https://tokyo-emacs.connpass.com/event/330572/][東京Emacs勉強会 オクトーバーフェスティバル2024]] の登壇資料です。
+[[https://tokyo-emacs.connpass.com/event/330572/][東京Emacs勉強会 オクトーバーフェスティバル2024]]の登壇資料です。
 
 ** 自己紹介 - Conao3
 [[./resources/public/img/ee6a20-6c1e2eb9-aeae-4f13-9d3b-9be0e0c39104.jpg]]
@@ -14351,7 +14351,7 @@ Emacsこわくないよ！
   - 広島 → 目黒
   - Pythonista → Clojurian
   - せっかく上京してきたので遊んでくれる人募集してます！
-    - 具体的にはVim-jpの #event-ramen で「ラーメン行きたい」と呟くと召喚できます！
+    - 具体的にはVim-jpの #event-ramenで「ラーメン行きたい」と呟くと召喚できます！
 
 - 趣味
 
@@ -14506,7 +14506,7 @@ attr_org: :width 300
   - 広島 → 目黒
   - Pythonista → Clojurian
   - せっかく上京してきたので遊んでくれる人募集してます！
-    - 具体的にはVim-jpの #event-ramen で「ラーメン行きたい」と呟くと召喚できます！
+    - 具体的にはVim-jpの #event-ramenで「ラーメン行きたい」と呟くと召喚できます！
 
 - 趣味
   - EmacsLisp
@@ -14521,7 +14521,7 @@ attr_org: :width 300
 - tree-sitterパーサの作り方
 - tree-sitterパーサをEmacsから使う
 
-  この記事で紹介するtreesitterパーサ及びEmacsの設定は [[https://github.com/conao3-playground/tree-sitter-conao3-clojure][github.com/conao3-playground/tree-sitter-conao3-clojure]]に置いてあります。
+  この記事で紹介するtreesitterパーサ及びEmacsの設定は[[https://github.com/conao3-playground/tree-sitter-conao3-clojure][github.com/conao3-playground/tree-sitter-conao3-clojure]]に置いてあります。
 
 ** Emacs meets tree-sitter
 Emacs 29でtree-sitterサポートがビルトインになった。
@@ -14534,7 +14534,7 @@ tree-sitterの登場により、エディタそれぞれでハイライトの実
 なお、tree-sitter.elはtreesit.elとしてビルトインされたので、ネット上の情報を調べるのはこの知識があると調べやすい。
 
 ** tree-sitterパーサの作り方
-[[https://tree-sitter.github.io/tree-sitter/creating-parsers][tree-sitter/creating-parser]] が丁寧に書いてある。
+[[https://tree-sitter.github.io/tree-sitter/creating-parsers][tree-sitter/creating-parser]]が丁寧に書いてある。
 
 *** tree-sitter-cliのインストール
 まず対象の言語を決めて、 =tree-sitter-cli= を入れる。
@@ -14885,7 +14885,7 @@ Clojureの標準モジュールであるclojure.coreを網羅的に解説しま�
 :export_date: 2024-12-21
 :end:
 
-私は conao3.com を持っていて、どうせ何回ブログを作っても飽きるので初めからサブドメインで用意するようにしています。
+私はconao3.comを持っていて、どうせ何回ブログを作っても飽きるので初めからサブドメインで用意するようにしています。
 今までのブログはこんな感じ。
 
 - https://conao3.com :: 2020/05~ hugo製
@@ -15304,7 +15304,7 @@ int main() {
 
 さらにはコミュニティにより他にも様々なフォーマットへの変換がサポートされています。
 エクスポートパッケージは =ox=- を付けることが慣習のため、[[https://melpa.org/#/?q=ox-][MELPAでこのクエリを入れて検索]]すると追加で実に40種ほどのエクスポート先を利用することができます。
-その中には私が作成した [[https://s.conao3.com/blog/2020/6dae6b][ox-zenn]] もあります。
+その中には私が作成した[[https://s.conao3.com/blog/2020/6dae6b][ox-zenn]]もあります。
 
 今回は簡単にテキストフォーマットのエクスポートを試してみましょう。
 org-modeの文書を開いた状態で、 =C-c C-t (org-export-dispatch)= を実行します。
@@ -15657,7 +15657,7 @@ nixpkgsに登録されているclj-kondoが少し古いバージョンだった�
 nixpkgsを更新するために調べたのでメモ。
 
 ** 結論
-[[https://github.com/Mic92/nix-update][nix-update]] を使えば良い。
+[[https://github.com/Mic92/nix-update][nix-update]]を使えば良い。
 特にグローバルに入れる必要もなく、nix runから直接起動すると良い。
 
 #+begin_src sh
@@ -15665,7 +15665,7 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 #+end_src
 
 ** Tips
-おそらくこのツールで作られたPRが [[https://github.com/NixOS/nixpkgs/pull/455542][NixOS/nixpkgs#455542]] 。
+おそらくこのツールで作られたPRが[[https://github.com/NixOS/nixpkgs/pull/455542][NixOS/nixpkgs#455542]]。
 このPRがnixpkgsの各ブランチにshipされたかどうかを追跡する以下のような便利サイトがある。
 
 - https://nixpk.gs/pr-tracker.html?pr=455542
@@ -16038,7 +16038,7 @@ posframe自体の装飾は常識的な範囲に滞まっているので、
 ローカル開発やCIでAWSをモックするとき、長らくLocalStackが定番でした。
 Docker daemonを立てて、 =localstack/localstack= を =docker run= して、 =--endpoint-url= をSDKに食わせる、というやつです。
 
-このやり方の不満をBunで全部書き直したのが [[https://github.com/conao3/bun-bunsai][bunsai]] です。
+このやり方の不満をBunで全部書き直したのが[[https://github.com/conao3/bun-bunsai][bunsai]]です。
 本記事ではv1.3.0 ( =@conao3/bunsai@1.3.0= )を題材に、何ができて何が違うかを実機で確認しながら紹介します。
 
 [[github:conao3/bun-bunsai::TypeScript][Local AWS API emulator built with Bun (LocalStack alternative)]]
@@ -16198,7 +16198,7 @@ curl -fLo bunsai https://github.com/conao3/bun-bunsai/releases/latest/download/b
 chmod +x bunsai && ./bunsai
 #+end_src
 
-ライセンスはApache-2.0、リポジトリは [[https://github.com/conao3/bun-bunsai]] です。
+ライセンスはApache-2.0、リポジトリは[[https://github.com/conao3/bun-bunsai]]です。
 Issue / PR大歓迎です。
 
 * Leanで書く証明付きの日付と税計算
@@ -16211,22 +16211,22 @@ Issue / PR大歓迎です。
 それでも、年末年始に当たる末日の繰り下げや、税率の区分の境目のように、手で計算すると間違えやすい所があります。
 プログラムに書いた場合も、その計算が条文どおりかを確かめるには手間がかかります。
 
-[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]] は、日本の法令が定める期間と税額の計算を Lean 4 で書いたライブラリと CLI です。
+[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算をLean 4で書いたライブラリとCLIです。
 ライブラリの関数には、条文どおりに計算することの証明を付けています。
-CLI もこの関数を呼んで計算します。
+CLIもこの関数を呼んで計算します。
 
 扱う計算は民法の期間計算、祝日の判定、控訴期間などの期限、所得税、相続税、消費税、延滞税、利子税、加算税の税額と、国税の端数処理です。
-以下の出力はどれも v0.5.0 の =ritsuryo= で実行した結果です。
+以下の出力はどれもv0.5.0の =ritsuryo= で実行した結果です。
 
 [[github:conao3/lean-ritsuryo::Lean][Japanese statutory period computations (民法 期間計算, 年齢計算, 祝日) in Lean 4 with proofs on the shipped functions, and the ritsuryo CLI]]
 
 ** 使ってみる
-CLI の引数は AWS CLI と同じ文法で書きます。
-どのコマンドも計算の結果 (=Result=)、途中の値 (=Steps=)、根拠の条文 (=Basis=)、計算の前提にした条文の読み方 (=Assumptions=) を JSON で出力します。
+CLIの引数はAWS CLIと同じ文法で書きます。
+どのコマンドも計算の結果 (=Result=)、途中の値 (=Steps=)、根拠の条文 (=Basis=)、計算の前提にした条文の読み方 (=Assumptions=) をJSONで出力します。
 
 *** 控訴期間
-2026-12-15 に判決の送達を受けたときの控訴期間です。
-2 週間の末日は 2026-12-29 ですが、この日は年末年始に当たるので、民事訴訟法 第95条第3項により末日は 2027-01-04 に繰り下がります。
+2026-12-15に判決の送達を受けたときの控訴期間です。
+2週間の末日は2026-12-29ですが、この日は年末年始に当たるので、民事訴訟法 第95条第3項により末日は2027-01-04に繰り下がります。
 
 #+begin_src console
 $ ritsuryo deadline compute-appeal-deadline --served-date 2026-12-15 \
@@ -16249,10 +16249,10 @@ $ ritsuryo deadline compute-appeal-deadline --served-date 2026-12-15 \
 #+end_src
 
 =RolledOver= には、繰り下げのときに飛ばした日が並びます。
-祝日の判定には内閣府の祝日 CSV を使い、その取得元と SHA-256 を出力の =Data= に書きます。
+祝日の判定には内閣府の祝日CSVを使い、その取得元とSHA-256を出力の =Data= に書きます。
 
 *** 所得税
-2026 年分で課税総所得金額が 7,000,000 円のとき、所得税は 974,000 円になります。
+2026年分で課税総所得金額が7,000,000円のとき、所得税は974,000円になります。
 これは国税庁の速算表で求めた額 (7,000,000 × 23% − 636,000) と同じです。
 
 #+begin_src console
@@ -16266,17 +16266,17 @@ $ ritsuryo income-tax compute-tax --tax-year 2026 --taxable-income 7000000 | jq 
 }
 #+end_src
 
-2027 年分からは、復興特別所得税が 1.1%、防衛特別所得税が 1% になります。
-=--tax-year 2027= を渡すと、 =ReconstructionTax= が 10714、 =DefenseTax= が 9740 になります。
+2027年分からは、復興特別所得税が1.1%、防衛特別所得税が1% になります。
+=--tax-year 2027= を渡すと、 =ReconstructionTax= が10714、 =DefenseTax= が9740になります。
 
 ** 条文を写して書く
-lean-ritsuryo では、まず計算を条文の構造どおりの定義として書いています。
+lean-ritsuryoでは、まず計算を条文の構造どおりの定義として書いています。
 以下ではこの定義を仕様と呼びます。
-Lean の定義は実行できるので、仕様をそのまま計算に使えることがあります。
-仕様を実行に使えるかどうかで、書き方は次の 3 通りに分かれました。
+Leanの定義は実行できるので、仕様をそのまま計算に使えることがあります。
+仕様を実行に使えるかどうかで、書き方は次の3通りに分かれました。
 
 *** 仕様をそのまま実行するとき
-民事訴訟法 第95条第3項は、期間の末日が日曜日、土曜日、祝日法の休日、1 月 2 日、1 月 3 日、12 月 29 日から 31 日までの日に当たるとき、期間はその翌日に満了すると定めます。
+民事訴訟法 第95条第3項は、期間の末日が日曜日、土曜日、祝日法の休日、1月2日、1月3日、12月29日から31日までの日に当たるとき、期間はその翌日に満了すると定めます。
 これらの日を判定する仕様は、条文の列挙をそのまま並べた関数です。
 
 #+begin_src lean
@@ -16295,8 +16295,8 @@ def isHolidaySpec (national : Date → Bool) (d : Date) : Bool :=
 
 **** 実装がすべての入力で仕様と一致するとき
 所得税法 第89条は、課税総所得金額を表の区分に分けてそれぞれに税率を掛け、合計した額を税額とします。
-この条文を写した仕様が =incomeTaxCentsSpec= で、税率表の区分を 1 つずつたどって税額を積み上げます。
-金額は百分の一円を 1 とする整数で表しています。
+この条文を写した仕様が =incomeTaxCentsSpec= で、税率表の区分を1つずつたどって税額を積み上げます。
+金額は百分の一円を1とする整数で表しています。
 
 #+begin_src lean
 def table : List Bracket := [
@@ -16307,7 +16307,7 @@ def incomeTaxCentsSpec (x : Nat) : Nat :=
   progressiveCents table 0 x
 #+end_src
 
-国税庁の速算表 (税率 × 金額 − 控除額) を使えば、区分をたどらずに 1 本の式で同じ税額を出せます。
+国税庁の速算表 (税率 × 金額 − 控除額) を使えば、区分をたどらずに1本の式で同じ税額を出せます。
 
 #+begin_src lean
 def quickCents (x : Nat) : Nat :=
@@ -16331,13 +16331,13 @@ theorem incomeTaxCentsSpec_eq_quickCents : @incomeTaxCentsSpec = @quickCents := 
   all_goals omega
 #+end_src
 
-=@[csimp]= の付いた等式があると、Lean のコンパイラは、左辺の関数を呼ぶ箇所を右辺の関数を呼ぶように書き換えます。
+=@[csimp]= の付いた等式があると、Leanのコンパイラは、左辺の関数を呼ぶ箇所を右辺の関数を呼ぶように書き換えます。
 そのため、ライブラリの税額の関数はソースでは仕様の =incomeTaxCentsSpec= を呼んでいても、実行されるのは速算表の式です。
 
 [[./resources/public/img/5499a8-csimp.svg]]
 
 書き換えられたことは、コンパイラが出力する中間表現 (IR) で確かめられます。
-次は =incomeTaxCentsSpec x= を返すだけの関数 =probeIncome= の IR です。
+次は =incomeTaxCentsSpec x= を返すだけの関数 =probeIncome= のIRです。
 
 #+begin_src console
 def probeIncome (x_1 : @& tobj) : tobj :=
@@ -16361,7 +16361,7 @@ def correspondingDaySpec (start : Date) : Length → Option Date
 #+end_src
 
 日の期間は =addDaysNaive= で翌日を =n= 回たどり、週の期間は =weekCorrespondingSpec= で翌日をたどりながら同じ曜日の日を探します。
-月と年の期間も、 =lastMonthSpec= が 1 か月ずつ進めて最後の月を求めます。
+月と年の期間も、 =lastMonthSpec= が1か月ずつ進めて最後の月を求めます。
 どれも、計算の回数が期間の日数か月数に比例して増えます。
 
 実装は日付を通算日 (ある基準日からの日数) に直して計算します。
@@ -16378,7 +16378,7 @@ def correspondingDays (start : Date) : Length → Option Int
 日と週の期間は通算日に =n= か =7 * n= を足すだけです。
 月と年の期間も、 =lastMonth= が月の通し番号に =n= を足して最後の月を求めます。
 
-ライブラリの期間の計算 =compute= はこの実装を使い、その結果が仕様と一致することを定理 PER-1 で証明しています。
+ライブラリの期間の計算 =compute= はこの実装を使い、その結果が仕様と一致することを定理PER-1で証明しています。
 
 #+begin_src lean
 theorem per1_compute_eq_spec (event : Date) (h : event.Valid) (startAtMidnight : Bool)
@@ -16390,16 +16390,16 @@ theorem per1_compute_eq_spec (event : Date) (h : event.Valid) (startAtMidnight :
 #+end_src
 
 仮定の =h : event.Valid= は、出来事の日 =event= が実在する日付であることを表します。
-PER-1 が一致を保証するのはこの仮定が成り立つときだけで、 =@[csimp]= はこのような仮定の付いた等式には使えません。
+PER-1が一致を保証するのはこの仮定が成り立つときだけで、 =@[csimp]= はこのような仮定の付いた等式には使えません。
 そのため、ライブラリの関数からは実装を直接呼んでいます。
 =@[csimp]= を使うには、実在する日付だけを表す型を作り、関数の引数をその型にする必要があります。
 
 *** 仕様が手順ではなく結果の条件を定めるとき
 民法 第142条などの繰り下げの規定は、末日が休日なら「その翌日」に満了すると書いています。
-翌日も休日のときについては書いていないので、lean-ritsuryo は休日でない最初の日まで繰り下げると読んでいます。
+翌日も休日のときについては書いていないので、lean-ritsuryoは休日でない最初の日まで繰り下げると読んでいます。
 この読み方が定めているのは、計算の手順ではなく、結果が満たすべき条件です。
-仕様が実行できる関数ではないので、繰り下げの実装を 1 つ書きました。
-実装は通算日を 1 日ずつ進め、休日でない日が見つかったところで止まります。
+仕様が実行できる関数ではないので、繰り下げの実装を1つ書きました。
+実装は通算日を1日ずつ進め、休日でない日が見つかったところで止まります。
 
 #+begin_src lean
 def rolloverDays (isHoliday : Int → Bool) : Nat → Int → Option Int
@@ -16408,56 +16408,56 @@ def rolloverDays (isHoliday : Int → Bool) : Nat → Int → Option Int
 #+end_src
 
 =fuel= は調べる日数の上限で、上限までに休日でない日がなければ =none= を返します。
-定理 ROL-1 は、この実装の結果が次の 2 つの条件を満たすことを証明しています。
+定理ROL-1は、この実装の結果が次の2つの条件を満たすことを証明しています。
 
 - 繰り下げた日は、もとの日以後で休日でない
 - もとの日から繰り下げた日の前日までは、すべて休日である
 
-lean-ritsuryo の定理の多くはこの形で、1 つの関数が満たす性質を述べています。
+lean-ritsuryoの定理の多くはこの形で、1つの関数が満たす性質を述べています。
 たとえば次のような性質です。
 
 - 期間の末日は起算点についても長さについても単調である
 - 所得税は課税所得が増えると減らず、課税所得から所得税を引いた額も減らない
-- 消費税の端数処理を品目ごとにしたときと合計でしたときの差は、品目の数から 1 を引いた円以下である
-- 民法 第900条の法定相続分の合計は 1 になる
+- 消費税の端数処理を品目ごとにしたときと合計でしたときの差は、品目の数から1を引いた円以下である
+- 民法 第900条の法定相続分の合計は1になる
 
-定理には TAX-1 のような ID を付けていて、ID は全部で 35 個あります。
-祝日は内閣府の CSV に載っているすべての年について、祝日法 第2条と第3条から導いた日が CSV と一致することを Lean のカーネルで確かめています。
-春分の日と秋分の日だけは、CSV から日付を取っています。
-定理はすべて =lake build= のときに Lean が検査し、どの証明も =sorry= 、 =admit= 、 =native_decide= を使っていません。
+定理にはTAX-1のようなIDを付けていて、IDは全部で35個あります。
+祝日は内閣府のCSVに載っているすべての年について、祝日法 第2条と第3条から導いた日がCSVと一致することをLeanのカーネルで確かめています。
+春分の日と秋分の日だけは、CSVから日付を取っています。
+定理はすべて =lake build= のときにLeanが検査し、どの証明も =sorry= 、 =admit= 、 =native_decide= を使っていません。
 
-** Lean で防げる誤り
+** Leanで防げる誤り
 テストは、選んだ入力について結果を確かめます。
-定理はすべての入力について述べていて、Lean は =lake build= のたびにその証明を検査します。
+定理はすべての入力について述べていて、Leanは =lake build= のたびにその証明を検査します。
 そのため、次のような誤りは選んだ入力に現れなくてもビルドの時点でエラーになります。
 
 *** 税率表の写し間違い
-速算表の控除額を 1 つ写し間違え、695 万円超 900 万円以下の区分の 636,000 円を 636,500 円にしてみました。
+速算表の控除額を1つ写し間違え、695万円超900万円以下の区分の636,000円を636,500円にしてみました。
 
 #+begin_src lean
   else if x ≤ 9000000 then 23 * x - 63650000
 #+end_src
 
-すると、仕様と速算表の式が等しいという証明が通らず、Lean がエラーを出します。
+すると、仕様と速算表の式が等しいという証明が通らず、Leanがエラーを出します。
 
 #+begin_src console
 $ lake env lean typo.lean
 typo.lean:16:12: error: omega could not prove the goal:
 #+end_src
 
-証明は金額を税率表の 7 つの区分で場合分けし、区分ごとに 2 つの式が等しいことを =omega= (整数の 1 次式の等式と不等式を判定する Lean の手続き) で示します。
-証明できずに残ったのは、695 万円超 900 万円以下の区分だけでした。
-この区分では条文どおりの積み上げが =23 * x - 63600000= になり、書き間違えた =23 * x - 63650000= とはどの金額でも 500 円ずれるので、等式が成り立ちません。
+証明は金額を税率表の7つの区分で場合分けし、区分ごとに2つの式が等しいことを =omega= (整数の1次式の等式と不等式を判定するLeanの手続き) で示します。
+証明できずに残ったのは、695万円超900万円以下の区分だけでした。
+この区分では条文どおりの積み上げが =23 * x - 63600000= になり、書き間違えた =23 * x - 63650000= とはどの金額でも500円ずれるので、等式が成り立ちません。
 
-700 万円を例に使うテストでもこの誤りは見つかりますが、4,000 万円を超える区分の誤りは、その金額を例に入れないテストでは見つかりません。
-証明は、7 つの区分のどれに誤りがあっても、その区分でエラーになります。
+700万円を例に使うテストでもこの誤りは見つかりますが、4,000万円を超える区分の誤りは、その金額を例に入れないテストでは見つかりません。
+証明は、7つの区分のどれに誤りがあっても、その区分でエラーになります。
 
 一方、区分の境目の =x ≤ 6950000= を =x < 6950000= に変えても、証明は通りました。
-ちょうど 6,950,000 円のときは、20% の区分の式でも 23% の区分の式でも税額が 962,500 円になり、どの金額でも税額が変わらないからです。
+ちょうど6,950,000円のときは、20% の区分の式でも23% の区分の式でも税額が962,500円になり、どの金額でも税額が変わらないからです。
 
-*** 繰り下げを 1 日で止める誤り
-「その翌日」を文字どおり 1 日だけ繰り下げる関数にすると、翌日も休日のとき、その休日が期間の末日になってしまいます。
-次のコードでは、2026-12-29 を 1 日だけ繰り下げた 2026-12-30 も民事訴訟法 第95条第3項の休日に当たることを、Lean のカーネルで確かめています。
+*** 繰り下げを1日で止める誤り
+「その翌日」を文字どおり1日だけ繰り下げる関数にすると、翌日も休日のとき、その休日が期間の末日になってしまいます。
+次のコードでは、2026-12-29を1日だけ繰り下げた2026-12-30も民事訴訟法 第95条第3項の休日に当たることを、Leanのカーネルで確かめています。
 
 #+begin_src lean
 def court : Date → Bool := RolloverRule.civilProcedure95.isHoliday Holiday.isHoliday
@@ -16468,32 +16468,32 @@ def rolloverOnce (H : Date → Bool) (d : Date) : Date :=
 example : court (rolloverOnce court ⟨2026, 12, 29⟩) = true := by decide +kernel
 #+end_src
 
-この関数は ROL-1 の 1 つ目の条件を満たさないので、ROL-1 は証明できません。
-休日なら必ず 2 日進めるような繰り下げすぎる関数も、2 つ目の条件を満たさないので証明できません。
+この関数はROL-1の1つ目の条件を満たさないので、ROL-1は証明できません。
+休日なら必ず2日進めるような繰り下げすぎる関数も、2つ目の条件を満たさないので証明できません。
 
 *** 月末をまたぐ期間
-2025-01-31 から始まる期間では、1 か月は 2025-02-28 に満了し、続く 1 か月は 2025-03-31 に満了します。
-一方、2 か月の期間は 2025-03-30 に満了します。
-1 か月の計算を 2 回くり返して 2 か月の期間を求める実装は、この例で 1 日ずれるので、PER-1 を証明できません。
+2025-01-31から始まる期間では、1か月は2025-02-28に満了し、続く1か月は2025-03-31に満了します。
+一方、2か月の期間は2025-03-30に満了します。
+1か月の計算を2回くり返して2か月の期間を求める実装は、この例で1日ずれるので、PER-1を証明できません。
 
 *** 防げない誤り
-Lean が確かめるのは、実装が仕様と一致することと、実装が定理に書いた性質を満たすことです。
+Leanが確かめるのは、実装が仕様と一致することと、実装が定理に書いた性質を満たすことです。
 仕様そのものが条文を読み違えていれば、実装も読み違えたとおりに計算し、証明も通ります。
 
 この誤りを減らすため、仕様は条文の構造どおりに書き、条文と並べて読み比べられるようにしています。
 条文の読み方は =docs/interpretation.md= に書き、国税庁のタックスアンサーに載っている計算例とも照らしています。
 
 ** 実行時間とバイナリの大きさ
-リリースの =ritsuryo= は 3.4 MB の実行ファイル 1 つで (x86_64-linux)、ほかに必要なのは C ライブラリだけです。
-1 回の実行は約 6 ms で終わります。
+リリースの =ritsuryo= は3.4 MBの実行ファイル1つで (x86_64-linux)、ほかに必要なのはCライブラリだけです。
+1回の実行は約6 msで終わります。
 
-Lean で書いたプログラムは、ライブラリの書き方によってはバイナリが 140 MB になります。
-lean-ritsuryo は関数に根拠の条文を記録するために独自の属性を使っています。
-この属性を定義するモジュールは =Lean= を import していて、通常の import で読み込むと =Lean= 全体がリンクされます。
-lean-ritsuryo はこのモジュールを =meta import= で読み込み、属性をコンパイルのときだけ使うようにしています。
+Leanで書いたプログラムは、ライブラリの書き方によってはバイナリが140 MBになります。
+lean-ritsuryoは関数に根拠の条文を記録するために独自の属性を使っています。
+この属性を定義するモジュールは =Lean= をimportしていて、通常のimportで読み込むと =Lean= 全体がリンクされます。
+lean-ritsuryoはこのモジュールを =meta import= で読み込み、属性をコンパイルのときだけ使うようにしています。
 
 ** 入手
-[[https://github.com/conao3/lean-ritsuryo/releases][GitHub のリリース]] に、x86_64-linux、aarch64-linux、aarch64-darwin のアーカイブがあります。
+[[https://github.com/conao3/lean-ritsuryo/releases][GitHubのリリース]]に、x86_64-linux、aarch64-linux、aarch64-darwinのアーカイブがあります。
 
 #+begin_src sh
 curl -sSfL https://github.com/conao3/lean-ritsuryo/releases/download/v0.5.0/ritsuryo-x86_64-linux.tar.gz | tar -xz
@@ -16501,10 +16501,10 @@ curl -sSfL https://github.com/conao3/lean-ritsuryo/releases/download/v0.5.0/rits
 # ritsuryo 0.5.0
 #+end_src
 
-Nix を使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行できます。
+Nixを使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行できます。
 
-ライセンスは Apache-2.0 で、リポジトリは [[https://github.com/conao3/lean-ritsuryo]] です。
-条文の読み方の違いや計算の誤りに気づいたら、Issue で教えてください。
+ライセンスはApache-2.0で、リポジトリは[[https://github.com/conao3/lean-ritsuryo]]です。
+条文の読み方の違いや計算の誤りに気づいたら、Issueで教えてください。
 
 * git fetch is Turing complete
 :properties:
@@ -16733,93 +16733,93 @@ Each command output in this post comes from a real run, pasted as is.
 :export_date: 2026-11-04 14:43
 :end:
 
-[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo について、英語の論文を書いて aiXiv に投稿しました。
-論文は [[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]] で読めます。
-論文のページには、タイトルと著者のほか、AI の関与の区分 (AI-derived) などが出ます。
+[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介したlean-ritsuryoについて、英語の論文を書いてaiXivに投稿しました。
+論文は[[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]]で読めます。
+論文のページには、タイトルと著者のほか、AIの関与の区分 (AI-derived) などが出ます。
 
 [[./resources/public/img/bfc7fe-aixiv-abs.png]]
 
 ** 招待のメール
-きっかけは aiXiv の運営から届いた 1 通のメールです。
+きっかけはaiXivの運営から届いた1通のメールです。
 件名は "Your result on Lean 4 verified Japanese statutory period and tax computations: an invitation to publish on aiXiv.online" でした。
 宛先はリポジトリのコミットに記録したメールアドレスで、本文の末尾にもそう書いてあります。
-aiXiv の運営は GitHub で公開された結果を見つけて、投稿を勧めるメールを送っているようです。
+aiXivの運営はGitHubで公開された結果を見つけて、投稿を勧めるメールを送っているようです。
 
 本文によれば、投稿の手順はアカウントを作り、エージェントに結果をアップロードさせるだけです。
 手で投稿する画面もありますが、運営はエージェントからの投稿を勧めています。
 結果に至るまでのエージェントのセッションの記録も共有され、あとの研究の役に立つからだそうです。
 
-** aiXiv とは
-[[https://aixiv.online][aiXiv]] は AI を使った数学の研究を載せるオープンアーカイブです。
-運営は Manifold AI Inc. で、名前は似ていますが arXiv とは関係がありません。
+** aiXivとは
+[[https://aixiv.online][aiXiv]]はAIを使った数学の研究を載せるオープンアーカイブです。
+運営はManifold AI Inc. で、名前は似ていますがarXivとは関係がありません。
 
 規約と投稿の案内 ([[https://aixiv.online/llms.txt]]) には、次のことが書かれています。
 
 - 載せるのは数学 (=math.*=) と理論・数理物理の研究だけ
-- 論文は必須で、公開リポジトリ、エージェントのセッションの記録、AI を使った工程のメモを添えられる
-- 投稿は受け付けた時点で UTC の時刻と SHA-256 が付いて公開され、削除の依頼は受け付けない
+- 論文は必須で、公開リポジトリ、エージェントのセッションの記録、AIを使った工程のメモを添えられる
+- 投稿は受け付けた時点でUTCの時刻とSHA-256が付いて公開され、削除の依頼は受け付けない
 - 一覧に載るのは審査を通ってからで、審査は研究としての寄与、主張の論証、参考文献の実在などを見る
 
-lean-ritsuryo は法令の計算を Lean 4 で書いたもので、数学の研究とは言いにくい内容です。
-それでも、Lean 4 で検証した実行可能なチェッカーの論文が =math.LO= (数理論理学) に載っていたので、同じ分野で出しました。
+lean-ritsuryoは法令の計算をLean 4で書いたもので、数学の研究とは言いにくい内容です。
+それでも、Lean 4で検証した実行可能なチェッカーの論文が =math.LO= (数理論理学) に載っていたので、同じ分野で出しました。
 
 ** 送るもの
-aiXiv に送ったのは次の 4 つです。
+aiXivに送ったのは次の4つです。
 
-- 論文: LaTeX で書いた 9 ページの英語の論文。サーバーが pdfLaTeX でコンパイルし直す
+- 論文: LaTeXで書いた9ページの英語の論文。サーバーがpdfLaTeXでコンパイルし直す
 - リポジトリ: [[https://github.com/conao3/lean-ritsuryo]]
-- AI の関与の申告: 区分は =ai-derived= (人が結果を立て、モデルが証明を出し、人が確かめる)
+- AIの関与の申告: 区分は =ai-derived= (人が結果を立て、モデルが証明を出し、人が確かめる)
 - 工程のメモ: 範囲と条文の読み方を誰が決め、コードと証明と論文を誰が書いたか
 
-lean-ritsuryo のコードと証明、論文の本文は Claude Code が書きました。
+lean-ritsuryoのコードと証明、論文の本文はClaude Codeが書きました。
 私が決めたのは、扱う条文、条文の読み方、証明する性質です。
 申告にはこの分担をそのまま書きました。
 
-論文の参考文献は Crossref と arXiv の記録で実在を確かめてから載せました。
+論文の参考文献はCrossrefとarXivの記録で実在を確かめてから載せました。
 記録で確かめられない巻やページは書いていません。
 
 ** セッションは添付しない
-投稿の CLI (=npx aixiv@latest publish=) は、既定でそのプロジェクトで動かしたエージェントのセッションファイルを添付します。
-サーバーがセッションから消すのは API キー、メールアドレス、IP アドレスだけです。
-Claude Code のセッションには、エージェントが読み込んだ個人用のメモや、ほかのリポジトリでの作業の内容も入ります。
+投稿のCLI (=npx aixiv@latest publish=) は、既定でそのプロジェクトで動かしたエージェントのセッションファイルを添付します。
+サーバーがセッションから消すのはAPIキー、メールアドレス、IPアドレスだけです。
+Claude Codeのセッションには、エージェントが読み込んだ個人用のメモや、ほかのリポジトリでの作業の内容も入ります。
 そのため、 =--no-sessions= を付けてセッションを添付せずに投稿しました。
 
-CLI は =https://aixiv.online/cli/aixiv.js= をダウンロードし、中身を読んでから node で動かしました。
+CLIは =https://aixiv.online/cli/aixiv.js= をダウンロードし、中身を読んでからnodeで動かしました。
 =--no-sessions= を付けたときは、セッションファイルを読む前に添付の処理を終えることも、このとき確かめました。
 
 ログインは =aixiv login= が出すリンクをブラウザで開いて承認します。
-=publish= に =--dry-run= を付けると、サーバーは LaTeX をコンパイルして、LaTeX から読み取ったタイトル、著者、要旨を返すだけで、何も公開しません。
+=publish= に =--dry-run= を付けると、サーバーはLaTeXをコンパイルして、LaTeXから読み取ったタイトル、著者、要旨を返すだけで、何も公開しません。
 要旨はそのままページに出るので、 =\emph= や自前のマクロは使わないほうがよいです。
 
-** 審査の notes
-投稿して約 12 分後に審査が終わり、一覧に載りました。
-直すことを求める項目 (=changes_to_make=) はありませんでしたが、notes として本文の直し候補が 4 点付いていました。
+** 審査のnotes
+投稿して約12分後に審査が終わり、一覧に載りました。
+直すことを求める項目 (=changes_to_make=) はありませんでしたが、notesとして本文の直し候補が4点付いていました。
 
-- 年末年始の繰り下げの例で、1 月 4 日が土日や祝日に当たるとさらに先へ延びることが書かれていない
-- 祝日の検査が比べる行に特別法の休日を含まないことが書かれておらず、検査の所要時間が 2 か所で食い違って見える
+- 年末年始の繰り下げの例で、1月4日が土日や祝日に当たるとさらに先へ延びることが書かれていない
+- 祝日の検査が比べる行に特別法の休日を含まないことが書かれておらず、検査の所要時間が2か所で食い違って見える
 - 利子税の根拠に国税通則法 第64条が抜けている
-- 1872 年の改暦の法令の種別が正確でない
+- 1872年の改暦の法令の種別が正確でない
 
-どれも指摘のとおりだったので、直して第 2 版を出しました。
+どれも指摘のとおりだったので、直して第2版を出しました。
 投稿から十数分で審査の結果が付き、その指摘が実際に直したほうがよい箇所を突いていたことには驚きました。
-第 2 版にも notes が 3 点付き、そのうち 1 点は祝日法 第3条の第2項と第3項の改正の経過をまとめすぎているという指摘でした。
-この 3 点も直して、第 3 版を出しました。
+第2版にもnotesが3点付き、そのうち1点は祝日法 第3条の第2項と第3項の改正の経過をまとめすぎているという指摘でした。
+この3点も直して、第3版を出しました。
 
 ** 改訂の公開と =--dry-run=
-第 2 版を出す前に、直した内容を確かめるつもりで、Claude Code が =--new-version= と =--dry-run= を付けて =publish= を実行しました。
-すると、第 2 版がそのまま公開されました。
+第2版を出す前に、直した内容を確かめるつもりで、Claude Codeが =--new-version= と =--dry-run= を付けて =publish= を実行しました。
+すると、第2版がそのまま公開されました。
 CLI (v0.4.1) の =publish= に =--new-version= を付けると、 =--dry-run= を付けても新しい版が公開されます。
 端末から実行していないときや、 =--json= か =--yes= を付けたときは、公開する前の確認も出ません。
-aiXiv は公開した版の削除を受け付けないので、第 2 版の公開は取り消せません。
+aiXivは公開した版の削除を受け付けないので、第2版の公開は取り消せません。
 
 改訂を出す前に確かめるときは、 =--new-version= を付けずに =aixiv publish <dir> --dry-run= を実行します。
-こうすると、コンパイルの結果と、LaTeX から読み取ったタイトル、著者、要旨だけを見られます。
+こうすると、コンパイルの結果と、LaTeXから読み取ったタイトル、著者、要旨だけを見られます。
 
 ** おわりに
-aiXiv では、投稿した論文に時刻とハッシュの付いた記録が残り、審査の結果には具体的な直し候補が付きます。
-lean-ritsuryo のように、AI を使って書いたコードと証明をまとめる先として使えました。
+aiXivでは、投稿した論文に時刻とハッシュの付いた記録が残り、審査の結果には具体的な直し候補が付きます。
+lean-ritsuryoのように、AIを使って書いたコードと証明をまとめる先として使えました。
 
-論文は [[https://aixiv.online/abs/2611.00464]] 、リポジトリは [[https://github.com/conao3/lean-ritsuryo]] です。
+論文は[[https://aixiv.online/abs/2611.00464]]、リポジトリは[[https://github.com/conao3/lean-ritsuryo]]です。
 
 * APIトークンを持たずにGitHub ActionsのビルドをCloudflare Workersへデプロイする
 :properties:
@@ -16827,41 +16827,41 @@ lean-ritsuryo のように、AI を使って書いたコードと証明をまと
 :export_date: 2026-11-04 20:32
 :end:
 
-GNU Emacs のマニュアルを日本語に機械翻訳したサイト [[https://emacs-doc.conao3.com]] を、Cloudflare Workers で公開しています。
-リポジトリは [[https://github.com/conao3/emacs-doc][conao3/emacs-doc]] (public) です。
-このサイトは GitHub にも Cloudflare にも API トークンを置かずにデプロイしています。
-ビルドは GitHub Actions で行い、生成物は GitHub の Release の添付ファイルとして置きます。
-デプロイは Cloudflare の Workers Builds が、その添付ファイルを取って行います。
+GNU Emacsのマニュアルを日本語に機械翻訳したサイト[[https://emacs-doc.conao3.com]]を、Cloudflare Workersで公開しています。
+リポジトリは[[https://github.com/conao3/emacs-doc][conao3/emacs-doc]] (public) です。
+このサイトはGitHubにもCloudflareにもAPIトークンを置かずにデプロイしています。
+ビルドはGitHub Actionsで行い、生成物はGitHubのReleaseの添付ファイルとして置きます。
+デプロイはCloudflareのWorkers Buildsが、その添付ファイルを取って行います。
 この記事では、この構成とその性質を紹介します。
 
 [[./resources/public/img/12e5f6-flow.svg]]
 
-** よくある方法はトークンを Secrets に置く
-GitHub Actions から Workers へデプロイする方法は、Cloudflare の公式の手順 ([[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions]]) に書かれています。
-この手順では、 =CLOUDFLARE_API_TOKEN= と =CLOUDFLARE_ACCOUNT_ID= をリポジトリの Secrets に置き、 =cloudflare/wrangler-action= に渡します。
-po4a で文書を翻訳してサイトを作る [[https://github.com/Netatalk/netatalk.io][Netatalk/netatalk.io]] も、同じようにトークンを Secrets に置いてデプロイしています。
+** よくある方法はトークンをSecretsに置く
+GitHub ActionsからWorkersへデプロイする方法は、Cloudflareの公式の手順 ([[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions]]) に書かれています。
+この手順では、 =CLOUDFLARE_API_TOKEN= と =CLOUDFLARE_ACCOUNT_ID= をリポジトリのSecretsに置き、 =cloudflare/wrangler-action= に渡します。
+po4aで文書を翻訳してサイトを作る[[https://github.com/Netatalk/netatalk.io][Netatalk/netatalk.io]]も、同じようにトークンをSecretsに置いてデプロイしています。
 
-GitHub の OIDC を使えば、クラウドによってはトークンを置かずに済みます。
-しかし、Cloudflare は GitHub の OIDC を受け付けません。
+GitHubのOIDCを使えば、クラウドによってはトークンを置かずに済みます。
+しかし、CloudflareはGitHubのOIDCを受け付けません。
 
-** Workers Builds では emacs-doc をビルドできない
-Workers Builds は Cloudflare の Git 連携の機能です。
-GitHub のリポジトリとつなぐと、監視するブランチへの push のたびに、Cloudflare 側で build command と deploy command (既定は =npx wrangler deploy=) を実行します。
-GitHub 側に Cloudflare のトークンを置く必要はありません。
+** Workers Buildsではemacs-docをビルドできない
+Workers BuildsはCloudflareのGit連携の機能です。
+GitHubのリポジトリとつなぐと、監視するブランチへのpushのたびに、Cloudflare側でbuild commandとdeploy command (既定は =npx wrangler deploy=) を実行します。
+GitHub側にCloudflareのトークンを置く必要はありません。
 
-ただし、emacs-doc のサイトは Workers Builds の環境ではビルドできません。
-emacs-doc のビルドでは、Texinfo のマニュアルを =makeinfo --html= で HTML にし、po4a で訳を差し込みます。
-Workers Builds のビルドイメージ ([[https://developers.cloudflare.com/workers/ci-cd/builds/build-image/][Build image]]) は Ubuntu 24.04 で、Node や Python は入っていますが、texinfo・po4a・gettext は入っていません。
-また、1 回のビルドは 20 分までです ([[https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/][Limits & pricing]])。
-emacs-doc では、 =make pot= と =make site= だけでそれぞれ約 5 分かかります。
+ただし、emacs-docのサイトはWorkers Buildsの環境ではビルドできません。
+emacs-docのビルドでは、Texinfoのマニュアルを =makeinfo --html= でHTMLにし、po4aで訳を差し込みます。
+Workers Buildsのビルドイメージ ([[https://developers.cloudflare.com/workers/ci-cd/builds/build-image/][Build image]]) はUbuntu 24.04で、NodeやPythonは入っていますが、texinfo・po4a・gettextは入っていません。
+また、1回のビルドは20分までです ([[https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/][Limits & pricing]])。
+emacs-docでは、 =make pot= と =make site= だけでそれぞれ約5分かかります。
 
 ** ビルドとデプロイを分ける
-そこで、ビルドは GitHub Actions、デプロイは Workers Builds に分けました。
-2 つをつなぐのは、固定の名前のリリース =site= の添付ファイル =dist.tar.zst= と、その SHA-256 を書いたファイル =SITE_SHA256= です。
+そこで、ビルドはGitHub Actions、デプロイはWorkers Buildsに分けました。
+2つをつなぐのは、固定の名前のリリース =site= の添付ファイル =dist.tar.zst= と、そのSHA-256を書いたファイル =SITE_SHA256= です。
 
-*** 1. Actions がサイトを作って Release に上げる
-Actions の =Update= ワークフローは手動 (=workflow_dispatch=) で回します。
-サイトを =dist/= に作ったあと、 =make package= で tar にします。
+*** 1. Actionsがサイトを作ってReleaseに上げる
+Actionsの =Update= ワークフローは手動 (=workflow_dispatch=) で回します。
+サイトを =dist/= に作ったあと、 =make package= でtarにします。
 
 #+begin_src makefile
 package:
@@ -16872,11 +16872,11 @@ package:
 	sha256sum $(SITE_ARCHIVE) | cut -d" " -f1 > SITE_SHA256
 #+end_src
 
-tar のオプションは同じファイルから同じバイト列を作るためのものです。
-ファイルを名前の順に並べ、更新時刻と所有者・グループを 0 に固定し、pax ヘッダーからアクセス時刻 (atime) と状態の変更時刻 (ctime) を外します。
-手元で作った tar と Actions で作った tar の SHA-256 は一致しました。
+tarのオプションは同じファイルから同じバイト列を作るためのものです。
+ファイルを名前の順に並べ、更新時刻と所有者・グループを0に固定し、paxヘッダーからアクセス時刻 (atime) と状態の変更時刻 (ctime) を外します。
+手元で作ったtarとActionsで作ったtarのSHA-256は一致しました。
 
-できた tar で、リリース =site= の添付ファイルを上書きします。
+できたtarで、リリース =site= の添付ファイルを上書きします。
 
 #+begin_src yaml
 - name: Upload the site to the release
@@ -16888,12 +16888,12 @@ tar のオプションは同じファイルから同じバイト列を作るた�
     gh release upload site build/dist.tar.zst --clobber
 #+end_src
 
-ワークフローの権限は =contents: write= で、Actions が自動で発行する =GITHUB_TOKEN= だけで足ります。
+ワークフローの権限は =contents: write= で、Actionsが自動で発行する =GITHUB_TOKEN= だけで足ります。
 
-*** 2. SHA-256 を master に commit する
-続けて、 =SITE_SHA256= を master に commit して push します。
-tar の中身が前回と同じなら =SITE_SHA256= も変わらないので、commit は作りません。
-次のステップは PO ファイルの扱いを省いて抜粋したものです。
+*** 2. SHA-256をmasterにcommitする
+続けて、 =SITE_SHA256= をmasterにcommitしてpushします。
+tarの中身が前回と同じなら =SITE_SHA256= も変わらないので、commitは作りません。
+次のステップはPOファイルの扱いを省いて抜粋したものです。
 
 #+begin_src yaml
 - name: Commit the catalogs and the checksum of the site
@@ -16907,9 +16907,9 @@ tar の中身が前回と同じなら =SITE_SHA256= も変わらないので、c
     fi
 #+end_src
 
-*** 3. Workers Builds が tar を取ってデプロイする
-Worker =emacs-doc= は Workers Builds で GitHub の master とつないでいます。
-build command は =make fetch-site= 、deploy command は =npx wrangler deploy= です。
+*** 3. Workers Buildsがtarを取ってデプロイする
+Worker =emacs-doc= はWorkers BuildsでGitHubのmasterとつないでいます。
+build commandは =make fetch-site= 、deploy commandは =npx wrangler deploy= です。
 
 #+begin_src makefile
 SITE_URL := https://github.com/conao3/emacs-doc/releases/download/site/dist.tar.zst
@@ -16923,35 +16923,35 @@ fetch-site:
 	tar --zstd -xf $(SITE_ARCHIVE) -C $(DIST_DIR)
 #+end_src
 
-public のリポジトリの Release の添付ファイルは、認証なしの curl で取れます。
-取った tar を =sha256sum --check= で =SITE_SHA256= と照らし、 =dist/= に展開します。
-=wrangler.jsonc= の =assets.directory= が =./dist= なので、 =npx wrangler deploy= は =dist/= を Worker の静的アセットとして上げます。
-curl、sha256sum、tar、zstd はどれもビルドイメージに入っているコマンドなので、Workers Builds の環境で動きます。
-デプロイが終わると、GitHub の commit に =Workers Builds: emacs-doc= の check run が付きます。
+publicのリポジトリのReleaseの添付ファイルは、認証なしのcurlで取れます。
+取ったtarを =sha256sum --check= で =SITE_SHA256= と照らし、 =dist/= に展開します。
+=wrangler.jsonc= の =assets.directory= が =./dist= なので、 =npx wrangler deploy= は =dist/= をWorkerの静的アセットとして上げます。
+curl、sha256sum、tar、zstdはどれもビルドイメージに入っているコマンドなので、Workers Buildsの環境で動きます。
+デプロイが終わると、GitHubのcommitに =Workers Builds: emacs-doc= のcheck runが付きます。
 
 ** この構成の性質
-- GitHub の Secrets は空で、Cloudflare の API トークンをどこにも置きません。Actions が使うのは =GITHUB_TOKEN= だけです。
-- 生成物を git の履歴に入れません。サイトは 2,240 ファイルで、tar にすると 49 MB、zstd で圧縮すると 4.7 MB になります。サイトについて履歴に入るのは、64 文字の SHA-256 だけです。
-- tar は同じファイルから同じバイト列になります。サイトの中身が変わらなければ =SITE_SHA256= も変わらず、Actions は commit を作らないので、デプロイも走りません。
-- README の修正など、 =SITE_SHA256= を変えない push でも Workers Builds は動きます。このときは同じ tar を取って、同じサイトをデプロイし直します。
-- =SITE_SHA256= と Release の tar が食い違うと、 =sha256sum --check= が失敗して build command も失敗します。このとき deploy command は実行されないので、公開中のサイトは前のままです。公開されるのは、 =SITE_SHA256= と一致した tar だけです。
+- GitHubのSecretsは空で、CloudflareのAPIトークンをどこにも置きません。Actionsが使うのは =GITHUB_TOKEN= だけです。
+- 生成物をgitの履歴に入れません。サイトは2,240ファイルで、tarにすると49 MB、zstdで圧縮すると4.7 MBになります。サイトについて履歴に入るのは、64文字のSHA-256だけです。
+- tarは同じファイルから同じバイト列になります。サイトの中身が変わらなければ =SITE_SHA256= も変わらず、Actionsはcommitを作らないので、デプロイも走りません。
+- READMEの修正など、 =SITE_SHA256= を変えないpushでもWorkers Buildsは動きます。このときは同じtarを取って、同じサイトをデプロイし直します。
+- =SITE_SHA256= とReleaseのtarが食い違うと、 =sha256sum --check= が失敗してbuild commandも失敗します。このときdeploy commandは実行されないので、公開中のサイトは前のままです。公開されるのは、 =SITE_SHA256= と一致したtarだけです。
 
-一方で、Release に置く tar は常に最新の 1 つだけです。
-古い commit をデプロイし直そうとしても、その commit の =SITE_SHA256= は今の tar と合わないので、ビルドが失敗します。
-同じ理由で、Actions が tar を上げてから =SITE_SHA256= を push するまでの間に別の push があると、そのビルドも失敗します。
+一方で、Releaseに置くtarは常に最新の1つだけです。
+古いcommitをデプロイし直そうとしても、そのcommitの =SITE_SHA256= は今のtarと合わないので、ビルドが失敗します。
+同じ理由で、Actionsがtarを上げてから =SITE_SHA256= をpushするまでの間に別のpushがあると、そのビルドも失敗します。
 元に戻すには、元の状態でサイトを作り直して上げるしかありません。
 
 ** 似た構成の実例
-トークンを置かずに Actions の生成物を公開する実例は、GitHub Pages に多くあります。
-=actions/upload-pages-artifact= で生成物を artifact に上げ、 =actions/deploy-pages= が =id-token: write= の OIDC で公開する構成です。
-po4a で訳した FreeBSD の文書を公開する [[https://github.com/fierceX/freebsd-doc-cn][fierceX/freebsd-doc-cn]] や、makeinfo でマニュアルを作る [[https://github.com/r0man/beads.el][r0man/beads.el]] がこの形です。
+トークンを置かずにActionsの生成物を公開する実例は、GitHub Pagesに多くあります。
+=actions/upload-pages-artifact= で生成物をartifactに上げ、 =actions/deploy-pages= が =id-token: write= のOIDCで公開する構成です。
+po4aで訳したFreeBSDの文書を公開する[[https://github.com/fierceX/freebsd-doc-cn][fierceX/freebsd-doc-cn]]や、makeinfoでマニュアルを作る[[https://github.com/r0man/beads.el][r0man/beads.el]]がこの形です。
 
-Release の添付ファイルを Workers Builds が取ってデプロイする構成は、GitHub のコード検索と Web 検索では実例が見つかりませんでした。
+Releaseの添付ファイルをWorkers Buildsが取ってデプロイする構成は、GitHubのコード検索とWeb検索では実例が見つかりませんでした。
 
 ** おわりに
-Workers Builds の環境でビルドできないサイトでも、ビルドを Actions に任せ、生成物を public の Release に置けば、トークンを持たずに Workers へデプロイできます。
-ビルドとデプロイの間を SHA-256 でつないでいるので、公開されるのは master の =SITE_SHA256= と一致した tar だけです。
-Workers の静的アセットで配りたいけれど、Cloudflare のトークンを GitHub に置きたくないときに使えます。
+Workers Buildsの環境でビルドできないサイトでも、ビルドをActionsに任せ、生成物をpublicのReleaseに置けば、トークンを持たずにWorkersへデプロイできます。
+ビルドとデプロイの間をSHA-256でつないでいるので、公開されるのはmasterの =SITE_SHA256= と一致したtarだけです。
+Workersの静的アセットで配りたいけれど、CloudflareのトークンをGitHubに置きたくないときに使えます。
 
 * PLaMo 3 Translateを手元で動かしてパイプで訳すCLI plamo-tr-localを作った
 :properties:
@@ -16959,43 +16959,43 @@ Workers の静的アセットで配りたいけれど、Cloudflare のトーク�
 :export_date: 2026-11-05 02:00
 :end:
 
-Preferred Networks (PFN) の翻訳特化 LLM である PLaMo 3 Translate の重みが、2026-11-05 に公開されました。
-このモデルを手元の PC で動かして、シェルのパイプで文章を訳すコマンド =plamo-tr-local= を作りました。
-リポジトリは [[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]] (public) で、ライセンスは Apache-2.0 です。
-記事の中の訳文の例はすべて PLaMo 3 Translate の生成物です。
+Preferred Networks (PFN) の翻訳特化LLMであるPLaMo 3 Translateの重みが、2026-11-05に公開されました。
+このモデルを手元のPCで動かして、シェルのパイプで文章を訳すコマンド =plamo-tr-local= を作りました。
+リポジトリは[[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]] (public) で、ライセンスはApache-2.0です。
+記事の中の訳文の例はすべてPLaMo 3 Translateの生成物です。
 
 [[./resources/public/img/33d2c2-flow.svg]]
 
 [[github:conao3/rust-plamo-tr-local::Rust][Translate text from the command line with PLaMo 3 Translate running on your machine]]
 
 ** きっかけ
-PLaMo 3 Translate は 0.8B・2B・8B・31B の 4 つの大きさで公開され、llama.cpp 向けの GGUF や MLX 向けの量子化版もそろっています ([[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][PFN のテックブログ]])。
+PLaMo 3 Translateは0.8B・2B・8B・31Bの4つの大きさで公開され、llama.cpp向けのGGUFやMLX向けの量子化版もそろっています ([[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][PFNのテックブログ]])。
 ただし、重みをダウンロードしただけでは訳せません。
-PFML3 という形式でプロンプトを組み、llama.cpp などでモデルを動かす手間があるので、文章を少し訳したいときには使いにくいです。
+PFML3という形式でプロンプトを組み、llama.cppなどでモデルを動かす手間があるので、文章を少し訳したいときには使いにくいです。
 
-作ろうと思ったのは、kat0h さんの[[https://x.com/kat0h/status/2118173128207851727][ポスト]]を見たからです。
-kat0h さんは、Claude の日本語の言い回しが嫌で、Claude の応答を手元の PLaMo を通して表示するスクリプトを用意したそうです。
-手元の翻訳モデルをパイプの 1 段として使えれば、こうした使い方をすぐに試せます。
+作ろうと思ったのは、kat0hさんの[[https://x.com/kat0h/status/2118173128207851727][ポスト]]を見たからです。
+kat0hさんは、Claudeの日本語の言い回しが嫌で、Claudeの応答を手元のPLaMoを通して表示するスクリプトを用意したそうです。
+手元の翻訳モデルをパイプの1段として使えれば、こうした使い方をすぐに試せます。
 
 ** 使い方
-Nix があれば、インストールせずに実行できます。
+Nixがあれば、インストールせずに実行できます。
 
 #+begin_src console
 $ nix run github:conao3/rust-plamo-tr-local -- text translate-text --text 今日はいい天気ですね。
 #+end_src
 
-Cargo でもインストールできます。
-Cargo はビルドの途中で llama.cpp をコンパイルするので、CMake と C++ コンパイラと libclang が要ります。
+Cargoでもインストールできます。
+Cargoはビルドの途中でllama.cppをコンパイルするので、CMakeとC++ コンパイラとlibclangが要ります。
 
 #+begin_src console
 $ cargo install --git https://github.com/conao3/rust-plamo-tr-local
 #+end_src
 
-初回の実行で、Hugging Face の =pfnet/plamo-3-translate-<大きさ>-GGUF= から Q4_K_M の GGUF をキャッシュ (Linux では =~/.cache/plamo-tr-local= ) へ自動でダウンロードします。
-アカウントも API キーも要らず、訳す文章は端末の外に出ません。
+初回の実行で、Hugging Faceの =pfnet/plamo-3-translate-<大きさ>-GGUF= からQ4_K_MのGGUFをキャッシュ (Linuxでは =~/.cache/plamo-tr-local= ) へ自動でダウンロードします。
+アカウントもAPIキーも要らず、訳す文章は端末の外に出ません。
 
 訳文の言語を指定しなければ、日本語の文は英語に、それ以外の言語の文は日本語に訳します。
-既定の出力は JSON です。
+既定の出力はJSONです。
 
 #+begin_src console
 $ plamo-tr-local text translate-text --text 今日はいい天気ですね。
@@ -17007,7 +17007,7 @@ $ plamo-tr-local text translate-text --text 今日はいい天気ですね。
 #+end_src
 
 標準入力から読むときは =--text= を省きます。
-訳文だけを取り出すときは、出力の JSON を =jq= に渡します。
+訳文だけを取り出すときは、出力のJSONを =jq= に渡します。
 
 #+begin_src console
 $ echo "Since it's raining today, I think I'll relax at home and read a book." \
@@ -17027,16 +17027,16 @@ $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
 =--model-size= には =0.8b= ・ =2b= ・ =8b= ・ =31b= を指定でき、既定は =2b= です。
 小さいモデルほど速く訳し、大きいモデルほど訳の質が上がります。
 
-** AWS CLI 型のコマンド体系
-コマンド体系は AWS CLI 型にしました。
+** AWS CLI型のコマンド体系
+コマンド体系はAWS CLI型にしました。
 =<コマンド> <サブコマンド>= の後に、名前付きの引数を並べます。
 
-** PFML3 のプロンプトを組む
-PLaMo 3 Translate へ渡すプロンプトの形式は PFML3 です。
+** PFML3のプロンプトを組む
+PLaMo 3 Translateへ渡すプロンプトの形式はPFML3です。
 =<|plamo:tag|>= で始まる節を並べ、データセットの種類、参考文脈、用語集、原文、訳文の言語と文体を書きます。
-=plamo-tr-local= は GGUF のリポジトリに付く =chat_template.jinja= と同じ形で、引数からこの文字列を組み立てます。
-たとえば、参考文脈 "A task list" と用語集 owner → 担当者 を付けて "Filter by owner." を日本語の敬体に訳すときのプロンプトは次のとおりです。
-実際は 1 行の文字列で、ここでは読みやすいように節ごとに改行しています。
+=plamo-tr-local= はGGUFのリポジトリに付く =chat_template.jinja= と同じ形で、引数からこの文字列を組み立てます。
+たとえば、参考文脈 "A task list" と用語集owner → 担当者 を付けて "Filter by owner." を日本語の敬体に訳すときのプロンプトは次のとおりです。
+実際は1行の文字列で、ここでは読みやすいように節ごとに改行しています。
 
 #+begin_example
 <|plamo:tag|>dataset<|plamo:msg|>translation
@@ -17048,21 +17048,21 @@ PLaMo 3 Translate へ渡すプロンプトの形式は PFML3 です。
 
 =input= の節に原文の言語 (=lang=) を書かなければ、モデルが原文の言語を判定します。
 モデルは最後の =<|plamo:msg|>= に続けて訳文を生成し、 =plamo-tr-local= は =<|plamo:tag|>= などの区切りのトークンが出たところで生成を止めます。
-トークンの選び方は greedy (毎回もっとも確率の高いトークンを選ぶ) です。
+トークンの選び方はgreedy (毎回もっとも確率の高いトークンを選ぶ) です。
 原文に =<|plamo:= を含む文字列があると、プロンプトの区切りと見分けられません。
-そのとき =plamo-tr-local= は、終了コード 254 で終了します。
+そのとき =plamo-tr-local= は、終了コード254で終了します。
 
 ** 長い文は段落ごとに訳す
-モデルカードによると、モデルが一度に扱えるのは入力と出力を合わせて 32,768 トークンまでです。
-=plamo-tr-local= は長い文を空行で段落に分け、4,096 トークン以下になるように段落をまとめて 1 回ずつ訳します。
-1 つの段落が 4,096 トークンを超えるときは、行ごとに分けます。
+モデルカードによると、モデルが一度に扱えるのは入力と出力を合わせて32,768トークンまでです。
+=plamo-tr-local= は長い文を空行で段落に分け、4,096トークン以下になるように段落をまとめて1回ずつ訳します。
+1つの段落が4,096トークンを超えるときは、行ごとに分けます。
 訳した結果は元の文と同じ空行と改行でつなぎ直します。
 
 ** 作るときに当たったこと
-*** llama-cpp-2 のリビジョンの固定
-Rust から llama.cpp を呼ぶのには、[[https://github.com/utilityai/llama-cpp-rs][llama-cpp-rs]] の =llama-cpp-2= クレートを使っています。
-ところが、crates.io の 0.1.161 に同梱された llama.cpp では、モデルの読み込みが =unknown tokenizer: 'plamo3'= で失敗しました。
-そこで、llama.cpp v0.8.0 を取り込んだ llama-cpp-rs の git のリビジョンに固定しました。
+*** llama-cpp-2のリビジョンの固定
+Rustからllama.cppを呼ぶのには、[[https://github.com/utilityai/llama-cpp-rs][llama-cpp-rs]]の =llama-cpp-2= クレートを使っています。
+ところが、crates.ioの0.1.161に同梱されたllama.cppでは、モデルの読み込みが =unknown tokenizer: 'plamo3'= で失敗しました。
+そこで、llama.cpp v0.8.0を取り込んだllama-cpp-rsのgitのリビジョンに固定しました。
 
 #+begin_src toml
 [dependencies.llama-cpp-2]
@@ -17071,7 +17071,7 @@ rev = "0364f5da1c6a6ee37f507031f116ce4a09b28594"
 version = "0.1.162"
 #+end_src
 
-Nix でビルドするときは、git から取る依存の中身を固定するために、 =flake.nix= の =cargoLock.outputHashes= にハッシュを書きます。
+Nixでビルドするときは、gitから取る依存の中身を固定するために、 =flake.nix= の =cargoLock.outputHashes= にハッシュを書きます。
 
 #+begin_src nix
 cargoLock = {
@@ -17080,11 +17080,11 @@ cargoLock = {
 };
 #+end_src
 
-*** AVX2 を使うビルド
-llama-cpp-sys-2 (=llama-cpp-2= が使う llama.cpp のバインディング) は、llama.cpp の CPU 向けの命令セットを Rust の target feature から決めます。
-Rust の x86_64 の既定は SSE2 までなので、そのままビルドすると llama.cpp も AVX2 を使わず、3〜4 倍遅くなりました。
-そこで、 =.cargo/config.toml= で x86_64 Linux の target CPU を =x86-64-v3= にしました。
-=x86-64-v3= は AVX2 を含む水準で、Intel は Haswell 以降、AMD は Excavator 以降の CPU が当てはまります。
+*** AVX2を使うビルド
+llama-cpp-sys-2 (=llama-cpp-2= が使うllama.cppのバインディング) は、llama.cppのCPU向けの命令セットをRustのtarget featureから決めます。
+Rustのx86_64の既定はSSE2までなので、そのままビルドするとllama.cppもAVX2を使わず、3〜4倍遅くなりました。
+そこで、 =.cargo/config.toml= でx86_64 Linuxのtarget CPUを =x86-64-v3= にしました。
+=x86-64-v3= はAVX2を含む水準で、IntelはHaswell以降、AMDはExcavator以降のCPUが当てはまります。
 
 #+begin_src toml
 [target.x86_64-unknown-linux-gnu]
@@ -17092,28 +17092,28 @@ rustflags = ["-C", "target-cpu=x86-64-v3"]
 #+end_src
 
 *** スレッド数の既定
-手元の Intel Core Ultra 5 225U は、性能重視の P コアと省電力の E コアが混ざった CPU で、論理 CPU は 14 個です。
-次の節と同じ MIT ライセンスの訳を、2b のモデルでスレッド数を変えて測りました。
-4 スレッドは 1 回、ほかは 3 回以上測った中央値です。
+手元のIntel Core Ultra 5 225Uは、性能重視のPコアと省電力のEコアが混ざったCPUで、論理CPUは14個です。
+次の節と同じMITライセンスの訳を、2bのモデルでスレッド数を変えて測りました。
+4スレッドは1回、ほかは3回以上測った中央値です。
 
-| スレッド数 | 最初のトークンまで | 出力 (214 トークン) | 全体    |
+| スレッド数 | 最初のトークンまで | 出力 (214トークン) | 全体    |
 |------------+--------------------+---------------------+---------|
-|          4 | 4.6 秒             | 13.0 秒             | 21.2 秒 |
-|          7 | 3.2 秒             | 10.0 秒             | 17.0 秒 |
-|         10 | 2.9 秒             | 9.3 秒              | 15.9 秒 |
-|         14 | 2.7 秒             | 10.4 秒             | 16.8 秒 |
+|          4 | 4.6秒             | 13.0秒             | 21.2秒 |
+|          7 | 3.2秒             | 10.0秒             | 17.0秒 |
+|         10 | 2.9秒             | 9.3秒              | 15.9秒 |
+|         14 | 2.7秒             | 10.4秒             | 16.8秒 |
 
 [[./resources/public/img/33d2c2-threads.svg]]
 
-入力を読むのは 14 スレッドがもっとも速く、出力の生成は 10 スレッドがもっとも速くなりました。
-8・9・11・12 スレッドも測りましたが、出力の生成は 10 スレッドより遅くなりました。
-14 スレッドでは、出力の生成が 7 スレッドより遅くなりました。
-そこで、スレッド数の既定を論理 CPU の 3/4 (手元では 10) にしました。
+入力を読むのは14スレッドがもっとも速く、出力の生成は10スレッドがもっとも速くなりました。
+8・9・11・12スレッドも測りましたが、出力の生成は10スレッドより遅くなりました。
+14スレッドでは、出力の生成が7スレッドより遅くなりました。
+そこで、スレッド数の既定を論理CPUの3/4 (手元では10) にしました。
 環境変数 =PLAMO_TR_LOCAL_THREADS= で変えられます。
 
 ** 速さ
-MIT ライセンスの本文 (英語 169 語、252 トークンのプロンプト) を日本語に訳す時間を、Intel Core Ultra 5 225U の CPU だけで測りました。
-スレッド数は既定の 10 で、どの値も 3 回以上測った中央値です。
+MITライセンスの本文 (英語169語、252トークンのプロンプト) を日本語に訳す時間を、Intel Core Ultra 5 225UのCPUだけで測りました。
+スレッド数は既定の10で、どの値も3回以上測った中央値です。
 各段階の時間は =--debug= が出す値です。
 
 #+begin_src console
@@ -17122,15 +17122,15 @@ $ plamo-tr-local text translate-text --text file://LICENSE | jq -r .TranslatedTe
 
 | モデル | 読み込み | 最初のトークンまで | 出力の速さ       | 全体    |
 |--------+----------+--------------------+------------------+---------|
-| 0.8b   | 2.8 秒   | 0.7 秒             | 71 トークン/秒 | 6.9 秒  |
-| 2b     | 3.4 秒   | 2.9 秒             | 23 トークン/秒 | 15.9 秒 |
+| 0.8b   | 2.8秒   | 0.7秒             | 71トークン/秒 | 6.9秒  |
+| 2b     | 3.4秒   | 2.9秒             | 23トークン/秒 | 15.9秒 |
 
 [[./resources/public/img/33d2c2-speed.svg]]
 
 「最初のトークンまで」はモデルを読み込んだあと、プロンプトを読んで最初のトークンを出すまでの時間です。
 グラフの「読み込みなど」は、全体から「最初のトークンまで」と出力の生成の時間を引いた残りで、モデルの読み込みを含みます。
-訳文は 0.8b が 229 トークン、2b が 214 トークンでした。
-2b の訳文は次のとおりです。
+訳文は0.8bが229トークン、2bが214トークンでした。
+2bの訳文は次のとおりです。
 
 #+begin_quote
 MITライセンス
@@ -17144,21 +17144,21 @@ Copyright (c) \lt{}year\gt{} \lt{}copyright holders\gt{}
 本ソフトウェアは「現状のまま」提供され、明示的か黙示的かを問わず、商品性、特定目的への適合性、および非侵害性に関する保証を含むがこれらに限定されない、いかなる種類の保証も伴わない。いかなる場合においても、著作者または著作権者は、契約上の行為、不法行為、またはその他の事由を問わず、本ソフトウェアに起因し、または本ソフトウェアの使用もしくはその他の取り扱いに関連して生じたいかなる請求、損害、またはその他の責任についても、一切の責任を負わないものとする。
 #+end_quote
 
-モデルの読み込みはコマンドを呼ぶたびにかかり、0.8b では全体の 4 割を占めます。
-Claude の答えを段落ごとに流して訳すような使い方では、この読み込みの時間が段落の数だけ積み重なります。
+モデルの読み込みはコマンドを呼ぶたびにかかり、0.8bでは全体の4割を占めます。
+Claudeの答えを段落ごとに流して訳すような使い方では、この読み込みの時間が段落の数だけ積み重なります。
 モデルを読み込んだまま入力を待つ常駐の形にするのが、次の課題です。
 
 ** 文体の指定で試したこと
-PLaMo 3 Translate で指定できる文体 (=form=) は、常体 (=plain=) と敬体 (=polite=) の 2 つです。
+PLaMo 3 Translateで指定できる文体 (=form=) は、常体 (=plain=) と敬体 (=polite=) の2つです。
 お嬢様言葉や関西弁に訳せるかを試しました。
-llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temperature を 0 にして、次の指定を試しました。
+llama.cppの =llama-server= で2Bと8BのGGUF (Q4_K_M) を動かし、temperatureを0にして、次の指定を試しました。
 
 - 訳文の言語 (=lang=) に =お嬢様言葉= ・ =関西弁= ・ =Japanese (Kansai dialect)= を入れると、原文の日本語をそのまま返しました。
 - =form= に =お嬢様言葉= ・ =ojousama= ・ =kansai= を入れると、常体で訳しました。
 - 参考文脈 (=context=) に「お嬢様言葉で訳す」と書くと、ふつうの口調で訳しました。
-- お嬢様言葉の対訳の履歴を 2 組、原文の前に置くと、ふつうの口調で訳しました。
+- お嬢様言葉の対訳の履歴を2組、原文の前に置くと、ふつうの口調で訳しました。
 
-2B と 8B のどちらでも、お嬢様言葉や関西弁の訳文は出ませんでした。
+2Bと8Bのどちらでも、お嬢様言葉や関西弁の訳文は出ませんでした。
 
 一方、日本語から日本語へ ~form=polite~ を付けて訳すと、常体の文を敬体に書き換えられました (2B)。
 
@@ -17170,13 +17170,13 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 =plamo-tr-local= は原文と訳文に同じ言語を指定すると止まるので、この書き換えは =llama-server= で試しただけです。
 
 ** ライセンス
-=plamo-tr-local= のライセンスは Apache-2.0 です。
-=plamo-tr-local= がダウンロードするモデルのライセンスは PFN の PLaMo コミュニティライセンス ([[https://huggingface.co/pfnet/plamo-3-translate-8b/raw/main/LICENSE/ja][本文]]) で、要点は次のとおりです。
+=plamo-tr-local= のライセンスはApache-2.0です。
+=plamo-tr-local= がダウンロードするモデルのライセンスはPFNのPLaMoコミュニティライセンス ([[https://huggingface.co/pfnet/plamo-3-translate-8b/raw/main/LICENSE/ja][本文]]) で、要点は次のとおりです。
 
 - 私的な利用と非商用の利用は無償です。
-- 商用の利用は PLaMo 商用利用登録フォームで登録したうえで、直近の事業年度の売上が 10 億円以下である間は無償です。
-- 生成した訳文を公表するときは、PLaMo の生成物であることを明示します。
-- モデルや派生モデル、生成物を第三者に提供するときは「Built with PLaMo」と表示します。 =plamo-tr-local= の README にもこの表示を書いています。
+- 商用の利用はPLaMo商用利用登録フォームで登録したうえで、直近の事業年度の売上が10億円以下である間は無償です。
+- 生成した訳文を公表するときは、PLaMoの生成物であることを明示します。
+- モデルや派生モデル、生成物を第三者に提供するときは「Built with PLaMo」と表示します。 =plamo-tr-local= のREADMEにもこの表示を書いています。
 
 使う前に、ライセンスの本文を読んでください。
 
@@ -17189,12 +17189,12 @@ llama.cpp の =llama-server= で 2B と 8B の GGUF (Q4_K_M) を動かし、temp
 :export_date: 2026-11-05 18:21
 :end:
 
-AWS CLI v2 のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返す CLI =awsr= を Rust で作りました。
-リポジトリは [[https://github.com/conao3/rust-awscli][conao3/rust-awscli]] で、ライセンスは Apache-2.0 です。
-=awsr sts get-caller-identity= は 6.0ms で終わり、同じ PC で本家の =aws= (2.39.3) は 659ms かかります。
-110 倍の差です。
-help ページは 380〜550 倍速く出ます。
-=awsr= は AWS の公式の製品ではありません。
+AWS CLI v2のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返すCLI =awsr= をRustで作りました。
+リポジトリは[[https://github.com/conao3/rust-awscli][conao3/rust-awscli]]で、ライセンスはApache-2.0です。
+=awsr sts get-caller-identity= は6.0msで終わり、同じPCで本家の =aws= (2.39.3) は659msかかります。
+110倍の差です。
+helpページは380〜550倍速く出ます。
+=awsr= はAWSの公式の製品ではありません。
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
@@ -17208,140 +17208,140 @@ $ awsr ec2 describe-instances \
     --query 'Reservations[].Instances[].InstanceId' --output text
 #+end_src
 
-設定ファイル (=~/.aws/config= と =~/.aws/credentials= )、SSO のトークンのキャッシュ、環境変数は本家と同じものを読みます。
-json、text、table の出力も =--query= の結果も本家と同じバイト列になるので、 =aws= を呼んでいるシェルスクリプトの出力は変わりません。
+設定ファイル (=~/.aws/config= と =~/.aws/credentials= )、SSOのトークンのキャッシュ、環境変数は本家と同じものを読みます。
+json、text、tableの出力も =--query= の結果も本家と同じバイト列になるので、 =aws= を呼んでいるシェルスクリプトの出力は変わりません。
 
-=awsr= は本家の 2.39.3 が同梱する botocore のモデルを取り込んでいて、そこにある全サービスの全操作を =awsr <サービス> <操作>= の形で呼べます。
+=awsr= は本家の2.39.3が同梱するbotocoreのモデルを取り込んでいて、そこにある全サービスの全操作を =awsr <サービス> <操作>= の形で呼べます。
 =s3 cp= や =s3 sync= などの高レベルのコマンド、 =configure= 、 =sso login= も本家から移植しました。
 
 ** 速さ
-手元の PC (Intel Core Ultra 5 225U) で、 =hyperfine -N= を使って平均の実行時間を測りました。
-API を呼ぶコマンドはローカルのスタブのサーバーに =--endpoint-url= で向け、静的な認証情報で動かしています。
-=awsr= は nix の flake のパッケージ (静的リンク)、本家は公式の Linux 向けのインストーラで入れた 2.39.3 です。
+手元のPC (Intel Core Ultra 5 225U) で、 =hyperfine -N= を使って平均の実行時間を測りました。
+APIを呼ぶコマンドはローカルのスタブのサーバーに =--endpoint-url= で向け、静的な認証情報で動かしています。
+=awsr= はnixのflakeのパッケージ (静的リンク)、本家は公式のLinux向けのインストーラで入れた2.39.3です。
 
 [[./resources/public/img/f681b9-speed.svg]]
 
 | コマンド                      |  awsr | aws 2.39.3 |     比 |
 |-------------------------------+-------+------------+--------|
-| =--version=                   | 1.3ms |      497ms | 380 倍 |
-| =sts get-caller-identity=     | 6.0ms |      659ms | 110 倍 |
-| =dynamodb list-tables=        | 5.3ms |      728ms | 140 倍 |
-| =ec2 describe-regions=        | 5.0ms |      936ms | 190 倍 |
-| =help=                        | 1.9ms |      759ms | 400 倍 |
-| =ec2 help=                    | 1.9ms |     1052ms | 550 倍 |
-| =ec2 describe-instances help= | 3.5ms |     1346ms | 380 倍 |
+| =--version=                   | 1.3ms |      497ms | 380倍 |
+| =sts get-caller-identity=     | 6.0ms |      659ms | 110倍 |
+| =dynamodb list-tables=        | 5.3ms |      728ms | 140倍 |
+| =ec2 describe-regions=        | 5.0ms |      936ms | 190倍 |
+| =help=                        | 1.9ms |      759ms | 400倍 |
+| =ec2 help=                    | 1.9ms |     1052ms | 550倍 |
+| =ec2 describe-instances help= | 3.5ms |     1346ms | 380倍 |
 
-比べる下限として、同じ PC で C の hello world を動かすと、動的リンクで 1.1ms、静的リンクで 0.7ms かかります。
-API を呼ぶコマンドの残りの数 ms は、プロセスの起動、エンドポイントのルールの評価、HTTP の送受信にかかっています。
+比べる下限として、同じPCでCのhello worldを動かすと、動的リンクで1.1ms、静的リンクで0.7msかかります。
+APIを呼ぶコマンドの残りの数msは、プロセスの起動、エンドポイントのルールの評価、HTTPの送受信にかかっています。
 
-本家は Python で書かれていて、呼ぶたびにインタプリタを起動し、多くのモジュールを import し、plugin を登録し、サービスのモデルの JSON を読み込みます。
-=aws= をループで何百回も呼ぶスクリプトや CI では、この 0.5〜1 秒が呼ぶ回数だけ積み重なります。
+本家はPythonで書かれていて、呼ぶたびにインタプリタを起動し、多くのモジュールをimportし、pluginを登録し、サービスのモデルのJSONを読み込みます。
+=aws= をループで何百回も呼ぶスクリプトやCIでは、この0.5〜1秒が呼ぶ回数だけ積み重なります。
 
 ** 起動を速くする仕組み
-=awsr= は、本家が実行のたびに行う準備 (API の呼び出しではモデルの解析、help ではページの整形) をビルド時に済ませておきます。
+=awsr= は、本家が実行のたびに行う準備 (APIの呼び出しではモデルの解析、helpではページの整形) をビルド時に済ませておきます。
 
 [[./resources/public/img/f681b9-build.svg]]
 
 *** モデルを解析済みの形で埋め込む
-botocore は各サービスの API を JSON のモデル (=service-2.json= など) で表していて、本家は呼ぶたびにこれを読み込んで解析します。
-モデルが最大の ec2 は、JSON で 3.5MB あります。
+botocoreは各サービスのAPIをJSONのモデル (=service-2.json= など) で表していて、本家は呼ぶたびにこれを読み込んで解析します。
+モデルが最大のec2は、JSONで3.5MBあります。
 
 =awsr= はビルド時にモデルを、オフセットでたどれる木と、重複を除いた文字列の表からなる形式に変換し、圧縮せずにバイナリへ埋め込みます。
 オブジェクトのキーには並べ替えた索引を付け、二分探索で引きます。
-実行時は JSON の解析も展開もせず、呼んだ操作が使う shape だけを読むので、ec2 の操作も sts の操作と同じくらいの時間で終わります。
+実行時はJSONの解析も展開もせず、呼んだ操作が使うshapeだけを読むので、ec2の操作もstsの操作と同じくらいの時間で終わります。
 
-サービスごとの Rust のコードは生成しません。
-公式の AWS SDK for Rust はサービスごとに型付きのコードを生成していて、aws-sdk-ec2 だけでビルドに 150〜250 秒かかります ([[https://github.com/awslabs/aws-sdk-rust/issues/113][awslabs/aws-sdk-rust#113]])。
-=awsr= はモデルを実行時に解釈するので、Rust のコンパイルの量はサービスの数によって変わりません。
+サービスごとのRustのコードは生成しません。
+公式のAWS SDK for Rustはサービスごとに型付きのコードを生成していて、aws-sdk-ec2だけでビルドに150〜250秒かかります ([[https://github.com/awslabs/aws-sdk-rust/issues/113][awslabs/aws-sdk-rust#113]])。
+=awsr= はモデルを実行時に解釈するので、Rustのコンパイルの量はサービスの数によって変わりません。
 
 ほかにも起動を速くするために、次のようにしています。
 
 - 引数の解析とエンドポイントのルールの評価では、正規表現をコンパイルせずに照合します。
-- tokio のランタイムは最初のリクエストを送るときに作ります。 =--version= と help では作りません。
-- 配布するバイナリは glibc を静的リンクし、起動時に動的ローダーを動かしません。
-- メモリの割り当てには glibc の malloc を使います。mimalloc に替えたビルドは、どのコマンドも 1.4〜2.3 倍遅くなりました。
+- tokioのランタイムは最初のリクエストを送るときに作ります。 =--version= とhelpでは作りません。
+- 配布するバイナリはglibcを静的リンクし、起動時に動的ローダーを動かしません。
+- メモリの割り当てにはglibcのmallocを使います。mimallocに替えたビルドは、どのコマンドも1.4〜2.3倍遅くなりました。
 
-*** help ページを groff で整形して埋め込む
-本家の =aws help= は、モデルと文書から reStructuredText を組み立て、docutils で man 形式に変換し、groff で整形してページャに渡します。
-=awsr= はこの文書の組み立てと docutils の変換を Rust に移植しましたが、整形には本家と同じく手元の groff を使います。
-groff を毎回起動すると、 =ec2 help= に 107ms かかります。
+*** helpページをgroffで整形して埋め込む
+本家の =aws help= は、モデルと文書からreStructuredTextを組み立て、docutilsでman形式に変換し、groffで整形してページャに渡します。
+=awsr= はこの文書の組み立てとdocutilsの変換をRustに移植しましたが、整形には本家と同じく手元のgroffを使います。
+groffを毎回起動すると、 =ec2 help= に107msかかります。
 
-そこで、配布するバイナリにはビルド時に groff で整形した全 20,448 ページを埋め込んでいます。
-整形したページは合計 732MB (最大は =quicksight update-template= の 36MB) あります。
-これを、16 ページに 1 ページを標本にして学習した zstd の辞書を使ってレベル 19 で圧縮すると、35.8MB になります。
-埋め込みのページを含めて、flake のパッケージのバイナリは 150MiB です。
+そこで、配布するバイナリにはビルド時にgroffで整形した全20,448ページを埋め込んでいます。
+整形したページは合計732MB (最大は =quicksight update-template= の36MB) あります。
+これを、16ページに1ページを標本にして学習したzstdの辞書を使ってレベル19で圧縮すると、35.8MBになります。
+埋め込みのページを含めて、flakeのパッケージのバイナリは150MiBです。
 
-groff の出力は groff のバージョンによって変わります。
-=awsr= は =PATH= にある groff のバージョン (=groff -v= の 1 行目) を整形に使ったバージョンと比べ、同じで =GROFF= で始まる環境変数もなければ、埋め込みのページを展開して出します。
-=groff -v= の結果は groff の実行ファイルごとにキャッシュするので、groff を起動するのはその PC で最初の 1 回だけです (このときの =ec2 help= は 3.8ms)。
-GitHub Releases のバイナリは Ubuntu の groff 1.23.0 で、flake のパッケージは nixpkgs の groff で整形しています。
-バージョンが違うときは本家と同じく手元の groff で整形し、結果を =~/.cache/awsr/help= に保存して、2 回目からはそれを出します。
+groffの出力はgroffのバージョンによって変わります。
+=awsr= は =PATH= にあるgroffのバージョン (=groff -v= の1行目) を整形に使ったバージョンと比べ、同じで =GROFF= で始まる環境変数もなければ、埋め込みのページを展開して出します。
+=groff -v= の結果はgroffの実行ファイルごとにキャッシュするので、groffを起動するのはそのPCで最初の1回だけです (このときの =ec2 help= は3.8ms)。
+GitHub ReleasesのバイナリはUbuntuのgroff 1.23.0で、flakeのパッケージはnixpkgsのgroffで整形しています。
+バージョンが違うときは本家と同じく手元のgroffで整形し、結果を =~/.cache/awsr/help= に保存して、2回目からはそれを出します。
 
 ** 本家と出力が一致することの確かめ方
 *** 差分テスト
-出力を本家と一致させるには、Python の値の書式まで合わせる必要があります。
-たとえば、浮動小数点数は Python の =repr= と同じ書式 (=1e-05= や =1.0=) で出し、text の出力の真偽値は =True= と =False= にします。
-table の出力の文字幅は、本家が同梱する Python の =unicodedata.east_asian_width= に従って数えます。
+出力を本家と一致させるには、Pythonの値の書式まで合わせる必要があります。
+たとえば、浮動小数点数はPythonの =repr= と同じ書式 (=1e-05= や =1.0=) で出し、textの出力の真偽値は =True= と =False= にします。
+tableの出力の文字幅は、本家が同梱するPythonの =unicodedata.east_asian_width= に従って数えます。
 
 このような規則を移植した結果を確かめるために、差分テストの道具 =awsr-difftest= を作りました。
 =awsr-difftest= は同じコマンドラインで =awsr= と本家を動かし、stdout、stderr、終了コード、ストリーミングで書き出したファイル、スタブのサーバーが受けたリクエストを比べます。
-本家は公式のインストーラ (2.39.3) を nix で取り込み、同梱の Python まで含めてバージョンを固定しています。
+本家は公式のインストーラ (2.39.3) をnixで取り込み、同梱のPythonまで含めてバージョンを固定しています。
 
-スタブのサーバーは操作の出力の shape からシード付きの乱数で応答を作ります。
+スタブのサーバーは操作の出力のshapeからシード付きの乱数で応答を作ります。
 値には、出力の規則が分かれるもの (=1.50= 、 =1e2= 、 =-0= 、多倍長の整数、 =NaN= 、オフセットの異なるタイムスタンプ、全角文字など) を必ず混ぜます。
 署名の値のように実行のたびに変わるヘッダーは、比べる対象から外しています。
 
-全サービスの全操作を、シード 4 つと json、text、table の 3 つの出力形式で回すと 233,880 件になり、233,040 件が本家と一致し、一致しない件はありません。
-残りの 840 件はスタブのサーバーでは比べられない操作です (CLI のコマンドにならない 552 件、本物のエンドポイントに向かう 144 件、 =session-manager-plugin= を起動する 24 件、イベントストリームの 12 件など)。
-除いた理由は [[https://github.com/conao3/rust-awscli/blob/master/difftest/exclusions.txt][difftest/exclusions.txt]] に書いてあります。
-本家の実行結果はキャッシュしておき、キャッシュがあれば全件を 2〜5 分で回せます。
+全サービスの全操作を、シード4つとjson、text、tableの3つの出力形式で回すと233,880件になり、233,040件が本家と一致し、一致しない件はありません。
+残りの840件はスタブのサーバーでは比べられない操作です (CLIのコマンドにならない552件、本物のエンドポイントに向かう144件、 =session-manager-plugin= を起動する24件、イベントストリームの12件など)。
+除いた理由は[[https://github.com/conao3/rust-awscli/blob/master/difftest/exclusions.txt][difftest/exclusions.txt]]に書いてあります。
+本家の実行結果はキャッシュしておき、キャッシュがあれば全件を2〜5分で回せます。
 
-*** help の全ページ比較
-help は =scripts/compare-help.sh= で本家と比べます。
-本家の help のコマンドラインを全部 (20,482 個) 並べて =awsr= と本家で実行し、stdout、stderr、終了コードをバイト単位で比べます。
-ビルド時に整形したページを埋め込んだ =awsr= で比べると、20,482 個のすべてが本家と一致しました。
+*** helpの全ページ比較
+helpは =scripts/compare-help.sh= で本家と比べます。
+本家のhelpのコマンドラインを全部 (20,482個) 並べて =awsr= と本家で実行し、stdout、stderr、終了コードをバイト単位で比べます。
+ビルド時に整形したページを埋め込んだ =awsr= で比べると、20,482個のすべてが本家と一致しました。
 
 ** 配布
-GitHub Releases に Linux (x86_64、x86_64 の musl、aarch64) と macOS (x86_64、aarch64) のバイナリを置いています。
-nix と Cargo でも入れられます。
+GitHub ReleasesにLinux (x86_64、x86_64のmusl、aarch64) とmacOS (x86_64、aarch64) のバイナリを置いています。
+nixとCargoでも入れられます。
 
 #+begin_src console
 $ nix profile install github:conao3/rust-awscli
 $ cargo install awsr
 #+end_src
 
-=cargo install= ではビルド時に help ページを整形しないので、help は最初に開いたときに手元の groff で整形します。
+=cargo install= ではビルド時にhelpページを整形しないので、helpは最初に開いたときに手元のgroffで整形します。
 
-*** crates.io の 10MB の上限
-crates.io に上げる .crate は 1 つあたり 10MB までです。
-=awsr= が埋め込むモデルは zstd で圧縮しても計 11.4MB あり、1 つの crate には収まりません。
-crates.io に上限の引き上げを頼みましたが、認められませんでした。
+*** crates.ioの10MBの上限
+crates.ioに上げる .crateは1つあたり10MBまでです。
+=awsr= が埋め込むモデルはzstdで圧縮しても計11.4MBあり、1つのcrateには収まりません。
+crates.ioに上限の引き上げを頼みましたが、認められませんでした。
 
-そこで、モデルをファイルとそのディレクトリだけを持つ 3 つのデータ crate に分けました。
+そこで、モデルをファイルとそのディレクトリだけを持つ3つのデータcrateに分けました。
 
 | crate                      | 中身                                             | 大きさ |
 |----------------------------+--------------------------------------------------+--------|
-| =awsr-models=              | CLI のデータ、エンドポイント、例、help の入力など | 2.1MiB |
-| =awsr-models-services-a-l= | 頭文字が a〜l のサービスのモデル                 | 5.2MiB |
-| =awsr-models-services-m-z= | 頭文字が m〜z のサービスのモデル                 | 3.7MiB |
+| =awsr-models=              | CLIのデータ、エンドポイント、例、helpの入力など | 2.1MiB |
+| =awsr-models-services-a-l= | 頭文字がa〜lのサービスのモデル                 | 5.2MiB |
+| =awsr-models-services-m-z= | 頭文字がm〜zのサービスのモデル                 | 3.7MiB |
 | =awsr=                     | 本体                                             | 3.1MiB |
 
-=awsr= は 3 つのデータ crate を build-dependency に取り、 =build.rs= が各 crate のディレクトリのファイルを読んで埋め込みます。
-データ crate のバージョンは本家のバージョン (2.39.3) にそろえ、本家のバージョンを上げたときだけ新しいバージョンを出します。
+=awsr= は3つのデータcrateをbuild-dependencyに取り、 =build.rs= が各crateのディレクトリのファイルを読んで埋め込みます。
+データcrateのバージョンは本家のバージョン (2.39.3) にそろえ、本家のバージョンを上げたときだけ新しいバージョンを出します。
 分けたあとも埋め込むデータは分ける前とバイト単位で同じなので、速さも変わりません。
-7 つのコマンドを分ける前のバイナリと並べて測ると差は ±0.3ms 以内で、測る順番を入れ替えると速い側も入れ替わりました。
+7つのコマンドを分ける前のバイナリと並べて測ると差は ±0.3ms以内で、測る順番を入れ替えると速い側も入れ替わりました。
 
-*** trusted publishing で公開する
-crates.io への公開は、GitHub Actions の trusted publishing (OIDC) で行っています。
-=Publish= の workflow で [[https://github.com/rust-lang/crates-io-auth-action][rust-lang/crates-io-auth-action]] が一時的なトークンを取るので、crates.io の API トークンをリポジトリの secret に置かずに済みます。
-workflow は 3 つのデータ crate、 =awsr= の順に、crates.io にまだないバージョンだけを =cargo publish= します。
+*** trusted publishingで公開する
+crates.ioへの公開は、GitHub Actionsのtrusted publishing (OIDC) で行っています。
+=Publish= のworkflowで[[https://github.com/rust-lang/crates-io-auth-action][rust-lang/crates-io-auth-action]]が一時的なトークンを取るので、crates.ioのAPIトークンをリポジトリのsecretに置かずに済みます。
+workflowは3つのデータcrate、 =awsr= の順に、crates.ioにまだないバージョンだけを =cargo publish= します。
 
-リリースは =Release= の workflow を手で起動するだけです。
-=Release= は =Cargo.toml= のバージョンを上げて commit とタグを push し、5 つのターゲットのバイナリを作って GitHub のリリースに付け、最後に =Publish= を起動します。
-crates.io の各バージョンのページには、公開した GitHub Actions の run が記録されます。
+リリースは =Release= のworkflowを手で起動するだけです。
+=Release= は =Cargo.toml= のバージョンを上げてcommitとタグをpushし、5つのターゲットのバイナリを作ってGitHubのリリースに付け、最後に =Publish= を起動します。
+crates.ioの各バージョンのページには、公開したGitHub Actionsのrunが記録されます。
 
 ** おわりに
-=aws= を何度も呼ぶスクリプトや CI で、 =aws= を =awsr= に置き換えて使ってください。
+=aws= を何度も呼ぶスクリプトやCIで、 =aws= を =awsr= に置き換えて使ってください。
 
 * awsr: the AWS CLI v2 in Rust, with the same output and up to 550 times the speed
 :properties:
@@ -17513,42 +17513,42 @@ If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 :export_date: 2026-11-05 20:05
 :end:
 
-Lean 4 で書いて証明した関数を Clojure から呼び、Clojure で書いた関数の性質を Lean で証明するためのライブラリとして lean-clj を作りました。
-リポジトリは [[https://github.com/conao3/lean-clj][conao3/lean-clj]] で、ライセンスは Apache-2.0 です。
-Clojars に =io.github.conao3/lean-clj= として公開していて、この記事は 0.3.0 をもとに書いています。
+Lean 4で書いて証明した関数をClojureから呼び、Clojureで書いた関数の性質をLeanで証明するためのライブラリとしてlean-cljを作りました。
+リポジトリは[[https://github.com/conao3/lean-clj][conao3/lean-clj]]で、ライセンスはApache-2.0です。
+Clojarsに =io.github.conao3/lean-clj= として公開していて、この記事は0.3.0をもとに書いています。
 
-lean-clj は Lean のコンパイラの中間表現 (IR) を Clojure のソースに変換します。
-JVM の上では、Lean の C backend がビルドするのと同じプログラムから型と証明を消したものが動きます。
+lean-cljはLeanのコンパイラの中間表現 (IR) をClojureのソースに変換します。
+JVMの上では、LeanのC backendがビルドするのと同じプログラムから型と証明を消したものが動きます。
 
 [[github:conao3/lean-clj::Clojure][Lean 4 IR to Clojure backend and Lean embedded in Clojure via S-expressions]]
 
-** 3 つの使い方
-lean-clj には次の 3 つの使い方があります。
+** 3つの使い方
+lean-cljには次の3つの使い方があります。
 
 [[./resources/public/img/4e5aa2-uses.svg]]
 
-1. Clojure のファイルの中に Lean で関数と定理を書き、Clojure から呼ぶ ( =deflean= )。
-2. 既存の Lean のプロジェクト (lake のプロジェクト) を、Clojure の namespace の集まりに変換する (CLI)。
-3. Clojure で書いた関数を Lean のモデルに変換し、その性質を Lean で証明する ( =lean-clj.typed= )。
+1. Clojureのファイルの中にLeanで関数と定理を書き、Clojureから呼ぶ ( =deflean= )。
+2. 既存のLeanのプロジェクト (lakeのプロジェクト) を、Clojureのnamespaceの集まりに変換する (CLI)。
+3. Clojureで書いた関数をLeanのモデルに変換し、その性質をLeanで証明する ( =lean-clj.typed= )。
 
-1 と 2 は Lean から Clojure への向き、3 は Clojure から Lean への向きです。
+1と2はLeanからClojureへの向き、3はClojureからLeanへの向きです。
 以下、この順に例を挙げます。
 
-** Lean で書いて Clojure から呼ぶ
-=deps.edn= に lean-clj を追加します。
+** Leanで書いてClojureから呼ぶ
+=deps.edn= にlean-cljを追加します。
 
 #+begin_src clojure
 {:deps {io.github.conao3/lean-clj {:mvn/version "0.3.0"}}}
 #+end_src
 
-=deflean= のブロックを最初に展開するときは、Lean 4.35.0 ( =lean= と =lake= ) と =lean-clj= の CLI が =PATH= に要ります。
-CLI は nix でインストールできます。
+=deflean= のブロックを最初に展開するときは、Lean 4.35.0 ( =lean= と =lake= ) と =lean-clj= のCLIが =PATH= に要ります。
+CLIはnixでインストールできます。
 
 #+begin_src console
 $ nix profile install github:conao3/lean-clj/v0.3.0
 #+end_src
 
-=deflean= の本体には Lean の構文を S 式にしたものを書きます。
+=deflean= の本体にはLeanの構文をS式にしたものを書きます。
 
 #+begin_src clojure
 (ns demo.core
@@ -17570,17 +17570,17 @@ $ nix profile install github:conao3/lean-clj/v0.3.0
 
 =def= で関数を、 =theorem= で定理を定義し、 =(by ...)= の中に証明を書きます。
 =double_eq= では、 =double= の定義を展開してから、自然数と整数の線形算術を解くタクティク =omega= で等式を示しています。
-namespace を読み込むと、lean-clj はブロックを Lean のソースに変換して =lake build= を実行し、証明まで検査します。
-検査が通ると、ブロックの関数がその namespace の Clojure の関数になります。
-structure の値は keyword を key に持つ map として受け渡します。
+namespaceを読み込むと、lean-cljはブロックをLeanのソースに変換して =lake build= を実行し、証明まで検査します。
+検査が通ると、ブロックの関数がそのnamespaceのClojureの関数になります。
+structureの値はkeywordをkeyに持つmapとして受け渡します。
 
 #+begin_src clojure
 (double 21)                                ;=> 42
 (deposit {:owner "ann" :balance 10} 5)     ;=> {:owner "ann", :balance 15}
 #+end_src
 
-証明が通らないと、namespace のコンパイルが止まります。
-定理の右辺を =(* 3 n)= に書き換えて namespace を読み込むと、次のエラーになります。
+証明が通らないと、namespaceのコンパイルが止まります。
+定理の右辺を =(* 3 n)= に書き換えてnamespaceを読み込むと、次のエラーになります。
 
 #+begin_src text
 Syntax error macroexpanding deflean at (demo/wrong.clj:5:1).
@@ -17597,16 +17597,16 @@ Lean source of the block:
    3 | theorem double_eq (n : Nat) : ((double n) = (3 * n)) := (by unfold double; omega)
 #+end_src
 
-エラーのメッセージには Clojure のファイルと行 ( =demo/wrong.clj:9= ) と、ブロックから作った Lean のソースが含まれます。
+エラーのメッセージにはClojureのファイルと行 ( =demo/wrong.clj:9= ) と、ブロックから作ったLeanのソースが含まれます。
 
-S 式で書けない構文は =(lean "...")= で Lean のソースを文字列のまま混ぜて書けます。
-サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/word-count][word-count]] は、 =do= 記法の関数をこの形で書いています。
-生成した Clojure のコードは =.lean-clj/cache/= に保存されます。
-ブロックを変えなければ、2 回目からは Lean を呼ばずにキャッシュから展開するので、キャッシュをリポジトリに入れておけば Lean の無い環境でも動きます。
+S式で書けない構文は =(lean "...")= でLeanのソースを文字列のまま混ぜて書けます。
+サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/word-count][word-count]]は、 =do= 記法の関数をこの形で書いています。
+生成したClojureのコードは =.lean-clj/cache/= に保存されます。
+ブロックを変えなければ、2回目からはLeanを呼ばずにキャッシュから展開するので、キャッシュをリポジトリに入れておけばLeanの無い環境でも動きます。
 
-** Lean のプロジェクトを Clojure の namespace にする
-lake のプロジェクトとして書いた Lean のコードも、CLI で Clojure の namespace に変換できます。
-サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]] は、整数とローマ数字の変換を Lean で書き、1〜999 の数をローマ数字にして戻すと元の数になることを証明しています。
+** LeanのプロジェクトをClojureのnamespaceにする
+lakeのプロジェクトとして書いたLeanのコードも、CLIでClojureのnamespaceに変換できます。
+サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]]は、整数とローマ数字の変換をLeanで書き、1〜999の数をローマ数字にして戻すと元の数になることを証明しています。
 
 #+begin_src lean
 def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
@@ -17618,14 +17618,14 @@ theorem roundtrip : ∀ n, n < 1000 → fromRoman (toRoman n) = if n = 0 then no
   decide +kernel
 #+end_src
 
-=lake build= で証明を検査したあと、CLI で module を namespace に変換します。
+=lake build= で証明を検査したあと、CLIでmoduleをnamespaceに変換します。
 
 #+begin_src console
 $ lean-clj module generate-namespace --module-name Roman --namespace roman.core \
     --search-path lean/.lake/build/lib/lean --output-file src/roman/core.clj
 #+end_src
 
-公開している関数は名前を kebab-case にした Clojure の関数になります。
+公開している関数は名前をkebab-caseにしたClojureの関数になります。
 =Option= の値は =some= の中身か =nil= になります。
 
 #+begin_src clojure
@@ -17636,12 +17636,12 @@ $ lean-clj module generate-namespace --module-name Roman --namespace roman.core 
 (roman/from-roman "hello")   ;=> nil
 #+end_src
 
-生成した =src/roman/core.clj= は普通の Clojure のファイルなので、リポジトリに commit すれば、使う側に Lean は要りません。
-プロジェクトの module をまとめて変換するときは =lean-clj project generate= を使います。
+生成した =src/roman/core.clj= は普通のClojureのファイルなので、リポジトリにcommitすれば、使う側にLeanは要りません。
+プロジェクトのmoduleをまとめて変換するときは =lean-clj project generate= を使います。
 
-** Clojure で書いて Lean で証明する
-3 つ目の使い方では、実装を Clojure で書きます。
-次の例では、0 から n までの和を閉じた式で計算する Clojure の関数が、和の定義どおりに再帰する Lean の仕様と等しいことを証明します。
+** Clojureで書いてLeanで証明する
+3つ目の使い方では、実装をClojureで書きます。
+次の例では、0からnまでの和を閉じた式で計算するClojureの関数が、和の定義どおりに再帰するLeanの仕様と等しいことを証明します。
 
 #+begin_src clojure
 (ns demo.sum
@@ -17671,23 +17671,23 @@ $ lean-clj module generate-namespace --module-name Roman --namespace roman.core 
     (by (funext n) (exact (.symm (sum-to-fast-eq n))))))
 #+end_src
 
-=lt/defn= は普通の Clojure の関数を定義し、引数と戻り値の Lean の型 (signature) を var に記録します。
-ブロックの中の =(clojure sum-to-fast)= は、その関数を Lean の定義に変換します。
-この記事では、変換した Lean の定義をモデルと呼びます。
-=quot= や =inc= のような =clojure.core= の関数のモデルは、lean-clj に同梱した Lean のライブラリ =Clj= にあります。
+=lt/defn= は普通のClojureの関数を定義し、引数と戻り値のLeanの型 (signature) をvarに記録します。
+ブロックの中の =(clojure sum-to-fast)= は、その関数をLeanの定義に変換します。
+この記事では、変換したLeanの定義をモデルと呼びます。
+=quot= や =inc= のような =clojure.core= の関数のモデルは、lean-cljに同梱したLeanのライブラリ =Clj= にあります。
 
-=sum-to-eq= に付けた =@[csimp]= は、 =sum-to= をコンパイルするときに =sum-to-fast= へ置き換えることを Lean に許す属性です。
-置き換えてよい根拠は、2 つの関数が等しいという証明です。
-そのため、Clojure から =sum-to= を呼ぶと、再帰ではなく Clojure の =sum-to-fast= が実行されます。
+=sum-to-eq= に付けた =@[csimp]= は、 =sum-to= をコンパイルするときに =sum-to-fast= へ置き換えることをLeanに許す属性です。
+置き換えてよい根拠は、2つの関数が等しいという証明です。
+そのため、Clojureから =sum-to= を呼ぶと、再帰ではなくClojureの =sum-to-fast= が実行されます。
 
 #+begin_src clojure
 (sum-to 1000000)  ;=> 500000500000
 #+end_src
 
-この形は [[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]] で紹介した lean-ritsuryo の書き方を、Clojure の実装に当てはめたものです。
+この形は[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介したlean-ritsuryoの書き方を、Clojureの実装に当てはめたものです。
 実装と仕様の関係ごとに、次のサンプルがあります。
 
-| 実装と仕様の関係                         | lean-clj での書き方                                    | サンプル                                    |
+| 実装と仕様の関係                         | lean-cljでの書き方                                    | サンプル                                    |
 |------------------------------------------+--------------------------------------------------------+---------------------------------------------|
 | 仕様をそのまま実行する                   | =deflean= の定義を呼ぶ                                 | todo-cli                                    |
 | 速い実装がすべての入力で仕様と一致する   | 等しいことを証明し、 =@[csimp]= で置き換える          | verified-clojure ( =sum-to= )               |
@@ -17696,7 +17696,7 @@ $ lean-clj module generate-namespace --module-name Roman --namespace roman.core 
 
 *** 本物の関数とモデルを生成テストで比べる
 証明が示すのはモデルの性質です。
-モデルの挙動が Clojure の関数と食い違っていれば、本物の関数では成り立たない定理も証明できてしまいます。
+モデルの挙動がClojureの関数と食い違っていれば、本物の関数では成り立たない定理も証明できてしまいます。
 そこで、 =lt/check= を使って本物の関数とモデルを同じ入力で呼び、結果を比べます。
 
 #+begin_src clojure
@@ -17704,13 +17704,13 @@ $ lean-clj module generate-namespace --module-name Roman --namespace roman.core 
 ;=> {:result true, :pass? true, :num-tests 100, :time-elapsed-ms 7, :seed 1}
 #+end_src
 
-=lt/check= は signature から、テストの入力を作る test.check の generator を生成します。
+=lt/check= はsignatureから、テストの入力を作るtest.checkのgeneratorを生成します。
 結果が食い違ったときは、引数と両方の戻り値を =:counterexample= に入れて返します。
 =lt/defcheck= を使うと、同じ検査を =clojure.test= のテストとして定義できます。
-lean-clj のテストでも、 =Clj= のモデルを =clojure.core= の関数と生成テストで照合していて、照合の表は 156 行あります。
+lean-cljのテストでも、 =Clj= のモデルを =clojure.core= の関数と生成テストで照合していて、照合の表は156行あります。
 
-定理は Clojure の関数が値を返す呼び出しについて成り立ちます。
-=Long= の overflow、0 での除算、範囲外の index のように例外を投げる呼び出しは、モデルの対象外です。
+定理はClojureの関数が値を返す呼び出しについて成り立ちます。
+=Long= のoverflow、0での除算、範囲外のindexのように例外を投げる呼び出しは、モデルの対象外です。
 
 ** 生成テストで見つかったモデルの誤り
 照合の生成テストで、モデルの誤りがいくつも見つかりました。
@@ -17728,7 +17728,7 @@ lean-clj のテストでも、 =Clj= のモデルを =clojure.core= の関数と
     false))
 #+end_src
 
-Clojure の =if-let= は、束縛した値が =false= か =nil= のときに else の分岐を取ります。
+Clojureの =if-let= は、束縛した値が =false= か =nil= のときにelseの分岐を取ります。
 そのため、 =false= だけのリストで =false= を探すと =false= を返します。
 
 #+begin_src clojure
@@ -17737,8 +17737,8 @@ Clojure の =if-let= は、束縛した値が =false= か =nil= のときに els
 #+end_src
 
 以前のモデルは、型の変数 =α= の値を真偽の判定で常に真として扱っていました。
-=Nat= や =String= の値は Clojure でも常に真なので、多くの型ではこの扱いで結果が Clojure と同じになります。
-しかし =α = Bool= のときは =false= が偽になるので、モデルと Clojure の関数の結果が食い違います。
+=Nat= や =String= の値はClojureでも常に真なので、多くの型ではこの扱いで結果がClojureと同じになります。
+しかし =α = Bool= のときは =false= が偽になるので、モデルとClojureの関数の結果が食い違います。
 このモデルでは、「先頭に =x= があれば =member?= は =true= を返す」という次の定理が、すべての =α= について証明できました。
 
 #+begin_src clojure
@@ -17747,9 +17747,9 @@ Clojure の =if-let= は、束縛した値が =false= か =nil= のときに els
   (by (rw [member?]) simp))
 #+end_src
 
-=x = false= のとき、Clojure の関数は =false= を返すので、この定理は本物の関数では成り立ちません。
+=x = false= のとき、Clojureの関数は =false= を返すので、この定理は本物の関数では成り立ちません。
 
-いまのモデルは、型の変数ごとに =[Clj.Truthy α]= という instance を引数に取り、 =α= に入る具体的な型の instance で値の真偽を決めます。
+いまのモデルは、型の変数ごとに =[Clj.Truthy α]= というinstanceを引数に取り、 =α= に入る具体的な型のinstanceで値の真偽を決めます。
 同じ定理を証明しようとすると、 =x= が真であることを示すゴールが残り、証明が失敗します。
 
 #+begin_src text
@@ -17760,10 +17760,10 @@ xs : List α
 ⊢ Clj.truthy x = true
 #+end_src
 
-サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/generic-search][generic-search]] は、 =nil= だけを偽とする =if-some= で =member?= を書き、同じ定理を証明しています。
+サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/generic-search][generic-search]]は、 =nil= だけを偽とする =if-some= で =member?= を書き、同じ定理を証明しています。
 
 *** そのほかの誤り
-ほかにも、生成テストで次の 3 つの Clojure の挙動がモデルと食い違いました。
+ほかにも、生成テストで次の3つのClojureの挙動がモデルと食い違いました。
 
 #+begin_src clojure
 (:k {:k nil} 0)                  ;=> nil
@@ -17771,16 +17771,16 @@ xs : List α
 (get [0 1] 4294967297)           ;=> 1
 #+end_src
 
-- =(:k m default)= は、key があって値が =nil= なら =nil= を返します。default を返すのは key が無いときだけです。モデルは =nil= のときにも default を返していました。
-- =str= は vector の中の =BigInt= に =N= を付けます。モデルは =N= を付けていませんでした。generator は =Long= に収まらない整数も作るので、この違いが見つかりました。
-- vector の =get= は、index を =int= の下位 32 bit に切り詰めます。 =4294967297= は =2^32 + 1= なので、index 1 の要素を返します。
+- =(:k m default)= は、keyがあって値が =nil= なら =nil= を返します。defaultを返すのはkeyが無いときだけです。モデルは =nil= のときにもdefaultを返していました。
+- =str= はvectorの中の =BigInt= に =N= を付けます。モデルは =N= を付けていませんでした。generatorは =Long= に収まらない整数も作るので、この違いが見つかりました。
+- vectorの =get= は、indexを =int= の下位32 bitに切り詰めます。 =4294967297= は =2^32 + 1= なので、index 1の要素を返します。
 
-どれも、モデルを Clojure の挙動に合わせて直しました。
+どれも、モデルをClojureの挙動に合わせて直しました。
 
 ** 作らなかったもの
-=Long= の overflow まで含めて、関数が例外を投げないことも証明するモード ( =^:total= ) は作りませんでした。
+=Long= のoverflowまで含めて、関数が例外を投げないことも証明するモード ( =^:total= ) は作りませんでした。
 このモードでは、式全体を =Option= のような例外を表す型の計算として書き直す必要があります。
-この書き直しを Lean の =do= 記法で行うと、評価の順序が Clojure と食い違います。
+この書き直しをLeanの =do= 記法で行うと、評価の順序がClojureと食い違います。
 
 #+begin_src lean
 def half (n : Nat) : Option Nat :=
@@ -17792,40 +17792,40 @@ def g (n : Nat) : Option Bool := do
 #eval g 1  -- none
 #+end_src
 
-Clojure の ~(or (= n 1) ...)~ は、 =n= が 1 なら右辺を評価せずに =true= を返します。
-Lean は =(← half n)= を式の外へ出して先に実行するので、右辺の =half 1= が失敗し、 =g 1= は =none= になります。
-=and= や =or= のように途中で評価をやめる式を、すべて Clojure と同じ順序で書き直す必要があり、このモードは変換の手間に見合わないと判断しました。
+Clojureの ~(or (= n 1) ...)~ は、 =n= が1なら右辺を評価せずに =true= を返します。
+Leanは =(← half n)= を式の外へ出して先に実行するので、右辺の =half 1= が失敗し、 =g 1= は =none= になります。
+=and= や =or= のように途中で評価をやめる式を、すべてClojureと同じ順序で書き直す必要があり、このモードは変換の手間に見合わないと判断しました。
 
-overflow を避けるには任意精度の =+'= の系列を使い、見つけるには =lt/check= に =:throws :fail= を渡して、例外を投げる入力を失敗として数えます。
+overflowを避けるには任意精度の =+'= の系列を使い、見つけるには =lt/check= に =:throws :fail= を渡して、例外を投げる入力を失敗として数えます。
 
 ** 仕組み
-生成するコードの形式には、Java のソースや JVM のバイトコードではなく Clojure のソースを選びました。
-Lean の =Array= は Clojure の永続ベクタと意味が合い、要素の更新が O(log n) で済みます。
-=Nat= の計算は =+'= で =BigInt= に切り替わり、Lean のクロージャは =IFn= を実装した Clojure の値にできます。
-JIT がバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
+生成するコードの形式には、JavaのソースやJVMのバイトコードではなくClojureのソースを選びました。
+Leanの =Array= はClojureの永続ベクタと意味が合い、要素の更新がO(log n) で済みます。
+=Nat= の計算は =+'= で =BigInt= に切り替わり、Leanのクロージャは =IFn= を実装したClojureの値にできます。
+JITがバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
 
-実行時に動くのは JVM だけです。
-Lean が動くのは =deflean= のブロックを展開するときと、CLI でモジュールを変換するときだけで、実行時は Lean の C の runtime の代わりに、その関数を Clojure で書き直した runtime を使います。
-Lean のプロセスも FFI も別のヒープもないので、2 つの runtime のあいだで状態を共有する場面はありません。
-Clojure と生成したコードのあいだで受け渡す値はどれも immutable です。
-Lean の可変な状態は Clojure の仕組みで動きます。 =IO.Ref= は atom、 =Task= は future、 =Thunk= は delay になり、標準出力は =*out*= に書くので =binding= で差し替えられます。
+実行時に動くのはJVMだけです。
+Leanが動くのは =deflean= のブロックを展開するときと、CLIでモジュールを変換するときだけで、実行時はLeanのCのruntimeの代わりに、その関数をClojureで書き直したruntimeを使います。
+LeanのプロセスもFFIも別のヒープもないので、2つのruntimeのあいだで状態を共有する場面はありません。
+Clojureと生成したコードのあいだで受け渡す値はどれもimmutableです。
+Leanの可変な状態はClojureの仕組みで動きます。 =IO.Ref= はatom、 =Task= はfuture、 =Thunk= はdelayになり、標準出力は =*out*= に書くので =binding= で差し替えられます。
 
-生成した Clojure が正しいことは、Lean の C backend との差分テストで確かめています。
-同じテスト用の関数を、C backend がビルドした実行ファイルと、生成した Clojure の両方で実行し、出力の 182 行を比べます。
-浮動小数点数の無限大を、C は =inf= 、Java は =Infinity= と表示する違いも、このテストで見つかりました。
+生成したClojureが正しいことは、LeanのC backendとの差分テストで確かめています。
+同じテスト用の関数を、C backendがビルドした実行ファイルと、生成したClojureの両方で実行し、出力の182行を比べます。
+浮動小数点数の無限大を、Cは =inf= 、Javaは =Infinity= と表示する違いも、このテストで見つかりました。
 
-生成したコードが、JVM の 1 メソッドあたり 64KB という上限を超えたこともありました。
-Lean の IR の join point (関数の中で複数の分岐が合流する先) を呼び出し箇所ごとに展開していたため、生成したコードが 36,000 行に膨らみ、 =Std.Format= の関数の読み込みが「Method code too large!」で失敗しました。
-いまは呼び出しが 1 か所の join point だけを展開し、2 か所以上のものは =letfn= にしています。
+生成したコードが、JVMの1メソッドあたり64KBという上限を超えたこともありました。
+LeanのIRのjoin point (関数の中で複数の分岐が合流する先) を呼び出し箇所ごとに展開していたため、生成したコードが36,000行に膨らみ、 =Std.Format= の関数の読み込みが「Method code too large!」で失敗しました。
+いまは呼び出しが1か所のjoin pointだけを展開し、2か所以上のものは =letfn= にしています。
 自己末尾呼び出しは =loop= と =recur= に、相互再帰は =trampoline= にして、スタックを積まずに実行します。
 
-** Clojure の型のライブラリとの関係
-Clojure には、clojure.spec、malli、Plumatic Schema のように、値を実行時に検査するスキーマのライブラリがあります。
-これらは値を検査する述語を組み合わせて書く仕組みで、型の変数を持たず、map は既定で開いていて、整数の固定精度と任意精度を区別しません。
-Typed Clojure と clj-kondo の型検査は、それぞれ独自の型の言語と、 =clojure.core= の関数の型の注釈を持っています。
+** Clojureの型のライブラリとの関係
+Clojureには、clojure.spec、malli、Plumatic Schemaのように、値を実行時に検査するスキーマのライブラリがあります。
+これらは値を検査する述語を組み合わせて書く仕組みで、型の変数を持たず、mapは既定で開いていて、整数の固定精度と任意精度を区別しません。
+Typed Clojureとclj-kondoの型検査は、それぞれ独自の型の言語と、 =clojure.core= の関数の型の注釈を持っています。
 
-lean-clj では型を Lean で書き、その型から malli のスキーマ、test.check の generator、clj-kondo の型を生成します。
-=deflean= で定義した structure =Account= からは、次の malli のスキーマができます。
+lean-cljでは型をLeanで書き、その型からmalliのスキーマ、test.checkのgenerator、clj-kondoの型を生成します。
+=deflean= で定義したstructure =Account= からは、次のmalliのスキーマができます。
 
 #+begin_src clojure
 (require '[lean-clj.types :as t])
@@ -17834,18 +17834,18 @@ lean-clj では型を Lean で書き、その型から malli のスキーマ、t
 ;=> [:map {:closed true} [:owner :string] [:balance [:and integer? [:>= 0]]]]
 #+end_src
 
-=Nat= は 0 以上の整数に、structure は同じ key を持つ閉じた map になります。
-証明を書かなくても、signature からこれらを使えます (サンプルの [[https://github.com/conao3/lean-clj/tree/master/samples/typed-schemas][typed-schemas]])。
+=Nat= は0以上の整数に、structureは同じkeyを持つ閉じたmapになります。
+証明を書かなくても、signatureからこれらを使えます (サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/typed-schemas][typed-schemas]])。
 
-近い領域のプロジェクトに、whilo さんの [[https://github.com/replikativ/ansatz][ansatz]] があります。
-ansatz は Lean のカーネルを Java で実装し、JVM だけで型の検査を済ませます。
-lean-clj は本物の Lean で検査し、Lean の構文と標準ライブラリ、既存の lake のプロジェクトをそのまま使います。
-その代わり、 =deflean= の初回の展開には Lean の toolchain が要ります。
+近い領域のプロジェクトに、whiloさんの[[https://github.com/replikativ/ansatz][ansatz]]があります。
+ansatzはLeanのカーネルをJavaで実装し、JVMだけで型の検査を済ませます。
+lean-cljは本物のLeanで検査し、Leanの構文と標準ライブラリ、既存のlakeのプロジェクトをそのまま使います。
+その代わり、 =deflean= の初回の展開にはLeanのtoolchainが要ります。
 
 ** おわりに
-lean-clj は Clojars の =io.github.conao3/lean-clj= から入手できます。
-[[https://github.com/conao3/lean-clj/tree/master/samples][samples]] には使い方ごとの小さなサンプルがあり、 =deflean= は todo-cli から、Clojure の関数の検証は verified-clojure から読むのがおすすめです。
-Issue / PR 大歓迎です。
+lean-cljはClojarsの =io.github.conao3/lean-clj= から入手できます。
+[[https://github.com/conao3/lean-clj/tree/master/samples][samples]]には使い方ごとの小さなサンプルがあり、 =deflean= はtodo-cliから、Clojureの関数の検証はverified-clojureから読むのがおすすめです。
+Issue / PR大歓迎です。
 
 * lean-clj: call Lean 4 functions from Clojure, and prove Clojure functions in Lean
 :properties:
@@ -18197,32 +18197,32 @@ I welcome issues and pull requests.
 :export_date: 2026-11-06 04:27
 :end:
 
-[[https://s.conao3.com/blog/2026/f681b9][前の記事]]で紹介した =awsr= は、AWS CLI v2 とバイト単位で同じ出力を返す Rust 製の CLI です。
+[[https://s.conao3.com/blog/2026/f681b9][前の記事]]で紹介した =awsr= は、AWS CLI v2とバイト単位で同じ出力を返すRust製のCLIです。
 同じ出力を返し続けるには、本家の新しいバージョンが出るたびに =awsr= も同じバージョンへ上げる必要があります。
-本家は 2026-09-30 から 2026-11-05 までの 36 日間に [[https://github.com/aws/aws-cli/tags][20 回リリース]]していて、平日はほぼ毎日新しいバージョンが出ます。
-そこで、本家の新しいバージョンへの追従を GitHub Actions で毎日回すようにしました。
-新しいバージョンが出ると、workflow がバージョンを上げる変更を作って本家と比べ、結果を載せた PR を作ります。
+本家は2026-09-30から2026-11-05までの36日間に[[https://github.com/aws/aws-cli/tags][20回リリース]]していて、平日はほぼ毎日新しいバージョンが出ます。
+そこで、本家の新しいバージョンへの追従をGitHub Actionsで毎日回すようにしました。
+新しいバージョンが出ると、workflowがバージョンを上げる変更を作って本家と比べ、結果を載せたPRを作ります。
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
-次の画像は、2.39.5 が出たときに [[https://github.com/conao3/rust-awscli/pull/6][workflow が作った PR]] です。
+次の画像は、2.39.5が出たときに[[https://github.com/conao3/rust-awscli/pull/6][workflowが作ったPR]]です。
 移植する前の比較の結果が、表に並んでいます。
 
 [[./resources/public/img/7fe084-pr.png]]
 
 ** バージョンを上げると変わるもの
-=awsr= は本家の決まった 1 つのバージョンに合わせて作っていて、そのバージョンを =models/VERSION= に書いています。
-=flake.nix= は、同じバージョンの本家のソースと公式の Linux 向けのインストーラを nix で取り込みます。
-本家のバージョンを上げると、次の 3 つが変わります。
+=awsr= は本家の決まった1つのバージョンに合わせて作っていて、そのバージョンを =models/VERSION= に書いています。
+=flake.nix= は、同じバージョンの本家のソースと公式のLinux向けのインストーラをnixで取り込みます。
+本家のバージョンを上げると、次の3つが変わります。
 
-- botocore のモデル: =awsr= がバイナリに埋め込む、サービスと操作の定義です。
-- テストの期待値: コマンドの表、引数の表のハッシュ、help の文書、waiter の説明は、本家のモデルとソースから作っています。
-- 本家のコードの変更: 独自の処理を持つコマンドや、認証の処理の変更です。本家の [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]] では =api-change= 以外の項目 (=enhancement= や =bugfix=) にあたります。
+- botocoreのモデル: =awsr= がバイナリに埋め込む、サービスと操作の定義です。
+- テストの期待値: コマンドの表、引数の表のハッシュ、helpの文書、waiterの説明は、本家のモデルとソースから作っています。
+- 本家のコードの変更: 独自の処理を持つコマンドや、認証の処理の変更です。本家の[[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]]では =api-change= 以外の項目 (=enhancement= や =bugfix=) にあたります。
 
-モデルと期待値は本家から機械で作れますが、本家のコードの変更は Rust へ移植する必要があります。
+モデルと期待値は本家から機械で作れますが、本家のコードの変更はRustへ移植する必要があります。
 
 ** バージョンを上げるスクリプト
-機械で作れる部分は [[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]] で作り直します。
+機械で作れる部分は[[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]]で作り直します。
 
 #+begin_src console
 $ scripts/update-reference.sh 2.39.5
@@ -18231,71 +18231,71 @@ $ scripts/update-reference.sh 2.39.5
 このスクリプトは次の順に作業します。
 
 1. =nix-prefetch-url= で本家のソースとインストーラのハッシュを取り、 =flake.nix= のバージョンとハッシュを書き換える。
-2. 新しいバージョンの devShell に入り、 =scripts/vendor-models.sh= でモデルを取り込み直す。モデルを持つ 3 つのデータ crate のバージョンも、ここで本家のバージョンにそろう。
-3. コマンドの表、引数の表のハッシュ、help の文書、waiter の説明を、本家のソースから作り直す。
+2. 新しいバージョンのdevShellに入り、 =scripts/vendor-models.sh= でモデルを取り込み直す。モデルを持つ3つのデータcrateのバージョンも、ここで本家のバージョンにそろう。
+3. コマンドの表、引数の表のハッシュ、helpの文書、waiterの説明を、本家のソースから作り直す。
 4. =nix fmt= で整形する。
 
-期待値を作るスクリプトは、2.39.3 のソースで動かすと commit 済みの期待値と同じ中身になることを確かめてから使っています。
+期待値を作るスクリプトは、2.39.3のソースで動かすとcommit済みの期待値と同じ中身になることを確かめてから使っています。
 
-** 毎日回す workflow
-[[https://github.com/conao3/rust-awscli/blob/master/.github/workflows/reference.yml][=Reference= の workflow]] は、毎日 12:00 UTC に本家の最新のタグを調べます。
-=models/VERSION= より新しいバージョンがあれば、上のスクリプトでバージョンを上げてから、次の 4 つで本家と比べます。
+** 毎日回すworkflow
+[[https://github.com/conao3/rust-awscli/blob/master/.github/workflows/reference.yml][=Reference= のworkflow]]は、毎日12:00 UTCに本家の最新のタグを調べます。
+=models/VERSION= より新しいバージョンがあれば、上のスクリプトでバージョンを上げてから、次の4つで本家と比べます。
 
 - =make check= (fmt、clippy、テスト)
 - [[https://github.com/conao3/rust-awscli/tree/master/difftest][差分テスト]]: モデルが変わったサービスの全操作を =awsr= と本家の両方で動かし、出力とリクエストを比べる。
-- help の比較: 同じサービスの help ページを、バイト単位で比べる。
+- helpの比較: 同じサービスのhelpページを、バイト単位で比べる。
 - シナリオと認証の比較: 手で書いたシナリオ、 =s3= コマンドのシナリオ、 =configure= や =sso login= などの認証まわりのコマンドを比べる。
 
-比べ終わると、 =reference/<バージョン>= のブランチを push し、結果の表を載せた PR を作ります。
-PR の本文には本家の changelog のうち =api-change= 以外の項目も並べます。
-比較が 1 つでも失敗するか移植の要る項目があれば、PR を draft にします。
+比べ終わると、 =reference/<バージョン>= のブランチをpushし、結果の表を載せたPRを作ります。
+PRの本文には本家のchangelogのうち =api-change= 以外の項目も並べます。
+比較が1つでも失敗するか移植の要る項目があれば、PRをdraftにします。
 
 [[./resources/public/img/7fe084-flow.svg]]
 
 ** 変わったサービスだけを比べる
-差分テストを全件回すと、23 万件を超える組み合わせを本家と比べることになります。
-本家の実行結果のキャッシュがないと、手元の 14 コアの PC で約 100 分かかりました。
-公開リポジトリで使う GitHub Actions の =ubuntu-latest= は 4 コアなので、全件を毎日回すのは現実的ではありません。
+差分テストを全件回すと、23万件を超える組み合わせを本家と比べることになります。
+本家の実行結果のキャッシュがないと、手元の14コアのPCで約100分かかりました。
+公開リポジトリで使うGitHub Actionsの =ubuntu-latest= は4コアなので、全件を毎日回すのは現実的ではありません。
 
 そこで、毎日の比較はモデルが変わったサービスに絞ります。
-2.39.3 から 2.39.5 では 34 サービスのモデルが変わっていて、その全操作の組み合わせは 48,504 件でした。
-このバージョンに上げたときの [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] は全体で約 71 分かかりました。
-そのうち差分テストが release ビルドを含めて約 44 分、help の 4,189 ページの比較が約 18 分です。
+2.39.3から2.39.5では34サービスのモデルが変わっていて、その全操作の組み合わせは48,504件でした。
+このバージョンに上げたときの[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]は全体で約71分かかりました。
+そのうち差分テストがreleaseビルドを含めて約44分、helpの4,189ページの比較が約18分です。
 
-** 2.39.5 で移植したもの
-2.39.3 から 2.39.5 に上げた PR は [[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]] です。
-2.39.4 と 2.39.5 の [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]] には、 =api-change= 以外の項目が 9 つありました。
-そのうち =awsr= に移植したのは、次の 4 つです。
+** 2.39.5で移植したもの
+2.39.3から2.39.5に上げたPRは[[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]]です。
+2.39.4と2.39.5の[[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]]には、 =api-change= 以外の項目が9つありました。
+そのうち =awsr= に移植したのは、次の4つです。
 
-- Bearer 認証のトークンを、HTTPS 以外の endpoint へ送らない。
-- =s3 cp= 、 =s3 mv= 、 =s3 sync= で、手元から S3 への転送に =--tags= を付けられる。
-- 転送が =PreconditionFailed= で失敗したとき、 =--no-overwrite= を付けた転送だけを、すでにあるファイルの skip として扱う。
-- =deploy install= が書く設定ファイルの権限を 600 にする。
+- Bearer認証のトークンを、HTTPS以外のendpointへ送らない。
+- =s3 cp= 、 =s3 mv= 、 =s3 sync= で、手元からS3への転送に =--tags= を付けられる。
+- 転送が =PreconditionFailed= で失敗したとき、 =--no-overwrite= を付けた転送だけを、すでにあるファイルのskipとして扱う。
+- =deploy install= が書く設定ファイルの権限を600にする。
 
-残りの 5 つは、CRT の転送クライアントと Windows での =aws update= の項目です。
-=awsr= は classic の転送クライアントだけを実装していて、 =update= のコマンドもまだ実装していないので、この 5 つは移植の対象になりません。
+残りの5つは、CRTの転送クライアントとWindowsでの =aws update= の項目です。
+=awsr= はclassicの転送クライアントだけを実装していて、 =update= のコマンドもまだ実装していないので、この5つは移植の対象になりません。
 
-Bearer 認証の変更は、2.39.5 で増えた =account-access-runtime= のサービスで見つかりました。
-差分テストはこのサービスの 24 件で一致せず、本家は =Bearer authorization requires an HTTPS endpoint.= で止まり、 =awsr= はリクエストを送っていました。
-この変更を移植すると、こんどは 2.39.3 の本家と比べたときに Bearer 認証を使う別のサービスが一致しなくなります。
-そのため、本家のバージョンに依存する移植は、バージョンを上げる PR の中で行います。
-PR のブランチに master を merge し、その上に移植の commit を積んで、手元ですべての比較が通ってから merge しました。
+Bearer認証の変更は、2.39.5で増えた =account-access-runtime= のサービスで見つかりました。
+差分テストはこのサービスの24件で一致せず、本家は =Bearer authorization requires an HTTPS endpoint.= で止まり、 =awsr= はリクエストを送っていました。
+この変更を移植すると、こんどは2.39.3の本家と比べたときにBearer認証を使う別のサービスが一致しなくなります。
+そのため、本家のバージョンに依存する移植は、バージョンを上げるPRの中で行います。
+PRのブランチにmasterをmergeし、その上に移植のcommitを積んで、手元ですべての比較が通ってからmergeしました。
 
-=--tags= は既存のシナリオでは比べられないので、 =s3= コマンドのシナリオを 6 つ足しました。
-足したシナリオがタグを確かに比べていることは、 =awsr= のタグを付ける処理を一時的に外し、upload の 4 つが失敗することで確かめています。
+=--tags= は既存のシナリオでは比べられないので、 =s3= コマンドのシナリオを6つ足しました。
+足したシナリオがタグを確かに比べていることは、 =awsr= のタグを付ける処理を一時的に外し、uploadの4つが失敗することで確かめています。
 
-** runner の上でだけ見つかった差分
-2.39.5 の PR を作った [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] では、 =deploy install= と =deploy uninstall= のシナリオが 3 つ失敗しました。
-同じシナリオは手元の PC では一致します。
+** runnerの上でだけ見つかった差分
+2.39.5のPRを作った[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]では、 =deploy install= と =deploy uninstall= のシナリオが3つ失敗しました。
+同じシナリオは手元のPCでは一致します。
 
-=deploy install= は、EC2 のインスタンスの上では動かないように作られていて、 =169.254.169.254= のメタデータのサービスに問い合わせて EC2 の上かを調べます。
-本家は Python の =urlopen= で HTTP の GET を送り、エラーの応答を受けたときは EC2 ではないと判断します。
-=awsr= は TCP でつながるかだけを見ていたので、このアドレスに何かのサービスが応答する環境では EC2 の上だと判断していました。
-[[https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners][GitHub Actions の runner]] は Azure か AWS の上で動き、Azure のメタデータのサービスも同じアドレスを使います。
-[[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service][Azure のメタデータのサービス]]は、 =Metadata: true= のヘッダーがない要求を拒みます。
+=deploy install= は、EC2のインスタンスの上では動かないように作られていて、 =169.254.169.254= のメタデータのサービスに問い合わせてEC2の上かを調べます。
+本家はPythonの =urlopen= でHTTPのGETを送り、エラーの応答を受けたときはEC2ではないと判断します。
+=awsr= はTCPでつながるかだけを見ていたので、このアドレスに何かのサービスが応答する環境ではEC2の上だと判断していました。
+[[https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners][GitHub Actionsのrunner]]はAzureかAWSの上で動き、Azureのメタデータのサービスも同じアドレスを使います。
+[[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service][Azureのメタデータのサービス]]は、 =Metadata: true= のヘッダーがない要求を拒みます。
 
-=awsr= も HTTP の GET を送り、応答のステータスが 400 未満のときだけ EC2 の上と判断するように直しました。
-手元では、 =unshare -rnm= で作った user namespace の中に =169.254.169.254= で 400 か 200 を返すサーバーを立て、 =/etc/lsb-release= を Ubuntu のものに差し替えて、本家と =awsr= の出力が同じになることを確かめています。
+=awsr= もHTTPのGETを送り、応答のステータスが400未満のときだけEC2の上と判断するように直しました。
+手元では、 =unshare -rnm= で作ったuser namespaceの中に =169.254.169.254= で400か200を返すサーバーを立て、 =/etc/lsb-release= をUbuntuのものに差し替えて、本家と =awsr= の出力が同じになることを確かめています。
 
 * Lean 4で証明した関数をRustから呼べるlean-rsを作った
 :properties:
