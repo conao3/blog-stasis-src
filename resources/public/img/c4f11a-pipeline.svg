@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="420" viewBox="0 0 1000 420" font-family="sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="420" rx="16" fill="#fff"/>
+  <rect x="30" y="50" width="250" height="120" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="155" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#0f4c81">lean-ritsuryo</text>
+  <text x="155" y="138" font-size="19" text-anchor="middle" fill="#222">計算の関数と証明</text>
+  <rect x="375" y="50" width="250" height="120" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="500" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#0f4c81">RitsuryoRs.Api</text>
+  <text x="500" y="138" font-size="19" text-anchor="middle" fill="#222">Rustに出す関数</text>
+  <rect x="720" y="50" width="250" height="120" rx="12" fill="#f8ece4" stroke="#a0410d" stroke-width="2"/>
+  <text x="845" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#a0410d">ritsuryo</text>
+  <text x="845" y="138" font-size="19" text-anchor="middle" fill="#222">生成したRustのcrate</text>
+  <rect x="720" y="260" width="250" height="120" rx="12" fill="#efe8f7" stroke="#5b3a91" stroke-width="2"/>
+  <text x="845" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#5b3a91">ritsuryo-wasm</text>
+  <text x="845" y="348" font-size="19" text-anchor="middle" fill="#222">WebAssemblyの関数</text>
+  <rect x="375" y="260" width="250" height="120" rx="12" fill="#f2f2f2" stroke="#555" stroke-width="2"/>
+  <text x="500" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#333">Webページ</text>
+  <text x="500" y="348" font-size="19" text-anchor="middle" fill="#222">ブラウザで計算する</text>
+  <rect x="30" y="260" width="250" height="120" rx="12" fill="#f8ece4" stroke="#a0410d" stroke-width="2"/>
+  <text x="155" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#a0410d">Rustのプログラム</text>
+  <text x="155" y="348" font-size="19" text-anchor="middle" fill="#222">crates.ioから使う</text>
+  <line x1="284" y1="110" x2="371" y2="110" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="328" y="96" font-size="19" text-anchor="middle" fill="#222">import</text>
+  <line x1="629" y1="110" x2="716" y2="110" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="672" y="96" font-size="19" text-anchor="middle" fill="#222">lean-rs</text>
+  <line x1="845" y1="174" x2="845" y2="256" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="858" y="222" font-size="19" fill="#222">wasm-bindgen</text>
+  <line x1="716" y1="320" x2="629" y2="320" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <path d="M 720 165 Q 500 215 284 268" fill="none" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+</svg>

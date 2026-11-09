@@ -18595,6 +18595,144 @@ lean-rsはcrates.ioの =lean-rust= から入手できます。
 [[https://github.com/conao3/lean-rs/tree/master/samples/steps][samples/steps]]には、最初の =lean!= のブロックからgenericな関数の検証まで、機能を1つずつ紹介する17段のサンプルがあります。
 Issue / PR大歓迎です。
 
+* Leanで証明した日付と税計算を、RustのcrateとWebページにした
+:properties:
+:export_file_name: generated/contents/blog/2026/c4f11a
+:export_date: 2026-11-09 14:40
+:export_draft: t
+:end:
+
+[[https://s.conao3.com/blog/2026/5499a8][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算をLean 4で書き、条文どおりに計算することを証明したライブラリです。
+このライブラリを[[https://s.conao3.com/blog/2026/b43a06][lean-rs]]でRustに変換し、RustのcrateとWebページにしました。
+Webページはブラウザの中のWebAssemblyで計算するので、入力はどこにも送りません。
+リポジトリは[[https://github.com/conao3/rust-ritsuryo][conao3/rust-ritsuryo]]で、ライセンスはApache-2.0です。
+crateは[[https://crates.io/crates/ritsuryo][crates.io]]に =ritsuryo= の名前で公開しています。
+この記事は =ritsuryo= 0.1.0と =lean-rust= 0.3.0で動かした結果をもとに書いています。
+
+[[github:conao3/rust-ritsuryo::Rust][Japanese statutory periods and taxes for Rust and the browser, compiled from proved Lean 4 code with lean-rs]]
+
+** ブラウザで計算する
+Webページは次のURLで開けます。
+
+https://conao3.github.io/rust-ritsuryo/
+
+[[./resources/public/img/c4f11a-page.png]]
+
+ページでコマンドとサブコマンドを選ぶと、そのパラメータの入力欄が出ます。
+コマンドはlean-ritsuryoのCLIの =ritsuryo= と同じ10個で、期間の満了日、年齢、祝日、上訴や確定申告の期限、所得税、相続税、消費税、延滞税、利子税、加算税を計算できます。
+ページはCLIのコマンドの表から入力欄を組み立てます。
+パラメータを入れると、同じ計算をするCLIのコマンドが結果の欄の上に出ます。
+「計算する」を押すと、選んだ形式でCLIと同じ結果が出ます。
+形式はJSON、テキスト、表から選べます。
+
+上の画像は、2025年分の課税総所得金額が500万円のときの所得税です。
+所得税は572,500円で、復興特別所得税を足して百円未満を切り捨てた納める額は584,500円になります。
+手元のChromeでは、1回の計算は数ミリ秒から数十ミリ秒で終わりました。
+
+** Rustから呼ぶ
+=Cargo.toml= に =ritsuryo= を追加します。
+次の例ではJSONを組み立てるために =serde_json= も使います。
+
+#+begin_src toml
+[dependencies]
+ritsuryo = "0.1.0"
+serde_json = "1"
+#+end_src
+
+#+begin_src rust
+use serde_json::json;
+
+fn main() {
+    let out = ritsuryo::invoke(
+        "income-tax",
+        "compute-tax",
+        &json!({"TaxYear": 2025, "TaxableIncome": 5_000_000}),
+    )
+    .unwrap();
+    println!("{}", out["Result"]);
+
+    let tax = ritsuryo::income_tax::compute(2025, 5_000_000, 0, 0);
+    println!("{} {}", tax.income_tax, tax.payable);
+
+    for h in ritsuryo::holiday::holidays(2027).iter().take(3) {
+        println!("{}/{} {} {:?}", h.month, h.day, h.name, h.kind);
+    }
+
+    let err = ritsuryo::invoke("holiday", "check-holiday", &json!({"Date": "2027-02-30"}));
+    println!("{:?}", err);
+}
+#+end_src
+
+#+begin_src console
+$ cargo run -q
+{"DefenseTax":0,"IncomeTax":572500,"Payable":584500,"ReconstructionTax":12022,"Total":584522}
+572500 584500
+1/1 元日 National
+1/11 成人の日 National
+2/11 建国記念の日 National
+Err(Error { code: 254, message: "2027-02-30 は存在しない日付" })
+#+end_src
+
+=invoke= はCLIのサブコマンドを名前で選び、パラメータをJSONのオブジェクトで渡して実行します。
+パラメータの名前はCLIの名前をPascalCaseにしたもので、 =--taxable-income= は =TaxableIncome= になります。
+戻り値は、CLIが出力するJSONと同じです。
+=holiday= と =income_tax= のmoduleは、lean-ritsuryoの関数をRustの型で呼びます。
+
+計算できない入力を渡すと、CLIの終了コードと同じ値の =code= を持つエラーが返ります。
+252は使えないコマンドやパラメータを渡したとき、254は存在しない日付のように計算が扱う範囲の外にある入力を渡したときの値です。
+
+crateはcargoだけでビルドでき、LeanのtoolchainもLeanのCのruntimeも要りません。
+
+** 仕組み
+lean-ritsuryoからWebページまでのつながりは、次の図のとおりです。
+
+[[./resources/public/img/c4f11a-pipeline.svg]]
+
+lean-ritsuryoとRustのあいだには、Rustに出す関数を決めるLeanのmodule [[https://github.com/conao3/rust-ritsuryo/blob/master/lean/RitsuryoRs/Api.lean][RitsuryoRs.Api]]を置いています。
+このmoduleはlean-ritsuryoをimportして、次の関数を定義します。
+
+- =invoke= : CLIのコマンドの表からサブコマンドを名前で引いて実行する。パラメータはJSONで受け取り、CLIと同じ検査をしてから計算する。
+- =describe= : コマンドの表をJSONで返す。Webページはこれを使って入力欄を組み立てる。
+- =isHoliday= 、 =holidays= 、 =incomeTax= : lean-ritsuryoの関数を直接呼ぶ。
+
+lean-ritsuryoのCLIでサブコマンドを実行する関数は、検査済みのパラメータを受け取ってJSONを返す純粋な関数です。
+ファイルの読み込みや標準出力への書き出しは、CLIの =main= が受け持ちます。
+そのため =invoke= はIOを使わずにすべてのサブコマンドを実行できます。
+
+lean-rsの =project generate= にこのmoduleを渡すと、moduleから呼ばれるlean-ritsuryoの関数まで含めて、1つのRustのファイルができます。
+できたファイルは約3.1MBで、3003個の関数が入っています。
+Rustの公開関数になるのは、 =RitsuryoRs.Api= で公開している6つの定義だけです。
+補助の関数は =private= にして、Rustの公開関数に含めないようにしています。
+
+Rustのファイルを生成するときは、lean-ritsuryoの証明も含めてLeanのパッケージをビルドします。
+証明が通らないと、Rustのファイルは生成されません。
+生成したRustのファイルはリポジトリにcommitしてあります。
+[[https://github.com/conao3/rust-ritsuryo/blob/master/.github/workflows/ci.yml][CI]]ではLeanのビルドから生成をやり直し、commitしたファイルと一致することを確かめています。
+
+証明が保証するのは、Leanの定義が条文どおりに計算することです。
+RustのコードがLeanの定義と同じ計算をするかどうかは、lean-rsの変換が正しいかにかかっています。
+lean-rsは、生成したRustの出力をLeanのCのbackendが作るプログラムの出力と比べるテストで、変換を確かめています。
+
+** WebAssemblyで動かす
+=ritsuryo-wasm= は、 =invoke= 、 =describe= 、 =isHoliday= をwasm-bindgenでJavaScriptから呼べるようにするcrateです。
+=wasm32-unknown-unknown= に向けてビルドし、wasm-optで縮めると、WebAssemblyのファイルは701KBになります。
+
+lean-rsのruntimeは =wasm32-unknown-unknown= でもビルドできます。
+ファイルや子プロセスのようにOSが要るIOの関数は、このtargetではunsupported operationのエラーを返します。
+lean-ritsuryoの計算はIOを使わないので、そのまま動きます。
+
+=lean-rust= の既定のfeatureは、テストのためにproptestを使います。
+proptestが依存するgetrandomは =wasm32-unknown-unknown= ではビルドできないので、 =ritsuryo= は =default-features = false= で =lean-rust= に依存しています。
+
+Webページは静的なファイルだけでできていて、GitHub Pagesに置いています。
+nixがあれば、手元でも次のコマンドで配信できます。
+
+#+begin_src console
+$ nix run github:conao3/rust-ritsuryo
+#+end_src
+
+=http://localhost:8080= でページが開きます。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
