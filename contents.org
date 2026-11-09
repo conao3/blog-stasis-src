@@ -18304,30 +18304,30 @@ PR のブランチに master を merge し、その上に移植の commit を積
 :export_draft: t
 :end:
 
-Lean 4 で書いて証明した関数を Rust から呼び、Rust で書いた関数の性質を Lean で証明するためのツールとして lean-rs を作りました。
-リポジトリは [[https://github.com/conao3/lean-rs][conao3/lean-rs]] で、ライセンスは Apache-2.0 です。
-crates.io に =lean-rust= として公開していて、この記事は 0.2.1 をもとに書いています。
+Lean 4で書いて証明した関数をRustから呼べるようにする、lean-rsを作りました。
+逆向きに、Rustで書いた関数の性質をLeanで証明することもできます。
+リポジトリは[[https://github.com/conao3/lean-rs][conao3/lean-rs]]で、ライセンスはApache-2.0です。
+crates.ioには =lean-rust= の名前で公開していて、この記事は0.2.1で動かした結果をもとに書いています。
 
-lean-rs は Lean のコンパイラの中間表現 (IR) を Rust のソースに変換します。
-生成した Rust は cargo だけでビルドでき、Lean の toolchain も Lean の C の runtime も要りません。
-同じことを Clojure で行う [[https://s.conao3.com/blog/2026/4e5aa2][lean-clj]] を先日紹介しましたが、lean-rs はその Rust 版です。
+lean-rsはLeanのコンパイラの中間表現をRustのソースに変換します。
+生成したRustはcargoだけでビルドでき、LeanのtoolchainもLeanのCのruntimeも要りません。
+先日紹介した[[https://s.conao3.com/blog/2026/4e5aa2][lean-clj]]はLeanの関数をClojureから呼ぶもので、lean-rsはその仕組みをRustに移したものです。
 
 [[github:conao3/lean-rs::Rust][Lean 4 to Rust: run Lean functions from Rust, embed Lean in Rust with lean!, and verify Rust functions in Lean on top of Aeneas]]
 
-** 3 つの使い方
-lean-rs には次の 3 つの使い方があります。
+** 3つの使い方
+lean-rsの使い方は3つあります。
 
 [[./resources/public/img/b43a06-uses.svg]]
 
-1. Rust のファイルの中に Lean で関数と定理を書き、Rust から呼ぶ ( =lean!= )。
-2. 既存の Lean のプロジェクト (lake のプロジェクト) を、Rust の module の集まりに変換する (CLI)。
-3. Rust で書いた関数を Lean のモデルに変換し、その性質を Lean で証明する ( =#[lean_rust::model]= と =cargo lean-rust= )。
+1. Rustのファイルの中にLeanで関数と定理を書き、Rustから呼ぶ。 =lean!= マクロを使う。
+2. 既存のlakeのプロジェクトを、Rustのmoduleの集まりに変換する。CLIを使う。
+3. Rustで書いた関数をLeanのモデルに変換し、その性質をLeanで証明する。 =#[lean_rust::model]= と =cargo lean-rust= を使う。
 
-1 と 2 は Lean から Rust への向き、3 は Rust から Lean への向きです。
-以下、この順に例を挙げます。
+1と2はLeanからRustへ、3はRustからLeanへの向きです。
 
-** Lean で書いて Rust から呼ぶ
-=Cargo.toml= に 2 つの crate を追加し、 =build.rs= で =lean-rust-build= を呼びます。
+** LeanでRustの関数を書く
+=Cargo.toml= に2つのcrateを追加し、 =build.rs= で =lean-rust-build= を呼びます。
 
 #+begin_src toml
 [dependencies]
@@ -18344,14 +18344,7 @@ fn main() {
 }
 #+end_src
 
-=lean!= のブロックを最初にビルドするときは、Lean 4.35.0 の =lake= (elan で入れたもの) と =lean-rust= の CLI が =PATH= に要ります。
-CLI は nix でインストールできます。
-
-#+begin_src console
-$ nix profile install github:conao3/lean-rs#lean-rust
-#+end_src
-
-=lean!= の中には Lean のソースをそのまま文字列で書きます。
+=lean!= の中にはLeanのソースを文字列のまま書きます。
 
 #+begin_src rust
 lean_rust::lean! {
@@ -18379,10 +18372,11 @@ fn main() {
 }
 #+end_src
 
-=double_eq= では、 =double= の定義を展開してから、自然数と整数の線形算術を解くタクティク =omega= で等式を示しています。
-=cargo build= を実行すると、build script がブロックを Lean のソースに書き出して =lake build= を実行し、証明まで検査します。
-検査が通ると、ブロックの関数が module =arith= の Rust の関数になります。
-Lean の =Nat= は任意精度の =lean_rust::Nat= に、structure =Account= は Rust の struct になります。
+=double_eq= は、 =double= の定義を展開してから =omega= で等式を示しています。
+=omega= は自然数と整数の線形算術を解くタクティクです。
+=cargo build= を実行すると、build scriptがブロックをLeanのソースに書き出して =lake build= を実行し、定理の証明を検査します。
+検査が通ると、ブロックの関数がmodule =arith= のRustの関数になります。
+Leanの =Nat= は任意精度の =lean_rust::Nat= に、structureの =Account= はRustのstructになります。
 
 #+begin_src console
 $ cargo run -q
@@ -18390,7 +18384,7 @@ $ cargo run -q
 Account { owner: "ann", balance: 15 }
 #+end_src
 
-証明が通らないと、ビルドが止まります。
+証明が通らなければ、ビルドが失敗します。
 定理の右辺を =3 * n= に書き換えてビルドすると、次のエラーになります。
 
 #+begin_src text
@@ -18402,30 +18396,39 @@ warning: demo@0.1.0:    a := ↑n
 error: failed to run custom build command for `demo v0.1.0 (/path/to/demo)`
 #+end_src
 
-エラーの位置 ( =src/main.rs:7:22= ) は、Lean が報告した行と列を Rust のファイルの位置に直したもので、 =omega= を書いた場所を指しています。
+=src/main.rs:7:22= は =omega= を書いた位置です。
+lean-rsは、Leanが報告した行と列を、Rustのファイルの中の位置に直して表示します。
 
-生成した Rust のコードは =.lean-rust/cache/= に保存されます。
-ブロックを変えなければ、2 回目からは Lean を呼ばずにキャッシュを使います。
-キャッシュをリポジトリに入れておけば、Lean の無い CI や crates.io から取得した利用者の環境でもビルドできます。
-=lean!= のマクロ自体は生成済みのファイルを =include!= するだけなので、rust-analyzer がマクロを展開しても Lean は動きません。
+初めてブロックをビルドするときは、Lean 4.35.0の =lake= と =lean-rust= のCLIが =PATH= に要ります。
+=lake= はelanで、CLIはnixで入れられます。
 
-Lean の型は次の Rust の型で受け渡します。
+#+begin_src console
+$ nix profile install github:conao3/lean-rs#lean-rust
+#+end_src
 
-| Lean                               | Rust                                               |
-|------------------------------------+----------------------------------------------------|
-| =Nat= 、 =Int=                     | =lean_rust::Nat= 、 =lean_rust::Int= (任意精度)    |
-| =UInt8= 〜 =UInt64= 、 =Int8= 〜 =Int64= | =u8= 〜 =u64= 、 =i8= 〜 =i64=               |
-| =String=                           | =String=                                           |
-| =List α= 、 =Array α=              | =Vec<T>=                                           |
-| =Option α= 、 =Except ε α=         | =Option<T>= 、 =Result<T, E>=                      |
-| structure 、inductive              | 生成した =struct= 、 =enum=                        |
-| =IO α=                             | =std::io::Result<T>=                               |
+生成したRustのコードは =.lean-rust/cache/= に保存され、ブロックを変えなければ2回目からはLeanを呼ばずにこれを使います。
+キャッシュをリポジトリにcommitしておけば、Leanの入っていないCIでも、crates.ioからcrateを取得した利用者の環境でもビルドできます。
+=lean!= マクロは生成済みのファイルを =include!= するだけなので、rust-analyzerがマクロを展開するときにLeanは動きません。
 
-型の変数を持つ多相の関数は、 =rust_instances largest [Nat, String]= のように型を指定すると、指定した型でだけ呼べる Rust の generic な関数になります。
+Leanの型とRustの型は次のように対応します。
 
-** Lean のプロジェクトを Rust の module にする
-lake のプロジェクトとして書いた Lean のコードも、CLI で Rust の module に変換できます。
-サンプルの [[https://github.com/conao3/lean-rs/tree/master/samples/roman-numerals][roman-numerals]] は、整数とローマ数字の変換を Lean で書き、1〜999 の数をローマ数字にして戻すと元の数になることを証明しています。
+| Lean                                       | Rust                                           |
+|--------------------------------------------+------------------------------------------------|
+| =Nat= 、 =Int=                             | 任意精度の =lean_rust::Nat= 、 =lean_rust::Int= |
+| =UInt8= 〜 =UInt64= 、 =Int8= 〜 =Int64=   | =u8= 〜 =u64= 、 =i8= 〜 =i64=                 |
+| =String=                                   | =String=                                       |
+| =List α= 、 =Array α=                      | =Vec<T>=                                       |
+| =Option α= 、 =Except ε α=                 | =Option<T>= 、 =Result<T, E>=                  |
+| structure、inductive                       | 生成した =struct= 、 =enum=                    |
+| =IO α=                                     | =std::io::Result<T>=                           |
+
+型の変数を持つ関数は、 =rust_instances largest [Nat, String]= のように型を指定すると、Rustのgenericな関数になります。
+呼べるのは指定した型だけです。
+
+** lakeのプロジェクトをRustのmoduleにする
+lakeのプロジェクトとして書いたLeanのコードは、CLIでRustのmoduleに変換できます。
+サンプルの[[https://github.com/conao3/lean-rs/tree/master/samples/roman-numerals][roman-numerals]]では、整数とローマ数字を相互に変換する関数をLeanで書いています。
+1〜999の数をローマ数字にして戻すと元の数になることも、Leanで証明しています。
 
 #+begin_src lean
 def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
@@ -18437,13 +18440,13 @@ theorem roundtrip : ∀ n, n < 1000 → fromRoman (toRoman n) = if n = 0 then no
   decide +kernel
 #+end_src
 
-=project generate= は、 =lake build= で証明を検査したあと、module ごとに Rust のファイルを書き出します。
+=project generate= は =lake build= で証明を検査してから、moduleごとにRustのファイルを書き出します。
 
 #+begin_src console
 $ lean-rust project generate --lake-dir lean --output-dir src/generated
 #+end_src
 
-公開している関数は名前を snake_case にした Rust の関数になります。
+公開している関数は名前をsnake_caseにしたRustの関数になります。
 
 #+begin_src rust
 mod generated;
@@ -18456,16 +18459,18 @@ fn main() {
 }
 #+end_src
 
-生成した =src/generated/= は普通の Rust のファイルなので、リポジトリに commit すれば、使う側に Lean は要りません。
+=src/generated/= は普通のRustのファイルなので、commitしておけば使う側にLeanは要りません。
 
-** Rust で書いて Lean で証明する
-3 つ目の使い方では、実装を Rust で書きます。
-Rust の関数を Lean に変換する部分には、[[https://github.com/AeneasVerif/charon][Charon]] と [[https://github.com/AeneasVerif/aeneas][Aeneas]] を使います。
-Charon が rustc から関数の中間表現を取り出し、Aeneas がそれを Lean の関数に変換します。
-この記事では、変換した Lean の関数をモデルと呼びます。
+** Rustの関数をLeanで証明する
+3つ目の使い方では、実装をRustで書き、その性質をLeanで証明します。
+RustからLeanへの変換には[[https://github.com/AeneasVerif/charon][Charon]]と[[https://github.com/AeneasVerif/aeneas][Aeneas]]を使います。
+Charonがrustcから関数の中間表現を取り出し、AeneasがそれをLeanの関数に変換します。
+この変換で得たLeanの関数を、以下ではモデルと呼びます。
 
-次の例では、2 つの =u32= の大きい方を返す Rust の関数 =max_u32= が、Lean で書いた仕様 (spec) の =max= と等しいことと、結果が両方の引数以上であることを証明します。
-spec は =lean!= で書いた Lean の関数で、型は Aeneas のモデルの型 ( =Std.U32= など) で書きます。
+例として、2つの =u32= のうち大きい方を返す =max_u32= を証明します。
+示すのは、 =max_u32= がLeanで書いたspecの =max= と等しいことと、結果が両方の引数以上であることです。
+specは =lean!= で書いたLeanの関数で、型にはAeneasのモデルの型を使います。
+=u32= に当たる型は =Std.U32= です。
 
 #+begin_src rust
 lean_rust::lean! {
@@ -18486,11 +18491,13 @@ pub fn max_u32(a: u32, b: u32) -> u32 {
 }
 #+end_src
 
-=refines = bits::max= は「 =max_u32= がすべての入力で =bits::max= と同じ値を返す」、 =ensures(bound = bits::max_bound)= は「結果が =max_bound= を満たす」という主張です。
-spec は Rust の path で指すので、spec の名前や引数の型を間違えると rustc のエラーになります。
+=refines = bits::max= は、 =max_u32= がすべての入力で =bits::max= と同じ値を返すという主張です。
+=ensures(bound = bits::max_bound)= は、結果が =max_bound= を満たすという主張です。
+specをRustのpathで指すので、名前や引数の型を間違えるとrustcがエラーにします。
 
-=cargo lean-rust extract= は Charon と Aeneas でモデルを作り、主張ごとに証明すべき Lean の命題 (義務) を書き出します。
-証明は crate の =lean/Proofs/= に Lean で書きます。
+=cargo lean-rust extract= は、CharonとAeneasでモデルを作り、主張ごとに証明すべきLeanの命題を書き出します。
+この記事ではこの命題を義務と呼びます。
+証明はcrateの =lean/Proofs/= にLeanで書きます。
 
 #+begin_src lean
 theorem max_u32.proof.refines : max_u32.obligation.refines := by
@@ -18499,8 +18506,8 @@ theorem max_u32.proof.refines : max_u32.obligation.refines := by
   by_cases h : a.val ≤ b.val <;> simp [UScalar.le_equiv, h]
 #+end_src
 
-=cargo lean-rust check= が証明を検査し、義務ごとの状態を lockfile ( =lean-rust.lock= ) に記録します。
-サンプルの [[https://github.com/conao3/lean-rs/tree/master/samples/verified-rust][verified-rust]] では、ビットを数えるループと挿入ソートも含めて、すべての義務が証明済みです。
+=cargo lean-rust check= は証明を検査し、義務ごとの状態を =lean-rust.lock= に記録します。
+サンプルの[[https://github.com/conao3/lean-rs/tree/master/samples/verified-rust][verified-rust]]では、ビットを数えるループと挿入ソートを含め、すべての義務を証明してあります。
 
 #+begin_src console
 $ cargo lean-rust status
@@ -18514,26 +18521,26 @@ crate::sort::insert_sorted
   perm    proved    axioms: Classical.choice, Quot.sound, propext
 #+end_src
 
-=axioms= の列は、証明が使った公理です。
-=sorry= で証明を飛ばした義務は =sorry= 、Lean の標準の 3 つ以外の公理を使った義務は =axioms= と表示されます。
+=axioms= の列には、証明が使った公理が並びます。
+=sorry= で証明を飛ばした義務は =sorry= 、Leanの標準の3つ以外の公理を使った義務は =axioms= と表示されます。
 
-*** 普段のビルドは stable の Rust のまま
-Charon は自前の nightly の Rust を使いますが、Charon を動かすのは =cargo lean-rust extract= だけです。
-普段の =cargo build= は stable の Rust で動き、lockfile を読んで、関数が抽出したときから変わっていないかを確かめます。
+*** 普段のビルドにLeanもnightlyも要らない
+Charonは自前のnightlyのRustで動きますが、Charonを呼ぶのは =cargo lean-rust extract= だけです。
+普段の =cargo build= はstableのRustで動き、lockfileと今のソースを比べて、抽出したときから関数が変わっていないかを確かめます。
 =max_u32= の =<== を =<= に書き換えてビルドすると、証明が古くなったことを警告します。
 
 #+begin_src text
 warning: verified-rust@0.1.0: lean-rust: crate::bits::max_u32: 2 obligations are stale (crate::bits::max_u32 changed since `cargo lean-rust extract`)
 #+end_src
 
-=Cargo.toml= の =[package.metadata.lean-rust]= に =require = "proved"= を書くか、環境変数 =LEAN_RUST_REQUIRE=proved= を付けると、証明済みでない義務があるときにビルドを止めます。
-CI ではこちらを使います。
+=Cargo.toml= の =[package.metadata.lean-rust]= に =require = "proved"= を書くと、証明の済んでいない義務があるときにビルドが失敗します。
+環境変数 =LEAN_RUST_REQUIRE=proved= でも同じ動作になるので、CIではこちらを使います。
 
-*** 証明の前に生成テストで確かめる
-証明を書く前でも、 =cargo test= で関数を spec と比べられます。
-=#[lean_rust::model]= は、引数の値を proptest で作り、Rust の関数と spec を同じ入力で呼ぶテストを生成します。
-spec は Lean で書いた関数を Rust にコンパイルしたものなので、同じ定義をテストと証明の両方に使えます。
-=max_u32= を小さい方を返す実装に書き換えると、次のように失敗します。
+*** 証明を書く前にテストで間違いを見つける
+=#[lean_rust::model]= は、Rustの関数とspecを同じ入力で呼んで結果を比べるテストを生成します。
+入力はproptestが作ります。
+specはLeanの関数をRustにコンパイルしたものなので、テストと証明で同じ定義を使えます。
+=max_u32= を小さい方を返すように書き換えて =cargo test= を実行すると、次のように失敗します。
 
 #+begin_src text
 Test failed: the function returned 0, and the spec bits::max returned 1 at samples/verified-rust/src/bits.rs:17.
@@ -18543,20 +18550,22 @@ minimal failing input: __args = (
 )
 #+end_src
 
-ブログを書くために例を動かしたとき、このメッセージは =assertion failed: copy :: refines(a.clone(), b.clone())= という生成コードの式だけで、関数と spec がそれぞれ何を返したかが出ていませんでした。
-0.2.1 で、両方の値を出すように直しました。
+0.2.0までは、このメッセージに =assertion failed: copy :: refines(a.clone(), b.clone())= という生成コードの式しか出ていませんでした。
+これでは関数とspecがそれぞれ何を返したかが分からないので、0.2.1で両方の値を出すように直しました。
 
-*** 証明した実装を Lean から呼ぶ
-=requires= (引数の仮定) の無い =refines= の証明が通ると、 =cargo lean-rust check= は Lean の =@[csimp]= の補題を書き出します。
-=@[csimp]= は、コンパイルのときに関数を別の関数へ置き換えることを Lean に許す属性で、置き換えてよい根拠は 2 つの関数が等しいという証明です。
-lean-rs はこの補題で spec の =bits::max= を Rust の =max_u32= に置き換えるので、Lean の側で =max= を呼んでも、実行されるのは Rust の関数です。
-Lean で書いた仕様を Rust で速く実装し、等しいことを証明してから差し替える使い方ができます。
+*** 証明したRustの実装をLeanから呼ぶ
+=refines= の証明が通ると、 =cargo lean-rust check= はLeanの =@[csimp]= の補題を書き出します。
+ただし、引数に仮定を置く =requires= を付けた関数は対象外です。
+=@[csimp]= を付けた補題は、2つの関数が等しいことの証明を根拠に、コンパイル時に一方を他方へ置き換えることをLeanに許します。
+lean-rsはこの補題でspecの =bits::max= をRustの =max_u32= に置き換えるので、Leanの側で =max= を呼んでも、実行されるのはRustの関数です。
+仕様をLeanで素直に書き、速い実装をRustで書いて、等しいことを証明してから差し替えられます。
 
 ** 仕組み
-lean-rs が生成する Rust は、Lean の C backend が書き出す C のコードを Rust に写したものです。
-runtime の crate =lean-rust-runtime= は Lean の =lean.h= と同じ object の配置と参照カウントを Rust で実装しています。
-生成コードは参照カウントが 1 の値を複製せずにその場で書き換えるので、 =Array= の更新などの性能の特性も C backend と同じになります。
-=deposit= の生成コードにも、 =lean_is_exclusive= で =Account= の参照カウントが 1 かを確かめて、1 なら同じ object を書き換える分岐があります。
+lean-rsが生成するRustは、LeanのC backendが書き出すCのコードを、そのままRustに写したものです。
+runtimeのcrateの =lean-rust-runtime= はLeanの =lean.h= と同じobjectの配置と参照カウントをRustで実装しています。
+生成コードは、参照カウントが1の値を複製せずにその場で書き換えます。
+そのため、 =Array= の更新などの性能の特性はC backendと変わりません。
+=deposit= の生成コードにも、 =lean_is_exclusive= で =Account= の参照カウントが1かを確かめて、1なら同じobjectを書き換える分岐があります。
 
 #+begin_src rust
 x_3 = rt::lean_ctor_get(x_1, 0);
@@ -18564,28 +18573,30 @@ x_4 = rt::lean_ctor_get(x_1, 1);
 x_12 = (!rt::lean_is_exclusive(x_1)) as u8;
 #+end_src
 
-C backend は関数の中の分岐の合流 (join point) と自己末尾呼び出しを =goto= で書きますが、Rust には =goto= がありません。
-lean-rs は関数の本体を =loop= の中の =match= にして、ブロックの番号を書き換えて =continue= することで =goto= を表します。
+C backendは、関数の中で分岐が合流する先と自己末尾呼び出しを =goto= で書きます。
+Rustには =goto= が無いので、lean-rsは関数の本体を =loop= の中の =match= にし、ブロックの番号を書き換えて =continue= することで =goto= を表しています。
 
-Rust から Lean の関数を呼ぶ方法には、Lean の C backend の出力と Lean の runtime をリンクして FFI で呼ぶ方法もあります ([[https://crates.io/crates/lean-sys][lean-sys]] など)。
-この方法では、ビルドと実行に Lean の toolchain が要ります。
-lean-rs は runtime を Rust で書き直したので、C のライブラリとのリンクも FFI もなく、実行時に要るのは Rust だけです。
-生成コードの内部は =unsafe= な関数ですが、公開する関数は Rust の値を受け渡す安全な関数です。
-=IO= も C の runtime と同じ範囲 (ファイル、ディレクトリ、環境変数、子プロセスなど) を実装していて、OS のエラーは C の runtime と同じ文面の =IO.Error= になります。
+RustからLeanの関数を呼ぶには、C backendの出力とLeanのruntimeをリンクして、FFIで呼ぶ方法もあります。
+[[https://crates.io/crates/lean-sys][lean-sys]]などがこの方法で、ビルドにも実行にもLeanのtoolchainが要ります。
+lean-rsはruntimeをRustで書き直したので、Cのライブラリとのリンクが要らず、実行時に要るのはRustだけです。
+生成コードの内部は =unsafe= な関数ですが、公開する関数はRustの値を受け渡す安全な関数です。
+=IO= も、ファイル、ディレクトリ、環境変数、子プロセスなどCのruntimeと同じ範囲を実装しました。
+OSのエラーはCのruntimeと同じ文面の =IO.Error= になります。
 
-生成した Rust が正しいことは、C backend との差分テストで確かめています。
-同じテスト用の関数を、C backend がビルドした実行ファイルと、生成した Rust の両方で実行し、出力の 182 行と =IO= の 70 行を比べます。
+生成したRustが正しいことは、C backendとの差分テストで確かめています。
+同じテスト用の関数を、C backendでビルドした実行ファイルと生成したRustの両方で実行し、出力を比べます。
+比べる出力は、一般の関数が182行、 =IO= が70行です。
 
 ** できないこと
-- 参照カウントは非 atomic で、 =Task= は作った場所で同期に実行します。
-- runtime は Unix (Linux と macOS) でだけビルドできます。
-- =#[lean_rust::model]= で検証できるのは、Aeneas が扱える Rust だけです。 =unsafe= 、内部可変性、並行処理は扱えません。
-- 2 つの module が同じ Lean の型を使うと、Rust の型も 2 つできます ( =uses= で結んだブロックを除く)。
+- 参照カウントはatomicでなく、 =Task= は作った場所で同期に実行します。
+- runtimeをビルドできるのはLinuxとmacOSだけです。
+- =#[lean_rust::model]= で検証できるのは、Aeneasが扱えるRustだけです。 =unsafe= 、内部可変性、並行処理を含む関数は検証できません。
+- 2つのmoduleが同じLeanの型を使うと、Rustの型も2つできます。 =uses= で結んだブロックの間では、型を共有します。
 
 ** おわりに
-lean-rs は crates.io の =lean-rust= から入手できます。
-[[https://github.com/conao3/lean-rs/tree/master/samples/steps][samples/steps]] には、最初の =lean!= のブロックから generic な関数の検証まで、機能を 1 つずつ紹介する 17 段のサンプルがあります。
-Issue / PR 大歓迎です。
+lean-rsはcrates.ioの =lean-rust= から入手できます。
+[[https://github.com/conao3/lean-rs/tree/master/samples/steps][samples/steps]]には、最初の =lean!= のブロックからgenericな関数の検証まで、機能を1つずつ紹介する17段のサンプルがあります。
+Issue / PR大歓迎です。
 
 * COMMENT Local variables
 # Local Variables:
