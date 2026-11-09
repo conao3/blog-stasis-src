@@ -18599,7 +18599,6 @@ Issue / PR大歓迎です。
 :properties:
 :export_file_name: generated/contents/blog/2026/c4f11a
 :export_date: 2026-11-09 14:40
-:export_draft: t
 :end:
 
 [[https://s.conao3.com/blog/2026/5499a8][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算をLean 4で書き、条文どおりに計算することを証明したライブラリです。
