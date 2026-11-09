@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="700" viewBox="0 0 1000 700" font-family="sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="700" rx="16" fill="#fff"/>
+  <rect x="40" y="30" width="400" height="70" rx="12" fill="#f2f2f2" stroke="#555" stroke-width="2"/>
+  <text x="240" y="73" font-size="22" font-weight="bold" text-anchor="middle" fill="#222">ソースコード</text>
+  <line x1="240" y1="100" x2="240" y2="140" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="40" y="140" width="400" height="70" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="240" y="183" font-size="22" font-weight="bold" text-anchor="middle" fill="#0f4c81">パーサー</text>
+  <text x="480" y="170" font-size="19" fill="#222">Grammar/python.gramに規則を足す</text>
+  <text x="480" y="198" font-size="19" fill="#222">Parser/pegen.cで予約語+!を名前にする</text>
+  <line x1="240" y1="210" x2="240" y2="250" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="40" y="250" width="400" height="80" rx="12" fill="#fdf6dc" stroke="#8a6d00" stroke-width="2"/>
+  <text x="240" y="283" font-size="22" font-weight="bold" text-anchor="middle" fill="#8a6d00">マクロを含むAST</text>
+  <text x="240" y="314" font-size="19" text-anchor="middle" fill="#8a6d00">MacroStmt・MacroExpr</text>
+  <text x="480" y="296" font-size="19" fill="#222">ast.parse()はここまでを返す</text>
+  <line x1="240" y1="330" x2="240" y2="370" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="40" y="370" width="400" height="80" rx="12" fill="#e9f5ec" stroke="#1e7a3c" stroke-width="2"/>
+  <text x="240" y="403" font-size="22" font-weight="bold" text-anchor="middle" fill="#1e7a3c">マクロの展開</text>
+  <text x="240" y="434" font-size="19" text-anchor="middle" fill="#1e7a3c">macros._expand()</text>
+  <text x="480" y="402" font-size="19" fill="#222">Python/compile.cがLib/macros.pyを呼び、</text>
+  <text x="480" y="430" font-size="19" fill="#222">Pythonで書いた処理器が木を書き換える</text>
+  <line x1="240" y1="450" x2="240" y2="490" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="40" y="490" width="400" height="80" rx="12" fill="#fdf6dc" stroke="#8a6d00" stroke-width="2"/>
+  <text x="240" y="523" font-size="22" font-weight="bold" text-anchor="middle" fill="#8a6d00">マクロを展開したAST</text>
+  <text x="240" y="554" font-size="19" text-anchor="middle" fill="#8a6d00">StmtExprを含んでよい</text>
+  <text x="480" y="536" font-size="19" fill="#222">C側で検査してからコンパイルへ渡す</text>
+  <line x1="240" y1="570" x2="240" y2="610" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <rect x="40" y="610" width="400" height="70" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="240" y="653" font-size="22" font-weight="bold" text-anchor="middle" fill="#0f4c81">シンボル表とバイトコード</text>
+  <text x="480" y="653" font-size="19" fill="#222">Python/codegen.cがStmtExprを直接訳す</text>
+</svg>
