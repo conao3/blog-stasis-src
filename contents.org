@@ -16207,34 +16207,31 @@ Issue / PR大歓迎です。
 :export_date: 2026-11-03 04:36
 :end:
 
-控訴期間の末日や所得税の額を求める手順は、条文を読めば決まります。
-それでも、年末年始に当たる末日の繰り下げや、税率の区分の境目のように、手で計算すると間違えやすいところがあります。
-計算をプログラムに書いた場合も、条文どおりに計算しているかを確かめるには手間がかかります。
+控訴期間の末日や所得税の額は、条文を読めば計算の手順が決まります。
+それでも、年末年始に当たる末日の繰り下げや、税率の区分の境目のように、手で計算すると間違えやすい所があります。
+プログラムに書いた場合も、その計算が条文どおりかを確かめるには手間がかかります。
 
-[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算を、プログラムと証明を書いて検査できる言語であるLean 4で書いたライブラリとCLIです。
-ライブラリの関数には、関数が条文どおりに計算することを示す証明を付けており、税率表の写し間違いや繰り下げの不足があればビルドの時点でエラーになります。
-CLIもこれらの関数を呼んで計算します。
-ライセンスはApache-2.0です。
+[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算をLean 4で書いたライブラリとCLIです。
+ライブラリの関数には、条文どおりに計算することの証明を付けています。
+CLIもこの関数を呼んで計算します。
 
-期間と日付の計算では、民法の期間計算、祝日の判定、控訴期間などの期限を扱います。
-税の計算では、所得税、相続税、消費税、延滞税、利子税、加算税の税額と、国税の端数処理を扱います。
-
-以下の出力はどれも、CLIであるv0.5.0の =ritsuryo= で実行した結果です。
+扱う計算は民法の期間計算、祝日の判定、控訴期間などの期限、所得税、相続税、消費税、延滞税、利子税、加算税の税額と、国税の端数処理です。
+以下の出力はどれもv0.5.0の =ritsuryo= で実行した結果です。
 
 [[github:conao3/lean-ritsuryo::Lean][Japanese statutory period computations (民法 期間計算, 年齢計算, 祝日) in Lean 4 with proofs on the shipped functions, and the ritsuryo CLI]]
 
 ** 使ってみる
-CLIの引数はAWS CLIと同じ文法で、対象と操作のサブコマンドに続けてオプションを並べて書きます。
+CLIの引数はAWS CLIと同じ文法で書きます。
 どのコマンドもJSONを出力し、次のキーを含みます。
 
-- 計算の結果を入れる =Result=
-- 計算の途中の値を入れる =Steps=
-- 根拠の条文を入れる =Basis=
-- 計算の前提にした条文の読み方を入れる =Assumptions=
+- =Result=: 計算の結果
+- =Steps=: 途中の値
+- =Basis=: 根拠の条文
+- =Assumptions=: 計算の前提にした条文の読み方
 
 *** 控訴期間
-次の例では、2026-12-15に判決の送達を受けたときの控訴期間を計算します。
-控訴期間は2週間なので本来の末日は2026-12-29ですが、この日は年末年始に当たります。
+2026-12-15に判決の送達を受けたときの控訴期間です。
+2週間の末日は2026-12-29ですが、この日は年末年始に当たります。
 そのため、民事訴訟法 第95条第3項により末日は2027-01-04に繰り下がります。
 
 #+begin_src console
@@ -16257,13 +16254,12 @@ $ ritsuryo deadline compute-appeal-deadline --served-date 2026-12-15 \
 }
 #+end_src
 
-上のコマンドでjqがまとめた =RolledOver= には、途中の値から取り出した、繰り下げのときに飛ばした日が並びます。
-また、祝日の判定には内閣府の祝日CSVを使っており、コマンドは出力の =Data= にそのCSVの取得元とSHA-256のハッシュ値を書きます。
+=RolledOver= には、繰り下げのときに飛ばした日が並びます。
+祝日の判定には内閣府の祝日CSVを使い、その取得元とSHA-256を出力の =Data= に書きます。
 
 *** 所得税
 2026年分で課税総所得金額が7,000,000円のとき、所得税は974,000円になります。
-国税庁の速算表は、課税される所得金額に税率を掛けて控除額を引く式で税額を求めます。
-この金額の区分では7,000,000 × 23% − 636,000となり、出力の税額は速算表で求めた額と同じです。
+国税庁の速算表で求めると7,000,000 × 23% − 636,000で、同じ額になります。
 
 #+begin_src console
 $ ritsuryo income-tax compute-tax --tax-year 2026 --taxable-income 7000000 | jq .Result
@@ -16276,19 +16272,19 @@ $ ritsuryo income-tax compute-tax --tax-year 2026 --taxable-income 7000000 | jq 
 }
 #+end_src
 
-2027年分からは税率が変わり、復興特別所得税が1.1%、防衛特別所得税が1%になります。
-同じ課税総所得金額に =--tax-year 2027= を渡すと、復興特別所得税を表す =ReconstructionTax= が10714円、防衛特別所得税を表す =DefenseTax= が9740円になります。
+2027年分からは、復興特別所得税が1.1%、防衛特別所得税が1%になります。
+=--tax-year 2027= を渡すと、 =ReconstructionTax= が10714、 =DefenseTax= が9740になります。
 
 ** 条文を写して書く
 lean-ritsuryoでは、計算を条文の構造どおりの定義として書いています。
 以下ではこの定義を仕様と呼びます。
-Leanで書いた定義は関数として実行できますが、条文が計算の手順ではなく結果の条件だけを定めているときや、条文どおりの手順では計算が遅いときは、仕様をそのまま実行には使えません。
-仕様が実行できる関数かどうかと、そのまま実行して十分な速さが出るかどうかで、書き方は次の3通りに分かれます。
+Leanの定義は実行できますが、条文が結果の条件だけを定めているときや、条文どおりの手順では遅いときは、仕様をそのまま実行に使えません。
+仕様を実行に使えるかどうかで、書き方は次の3通りに分かれます。
 
 *** 仕様をそのまま実行するとき
 民事訴訟法 第95条第3項は、期間の末日が休日に当たるとき、期間はその翌日に満了すると定めます。
-ここでいう休日には、日曜日、土曜日、祝日法の休日、1月2日、1月3日、12月29日から31日までの日が並びます。
-ある日がこれらのどれかに当たるかを判定する仕様は、条文の列挙をそのまま並べた関数です。
+休日は、日曜日、土曜日、祝日法の休日、1月2日、1月3日、12月29日から31日までの日です。
+これらの日を判定する仕様は、条文の列挙をそのまま並べた関数です。
 
 #+begin_src lean
 def isHolidaySpec (national : Date → Bool) (d : Date) : Bool :=
@@ -16297,17 +16293,17 @@ def isHolidaySpec (national : Date → Bool) (d : Date) : Bool :=
     HolidayClass.holds national d .yearEnd
 #+end_src
 
-この仕様の関数は与えられた日付に対して条件を順に調べるだけで速く終わるので、繰り下げを計算する関数はこの仕様の関数をそのまま呼んでいます。
-この場合は、仕様とは別に実装の関数を書く必要がありません。
+この関数は十分に速いので、繰り下げの計算はこの仕様をそのまま呼んでいます。
+この場合は、仕様のほかに実装を書く必要がありません。
 
 *** 仕様の実行が遅く、速い実装を書くとき
-仕様の関数をそのまま実行すると遅いときは、速く計算できる実装の関数を別に書き、実装が仕様と一致することを証明します。
-ライブラリから仕様と実装のどちらの関数を呼ぶかは、この一致がすべての入力で成り立つか、条件付きで成り立つかで分かれます。
+仕様の計算が遅いときは、速く計算できる実装を別に書き、実装が仕様と一致することを証明します。
+ライブラリから仕様と実装のどちらを呼ぶかは、一致がすべての入力で成り立つか、条件付きで成り立つかで分かれます。
 
 **** 実装がすべての入力で仕様と一致するとき
-所得税法 第89条は、課税総所得金額を表の区分に分けてそれぞれに税率を掛け、合計した額を所得税の額と定めます。
+所得税法 第89条は、課税総所得金額を表の区分に分けてそれぞれに税率を掛け、合計した額を税額とします。
 この条文を写した仕様が =incomeTaxCentsSpec= で、税率表の区分を1つずつたどって税額を積み上げます。
-入力の課税総所得金額は円を単位とし、関数が返す税額と式の中の控除額は百分の一円を1とする整数で表しています。
+課税総所得金額は円、税額と控除額は百分の一円を1とする整数で表しています。
 
 #+begin_src lean
 def table : List Bracket := [
@@ -16318,7 +16314,7 @@ def incomeTaxCentsSpec (x : Nat) : Nat :=
   progressiveCents table 0 x
 #+end_src
 
-一方、国税庁の速算表のように金額に税率を掛けて控除額を引く実装にすれば、区分をたどらずに1本の式で同じ税額を出せます。
+国税庁の速算表のように税率を掛けて控除額を引けば、区分をたどらずに1本の式で同じ税額を出せます。
 
 #+begin_src lean
 def quickCents (x : Nat) : Nat :=
@@ -16331,7 +16327,7 @@ def quickCents (x : Nat) : Nat :=
   else 45 * x - 479600000
 #+end_src
 
-そこで、仕様と速算表の実装がどの金額でも等しいことを証明し、コンパイル時に呼び出しを置き換えるための =@[csimp]= をその定理に付けます。
+仕様と速算表の式がどの金額でも等しいことを証明し、その定理に =@[csimp]= を付けます。
 
 #+begin_src lean
 @[csimp]
@@ -16342,25 +16338,25 @@ theorem incomeTaxCentsSpec_eq_quickCents : @incomeTaxCentsSpec = @quickCents := 
   all_goals omega
 #+end_src
 
-=@[csimp]= の付いた等式の定理があると、Leanのコンパイラは左辺の関数を呼ぶ箇所を右辺の関数を呼ぶように書き換えます。
-そのため、ライブラリの税額を計算する関数は、ソースでは仕様の =incomeTaxCentsSpec= を呼んでいても、実行時には速算表の実装を呼びます。
-相続税の税率表でも、同じように仕様と速算表の実装を書いて一致の定理にこの属性を付けています。
+=@[csimp]= の付いた等式があると、Leanのコンパイラは左辺の関数を呼ぶ箇所を右辺の関数を呼ぶように書き換えます。
+そのため、ライブラリの税額の関数はソースでは仕様の =incomeTaxCentsSpec= を呼んでいても、実行されるのは速算表の式です。
+相続税の税率表も同じ形にしています。
 
 [[./resources/public/img/5499a8-csimp.svg]]
 
-関数の呼び出しが書き換えられたことは、コンパイラが出力する中間表現であるIRで確かめられます。
-確かめるために、 =incomeTaxCentsSpec x= を返すだけの関数 =probeIncome= を書いてIRを出力させました。
+書き換えられたことは、コンパイラが出力する中間表現のIRで確かめられます。
+次は =incomeTaxCentsSpec x= を返すだけの関数 =probeIncome= のIRです。
 
 #+begin_src console
 def probeIncome (x_1 : @& tobj) : tobj :=
   let x_2 : tobj := Ritsuryo.Tax.Income.quickCents x_1;
 #+end_src
 
-IRの本体では、仕様の関数ではなく速算表の実装の関数が呼ばれています。
-コンパイラは仕様を呼ぶ関数をコンパイルするときにその呼び出しを書き換えるので、 =@[csimp]= の定理はソースの中で仕様を呼ぶ関数より前に書いておきます。
+IRでは仕様ではなく =quickCents= が呼ばれています。
+コンパイラは仕様を呼ぶ関数をコンパイルするときに書き換えるので、 =@[csimp]= の定理はその関数より前に書きます。
 
 **** 実装が条件付きで仕様と一致するとき
-民法 第143条は、週、月、年で定めた期間を暦に従って計算し、最後の週、月、年の中で起算日に応じる日である応当日の前日に満了すると定めます。
+民法 第143条は、週、月、年で定めた期間を暦に従って計算し、最後の週、月、年で起算日に応当する日の前日に満了すると定めます。
 この条文を写した仕様は応当日を次のように求めます。
 
 #+begin_src lean
@@ -16372,11 +16368,11 @@ def correspondingDaySpec (start : Date) : Length → Option Date
     if start.day ≤ ym.daysInMonth then some ⟨ym.year, ym.month, start.day⟩ else none
 #+end_src
 
-この仕様の関数は、日の期間では =addDaysNaive= で翌日を =n= 回たどり、週の期間では =weekCorrespondingSpec= で翌日をたどりながら起算日と同じ曜日の日を探します。
-月と年の期間でも、 =lastMonthSpec= が年月を1か月ずつ進めて応当日のある最後の月を求めます。
-どの期間でも、計算の回数が期間の日数か月数に比例して増えます。
+日の期間は =addDaysNaive= で翌日を =n= 回たどり、週の期間は =weekCorrespondingSpec= で翌日をたどりながら同じ曜日の日を探します。
+月と年の期間も、 =lastMonthSpec= が1か月ずつ進めて最後の月を求めます。
+どれも、計算の回数が期間の日数か月数に比例して増えます。
 
-一方、実装の関数は、日付をある基準日からの日数である通算日に直して計算します。
+実装は日付を基準日からの通算日に直して計算します。
 
 #+begin_src lean
 def correspondingDays (start : Date) : Length → Option Int
@@ -16387,10 +16383,10 @@ def correspondingDays (start : Date) : Length → Option Int
     if start.day ≤ ym.daysInMonth then some (toDays ⟨ym.year, ym.month, start.day⟩) else none
 #+end_src
 
-翌日をたどる仕様に対し、この実装は日と週の期間では通算日に =n= か =7 * n= を足すだけで応当日を求めます。
-月と年の期間でも、 =lastMonth= が年と月から求めた月の通し番号に =n= を足して、応当日のある最後の月を一度の足し算で求めます。
+日と週の期間は通算日に =n= か =7 * n= を足すだけです。
+月と年の期間も、 =lastMonth= が月の通し番号に =n= を足して最後の月を求めます。
 
-ライブラリの期間を計算する関数 =compute= はこの実装を使い、lean-ritsuryoではその結果が仕様と一致することをID付きの定理であるPER-1で証明しています。
+ライブラリの期間の計算 =compute= はこの実装を使い、その結果が仕様と一致することを定理PER-1で証明しています。
 
 #+begin_src lean
 theorem per1_compute_eq_spec (event : Date) (h : event.Valid) (startAtMidnight : Bool)
@@ -16402,7 +16398,7 @@ theorem per1_compute_eq_spec (event : Date) (h : event.Valid) (startAtMidnight :
 #+end_src
 
 仮定の =h : event.Valid= は、出来事の日 =event= が実在する日付であることを表します。
-PER-1が一致を保証するのはこの仮定が成り立つときだけで、 =@[csimp]= はこのような仮定の付いた等式の定理には使えません。
+PER-1が一致を保証するのはこの仮定が成り立つときだけで、 =@[csimp]= はこのような仮定の付いた等式には使えません。
 そのため、ライブラリの関数からは実装を直接呼んでいます。
 =@[csimp]= を使うには、実在する日付だけを表す型を作り、関数の引数をその型にする必要があります。
 
@@ -16410,7 +16406,7 @@ PER-1が一致を保証するのはこの仮定が成り立つときだけで、
 民法 第142条などの繰り下げの規定は、末日が休日なら「その翌日」に満了すると書いています。
 翌日も休日のときについては書いていないので、lean-ritsuryoは休日でない最初の日まで繰り下げると読んでいます。
 この読み方が定めているのは、計算の手順ではなく結果が満たすべき条件です。
-このように仕様が結果の条件であって実行できる関数ではないときは、仕様の関数は書かずに、繰り下げを計算する実装の関数を1つ書いています。
+仕様が実行できる関数ではないので、繰り下げの実装を1つ書きました。
 実装は通算日を1日ずつ進め、休日でない日が見つかったところで止まります。
 
 #+begin_src lean
@@ -16420,32 +16416,32 @@ def rolloverDays (isHoliday : Int → Bool) : Nat → Int → Option Int
 #+end_src
 
 =fuel= は調べる日数の上限で、上限までに休日でない日がなければ =none= を返します。
-lean-ritsuryoは、この実装の結果が次の2つの条件を満たすことを定理ROL-1で証明しています。
+定理ROL-1は、この実装の結果が次の2つの条件を満たすことを証明しています。
 
 - 繰り下げた日はもとの日以後で休日でない
 - もとの日から繰り下げた日の前日まではすべて休日である
 
-ここまで見てきた書き方のうち、lean-ritsuryoの定理の多くは、実装の1つの関数が満たす条件を述べる形をとっています。
-たとえば、繰り下げのほかにも次のような性質を定理として証明しています。
+lean-ritsuryoの定理の多くはこの形で、1つの関数が満たす性質を述べています。
+たとえば次のような性質です。
 
-- 期間の末日は起算点についても長さについても単調であり、起算点を後ろにずらすか期間を長くしたときに末日が前に戻らない
+- 期間の末日は起算点についても長さについても単調である
 - 所得税は課税所得が増えると減らず、課税所得から所得税を引いた額も減らない
-- 消費税の端数処理を品目ごとにしたときと合計でしたときの税額の差は、品目の数から1を引いた値に相当する円以下である
+- 消費税の端数処理を品目ごとにしたときと合計でしたときの税額の差は、品目の数から1を引いた円以下である
 - 民法 第900条の法定相続分の合計は1になる
 
-ライブラリ全体の定理にはTAX-1のようなIDを付けており、そのような定理は全部で35個あります。
-祝日については、祝日法 第2条と第3条から導いた日が内閣府のCSVに載っているすべての年の記録と一致することを、Leanのカーネルで確かめています。
-ただし、法律が日付を直接定めていない春分の日と秋分の日だけは例外としてCSVから日付を取っています。
-定理の証明はすべて =lake build= のときにLeanが検査します。
+定理にはTAX-1のようなIDを付けていて、IDは全部で35個あります。
+祝日は、祝日法 第2条と第3条から導いた日が内閣府のCSVのすべての年と一致することを、Leanのカーネルで確かめています。
+ただし、春分の日と秋分の日だけはCSVから日付を取っています。
+定理はすべて =lake build= のときにLeanが検査します。
 どの証明も =sorry= 、 =admit= 、 =native_decide= を使っていません。
 
 ** Leanで防げる誤り
-テストは、あらかじめ選んだ入力について計算の結果を確かめます。
-これに対し、定理はすべての入力について性質を述べており、Leanは =lake build= のたびにその証明を検査します。
-そのため、テストに選んだ入力では計算の結果がずれないような誤りであっても、ビルドの時点でエラーになります。
+テストは、選んだ入力について結果を確かめます。
+定理はすべての入力について述べていて、Leanは =lake build= のたびにその証明を検査します。
+そのため、選んだ入力に現れない誤りも、ビルドの時点でエラーになります。
 
 *** 税率表の写し間違い
-試しに速算表の控除額を1つ写し間違えたことにして、695万円超900万円以下の区分の636,000円を636,500円に変え、百分の一円を単位とするコードの値を書き換えてみました。
+速算表の控除額を1つ写し間違え、695万円超900万円以下の区分の636,000円を636,500円にしてみました。
 
 #+begin_src lean
   else if x ≤ 9000000 then 23 * x - 63650000
@@ -16458,21 +16454,20 @@ $ lake env lean typo.lean
 typo.lean:16:12: error: omega could not prove the goal:
 #+end_src
 
-この定理の証明は金額を税率表の7つの区分で場合分けし、区分ごとに2つの式が等しいことを =omega= で示します。
-この手続きは、整数の1次式の等式と不等式を判定するLeanの機能です。
-検査で証明できずに残ったのは、695万円超900万円以下の区分だけでした。
+証明は金額を税率表の7つの区分で場合分けし、区分ごとに2つの式が等しいことを =omega= で示します。
+=omega= は整数の1次式の等式と不等式を判定するLeanの手続きです。
+証明できずに残ったのは、695万円超900万円以下の区分だけでした。
 この区分では条文どおりの積み上げが =23 * x - 63600000= になり、写し間違えた =23 * x - 63650000= とはどの金額でも500円ずれるので、等式が成り立ちません。
 
 700万円を例に使うテストでもこの誤りは見つかりますが、4,000万円を超える区分の誤りは、その金額を例に入れないテストでは見つかりません。
-一方、証明の検査では、7つの区分のどれに誤りがあってもLeanがその区分でエラーを出します。
+証明は、7つの区分のどれに誤りがあっても、その区分でエラーになります。
 
-これに対し、区分の境目の =x ≤ 6950000= を =x < 6950000= に変えても、証明は通りました。
-ちょうど6,950,000円のときは、20%の区分の式でも23%の区分の式でも税額が962,500円になるため、境目の不等号を変える前と後でどの金額に対しても税額が変わらないからです。
+一方、区分の境目の =x ≤ 6950000= を =x < 6950000= に変えても、証明は通りました。
+ちょうど6,950,000円のときは、20%の区分の式でも23%の区分の式でも税額が962,500円になり、どの金額でも税額が変わらないからです。
 
 *** 繰り下げを1日で止める誤り
-条文の「その翌日」という言葉を文字どおり受け取り、繰り下げの実装を1日だけ進める関数にすると、翌日も休日のときにその休日が期間の末日になってしまいます。
-次のコードでは、この関数が返した日が民事訴訟法 第95条第3項の休日に当たることをLeanのカーネルで確かめています。
-具体的には、2026-12-29を1日だけ繰り下げた2026-12-30も休日と判定されます。
+「その翌日」を文字どおり1日だけ繰り下げる関数にすると、翌日も休日のとき、その休日が期間の末日になってしまいます。
+次のコードでは、2026-12-29を1日だけ繰り下げた2026-12-30も民事訴訟法 第95条第3項の休日に当たることを、Leanのカーネルで確かめています。
 
 #+begin_src lean
 def court : Date → Bool := RolloverRule.civilProcedure95.isHoliday Holiday.isHoliday
@@ -16483,29 +16478,29 @@ def rolloverOnce (H : Date → Bool) (d : Date) : Date :=
 example : court (rolloverOnce court ⟨2026, 12, 29⟩) = true := by decide +kernel
 #+end_src
 
-この関数はROL-1の1つ目の条件である「繰り下げた日が休日でないこと」を満たさないので、この関数に対してROL-1と同じ定理を証明しようとしても通りません。
-反対に、休日なら必ず2日進めるような繰り下げすぎる関数も、2つ目の条件である「繰り下げた日の前日までがすべて休日であること」を満たさないので証明できません。
+この関数はROL-1の1つ目の条件を満たさないので、ROL-1は証明できません。
+休日なら必ず2日進めるような繰り下げすぎる関数も、2つ目の条件を満たさないので証明できません。
 
 *** 月末をまたぐ期間
-2025-01-31から始まる期間では、最初の1か月は2025-02-28に満了し、そこから続く1か月は2025-03-31に満了します。
-一方、同じ日から始まる2か月の期間は2025-03-30に満了します。
-そのため、1か月の計算を2回くり返して2か月の期間を求める実装にすると、この例で仕様の末日と1日ずれるため、その実装に対してはPER-1を証明できません。
+2025-01-31から始まる期間では、1か月は2025-02-28に満了し、続く1か月は2025-03-31に満了します。
+一方、2か月の期間は2025-03-30に満了します。
+1か月の計算を2回くり返して2か月の期間を求める実装は、この例で1日ずれるので、PER-1を証明できません。
 
 *** 防げない誤り
-一方で、Leanが確かめるのは、実装が仕様と一致することと、実装が定理に書いた性質を満たすことだけです。
-仕様そのものが条文を読み違えていれば、実装も読み違えたとおりに計算し、証明もそのまま通るので、条文の読み違えはLeanだけでは防げません。
+Leanが確かめるのは、実装が仕様と一致することと、実装が定理に書いた性質を満たすことです。
+仕様そのものが条文を読み違えていれば、実装も読み違えたとおりに計算し、証明も通ります。
 
-この誤りを減らすため、lean-ritsuryoでは仕様を条文の構造どおりに書き、人が条文と並べて読み比べられるようにしています。
-また、前提にした条文の読み方をリポジトリの =docs/interpretation.md= に書き出し、計算の結果を国税庁のタックスアンサーに載っている計算例と照らし合わせています。
+この誤りを減らすため、仕様は条文の構造どおりに書き、条文と並べて読み比べられるようにしています。
+条文の読み方は =docs/interpretation.md= に書き、国税庁のタックスアンサーに載っている計算例とも照らしています。
 
 ** 実行時間とバイナリの大きさ
-x86_64-linux向けのリリースの =ritsuryo= は3.4 MBの実行ファイル1つで、動かすのにほかに必要なのはCライブラリだけです。
+x86_64-linux向けのリリースの =ritsuryo= は3.4 MBの実行ファイル1つで、ほかに必要なのはCライブラリだけです。
 1回の実行は約6 msで終わります。
 
-Leanで書いたプログラムは、モジュールの読み込み方によってはコンパイラ自体がリンクされてバイナリが140 MBになります。
-lean-ritsuryoでも、関数に根拠の条文を記録するために独自の属性を使っており、この属性を定義するモジュールは =Lean= をimportしています。
-このモジュールを通常のimportで読み込むと、実行ファイルに =Lean= 全体がリンクされてしまいます。
-そこでlean-ritsuryoはこのモジュールを =meta import= で読み込み、独自の属性をコンパイルのときだけ使うようにしてバイナリを小さく保っています。
+Leanで書いたプログラムは、モジュールの読み込み方によってはバイナリが140 MBになります。
+lean-ritsuryoは関数に根拠の条文を記録するために独自の属性を使っていて、この属性を定義するモジュールは =Lean= をimportしています。
+このモジュールを通常のimportで読み込むと、 =Lean= 全体がリンクされます。
+そこでこのモジュールを =meta import= で読み込み、属性をコンパイルのときだけ使うようにしています。
 
 ** 入手
 [[https://github.com/conao3/lean-ritsuryo/releases][GitHubのリリース]]に、x86_64-linux、aarch64-linux、aarch64-darwinのアーカイブがあります。
@@ -16518,7 +16513,7 @@ curl -sSfL https://github.com/conao3/lean-ritsuryo/releases/download/v0.5.0/rits
 
 Nixを使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行できます。
 
-リポジトリは[[https://github.com/conao3/lean-ritsuryo]]です。
+ライセンスはApache-2.0で、リポジトリは[[https://github.com/conao3/lean-ritsuryo]]です。
 条文の読み方の違いや計算の誤りに気づいたら、Issueで教えてください。
 * git fetch is Turing complete
 :properties:
@@ -16747,22 +16742,21 @@ Each command output in this post comes from a real run, pasted as is.
 :export_date: 2026-11-04 14:43
 :end:
 
-[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介した、日本の法令の計算を形式化したlean-ritsuryoについて、英語の論文を書いてAIを使った研究のオープンアーカイブであるaiXivに投稿しました。
-aiXivでは投稿の直後に本文の具体的な直し候補が届く一方、CLIによるセッションの自動添付や改訂時のドライランの動作には注意が要ります。
-公開した論文は[[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]]で読めます。
-論文のページにはタイトルと著者のほか、AIの関与の区分としてAI-derivedの表示などが出ます。
+[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介したlean-ritsuryoについて、英語の論文を書いてaiXivに投稿しました。
+論文は[[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]]で読めます。
+論文のページには、タイトルと著者のほか、AIの関与の区分のAI-derivedなどが出ます。
 
 [[./resources/public/img/bfc7fe-aixiv-abs.png]]
 
 ** 招待のメール
 きっかけはaiXivの運営から届いた1通のメールです。
 件名は "Your result on Lean 4 verified Japanese statutory period and tax computations: an invitation to publish on aiXiv.online" でした。
-メールの宛先はGitのリポジトリのコミットに記録したメールアドレスで、本文の末尾にもコミットの記録から連絡先を取得したと書いてあります。
-aiXivの運営はGitHubで公開されたリポジトリや証明の成果を見つけて、投稿を勧めるメールを送っているようです。
+宛先はリポジトリのコミットに記録したメールアドレスで、本文の末尾にもそう書いてあります。
+aiXivの運営はGitHubで公開された結果を見つけて、投稿を勧めるメールを送っているようです。
 
-本文によれば、投稿するにはアカウントを作り、エージェントに論文とリポジトリをアップロードさせるだけです。
+本文によれば、投稿するにはアカウントを作り、エージェントに結果をアップロードさせるだけです。
 手で投稿する画面もありますが、運営はエージェントからの投稿を勧めています。
-エージェントから投稿すると、証明に至るまでにエージェントを動かしたセッションの記録も共有され、その記録があとの研究の役に立つというのが勧める理由です。
+エージェントから投稿すると、結果に至るまでのセッションの記録も共有され、あとの研究の役に立つというのが理由です。
 
 ** aiXivとは
 [[https://aixiv.online][aiXiv]]はAIを使った数学の研究を載せるオープンアーカイブです。
@@ -16770,68 +16764,68 @@ Manifold AI Inc.が運営しており、名前は似ていますがarXivとは�
 
 規約と[[https://aixiv.online/llms.txt][投稿の案内]]には、次のことが書かれています。
 
-- 載せるのは識別子が =math.*= の数学分野と、理論・数理物理の研究だけ
+- 載せるのは =math.*= の数学と、理論・数理物理の研究だけ
 - 論文は必須で、公開リポジトリ、エージェントのセッションの記録、AIを使った工程のメモを添えられる
-- aiXivは投稿を受け付けた時点でUTCの時刻と提出物のSHA-256ハッシュを付けて公開し、削除の依頼は受け付けない
-- 一覧に載るのは審査を通ってからで、審査では研究としての寄与、主張の論証、参考文献の実在などを見る
+- 投稿は受け付けた時点でUTCの時刻とSHA-256が付いて公開され、削除の依頼は受け付けない
+- 一覧に載るのは審査を通ってからで、審査は研究としての寄与、主張の論証、参考文献の実在などを見る
 
 lean-ritsuryoは法令の計算をLean 4で書いたもので、数学の研究とは言いにくい内容です。
-それでも、aiXivの一覧を見ると、実行可能なチェッカーをLean 4で検証した論文が数理論理学の =math.LO= に載っていたので、今回の論文も同じ分野で出しました。
+それでも、Lean 4で検証した実行可能なチェッカーの論文が数理論理学の =math.LO= に載っていたので、同じ分野で出しました。
 
 ** 送るもの
 aiXivに送ったのは次の4つです。
 
-- 論文: LaTeXで書いた9ページの英語の論文。送ったLaTeXのソースをaiXivのサーバーがpdfLaTeXでコンパイルし直す
+- 論文: LaTeXで書いた9ページの英語の論文。サーバーがpdfLaTeXでコンパイルし直す
 - リポジトリ: [[https://github.com/conao3/lean-ritsuryo]]
-- AIの関与の申告: 人が証明する命題を決め、モデルが証明を書き、人がそれを確かめる =ai-derived= の区分
-- 工程のメモ: 扱う条文の範囲と読み方を誰が決め、コードと証明と論文を誰が書いたかの記録
+- AIの関与の申告: 人が命題を決め、モデルが証明を書き、人が確かめる =ai-derived= の区分
+- 工程のメモ: 条文の範囲と読み方を誰が決め、コードと証明と論文を誰が書いたか
 
 lean-ritsuryoのコードと証明、論文の本文はClaude Codeが書きました。
-私が決めたのは、扱う条文の範囲、条文の読み方、証明する性質です。
-AIの関与の申告と工程のメモにはこの分担をそのまま書きました。
+私が決めたのは、扱う条文、条文の読み方、証明する性質です。
+申告にはこの分担をそのまま書きました。
 
-審査では参考文献の実在も見られるため、論文に載せる文献は学術文献のDOIを管理するCrossrefとarXivの書誌情報で実在を確かめました。
+論文の参考文献はCrossrefとarXivの書誌情報で実在を確かめてから載せました。
 書誌情報で確かめられない巻やページは書いていません。
 
 ** セッションは添付しない
-投稿に使うCLIの =npx aixiv@latest publish= は、投稿するディレクトリで動かしたエージェントのセッションファイルを既定で添付します。
-aiXivのサーバーがセッションファイルから消すのはAPIキー、メールアドレス、IPアドレスだけです。
-しかしClaude Codeのセッションファイルには、エージェントが読み込んだ個人用のメモや、ほかのリポジトリでの作業の内容も入ります。
-そのため、今回は =--no-sessions= を付けてセッションを添付せずに投稿しました。
-実行する前にCLIのスクリプトである =https://aixiv.online/cli/aixiv.js= をダウンロードして読み、 =--no-sessions= を付けたときはCLIがセッションファイルを読まずに添付の処理を飛ばすことを確かめました。
+投稿のCLIの =npx aixiv@latest publish= は、投稿するディレクトリで動かしたエージェントのセッションファイルを既定で添付します。
+サーバーがセッションファイルから消すのはAPIキー、メールアドレス、IPアドレスだけです。
+Claude Codeのセッションファイルには、エージェントが読み込んだ個人用のメモや、ほかのリポジトリでの作業の内容も入ります。
+そのため、 =--no-sessions= を付けてセッションを添付せずに投稿しました。
+実行する前に =https://aixiv.online/cli/aixiv.js= をダウンロードして読み、 =--no-sessions= を付けたときはセッションファイルを読まずに添付の処理を飛ばすことを確かめました。
 
-CLIから投稿するときは、まず =aixiv login= が出すリンクをブラウザで開いてログインを承認します。
-続けて =publish= に =--dry-run= を付けて実行すると、論文は公開されず、サーバーがLaTeXのソースをコンパイルして読み取ったタイトル、著者、要旨だけが返ります。
-論文のページでは要旨のLaTeXコマンドが展開されずに文字のまま表示されるため、要旨には =\emph= や自前のマクロを使わないほうがよいです。
+CLIから投稿するときは、まず =aixiv login= が出すリンクをブラウザで開いて承認します。
+続けて =publish= に =--dry-run= を付けて実行すると、論文は公開されず、サーバーがLaTeXをコンパイルして読み取ったタイトル、著者、要旨だけが返ります。
+要旨はそのままページに出るので、 =\emph= や自前のマクロは使わないほうがよいです。
 
 ** 審査のnotes
-投稿して約12分後に審査が終わり、論文がaiXivの一覧に載りました。
-審査の結果には修正を必須とする =changes_to_make= の欄と、任意の改善点を挙げるnotesの欄があります。
-今回の論文では必須の項目はありませんでしたが、notesの欄に本文の直し候補が4点付いていました。
+投稿して約12分後に審査が終わり、一覧に載りました。
+審査の結果には、直すことを求める =changes_to_make= と、notesの欄があります。
+=changes_to_make= はありませんでしたが、notesに本文の直し候補が4点付いていました。
 
 - 年末年始の繰り下げの例で、1月4日が土日や祝日に当たるとさらに先へ延びることが書かれていない
-- 祝日の判定を内閣府の祝日一覧の各行と比べる検査で、対象に特別法の休日を含まないことが書かれていない。また、その検査の所要時間が本文の2か所で食い違って見える
+- 祝日の検査が比べる行に特別法の休日を含まないことが書かれておらず、検査の所要時間が2か所で食い違って見える
 - 利子税の根拠に国税通則法 第64条が抜けている
 - 1872年の改暦の法令の種別が正確でない
 
-短い時間で審査が終わり、その指摘がいずれも実際に直したほうがよい箇所に当たっていたことには驚きました。
-指摘に沿って本文を直したところ、次の節で触れる経緯で第2版が公開されました。
-その第2版にもnotesが3点付き、うちの1点は祝日法 第3条にある第2項と第3項について、改正の経過を省きすぎて記述が正確でないという指摘でした。
+短い時間で審査が終わり、指摘がどれも直したほうがよい箇所を突いていたことには驚きました。
+指摘に沿って直したところ、次の節の経緯で第2版が公開されました。
+第2版にもnotesが3点付き、うち1点は祝日法 第3条の第2項と第3項の改正の経過をまとめすぎているという指摘でした。
 この3点も直して、第3版を出しました。
 
 ** 改訂の公開と =--dry-run=
 第2版を出す前に、直した内容を確かめるつもりで、Claude Codeが =--new-version= と =--dry-run= を付けて =publish= を実行しました。
-すると、第2版がそのまま公開されてしまいました。
-CLIのv0.4.1では、 =publish= に =--new-version= を付けると =--dry-run= が無視されて新しい版が公開されてしまいます。
-さらに、エージェントのように対話端末の外から実行した場合や、 =--json= か =--yes= を付けた場合は、公開してよいかを尋ねるプロンプトも出ません。
-aiXivは公開した版の削除を受け付けないので、誤って公開された第2版は取り消せません。
+すると、第2版がそのまま公開されました。
+CLIのv0.4.1では、 =publish= に =--new-version= を付けると、 =--dry-run= を付けても新しい版が公開されます。
+端末から実行していないときや、 =--json= か =--yes= を付けたときは、公開する前の確認も出ません。
+aiXivは公開した版の削除を受け付けないので、第2版は取り消せません。
 
-改訂した論文のコンパイル結果や要旨を出す前に確かめるときは、 =--new-version= を付けずに =aixiv publish <dir> --dry-run= を実行します。
+改訂を出す前に確かめるときは、 =--new-version= を付けずに =aixiv publish <dir> --dry-run= を実行します。
 こうすると、新しい版を公開せずに、コンパイルの結果とLaTeXから読み取ったタイトル、著者、要旨を確かめられます。
 
 ** おわりに
-aiXivは、Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryoのリポジトリ]]を公開し、条文の根拠や記述の抜けについて具体的な審査結果を得る場として役立ちました。
-CLIから投稿するときは、セッションの自動添付を止める指定と、改訂時のドライランでは新しい版を作る指定を外す点に気を付けると、意図しない情報や版の公開を防げます。
+aiXivでは、投稿した論文に時刻とハッシュの付いた記録が残り、審査の結果には具体的な直し候補が付きます。
+Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryoのリポジトリ]]のように、AIを使って書いたコードと証明をまとめる先として使えました。
 
 * APIトークンを持たずにGitHub ActionsのビルドをCloudflare Workersへデプロイする
 :properties:
@@ -16841,37 +16835,39 @@ CLIから投稿するときは、セッションの自動添付を止める指�
 
 GNU Emacsのマニュアルを日本語に機械翻訳したサイト[[https://emacs-doc.conao3.com]]を、Cloudflare Workersで公開しています。
 [[https://github.com/conao3/emacs-doc][conao3/emacs-doc]]はpublicのリポジトリです。
-このサイトでは、GitHub Actionsがサイトをビルドして生成物をGitHubのReleaseへ添付ファイルとしてアップロードし、CloudflareのWorkers Buildsがその添付ファイルをダウンロードしてデプロイします。
-Workers Buildsの環境でビルドできないサイトでも、この構成ならGitHubにCloudflareのAPIトークンを置かず、CloudflareにもGitHubのAPIトークンを置かずにWorkersへデプロイできます。
+このサイトはGitHubにもCloudflareにもAPIトークンを置かずにデプロイしています。
+ビルドはGitHub Actionsで行い、生成物はGitHubのReleaseの添付ファイルとして置きます。
+デプロイはCloudflareのWorkers Buildsが、その添付ファイルを取って行います。
+この記事では、この構成とその性質を紹介します。
 
 [[./resources/public/img/12e5f6-flow.svg]]
 
 ** よくある方法はトークンをSecretsに置く
-GitHub ActionsからWorkersへデプロイする方法は、Cloudflareの公式の手順である[[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions]]に書かれています。
+GitHub ActionsからWorkersへデプロイする方法は、Cloudflareの公式の手順[[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions]]に書かれています。
 この手順では、 =CLOUDFLARE_API_TOKEN= と =CLOUDFLARE_ACCOUNT_ID= をリポジトリのSecretsに置き、 =cloudflare/wrangler-action= に渡します。
-翻訳ツールのpo4aで文書を翻訳してサイトを作る[[https://github.com/Netatalk/netatalk.io][Netatalk/netatalk.io]]も、同じようにトークンをSecretsに置いてデプロイしています。
+po4aで文書を翻訳してサイトを作る[[https://github.com/Netatalk/netatalk.io][Netatalk/netatalk.io]]も、同じようにトークンをSecretsに置いてデプロイしています。
 
-トークンをSecretsに置かずにデプロイする方法として、クラウドによってはGitHubのOIDCで一時的な権限を受け渡す仕組みを使えます。
+GitHubのOIDCを使えば、クラウドによってはトークンを置かずに済みます。
 しかし、CloudflareはGitHubのOIDCを受け付けません。
 
 ** Workers Buildsではemacs-docをビルドできない
 Workers BuildsはCloudflareのGit連携の機能です。
-GitHubのリポジトリを接続すると、監視するブランチへpushされるたびにCloudflare側でbuild commandとdeploy commandを実行します。
-deploy commandの既定値は =npx wrangler deploy= で、GitHub側にCloudflareのトークンを置く必要はありません。
+GitHubのリポジトリをつなぐと、監視するブランチへpushされるたびにCloudflare側でbuild commandとdeploy commandを実行します。
+deploy commandの既定は =npx wrangler deploy= で、GitHub側にCloudflareのトークンは要りません。
 
 ただし、emacs-docのサイトはWorkers Buildsの環境ではビルドできません。
-emacs-docのビルドでは、Texinfoのマニュアルを =makeinfo --html= でHTMLに変換し、po4aで訳を差し込みます。
-Workers Buildsのビルドイメージである[[https://developers.cloudflare.com/workers/ci-cd/builds/build-image/][Build image]]はUbuntu 24.04で、NodeやPythonは入っていますが、ビルドに必要なtexinfo・po4a・gettextは入っていません。
-また、[[https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/][Limits & pricing]]にあるとおり、1回のビルドにかけられる時間は20分までです。
-emacs-docでは =make pot= と =make site= の処理だけでそれぞれ約5分かかるため、ビルド時間も制約になります。
+emacs-docのビルドでは、Texinfoのマニュアルを =makeinfo --html= でHTMLにし、po4aで訳を差し込みます。
+Workers Buildsのビルドイメージ[[https://developers.cloudflare.com/workers/ci-cd/builds/build-image/][Build image]]はUbuntu 24.04で、NodeやPythonは入っていますが、texinfo・po4a・gettextは入っていません。
+また、[[https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/][Limits & pricing]]のとおり、1回のビルドは20分までです。
+emacs-docでは =make pot= と =make site= だけでそれぞれ約5分かかります。
 
 ** ビルドとデプロイを分ける
-そこで、ビルドはGitHub Actionsが担当し、デプロイはWorkers Buildsが担当するように2つの役割を分けました。
-GitHub Actionsは名前を固定したリリース =site= に添付ファイル =dist.tar.zst= をアップロードし、Workers BuildsはそのSHA-256を書いたファイル =SITE_SHA256= と照合してデプロイします。
+そこで、ビルドはGitHub Actions、デプロイはWorkers Buildsに分けました。
+Actionsは名前を固定したリリース =site= に添付ファイル =dist.tar.zst= を上げ、Workers BuildsはそのSHA-256を書いたファイル =SITE_SHA256= と照合してデプロイします。
 
 *** 1. Actionsがサイトを作ってReleaseに上げる
-Actionsの =Update= ワークフローは、 =workflow_dispatch= トリガーで手動で実行します。
-このワークフローはサイトを =dist/= に生成したあと、 =make package= でtarアーカイブにまとめます。
+Actionsの =Update= ワークフローは =workflow_dispatch= で手動で回します。
+サイトを =dist/= に作ったあと、 =make package= でtarにします。
 
 #+begin_src makefile
 package:
@@ -16883,10 +16879,10 @@ package:
 #+end_src
 
 tarのオプションは、同じ内容のファイルから同じバイト列を作るためのものです。
-ファイルを名前の順に並べ、更新時刻と所有者・グループを0に固定し、tarの拡張ヘッダーであるpaxヘッダーからアクセス時刻のatimeと状態の変更時刻のctimeを外します。
+ファイルを名前の順に並べ、更新時刻と所有者・グループを0に固定し、paxヘッダーからアクセス時刻のatimeと状態の変更時刻のctimeを外します。
 手元で作ったtarとActionsで作ったtarのSHA-256は一致しました。
 
-続いて、作成したtarをリリース =site= にアップロードして添付ファイルを上書きします。
+続いて、できたtarでリリース =site= の添付ファイルを上書きします。
 
 #+begin_src yaml
 - name: Upload the site to the release
@@ -16898,12 +16894,12 @@ tarのオプションは、同じ内容のファイルから同じバイト列�
     gh release upload site build/dist.tar.zst --clobber
 #+end_src
 
-Releaseへのアップロードと次の節のpushに必要なワークフローの権限は =contents: write= であり、Actionsが自動で発行する =GITHUB_TOKEN= だけで実行できます。
+ワークフローの権限は =contents: write= で、Actionsが自動で発行する =GITHUB_TOKEN= だけで足ります。
 
 *** 2. SHA-256をmasterにcommitする
-続けて、ワークフローは =SITE_SHA256= をmasterにcommitしてpushします。
-tarの中身が前回と同じなら =SITE_SHA256= も変わらないので、新しいcommitは作りません。
-次のステップは、po4aの翻訳ファイルであるPOファイルをcommit前に扱う処理を省いて抜粋したものです。
+続けて、 =SITE_SHA256= をmasterにcommitしてpushします。
+tarの中身が前回と同じなら =SITE_SHA256= も変わらないので、commitは作りません。
+次のステップは、POファイルの扱いを省いて抜粋したものです。
 
 #+begin_src yaml
 - name: Commit the catalogs and the checksum of the site
@@ -16918,8 +16914,8 @@ tarの中身が前回と同じなら =SITE_SHA256= も変わらないので、�
 #+end_src
 
 *** 3. Workers Buildsがtarを取ってデプロイする
-Workers Buildsでは、Workerの =emacs-doc= をGitHubリポジトリのmasterブランチに接続しています。
-build commandには =make fetch-site= を、deploy commandには =npx wrangler deploy= を設定しています。
+Workers Buildsで、Worker =emacs-doc= をGitHubのmasterにつないでいます。
+build commandは =make fetch-site= 、deploy commandは =npx wrangler deploy= です。
 
 #+begin_src makefile
 SITE_URL := https://github.com/conao3/emacs-doc/releases/download/site/dist.tar.zst
@@ -16933,59 +16929,60 @@ fetch-site:
 	tar --zstd -xf $(SITE_ARCHIVE) -C $(DIST_DIR)
 #+end_src
 
-リポジトリがpublicなので、Releaseに置かれた添付ファイルは認証なしのcurlでダウンロードできます。
-ダウンロードしたtarを =sha256sum --check= で =SITE_SHA256= と照合し、 =dist/= に展開します。
-ここで使うcurl、sha256sum、tar、zstdはどれもビルドイメージに入っているコマンドなので、build commandはWorkers Buildsの環境でそのまま実行できます。
+リポジトリがpublicなので、Releaseの添付ファイルは認証なしのcurlで取れます。
+取ったtarを =sha256sum --check= で =SITE_SHA256= と照合し、 =dist/= に展開します。
+curl、sha256sum、tar、zstdはどれもビルドイメージに入っているので、build commandはWorkers Buildsの環境で動きます。
 
-続くdeploy commandでは、 =wrangler.jsonc= の =assets.directory= が =./dist= に指定されているため、 =npx wrangler deploy= が =dist/= をWorkerの静的アセットとしてアップロードします。
+deploy commandでは、 =wrangler.jsonc= の =assets.directory= が =./dist= なので、 =npx wrangler deploy= が =dist/= をWorkerの静的アセットとして上げます。
 デプロイが終わると、GitHubのcommitに =Workers Builds: emacs-doc= のcheck runが付きます。
 
 ** この構成の性質
-- CloudflareのAPIトークンを置かないため、GitHubのSecretsは空のままで、Actionsが使うトークンは =GITHUB_TOKEN= だけです。
-- ビルドしたサイトは2,240ファイルあり、tarにすると49 MB、zstdで圧縮しても4.7 MBありますが、これらの生成物をgitの履歴に入れずに済みます。サイトについてgitの履歴に入るのは、64文字のSHA-256だけです。
-- 同じ内容のファイルからtarを作ると同じバイト列になるため、サイトの中身が変わらなければ =SITE_SHA256= も変わりません。そのときはActionsがcommitを作らないので、デプロイも実行されません。
-- READMEの修正など、 =SITE_SHA256= を変えないpushでもWorkers Buildsはビルドとデプロイを実行します。このときはReleaseから同じtarをダウンロードして、同じサイトをデプロイし直します。
-- =SITE_SHA256= とReleaseのtarが食い違うと、 =sha256sum --check= が失敗してbuild commandも失敗します。このときdeploy commandは実行されないので、公開中のサイトは前のまま保たれ、 =SITE_SHA256= と一致したtarだけが公開されます。
+- CloudflareのAPIトークンをどこにも置かず、GitHubのSecretsは空です。Actionsが使うのは =GITHUB_TOKEN= だけです。
+- 生成物をgitの履歴に入れません。サイトは2,240ファイルで、tarにすると49 MB、zstdで圧縮すると4.7 MBです。サイトについて履歴に入るのは、64文字のSHA-256だけです。
+- tarは同じ内容のファイルから同じバイト列になるので、サイトの中身が変わらなければ =SITE_SHA256= も変わりません。そのときはActionsがcommitを作らないので、デプロイも走りません。
+- READMEの修正など、 =SITE_SHA256= を変えないpushでもWorkers Buildsは動きます。このときは同じtarを取って、同じサイトをデプロイし直します。
+- =SITE_SHA256= とReleaseのtarが食い違うと、 =sha256sum --check= が失敗してbuild commandも失敗します。このときdeploy commandは実行されないので、公開中のサイトは前のままです。公開されるのは =SITE_SHA256= と一致したtarだけです。
 
-一方で、この構成には古いcommitからサイトをデプロイし直せないという制約があります。
-Releaseに置くtarは常に最新の1つだけなので、古いcommitをデプロイし直そうとしても、そのcommitの =SITE_SHA256= がReleaseにある最新のtarと一致せず、ビルドが失敗します。
-同じ理由で、ActionsがReleaseへtarをアップロードしてから =SITE_SHA256= をpushするまでの間に別のpushがあると、そのビルドも失敗します。
-公開中のサイトを以前の版に戻すには、その版の状態でサイトをビルドし直してReleaseへアップロードする必要があります。
+一方で、この構成では古いcommitからデプロイし直せません。
+Releaseのtarは常に最新の1つだけなので、古いcommitの =SITE_SHA256= は今のtarと合わず、ビルドが失敗します。
+同じ理由で、Actionsがtarを上げてから =SITE_SHA256= をpushするまでの間に別のpushがあると、そのビルドも失敗します。
+以前の版に戻すには、その版の状態でサイトを作り直して上げるしかありません。
 
 ** 似た構成の実例
 トークンを置かずにActionsの生成物を公開する実例は、GitHub Pagesに多くあります。
-この構成では、ワークフローが =actions/upload-pages-artifact= でActionsの一時保存領域であるartifactに生成物をアップロードし、 =actions/deploy-pages= が =id-token: write= のOIDCを使って公開します。
-po4aで翻訳したFreeBSDの文書を公開する[[https://github.com/fierceX/freebsd-doc-cn][fierceX/freebsd-doc-cn]]や、makeinfoでマニュアルを作る[[https://github.com/r0man/beads.el][r0man/beads.el]]がこの構成を採っています。
+=actions/upload-pages-artifact= で生成物をartifactに上げ、 =actions/deploy-pages= が =id-token: write= のOIDCで公開する構成です。
+po4aで訳したFreeBSDの文書を公開する[[https://github.com/fierceX/freebsd-doc-cn][fierceX/freebsd-doc-cn]]や、makeinfoでマニュアルを作る[[https://github.com/r0man/beads.el][r0man/beads.el]]がこの形です。
 
-一方、Releaseの添付ファイルをWorkers Buildsがダウンロードしてデプロイする構成の実例は、GitHubのコード検索とWeb検索で探した範囲では見つかりませんでした。
+Releaseの添付ファイルをWorkers Buildsが取ってデプロイする構成の実例は、GitHubのコード検索とWeb検索では見つかりませんでした。
 
 ** おわりに
-この構成は、サイトをWorkersの静的アセットとして配信したいものの、Workers Buildsの環境ではビルドできず、CloudflareのトークンもGitHubに置きたくないときに使えます。
-Workers BuildsがReleaseからダウンロードしたtarをmasterの =SITE_SHA256= とSHA-256で照合するため、一致したtarだけを公開できます。
+Workers Buildsの環境でビルドできないサイトでも、ビルドをActionsに任せ、生成物をpublicのReleaseに置けば、トークンを持たずにWorkersへデプロイできます。
+Workers BuildsはReleaseのtarをmasterの =SITE_SHA256= と照合するので、公開されるのは一致したtarだけです。
+Workersの静的アセットで配りたいけれど、CloudflareのトークンをGitHubに置きたくないときに使えます。
 * PLaMo 3 Translateを手元で動かしてパイプで訳すCLI plamo-tr-localを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/33d2c2
 :export_date: 2026-11-05 02:00
 :end:
 
-Preferred NetworksであるPFNの翻訳に特化したLLM、PLaMo 3 Translateの重みが2026-11-05に公開されました。
-手元のPCでこのモデルを動かし、シェルのパイプで文章を訳せるコマンド =plamo-tr-local= を作りました。
-公開リポジトリは [[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]] で、ライセンスはApache-2.0です。
-モデルのライセンスの条件に従い、記事の中の訳文の例はすべてPLaMo 3 Translateの生成物であることを明記します。
+Preferred Networksの翻訳特化LLMであるPLaMo 3 Translateの重みが、2026-11-05に公開されました。
+このモデルを手元のPCで動かして、シェルのパイプで文章を訳すコマンド =plamo-tr-local= を作りました。
+公開リポジトリは[[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]]で、ライセンスはApache-2.0です。
+記事の中の訳文の例はすべてPLaMo 3 Translateの生成物です。
 
 [[./resources/public/img/33d2c2-flow.svg]]
 
 [[github:conao3/rust-plamo-tr-local::Rust][Translate text from the command line with PLaMo 3 Translate running on your machine]]
 
 ** きっかけ
-[[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][PFNのテックブログ]] によると、PLaMo 3 Translateはパラメータ数が0.8B・2B・8B・31Bの4つの大きさで公開されています。
+[[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][Preferred Networksのテックブログ]]によると、PLaMo 3 Translateは0.8B・2B・8B・31Bの4つの大きさで公開されています。
 llama.cpp向けのGGUFやMLX向けの量子化版もそろっています。
-ただし、モデルの重みをダウンロードしただけでは文章を訳せません。
-文章を少し訳したいだけでも、PLaMo向けのプロンプト形式であるPFML3で入力を組み立て、llama.cppなどでモデルを動かす必要があります。
+ただし、重みをダウンロードしただけでは訳せません。
+文章を少し訳したいだけでも、PFML3という形式でプロンプトを組み、llama.cppなどでモデルを動かす必要があります。
 
-このコマンドを作ろうと思ったのは、kat0hさんの [[https://x.com/kat0h/status/2118173128207851727][ポスト]] を見たからです。
-kat0hさんはClaudeが書く日本語の言い回しを避けるため、その応答をローカルのPLaMoに通して表示するスクリプトを用意したそうです。
-翻訳モデルをシェルのパイプの1段として呼び出せれば、出力をその場で訳して表示する使い方をすぐに試せます。
+作ろうと思ったのは、kat0hさんの[[https://x.com/kat0h/status/2118173128207851727][ポスト]]を見たからです。
+kat0hさんは、Claudeの日本語の言い回しが嫌で、その応答を手元のPLaMoに通して表示するスクリプトを用意したそうです。
+手元の翻訳モデルをパイプの1段として使えれば、こうした使い方をすぐに試せます。
 
 ** 使い方
 Nixがあれば、インストールせずに実行できます。
@@ -16995,14 +16992,14 @@ $ nix run github:conao3/rust-plamo-tr-local -- text translate-text --text 今日
 #+end_src
 
 Cargoでもインストールできます。
-ビルドの途中でllama.cppをコンパイルするため、CMake、C++コンパイラ、libclangが要ります。
+ビルドの途中でllama.cppをコンパイルするので、CMake、C++コンパイラ、libclangが要ります。
 
 #+begin_src console
 $ cargo install --git https://github.com/conao3/rust-plamo-tr-local
 #+end_src
 
-このコマンドを初めて実行すると、Hugging Faceの =pfnet/plamo-3-translate-<大きさ>-GGUF= から、Q4_K_Mで量子化したGGUFファイルをキャッシュへ自動でダウンロードします。
-Linuxでは =~/.cache/plamo-tr-local= がキャッシュの保存先になります。
+初めて実行すると、Hugging Faceの =pfnet/plamo-3-translate-<大きさ>-GGUF= からQ4_K_MのGGUFをキャッシュへ自動でダウンロードします。
+Linuxのキャッシュは =~/.cache/plamo-tr-local= です。
 アカウントもAPIキーも要らず、訳す文章はPCの外に出ません。
 
 訳文の言語を指定しなければ、日本語の文は英語に、それ以外の言語の文は日本語に訳します。
@@ -17026,7 +17023,7 @@ $ echo "Since it's raining today, I think I'll relax at home and read a book." \
 今日は雨だから、家でゆっくり本を読んでいようと思う。
 #+end_src
 
-=--glossary= に用語集を渡して特定の語の訳を指定でき、 =--writing-style= では日本語の文体として常体の =plain= と敬体の =polite= を選べます。
+=--glossary= で語の訳を指定でき、 =--writing-style= で日本語の文体を常体の =plain= と敬体の =polite= から選べます。
 
 #+begin_src console
 $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
@@ -17034,21 +17031,20 @@ $ plamo-tr-local text translate-text --text "Filter tasks by owner." \
 担当者でタスクを絞り込みます。
 #+end_src
 
-ほかに、訳す文章の前後の段落やページの種類をモデルに伝える =--context= と、モデルの大きさを選ぶ =--model-size= があります。
+ほかに、前後の段落やページの種類を伝える =--context= と、モデルの大きさを選ぶ =--model-size= があります。
 =--model-size= には =0.8b= ・ =2b= ・ =8b= ・ =31b= を指定でき、既定は =2b= です。
-小さいモデルほど速く動作し、大きいモデルほど自然な訳文を出します。
+小さいモデルほど速く動き、大きいモデルほど自然に訳します。
 
 ** AWS CLI型のコマンド体系
-このコマンドの引数は、AWS CLIと同じく対象の種類と操作を並べる体系にしました。
-実行するときは =<コマンド> <サブコマンド>= の後に、名前付きの引数を並べて指定します。
+コマンド体系はAWS CLIと同じ形にしました。
+=<コマンド> <サブコマンド>= の後に、名前付きの引数を並べます。
 
 ** PFML3のプロンプトを組む
 PLaMo 3 Translateへ渡すプロンプトの形式はPFML3です。
-この形式のプロンプトは =<|plamo:tag|>= で始まる区切りを連ねて作り、翻訳タスクであることを示すデータセットの種類、参考文脈、用語集、原文、訳文の言語と文体を順に指定します。
-=plamo-tr-local= はGGUFのリポジトリに付属する =chat_template.jinja= と同じ手順で、コマンドの引数からこのプロンプトの文字列を組み立てます。
-たとえば、参考文脈に "A task list" を渡し、用語集でownerの訳語に担当者を指定して、"Filter by owner." を日本語の敬体に訳す場合を考えます。
-このときに組み立てられるプロンプトは次のとおりです。
-実際のプロンプトは1行の文字列ですが、ここでは読みやすいように区切りごとに改行しています。
+=<|plamo:tag|>= で始まる節を連ね、データセットの種類、参考文脈、用語集、原文、訳文の言語と文体を順に書きます。
+=plamo-tr-local= はGGUFのリポジトリに付く =chat_template.jinja= と同じ手順で、引数からこのプロンプトを組み立てます。
+たとえば、参考文脈に "A task list" 、用語集にowner → 担当者を指定して、"Filter by owner." を日本語の敬体に訳すときのプロンプトは次のとおりです。
+実際は1行の文字列で、ここでは読みやすいように節ごとに改行しています。
 
 #+begin_example
 <|plamo:tag|>dataset<|plamo:msg|>translation
@@ -17058,23 +17054,23 @@ PLaMo 3 Translateへ渡すプロンプトの形式はPFML3です。
 <|plamo:tag|>output<|plamo:key|>lang<|plamo:val|>ja<|plamo:key|>form<|plamo:val|>polite<|plamo:msg|>
 #+end_example
 
-=input= の区切りで =lang= に原文の言語を指定しなければ、モデルが自動で言語を判定します。
+=input= の節で =lang= に原文の言語を指定しなければ、モデルが言語を判定します。
 モデルは最後の =<|plamo:msg|>= に続けて訳文を生成し、 =plamo-tr-local= は =<|plamo:tag|>= などの区切りのトークンが出たところで生成を止めます。
-生成時のトークンは、毎回もっとも確率の高い候補を選ぶgreedy方式で決めます。
-なお、原文に =<|plamo:= を含む文字列があると、モデルがプロンプトの区切りと見分けられません。
-そのとき =plamo-tr-local= はエラーを出して終了コード254で止まります。
+トークンは、毎回もっとも確率の高い候補を選ぶgreedy方式で決めます。
+原文に =<|plamo:= を含む文字列があると、プロンプトの区切りと見分けられません。
+そのとき =plamo-tr-local= は終了コード254で止まります。
 
 ** 長い文は段落ごとに訳す
-モデルカードによると、モデルが一度に扱える量は入力と出力を合わせて32,768トークンまでです。
-出力の分を残して一度に渡しすぎないよう、 =plamo-tr-local= は入力の長い文章を空行で段落に分け、合計が4,096トークン以下になる塊にまとめて1回ずつモデルに渡します。
-1つの段落だけで4,096トークンを超えるときは、さらに行ごとに分けます。
-それぞれの塊を訳した結果は、元の文章と同じ空行と改行でつなぎ直します。
+モデルカードによると、モデルが一度に扱えるのは入力と出力を合わせて32,768トークンまでです。
+=plamo-tr-local= は長い文章を空行で段落に分け、4,096トークン以下の塊にまとめて1回ずつ訳します。
+1つの段落が4,096トークンを超えるときは、行ごとに分けます。
+訳した結果は、元の文章と同じ空行と改行でつなぎ直します。
 
 ** 作るときに当たったこと
 *** llama-cpp-2のリビジョンの固定
-Rustからllama.cppを呼ぶには、 [[https://github.com/utilityai/llama-cpp-rs][llama-cpp-rs]] が提供する =llama-cpp-2= クレートを使っています。
-ところが、crates.ioで公開されている版である0.1.161は同梱のllama.cppが古く、モデルの読み込みが =unknown tokenizer: 'plamo3'= のエラーで失敗しました。
-そこで、llama.cpp v0.8.0を取り込んだllama-cpp-rsのリビジョンをgitで指定して依存先を固定しました。
+Rustからllama.cppを呼ぶには、[[https://github.com/utilityai/llama-cpp-rs][llama-cpp-rs]]の =llama-cpp-2= クレートを使っています。
+ところが、crates.ioの0.1.161に同梱されたllama.cppでは、モデルの読み込みが =unknown tokenizer: 'plamo3'= で失敗しました。
+そこで、llama.cpp v0.8.0を取り込んだllama-cpp-rsのgitのリビジョンに依存を固定しました。
 
 #+begin_src toml
 [dependencies.llama-cpp-2]
@@ -17083,7 +17079,7 @@ rev = "0364f5da1c6a6ee37f507031f116ce4a09b28594"
 version = "0.1.162"
 #+end_src
 
-Nixでビルドするときは、gitから取得する依存クレートの中身を固定するため、 =flake.nix= の =cargoLock.outputHashes= にハッシュを指定します。
+Nixでビルドするときは、gitから取る依存の中身を固定するため、 =flake.nix= の =cargoLock.outputHashes= にハッシュを書きます。
 
 #+begin_src nix
 cargoLock = {
@@ -17093,11 +17089,11 @@ cargoLock = {
 #+end_src
 
 *** AVX2を使うビルド
-=llama-cpp-2= が内部で使うバインディングのllama-cpp-sys-2は、llama.cppのCPU向けの命令セットをRustのtarget featureから決めます。
-x86_64向けのRustが既定で有効にする命令セットはSSE2までなので、そのままビルドするとllama.cppでもAVX2が無効になります。
-実際にAVX2が無効な状態で動かすと、AVX2を有効にしたビルドに比べて実行に3〜4倍の時間がかかりました。
-そこで、 =.cargo/config.toml= でx86_64 Linux向けのtarget CPUを =x86-64-v3= に設定しました。
-=x86-64-v3= はAVX2を含む命令セットの世代にあたり、IntelならHaswell以降、AMDならExcavator以降のCPUがこの世代に対応しています。
+=llama-cpp-2= が使うバインディングのllama-cpp-sys-2は、llama.cppのCPU向けの命令セットをRustのtarget featureから決めます。
+Rustのx86_64向けの既定はSSE2までなので、そのままビルドするとllama.cppもAVX2を使いません。
+AVX2を使わないビルドは、使うビルドより3〜4倍遅くなりました。
+そこで、 =.cargo/config.toml= でx86_64 Linux向けのtarget CPUを =x86-64-v3= にしました。
+=x86-64-v3= はAVX2を含む水準で、IntelはHaswell以降、AMDはExcavator以降のCPUが当てはまります。
 
 #+begin_src toml
 [target.x86_64-unknown-linux-gnu]
@@ -17105,10 +17101,10 @@ rustflags = ["-C", "target-cpu=x86-64-v3"]
 #+end_src
 
 *** スレッド数の既定
-検証に使ったIntel Core Ultra 5 225Uは、性能重視のPコアと省電力のEコアが混ざったCPUで、論理CPUは14個あります。
-MITライセンスの本文を2bのモデルで日本語に訳すのにかかる時間を、スレッド数を変えて測りました。
-表の「最初のトークンまで」は、モデルを読み込んだあとにプロンプトを処理して最初のトークンを出すまでの時間です。
-表の値は、4スレッドが1回の測定値で、ほかは3回以上測った中央値です。
+手元のIntel Core Ultra 5 225Uは、性能重視のPコアと省電力のEコアが混ざったCPUで、論理CPUは14個です。
+MITライセンスの本文を2bのモデルで日本語に訳す時間を、スレッド数を変えて測りました。
+表の「最初のトークンまで」は、モデルを読み込んだあと、プロンプトを読んで最初のトークンを出すまでの時間です。
+4スレッドは1回、ほかは3回以上測った中央値です。
 
 | スレッド数 | 最初のトークンまで | 出力 (214トークン) | 全体    |
 |------------+--------------------+---------------------+---------|
@@ -17119,17 +17115,18 @@ MITライセンスの本文を2bのモデルで日本語に訳すのにかかる
 
 [[./resources/public/img/33d2c2-threads.svg]]
 
-プロンプトを処理して「最初のトークンまで」に進む時間は14スレッドがもっとも速く、訳文の出力を生成する時間は10スレッドがもっとも速くなりました。
-8・9・11・12スレッドも測りましたが、いずれも出力にかかった時間は10スレッドより長くなりました。
-論理CPUをすべて使う14スレッドではEコアまで使われるためか、出力に7スレッドより長い時間がかかっています。
-そこで、スレッド数の既定値は論理CPUの個数の3/4とし、このCPUでは10スレッドになるようにしました。
-スレッド数は環境変数 =PLAMO_TR_LOCAL_THREADS= で変えられます。
+プロンプトの処理は14スレッドがもっとも速く、出力の生成は10スレッドがもっとも速くなりました。
+8・9・11・12スレッドも測りましたが、出力の生成は10スレッドより遅くなりました。
+14スレッドでは、出力の生成が7スレッドより遅くなりました。
+そこで、スレッド数の既定を論理CPUの3/4にしました。
+手元のCPUでは10です。
+環境変数 =PLAMO_TR_LOCAL_THREADS= で変えられます。
 
 ** 速さ
 同じMITライセンスの本文を日本語に訳す時間を、モデルの大きさごとに比べました。
-原文は英語169語で、プロンプト全体では252トークンになります。
-測定にはIntel Core Ultra 5 225UのCPUだけを使い、スレッド数は既定の10にして、どちらも3回以上測った中央値を取りました。
-表にある処理ごとの時間は =--debug= を付けたときに出力される値です。
+原文は英語169語で、プロンプトは252トークンです。
+Intel Core Ultra 5 225UのCPUだけを使い、スレッド数は既定の10で、どちらも3回以上測った中央値です。
+処理ごとの時間は =--debug= が出す値です。
 
 #+begin_src console
 $ plamo-tr-local text translate-text --text file://LICENSE | jq -r .TranslatedText
@@ -17143,8 +17140,8 @@ $ plamo-tr-local text translate-text --text file://LICENSE | jq -r .TranslatedTe
 [[./resources/public/img/33d2c2-speed.svg]]
 
 グラフの「読み込みなど」は、全体から「最初のトークンまで」と出力の生成の時間を引いた残りで、モデルの読み込みを含みます。
-生成された訳文の長さは0.8bが229トークン、2bが214トークンでした。
-2bが出力した訳文は次のとおりです。
+訳文は0.8bが229トークン、2bが214トークンでした。
+2bの訳文は次のとおりです。
 
 #+begin_quote
 MITライセンス
@@ -17158,24 +17155,24 @@ Copyright (c) \lt{}year\gt{} \lt{}copyright holders\gt{}
 本ソフトウェアは「現状のまま」提供され、明示的か黙示的かを問わず、商品性、特定目的への適合性、および非侵害性に関する保証を含むがこれらに限定されない、いかなる種類の保証も伴わない。いかなる場合においても、著作者または著作権者は、契約上の行為、不法行為、またはその他の事由を問わず、本ソフトウェアに起因し、または本ソフトウェアの使用もしくはその他の取り扱いに関連して生じたいかなる請求、損害、またはその他の責任についても、一切の責任を負わないものとする。
 #+end_quote
 
-モデルの読み込みはコマンドを実行するたびに行われ、0.8bでは読み込みの時間が全体の4割を占めます。
-Claudeの応答をパイプで段落ごとにコマンドへ渡して訳すような使い方では、この読み込みの時間が段落の数だけ積み重なります。
-モデルを読み込んだまま次の入力を待つ常駐の形にするのが、今後の課題です。
+モデルの読み込みはコマンドを呼ぶたびにかかり、0.8bでは全体の4割を占めます。
+Claudeの応答を段落ごとにパイプで渡して訳すような使い方では、この読み込みの時間が段落の数だけ積み重なります。
+モデルを読み込んだまま入力を待つ常駐の形にするのが、次の課題です。
 
 ** 文体の指定で試したこと
-PLaMo 3 Translateが文体の指定である =form= で受け付ける値は、常体の =plain= と敬体の =polite= の2つです。
-このほかに、お嬢様言葉や関西弁へ訳せるかを試しました。
-llama.cppの =llama-server= で2Bと8BのQ4_K_Mに量子化したGGUFを動かし、temperatureを0にして次の指定を試しました。
+PLaMo 3 Translateの文体の指定 =form= に使える値は、常体の =plain= と敬体の =polite= の2つです。
+お嬢様言葉や関西弁に訳せるかを試しました。
+llama.cppの =llama-server= で2Bと8BのQ4_K_MのGGUFを動かし、temperatureを0にして次の指定を試しました。
 
-- 日本語の原文に対し、訳文の言語を指定する =lang= に =お嬢様言葉= ・ =関西弁= ・ =Japanese (Kansai dialect)= を入れると、モデルは原文の日本語をそのまま返しました。
-- =form= へ =お嬢様言葉= ・ =ojousama= ・ =kansai= を入れると、モデルは常体で訳しました。
-- 参考文脈を渡す =context= に「お嬢様言葉で訳す」と書くと、モデルはふつうの口調で訳しました。
-- プロンプトの中で原文の前に、お嬢様言葉に訳した対訳の例を履歴として2組置いても、モデルはふつうの口調で訳しました。
+- 訳文の言語の =lang= に =お嬢様言葉= ・ =関西弁= ・ =Japanese (Kansai dialect)= を入れると、原文の日本語をそのまま返しました。
+- =form= に =お嬢様言葉= ・ =ojousama= ・ =kansai= を入れると、常体で訳しました。
+- 参考文脈の =context= に「お嬢様言葉で訳す」と書くと、ふつうの口調で訳しました。
+- お嬢様言葉の対訳の例を2組、履歴として原文の前に置くと、ふつうの口調で訳しました。
 
 2Bと8Bのどちらでも、お嬢様言葉や関西弁の訳文は出ませんでした。
 
-一方、日本語の原文から日本語へ ~form=polite~ を付けて訳すと、2Bのモデルで常体の文を敬体に書き換えられました。
-=plamo-tr-local= は原文と訳文に同じ言語を指定するとエラーで止まるため、この書き換えも =llama-server= で直接試しています。
+一方、日本語から日本語へ ~form=polite~ を付けて訳すと、2Bのモデルで常体の文を敬体に書き換えられました。
+=plamo-tr-local= は原文と訳文に同じ言語を指定すると止まるので、この書き換えは =llama-server= で試しました。
 
 #+begin_example
 今日は雨だから家で本読むわ。
@@ -17183,19 +17180,19 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_Mに量子化したGGUFを動か�
 #+end_example
 
 ** ライセンス
-=plamo-tr-local= 自体のコードはApache-2.0ライセンスで公開しています。
-一方、 =plamo-tr-local= がダウンロードするモデルの重みにはPFNの [[https://huggingface.co/pfnet/plamo-3-translate-8b/raw/main/LICENSE/ja][PLaMoコミュニティライセンス]] が適用され、その要点は次のとおりです。
+=plamo-tr-local= のライセンスはApache-2.0です。
+=plamo-tr-local= がダウンロードするモデルにはPreferred Networksの[[https://huggingface.co/pfnet/plamo-3-translate-8b/raw/main/LICENSE/ja][PLaMoコミュニティライセンス]]が適用され、要点は次のとおりです。
 
 - 私的な利用と非商用の利用は無償です。
-- 商用で利用する場合はPLaMo商用利用登録フォームからの登録が必要で、直近の事業年度の売上が10億円以下である間は無償です。
-- 生成した訳文を公表するときは、PLaMoの生成物であることを明示する必要があります。
-- モデルや派生モデル、生成物を第三者に提供するときは「Built with PLaMo」と表示する必要があります。
+- 商用の利用はPLaMo商用利用登録フォームで登録したうえで、直近の事業年度の売上が10億円以下である間は無償です。
+- 生成した訳文を公表するときは、PLaMoの生成物であることを明示します。
+- モデルや派生モデル、生成物を第三者に提供するときは「Built with PLaMo」と表示します。
 
-この条件に従い、 =plamo-tr-local= のREADMEにも「Built with PLaMo」の表示を記載しています。
-実際にモデルを使う前に、ライセンスの本文を読んでください。
+=plamo-tr-local= のREADMEにもこの表示を書いています。
+使う前に、ライセンスの本文を読んでください。
 
 ** おわりに
-シェルのパイプに組み込んで、文章をPCの外に出さずに訳したいときに使ってください。
+文章をPCの外に出さずに訳したいときに使ってください。
 
 * AWS CLI v2と出力が同じで最大550倍速いawsrをRustで作った
 :properties:
@@ -17203,13 +17200,11 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_Mに量子化したGGUFを動か�
 :export_date: 2026-11-05 18:21
 :end:
 
-RustでCLIの =awsr= を作りました。
-本家であるAWS CLI v2の2.39.3に対応し、コマンドラインをそのまま受け付けて本家の =aws= とバイト単位で同じ出力を返します。
+AWS CLI v2のコマンドラインをそのまま受け付け、本家とバイト単位で同じ出力を返すCLI =awsr= をRustで作りました。
+リポジトリは[[https://github.com/conao3/rust-awscli][conao3/rust-awscli]]で、ライセンスはApache-2.0です。
 =awsr sts get-caller-identity= は6.0msで終わり、同じPCで本家の =aws= 2.39.3は659msかかります。
 110倍の差です。
-helpページも本家より380〜550倍速く出ます。
-リポジトリは[[https://github.com/conao3/rust-awscli][conao3/rust-awscli]]で、GitHub Releases、nix、Cargoから入れられます。
-ライセンスはApache-2.0です。
+helpページは380〜550倍速く出ます。
 =awsr= はAWSの公式の製品ではありません。
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
@@ -17225,16 +17220,16 @@ $ awsr ec2 describe-instances \
 #+end_src
 
 設定ファイルの =~/.aws/config= と =~/.aws/credentials= 、SSOのトークンのキャッシュ、環境変数は本家と同じものを読みます。
-json、text、tableの各出力形式でも =--query= を付けた結果でも本家と同じバイト列になるので、シェルスクリプトの中の =aws= を =awsr= に置き換えても出力は変わりません。
+json、text、tableの出力も =--query= の結果も本家と同じバイト列になるので、シェルスクリプトの =aws= を =awsr= に置き換えても出力は変わりません。
 
-=awsr= は、各サービスのAPIを表すbotocoreのモデルを本家の2.39.3から取り込んでいます。
+=awsr= は本家の2.39.3からbotocoreのモデルを取り込んでいます。
 モデルにある全サービスの全操作を =awsr <サービス> <操作>= の形で呼べます。
-モデルの操作とは別に本家が持つ =s3 cp= や =s3 sync= などの高レベルのコマンド、 =configure= 、 =sso login= も本家から移植しました。
+=s3 cp= や =s3 sync= などの高レベルのコマンド、 =configure= 、 =sso login= も本家から移植しました。
 
 ** 速さ
-Intel Core Ultra 5 225Uを積んだ手元のPCで、シェルを介さずにコマンドを起動する =hyperfine -N= を使って平均の実行時間を測りました。
-APIを呼ぶコマンドは、 =--endpoint-url= で接続先をローカルのスタブサーバーに向け、固定の認証情報を渡して動かしました。
-=awsr= はnixのflakeで作った静的リンクのパッケージを使い、本家は公式のLinux向けインストーラで入れた2.39.3を使いました。
+Intel Core Ultra 5 225Uの手元のPCで、 =hyperfine -N= で平均の実行時間を測りました。
+APIを呼ぶコマンドは =--endpoint-url= でローカルのスタブサーバーに向け、静的な認証情報で動かしました。
+=awsr= はnixのflakeの静的リンクのパッケージ、本家は公式のLinux向けインストーラで入れた2.39.3です。
 
 [[./resources/public/img/f681b9-speed.svg]]
 
@@ -17249,16 +17244,15 @@ APIを呼ぶコマンドは、 =--endpoint-url= で接続先をローカルの�
 | =ec2 describe-instances help= | 3.5ms |     1346ms | 380倍 |
 
 本家はPythonで書かれています。
-実行するたびにインタプリタを起動し、多くのモジュールをimportしてpluginを登録したうえで、サービスのモデルのJSONを読み込みます。
-=aws= をループで何百回も実行するスクリプトやCIでは、1回あたり0.5〜1秒の時間が回数分だけ積み重なります。
+呼ぶたびにインタプリタを起動し、多くのモジュールをimportし、pluginを登録し、サービスのモデルのJSONを読み込みます。
+=aws= をループで何百回も呼ぶスクリプトやCIでは、この0.5〜1秒が回数分だけ積み重なります。
 
-プロセスを起動して終了するだけの下限として同じPCでCのhello worldを動かすと、動的リンクで1.1ms、静的リンクで0.7msかかります。
-=awsr= の =--version= やhelpはこの下限に近い時間で終わります。
-APIを呼ぶコマンドにかかる数msは、プロセスの起動、接続先のURLを決めるエンドポイントのルールの評価、HTTPの送受信の合計です。
+比べる下限として、同じPCでCのhello worldを動かすと、動的リンクで1.1ms、静的リンクで0.7msかかります。
+APIを呼ぶコマンドの残りの数msは、プロセスの起動、エンドポイントのルールの評価、HTTPの送受信にかかっています。
 
 ** 起動を速くする仕組み
 =awsr= は、本家が実行のたびに行う準備をビルド時に済ませておきます。
-APIの呼び出しに使うモデルは解析済みの形に変換し、helpページはあらかじめ整形してバイナリに埋め込みます。
+モデルは解析済みの形にし、helpページは整形して、バイナリに埋め込みます。
 
 [[./resources/public/img/f681b9-build.svg]]
 
@@ -17266,70 +17260,69 @@ APIの呼び出しに使うモデルは解析済みの形に変換し、helpペ�
 botocoreは各サービスのAPIを =service-2.json= などのJSONのモデルで表していて、本家は呼ぶたびにこれを読み込んで解析します。
 モデルが最大のec2はJSONで3.5MBあります。
 
-=awsr= はビルド時にJSONのモデルを独自のバイナリ形式に変換し、圧縮せずにバイナリへ埋め込みます。
-この形式は、バイト位置のオフセットでノードをたどれる木と、重複を除いた文字列の表でできています。
-JSONのオブジェクトのキーには辞書順に並べ替えた索引を付け、キーを二分探索で探せるようにしています。
-実行時はJSONの解析も圧縮データの展開もせず、呼んだ操作が使う入出力の型の定義であるshapeだけをオフセットでたどって読みます。
-そのため、モデルが最大のec2の操作もstsの操作と同じくらいの時間で終わります。
+=awsr= はビルド時にモデルを、オフセットでたどれる木と、重複を除いた文字列の表からなる形式に変換し、圧縮せずにバイナリへ埋め込みます。
+オブジェクトのキーには並べ替えた索引を付け、二分探索で引きます。
+実行時はJSONの解析も展開もせず、呼んだ操作が使うshapeだけを読みます。
+そのため、ec2の操作もstsの操作と同じくらいの時間で終わります。
 
 サービスごとのRustのコードは生成しません。
-公式のAWS SDK for Rustはサービスごとに型付きのコードを生成するため、[[https://github.com/awslabs/aws-sdk-rust/issues/113][awslabs/aws-sdk-rust#113]]で報告されているとおりaws-sdk-ec2だけでビルドに150〜250秒かかります。
-=awsr= は埋め込んだモデルを実行時に解釈するので、コンパイルするRustのコードの量はサービスの数によって変わりません。
+公式のAWS SDK for Rustはサービスごとに型付きのコードを生成していて、[[https://github.com/awslabs/aws-sdk-rust/issues/113][awslabs/aws-sdk-rust#113]]で報告されているとおりaws-sdk-ec2だけでビルドに150〜250秒かかります。
+=awsr= はモデルを実行時に解釈するので、Rustのコンパイルの量はサービスの数によって変わりません。
 
 *** helpページをgroffで整形して埋め込む
-本家の =aws help= は、モデルとそこに含まれる説明文からreStructuredTextを組み立て、docutilsでman形式に変換し、groffで整形してページャに渡します。
+本家の =aws help= は、モデルと文書からreStructuredTextを組み立て、docutilsでman形式に変換し、groffで整形してページャに渡します。
 =awsr= はreStructuredTextの組み立てとdocutilsの変換をRustに移植しましたが、整形には本家と同じく手元のgroffを使います。
 groffを毎回起動すると、 =ec2 help= に107msかかります。
 
 そこで、配布するバイナリにはビルド時にgroffで整形した全20,448ページを埋め込んでいます。
-整形したページは合計732MBあり、最大の =quicksight update-template= だけで36MBあります。
-この732MBをzstdの辞書圧縮のレベル19で35.8MBに縮めてから埋め込みます。
+整形したページは合計732MBあり、最大の =quicksight update-template= は36MBです。
+これをzstdの辞書を使ってレベル19で圧縮すると、35.8MBになります。
 辞書は16ページに1ページを標本にして学習しました。
-埋め込みのページを含めて、flakeでビルドしたバイナリは150MiBです。
+埋め込みのページを含めて、flakeのパッケージのバイナリは150MiBです。
 
 groffの出力はバージョンによって変わります。
-埋め込むページは、GitHub ReleasesのバイナリではUbuntuのgroff 1.23.0で整形し、flakeのパッケージではnixpkgsのgroffで整形しています。
-=awsr= は実行時に =PATH= にあるgroffの =groff -v= の1行目を見て、ビルド時の整形に使ったgroffとバージョンを比べます。
-両者が同じで、かつ =GROFF= で始まる環境変数が設定されていなければ、埋め込みのページを展開して出します。
+埋め込むページは、GitHub ReleasesのバイナリではUbuntuのgroff 1.23.0で、flakeのパッケージではnixpkgsのgroffで整形しています。
+=awsr= は =PATH= にあるgroffの =groff -v= の1行目を見て、整形に使ったgroffとバージョンを比べます。
+同じで、 =GROFF= で始まる環境変数もなければ、埋め込みのページを展開して出します。
 違うときは本家と同じく手元のgroffで整形し、結果を =~/.cache/awsr/help= に保存して、2回目からはそれを出します。
-=groff -v= の結果はgroffの実行ファイルごとにキャッシュするので、バージョンを確かめるためにgroffを起動するのは実行ファイルごとに最初の1回だけです。
-この最初の1回でも =ec2 help= は3.8msで終わります。
+=groff -v= の結果はgroffの実行ファイルごとにキャッシュするので、groffを起動するのはそのPCで最初の1回だけです。
+この1回でも =ec2 help= は3.8msで終わります。
 
-モデルとhelpページの埋め込みのほかにも、実行時の処理を減らして起動を速くしています。
+ほかにも起動を速くするために、次のようにしています。
 
-- 引数の解析とエンドポイントのルールの評価では、正規表現をコンパイルせず文字列の走査だけでパターンを照合します。
+- 引数の解析とエンドポイントのルールの評価では、正規表現をコンパイルせずに照合します。
 - tokioのランタイムは =--version= やhelpでは作らず、最初のリクエストを送るときに作ります。
-- 配布するバイナリにはglibcを静的リンクしてあり、起動時に動的ローダーを動かしません。
-- メモリの割り当てにはglibcのmallocを使っており、mimallocに替えるとどのコマンドも1.4〜2.3倍遅くなりました。
+- 配布するバイナリはglibcを静的リンクし、起動時に動的ローダーを動かしません。
+- メモリの割り当てにはglibcのmallocを使い、mimallocに替えるとどのコマンドも1.4〜2.3倍遅くなりました。
 
 ** 本家と出力が一致することの確かめ方
 *** 差分テスト
 出力を本家と一致させるには、Pythonの値の書式まで合わせる必要があります。
-たとえば、浮動小数点数は =1e-05= や =1.0= のようにPythonの =repr= と同じ書式で出し、text形式の出力では真偽値を =True= と =False= にします。
-table形式の出力の文字幅は、本家が同梱するPythonの =unicodedata.east_asian_width= に従って数えます。
+たとえば、浮動小数点数は =1e-05= や =1.0= のようにPythonの =repr= と同じ書式で出し、textの出力の真偽値は =True= と =False= にします。
+tableの出力の文字幅は、本家が同梱するPythonの =unicodedata.east_asian_width= に従って数えます。
 
 このような規則を移植した結果を確かめるために、差分テストの道具 =awsr-difftest= を作りました。
 =awsr-difftest= は同じコマンドラインで =awsr= と本家を動かします。
-実行したあと、stdout、stderr、終了コード、ストリーミングの操作が書き出したファイル、スタブサーバーが受けたリクエストの5つを比べます。
-比較に使う本家は、公式のインストーラの2.39.3をnixで取り込み、同梱のPythonまで含めてバージョンを固定しています。
+stdout、stderr、終了コード、ストリーミングで書き出したファイル、スタブサーバーが受けたリクエストを比べます。
+本家は公式のインストーラの2.39.3をnixで取り込み、同梱のPythonまで含めてバージョンを固定しています。
 
-スタブサーバーは、操作が返す出力のshapeからシード付きの乱数で応答を作ります。
+スタブサーバーは操作の出力のshapeからシード付きの乱数で応答を作ります。
 応答には、 =1.50= 、 =1e2= 、 =-0= 、多倍長の整数、 =NaN= 、オフセットの異なるタイムスタンプ、全角文字など、書式の規則が分かれる値を必ず混ぜます。
 署名の値のように実行のたびに変わるヘッダーは、比べる対象から外しています。
 
-全サービスの全操作を、シード4つとjson、text、tableの3つの出力形式で組み合わせると233,880件になります。
-そのうち840件はスタブサーバーでは比べられない操作で、内訳はCLIのコマンドにならない552件、本物のエンドポイントに向かう144件、 =session-manager-plugin= を起動する24件、イベントストリームの12件などです。
+全サービスの全操作を、シード4つとjson、text、tableの3つの出力形式で回すと233,880件になります。
+そのうち840件はスタブサーバーでは比べられない操作で、CLIのコマンドにならない552件、本物のエンドポイントに向かう144件、 =session-manager-plugin= を起動する24件、イベントストリームの12件などです。
 除いた理由は[[https://github.com/conao3/rust-awscli/blob/master/difftest/exclusions.txt][difftest/exclusions.txt]]に書いてあります。
-残りの233,040件はすべて本家と一致し、不一致は0件です。
-本家の実行結果はキャッシュしておき、2回目以降は全件を2〜5分で回せます。
+残りの233,040件はすべて本家と一致しました。
+本家の実行結果はキャッシュしておき、キャッシュがあれば全件を2〜5分で回せます。
 
 *** helpの全ページ比較
 helpは =scripts/compare-help.sh= で本家と比べます。
-本家で開ける全20,482個のhelpのコマンドラインを =awsr= と本家で実行し、stdout、stderr、終了コードをバイト単位で比べます。
+本家のhelpの全20,482個のコマンドラインを =awsr= と本家で実行し、stdout、stderr、終了コードをバイト単位で比べます。
 ビルド時に整形したページを埋め込んだ =awsr= で比べると、20,482個のすべてが本家と一致しました。
 
 ** 配布
-GitHub Releasesには、Linux向けのx86_64、x86_64のmusl、aarch64と、macOS向けのx86_64、aarch64のバイナリを置いています。
+GitHub Releasesに、Linuxのx86_64、x86_64のmusl、aarch64と、macOSのx86_64、aarch64のバイナリを置いています。
 nixとCargoでも入れられます。
 
 #+begin_src console
@@ -17340,11 +17333,11 @@ $ cargo install awsr
 =cargo install= ではビルド時にhelpページを整形しないので、helpは最初に開いたときに手元のgroffで整形します。
 
 *** crates.ioの10MBの上限
-crates.ioに公開するパッケージの.crateファイルは1つあたり10MBまでです。
-=awsr= が埋め込むモデルはパッケージ用にzstdで圧縮しても計11.4MBあり、1つのcrateには収まりません。
+crates.ioに上げる.crateファイルは1つあたり10MBまでです。
+=awsr= が埋め込むモデルはzstdで圧縮しても計11.4MBあり、1つのcrateには収まりません。
 crates.ioに上限の引き上げを頼みましたが、認められませんでした。
 
-そこで、Rustのコードを持たずモデルのファイルとそのディレクトリだけを収めた3つのデータcrateに分けました。
+そこで、モデルを、ファイルとそのディレクトリだけを収めた3つのデータcrateに分けました。
 
 | crate                      | 中身                                             | 大きさ |
 |----------------------------+--------------------------------------------------+--------|
@@ -17353,23 +17346,23 @@ crates.ioに上限の引き上げを頼みましたが、認められません�
 | =awsr-models-services-m-z= | 頭文字がm〜zのサービスのモデル                 | 3.7MiB |
 | =awsr=                     | 本体                                             | 3.1MiB |
 
-=awsr= は3つのデータcrateをbuild-dependencyに取り、 =build.rs= が各crateにあるディレクトリからファイルを読んでバイナリに埋め込みます。
+=awsr= は3つのデータcrateをbuild-dependencyに取り、 =build.rs= が各crateのディレクトリからファイルを読んで埋め込みます。
 データcrateのバージョンは本家の2.39.3にそろえ、本家のバージョンを上げたときだけ新しいバージョンを出します。
-3つのデータcrateに分けてもバイナリに埋め込むデータは分ける前とバイト単位で同じなので、実行の速さも変わりません。
+分けても埋め込むデータは分ける前とバイト単位で同じなので、速さも変わりません。
 7つのコマンドを分ける前のバイナリと並べて測ると差は±0.3ms以内で、測る順番を入れ替えると速い側も入れ替わりました。
 
 *** trusted publishingで公開する
-crates.ioへは、OIDCで一時的なトークンを発行するGitHub Actionsのtrusted publishingを使って公開しています。
+crates.ioへは、OIDCを使うGitHub Actionsのtrusted publishingで公開しています。
 =Publish= のworkflowで[[https://github.com/rust-lang/crates-io-auth-action][rust-lang/crates-io-auth-action]]が一時的なトークンを取るので、crates.ioのAPIトークンをリポジトリのsecretに置かずに済みます。
 =Publish= は3つのデータcrate、 =awsr= の順に、crates.ioにまだないバージョンだけを =cargo publish= します。
-trusted publishingで公開すると、crates.ioの各バージョンのページに公開に使ったGitHub Actionsのrunが記録されます。
+crates.ioの各バージョンのページには、公開したGitHub Actionsのrunが記録されます。
 
-リリースするときは =Release= のworkflowを手で起動するだけです。
-=Release= はまず =Cargo.toml= のバージョンを上げてcommitとタグをpushし、5つのターゲットのバイナリを作ってGitHubのリリースに付けます。
-最後に =Publish= を起動してcrates.ioへ公開します。
+リリースは =Release= のworkflowを手で起動するだけです。
+=Release= は =Cargo.toml= のバージョンを上げてcommitとタグをpushし、5つのターゲットのバイナリを作ってGitHubのリリースに付けます。
+最後に =Publish= を起動します。
 
 ** おわりに
-AWS CLIを何度も呼ぶスクリプトやCIで、 =aws= を =awsr= に置き換えて使ってください。
+=aws= を何度も呼ぶスクリプトやCIで、 =aws= を =awsr= に置き換えて使ってください。
 * awsr: the AWS CLI v2 in Rust, with the same output and up to 550 times the speed
 :properties:
 :export_file_name: generated/contents/blog/2026/87e5cb
@@ -17545,9 +17538,8 @@ Lean 4で書いて証明した関数をClojureから呼び、Clojureで書いた
 Clojarsに =io.github.conao3/lean-clj= として公開しています。
 この記事は0.3.0をもとに書いています。
 
-lean-cljは、Leanのコンパイラの中間表現であるIRをClojureのソースに変換します。
-型と証明は変換の段階で消え、JVMの上では、LeanのC backendがビルドするのと同じプログラムが動きます。
-また、Clojureの関数をLeanのモデルに変換して性質を証明するときは、本物の関数とモデルを生成テストで照合することで、モデルの誤りから成り立たない定理を証明してしまうのを防ぎます。
+lean-cljはLeanのコンパイラの中間表現をClojureのソースに変換します。
+JVMの上では、LeanのC backendがビルドするのと同じプログラムから型と証明を消したものが動きます。
 
 [[github:conao3/lean-clj::Clojure][Lean 4 IR to Clojure backend and Lean embedded in Clojure via S-expressions]]
 
@@ -17556,11 +17548,11 @@ lean-cljには次の3つの使い方があります。
 
 [[./resources/public/img/4e5aa2-uses.svg]]
 
-1. Clojureのファイルの中に =deflean= でLeanの関数と定理を書き、Clojureから呼ぶ。
+1. Clojureのファイルに =deflean= でLeanの関数と定理を書き、Clojureから呼ぶ。
 2. 既存のLeanのlakeプロジェクトを、CLIでClojureのnamespaceの集まりに変換する。
-3. Clojureの関数を =lean-clj.typed= で書き、Leanの定義に変換したモデルに対して性質をLeanで証明する。
+3. Clojureの関数を =lean-clj.typed= で書いてLeanのモデルに変換し、その性質をLeanで証明する。
 
-1と2はLeanからClojureへの向き、3はClojureからLeanへの向きで、以下ではこの順に例を挙げます。
+1と2はLeanからClojureへ、3はClojureからLeanへの向きで、以下この順に例を挙げます。
 
 ** Leanで書いてClojureから呼ぶ
 =deps.edn= にlean-cljを追加します。
@@ -17569,7 +17561,7 @@ lean-cljには次の3つの使い方があります。
 {:deps {io.github.conao3/lean-clj {:mvn/version "0.3.0"}}}
 #+end_src
 
-=deflean= のブロックを最初に展開するときは、Lean 4.35.0の =lean= と =lake= 、および =lean-clj= のCLIが =PATH= から呼べる必要があります。
+=deflean= のブロックを最初に展開するときは、Lean 4.35.0の =lean= と =lake= 、 =lean-clj= のCLIが =PATH= に要ります。
 CLIはnixでインストールできます。
 
 #+begin_src console
@@ -17597,10 +17589,10 @@ $ nix profile install github:conao3/lean-clj/v0.3.0
 #+end_src
 
 =def= で関数を、 =theorem= で定理を定義し、 =(by ...)= の中に証明を書きます。
-=double_eq= では =double= の定義を式に置き換え、タクティクの =omega= で自然数と整数の線形算術を解いて等式を示しています。
+=double_eq= では =double= の定義を展開し、タクティクの =omega= で自然数と整数の線形算術を解いて等式を示しています。
 namespaceを読み込むと、lean-cljはブロックをLeanのソースに変換して =lake build= を実行し、証明まで検査します。
 検査が通ると、ブロックの関数がそのnamespaceのClojureの関数になります。
-Clojureからこれらの関数を呼ぶとき、Leanのstructureの値は、keywordをkeyに持つmapとしてやり取りします。
+structureの値は、keywordをkeyに持つmapとしてやり取りします。
 
 #+begin_src clojure
 (double 21)                                ;=> 42
@@ -17625,19 +17617,19 @@ Lean source of the block:
    3 | theorem double_eq (n : Nat) : ((double n) = (3 * n)) := (by unfold double; omega)
 #+end_src
 
-エラーのメッセージには、 =demo/wrong.clj:9= のようなClojureのファイル名と行番号に加え、ブロックから作ったLeanのソースが含まれます。
+エラーのメッセージには、 =demo/wrong.clj:9= のようなClojureのファイル名と行番号と、ブロックから作ったLeanのソースが含まれます。
 
-S式で書けない構文を書くには、 =(lean "...")= を使ってLeanのソースを文字列のまま混ぜます。
+S式で書けない構文は、 =(lean "...")= でLeanのソースを文字列のまま混ぜて書けます。
 サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/word-count][word-count]]では、 =do= 記法の関数をこの形で書いています。
 
 生成したClojureのコードは =.lean-clj/cache/= に保存されます。
-ブロックを変えなければ、2回目からはlean-cljがLeanを呼ばずにキャッシュから展開します。
-そのため、キャッシュをリポジトリに入れておけば、Leanの無い環境でもClojureのコードが動きます。
+ブロックを変えなければ、2回目からはLeanを呼ばずにキャッシュから展開します。
+キャッシュをリポジトリに入れておけば、Leanの無い環境でも動きます。
 
 ** LeanのプロジェクトをClojureのnamespaceにする
 lakeのプロジェクトとして書いたLeanのコードも、CLIでClojureのnamespaceに変換できます。
-サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]]では、整数とローマ数字を変換する関数をLeanで書いています。
-あわせて、1〜999の数をローマ数字にしてから元の型に戻すと、元の数に一致することを証明しています。
+サンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/roman-numerals][roman-numerals]]では、整数とローマ数字の変換をLeanで書いています。
+あわせて、1〜999の数をローマ数字にして戻すと元の数になることを証明しています。
 
 #+begin_src lean
 def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
@@ -17656,8 +17648,8 @@ $ lean-clj module generate-namespace --module-name Roman --namespace roman.core 
     --search-path lean/.lake/build/lib/lean --output-file src/roman/core.clj
 #+end_src
 
-Leanのmoduleで公開している関数は、名前をkebab-caseにしたClojureの関数になります。
-戻り値が =Option= の場合は、 =some= の中身か =nil= が返ります。
+公開している関数は、名前をkebab-caseにしたClojureの関数になります。
+戻り値が =Option= のときは、 =some= の中身か =nil= を返します。
 
 #+begin_src clojure
 (require '[roman.core :as roman])
@@ -17672,8 +17664,8 @@ Leanのmoduleで公開している関数は、名前をkebab-caseにしたClojur
 
 ** Clojureで書いてLeanで証明する
 3つ目の使い方では、実装をClojureで書きます。
-次の例では、0からnまでの和を求めるClojureの関数とLeanの仕様を定義し、両者が等しいことを証明します。
-Clojureの関数は再帰を使わない閉じた式で和を計算し、Leanの仕様は和の定義どおりに再帰して計算します。
+次の例では、0からnまでの和を求めるClojureの関数とLeanの仕様が等しいことを証明します。
+Clojureの関数は閉じた式で計算し、Leanの仕様は和の定義どおりに再帰します。
 
 #+begin_src clojure
 (ns demo.sum
@@ -17704,18 +17696,19 @@ Clojureの関数は再帰を使わない閉じた式で和を計算し、Leanの
 #+end_src
 
 =lt/defn= は普通のClojureの関数を定義し、引数と戻り値のLeanの型をsignatureとしてvarに記録します。
-ブロックの中の =(clojure sum-to-fast)= は、その関数をLeanの定義であるモデルに変換します。
+ブロックの =(clojure sum-to-fast)= は、その関数をLeanの定義に変換します。
+この記事では、この定義をモデルと呼びます。
 =quot= や =inc= のような =clojure.core= の関数のモデルは、lean-cljに同梱したLeanのライブラリ =Clj= にあります。
 
-=sum-to-eq= では2つの関数が等しいことを証明し、 =@[csimp]= という属性を付けています。
+=sum-to-eq= では2つの関数が等しいことを証明し、 =@[csimp]= を付けています。
 この属性は、 =sum-to= をコンパイルするときに =sum-to-fast= へ置き換えることをLeanに許します。
-そのため、Clojureから =sum-to= を呼ぶと、再帰ではなくClojureの =sum-to-fast= が実行されます。
+Clojureから =sum-to= を呼ぶと、再帰ではなくClojureの =sum-to-fast= が実行されます。
 
 #+begin_src clojure
 (sum-to 1000000)  ;=> 500000500000
 #+end_src
 
-仕様と速い実装が等しいことを証明して置き換えるこの手順は、[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介したlean-ritsuryoの手法をClojureの実装に当てはめたものです。
+等しいことを証明して置き換えるこの形は、[[https://s.conao3.com/blog/2026/5499a8][Leanで書く証明付きの日付と税計算]]で紹介したlean-ritsuryoの書き方をClojureの実装に当てはめたものです。
 実装と仕様の関係ごとに、次のサンプルがあります。
 
 | 実装と仕様の関係                         | lean-cljでの書き方                                    | サンプル                                    |
@@ -17735,15 +17728,15 @@ Clojureの関数は再帰を使わない閉じた式で和を計算し、Leanの
 ;=> {:result true, :pass? true, :num-tests 100, :time-elapsed-ms 7, :seed 1}
 #+end_src
 
-=lt/check= はsignatureをもとに、テストの入力を用意するtest.checkのgeneratorを組み立てます。
+=lt/check= はsignatureから、テストの入力を作るtest.checkのgeneratorを組み立てます。
 結果が食い違ったときは、引数と両方の戻り値を =:counterexample= に入れて返します。
 =lt/defcheck= を使うと、同じ検査を =clojure.test= のテストとして定義できます。
-lean-clj自身のテストでも、 =Clj= のモデルと =clojure.core= の関数を生成テストで照合しています。
-検査する関数と型を並べた表は156行あります。
+lean-clj自身のテストでも、 =Clj= のモデルを =clojure.core= の関数と生成テストで照合しています。
+照合の表は156行あります。
 
 ** 生成テストで見つかったモデルの誤り
-本物の関数とモデルを照合する生成テストによって、モデルの誤りがいくつも見つかりました。
-その中には、本物の関数では成り立たない定理が証明できてしまう誤りもありました。
+生成テストで、モデルの誤りがいくつも見つかりました。
+中には、本物の関数では成り立たない定理を証明できる誤りもありました。
 
 *** 多相の関数の真偽
 次の =member?= は、任意の型 =α= のリスト =xs= に =x= があるかを調べます。
@@ -17758,17 +17751,17 @@ lean-clj自身のテストでも、 =Clj= のモデルと =clojure.core= の関�
 #+end_src
 
 Clojureの =if-let= は、束縛した値が =false= か =nil= のときにelseの分岐を取ります。
-そのため、要素が =false= だけのリストから =false= を探すと、この関数は =false= を返します。
+そのため、 =false= だけのリストで =false= を探すと =false= を返します。
 
 #+begin_src clojure
 (member? 1 [1])          ;=> true
 (member? false [false])  ;=> false
 #+end_src
 
-もしモデルが、真偽の判定で型の変数 =α= の値を常に真として扱うとどうなるでしょうか。
+モデルが真偽の判定で型の変数 =α= の値を常に真として扱うとします。
 =Nat= や =String= の値はClojureでも常に真なので、多くの型ではこの扱いでも結果がClojureと同じになります。
-しかし =α = Bool= のときは =false= が偽になるため、モデルとClojureの関数の結果が食い違います。
-常に真として扱うモデルでは、「先頭に =x= があれば =member?= は =true= を返す」という次の定理が、すべての =α= について証明できてしまいます。
+しかし =α = Bool= のときは =false= が偽になるので、モデルとClojureの関数の結果が食い違います。
+このモデルでは、「先頭に =x= があれば =member?= は =true= を返す」という次の定理が、すべての =α= について証明できてしまいます。
 
 #+begin_src clojure
 (theorem member-head [(implicit α Type) (inst (BEq α)) (inst (LawfulBEq α)) (inst (Clj.Truthy α)) x α xs (List α)]
@@ -17778,9 +17771,8 @@ Clojureの =if-let= は、束縛した値が =false= か =nil= のときにelse�
 
 =x = false= のとき、Clojureの関数は =false= を返すので、この定理は本物の関数では成り立ちません。
 
-そこでlean-cljのモデルは、型クラスのインスタンスである =[Clj.Truthy α]= を型の変数ごとに引数に取ります。
-値の真偽は、 =α= に入る具体的な型のインスタンスで決まります。
-このモデルで同じ定理を証明しようとすると、 =x= が真であることを示すゴールが残って失敗します。
+lean-cljのモデルは、型の変数ごとに =[Clj.Truthy α]= というinstanceを引数に取り、 =α= に入る具体的な型のinstanceで値の真偽を決めます。
+このモデルで同じ定理を証明しようとすると、 =x= が真であることを示すゴールが残り、失敗します。
 
 #+begin_src text
 error: demo/member.clj:15: deflean proofs:3:128: unsolved goals
@@ -17803,16 +17795,16 @@ xs : List α
 
 - =(:k m default)= は、keyがあって値が =nil= なら =nil= を返します。
   defaultを返すのはkeyが無いときだけです。
-  値が =nil= のときにもdefaultを返すモデルでは、この挙動と食い違います。
+  値が =nil= のときにもdefaultを返すモデルは、これと食い違います。
 - =str= はvectorの中の =BigInt= に =N= を付けます。
-  =N= を付けないモデルでは、 =Long= に収まらない整数をgeneratorが作ったときに結果が食い違います。
+  =N= を付けないモデルは、 =Long= に収まらない整数をgeneratorが作ったときに食い違います。
 - vectorの =get= は、indexを =int= の下位32 bitに切り詰めます。
   =4294967297= は =2^32 + 1= なので、index 1の要素を返します。
 
-モデルはこれらのClojureの挙動に合わせて定義しています。
+モデルはどれもClojureの挙動に合わせています。
 
 ** 作らなかったもの
-モデルの定理は、Clojureの関数が例外を投げずに値を返す呼び出しについて成り立ちます。
+定理はClojureの関数が値を返す呼び出しについて成り立ちます。
 =Long= のoverflow、0での除算、範囲外のindexのように例外を投げる呼び出しは、モデルの対象外です。
 
 =Long= のoverflowまで含め、関数が例外を投げないことを証明する =^:total= モードは作りませんでした。
@@ -17831,21 +17823,21 @@ def g (n : Nat) : Option Bool := do
 
 Clojureの ~(or (= n 1) ...)~ は、 =n= が1なら右辺を評価せずに =true= を返します。
 Leanは =(← half n)= を式の外へ出して先に実行するので、右辺の =half 1= が失敗し、 =g 1= は =none= になります。
-=and= や =or= のように途中で評価をやめる式は、すべてClojureと同じ順序で評価されるように書き直す必要があります。
-そのため、このモードは変換の手間に見合わないと判断しました。
+=and= や =or= のように途中で評価をやめる式は、すべてClojureと同じ順序で書き直す必要があります。
+このモードは変換の手間に見合わないと判断しました。
 
-overflowを避けるには、任意精度で計算する =+'= などの演算子を使います。
-また、overflowを起こす入力を見つけるには、 =lt/check= に =:throws :fail= を渡して、例外を投げる入力をテストの失敗として数えます。
+overflowを避けるには、任意精度の =+'= などを使います。
+overflowを起こす入力を見つけるには、 =lt/check= に =:throws :fail= を渡して、例外を投げる入力を失敗として数えます。
 
 ** 仕組み
 生成するコードの形式には、JavaのソースやJVMのバイトコードではなくClojureのソースを選びました。
 Leanの =Array= はClojureの永続ベクタと意味が合い、要素の更新がO(log n) で済みます。
 =Nat= の計算は =+'= で =BigInt= に切り替わり、Leanのクロージャは =IFn= を実装したClojureの値にできます。
-また、JVMのJITがバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
+JITがバイトコードを最適化するので、バイトコードを直接生成しても速さの利点は小さいと考えました。
 
 実行時に動くのはJVMだけです。
-Leanが動くのは、 =deflean= のブロックを展開するときと、CLIでモジュールを変換するときに限られます。
-実行時にはLeanのCのruntimeは使わず、Cのruntimeの関数をClojureで書き直したruntimeを使います。
+Leanが動くのは、 =deflean= のブロックを展開するときと、CLIでモジュールを変換するときだけです。
+実行時はLeanのCのruntimeの代わりに、その関数をClojureで書き直したruntimeを使います。
 LeanのプロセスもFFIも別のヒープもないので、2つのruntimeのあいだで状態を共有する場面はありません。
 Clojureと生成したコードのあいだで受け渡す値はどれもimmutableです。
 Leanの可変な状態はClojureの仕組みで動きます。
@@ -17855,17 +17847,17 @@ Leanの可変な状態はClojureの仕組みで動きます。
 同じテスト用の関数を、C backendがビルドした実行ファイルと、生成したClojureの両方で実行し、出力の182行を比べます。
 浮動小数点数の無限大を、Cは =inf= 、Javaは =Infinity= と表示する違いも、このテストで見つかりました。
 
-LeanのIRには、関数の中で複数の分岐が合流する先を表すjoin pointがあります。
-join pointを呼び出し箇所ごとにそのまま展開すると、生成したコードがJVMの1メソッドあたり64KBという上限を超えることがあります。
+Leanの中間表現には、関数の中で複数の分岐が合流する先を表すjoin pointがあります。
+join pointを呼び出し箇所ごとに展開すると、生成したコードがJVMの1メソッドあたり64KBという上限を超えることがあります。
 すべてのjoin pointを展開すると生成したコードが36,000行になり、 =Std.Format= の関数の読み込みが「Method code too large!」で失敗します。
-そこでlean-cljは、呼び出しが1か所のjoin pointだけを展開し、2か所以上のものは =letfn= に変換します。
+lean-cljは、呼び出しが1か所のjoin pointだけを展開し、2か所以上のものは =letfn= にします。
 
-また、自己末尾呼び出しは =loop= と =recur= に、相互再帰は =trampoline= に変換して、スタックを積まずに実行します。
+自己末尾呼び出しは =loop= と =recur= に、相互再帰は =trampoline= にして、スタックを積まずに実行します。
 
 ** Clojureの型のライブラリとの関係
 Clojureには、clojure.spec、malli、Plumatic Schemaのように、値を実行時に検査するスキーマのライブラリがあります。
-これらのライブラリでは、値を検査する述語を組み合わせてスキーマを書きます。
-型の変数は持たず、mapは既定で開いた扱いになり、整数の固定精度と任意精度も区別しません。
+これらは値を検査する述語を組み合わせてスキーマを書きます。
+型の変数は持たず、mapは既定で開いていて、整数の固定精度と任意精度を区別しません。
 Typed Clojureとclj-kondoの型検査は、それぞれ独自の型の言語と、 =clojure.core= の関数の型の注釈を持っています。
 
 lean-cljでは型をLeanで書き、その型からmalliのスキーマ、test.checkのgenerator、clj-kondoの型を生成します。
@@ -17879,7 +17871,7 @@ lean-cljでは型をLeanで書き、その型からmalliのスキーマ、test.c
 #+end_src
 
 =Nat= は0以上の整数に、structureは同じkeyを持つ閉じたmapになります。
-証明を書かなくても、関数のsignatureからmalliのスキーマやgeneratorを生成して使えます。
+証明を書かなくても、関数のsignatureからこれらを生成して使えます。
 使い方はサンプルの[[https://github.com/conao3/lean-clj/tree/master/samples/typed-schemas][typed-schemas]]にあります。
 
 近い領域のプロジェクトに、whiloさんの[[https://github.com/replikativ/ansatz][ansatz]]があります。
@@ -17889,7 +17881,7 @@ lean-cljは本物のLeanで検査し、Leanの構文と標準ライブラリ、�
 
 ** おわりに
 lean-cljはClojarsの =io.github.conao3/lean-clj= から入手できます。
-リポジトリの[[https://github.com/conao3/lean-clj/tree/master/samples][samples]]には使い方ごとの小さなサンプルがあります。
+[[https://github.com/conao3/lean-clj/tree/master/samples][samples]]には使い方ごとの小さなサンプルがあります。
 =deflean= の使い方はtodo-cliから、Clojureの関数の検証はverified-clojureから読むのがおすすめです。
 IssueやPRは大歓迎です。
 * lean-clj: call Lean 4 functions from Clojure, and prove Clojure functions in Lean
@@ -18243,45 +18235,44 @@ I welcome issues and pull requests.
 :end:
 
 [[https://s.conao3.com/blog/2026/f681b9][前の記事]]で紹介した =awsr= は、AWS CLI v2とバイト単位で同じ出力を返すRust製のCLIです。
-同じ出力を返し続けるには、本家の新しいバージョンが出るたびに、 =awsr= が合わせるバージョンも上げる必要があります。
+同じ出力を返し続けるには、本家の新しいバージョンが出るたびに =awsr= も同じバージョンへ上げる必要があります。
 本家は2026-09-30から2026-11-05までの36日間に[[https://github.com/aws/aws-cli/tags][20回リリース]]していて、平日はほぼ毎日新しいバージョンが出ます。
-そこで、本家の新しいバージョンに追従するworkflowをGitHub Actionsで毎日動かすようにしました。
-新しいバージョンが出ると、このworkflowは =awsr= が合わせるバージョンを上げ、モデルが変わったサービスに絞って本家と出力を比べたPRを作ります。
-本家のコードの変更で出力に差が出たものは、そのPRの中でRustへ移植します。
+そこで、本家の新しいバージョンへの追従をGitHub Actionsで毎日回すようにしました。
+新しいバージョンが出ると、workflowがバージョンを上げる変更を作って本家と比べ、結果を載せたPRを作ります。
 
 [[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
 
-次の画像は、2.39.5が出たときに[[https://github.com/conao3/rust-awscli/pull/6][workflowが作ったPR]]の画面です。
-コードの変更を移植する前に =awsr= と本家の出力を比べた結果が表に並んでいます。
+次の画像は、2.39.5が出たときに[[https://github.com/conao3/rust-awscli/pull/6][workflowが作ったPR]]です。
+移植する前の比較の結果が表に並んでいます。
 
 [[./resources/public/img/7fe084-pr.png]]
 
 ** バージョンを上げると変わるもの
 =awsr= は本家の決まった1つのバージョンに合わせて作っていて、その番号を =models/VERSION= に書いています。
-=flake.nix= では、 =models/VERSION= と同じバージョンの本家のソースと、公式のLinux向けインストーラをnixで取り込みます。
+=flake.nix= は、同じバージョンの本家のソースと公式のLinux向けインストーラをnixで取り込みます。
 本家のバージョンを上げると、次の3つが変わります。
 
 - botocoreのモデル: =awsr= がバイナリに埋め込むサービスと操作の定義です。
-- テストの期待値: コマンドの表、引数の表から計算したハッシュ、helpの文書、waiterの説明という4つの期待値で、本家のモデルとソースから作っています。
-- 本家のコードの変更: モデルだけでは決まらない独自の処理を持つコマンドや認証の処理に対する変更で、本家の[[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]]では =enhancement= や =bugfix= など =api-change= 以外の項目にあたります。
+- テストの期待値: コマンドの表、引数の表のハッシュ、helpの文書、waiterの説明で、本家のモデルとソースから作っています。
+- 本家のコードの変更: 独自の処理を持つコマンドや認証の処理の変更で、本家の[[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]]では =enhancement= や =bugfix= など =api-change= 以外の項目にあたります。
 
-このうちモデルとテストの期待値は本家からスクリプトで機械的に作れますが、コードの変更はRustへ移植する必要があります。
+モデルと期待値は本家から機械で作れますが、コードの変更はRustへ移植する必要があります。
 
 ** バージョンを上げるスクリプト
-モデルとテストの期待値は、[[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]]を実行して更新します。
+モデルと期待値は[[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]]で作り直します。
 
 #+begin_src console
 $ scripts/update-reference.sh 2.39.5
 #+end_src
 
-このスクリプトは次の順に処理を進めます。
+このスクリプトは次の順に処理します。
 
 1. =nix-prefetch-url= で本家のソースとインストーラのハッシュを取り、 =flake.nix= のバージョンとハッシュを書き換える。
-2. 新しいバージョンのdevShellに入り、 =scripts/vendor-models.sh= でモデルを取り込み直して、モデルを保持する3つのデータcrateのバージョンも本家にそろえる。
-3. コマンドの表、引数の表のハッシュ、helpの文書、waiterの説明という4つのテストの期待値を、本家のソースから作り直す。
+2. 新しいバージョンのdevShellに入り、 =scripts/vendor-models.sh= でモデルを取り込み直して、モデルを持つ3つのデータcrateのバージョンも本家にそろえる。
+3. コマンドの表、引数の表のハッシュ、helpの文書、waiterの説明を、本家のソースから作り直す。
 4. =nix fmt= で整形する。
 
-手順3でテストの期待値を作るスクリプトについては、更新前の2.39.3のソースに対して動かし、commit済みの期待値と同じ中身が出力されることを確かめてから使っています。
+期待値を作るスクリプトは、更新前の2.39.3のソースで動かし、commit済みの期待値と同じ中身になることを確かめてから使っています。
 
 ** 毎日回すworkflow
 [[https://github.com/conao3/rust-awscli/blob/master/.github/workflows/reference.yml][=Reference= のworkflow]]は毎日12:00 UTCに本家の最新のタグを調べます。
@@ -18289,24 +18280,24 @@ $ scripts/update-reference.sh 2.39.5
 
 - =make check= : fmt、clippy、テストを実行する。
 - [[https://github.com/conao3/rust-awscli/tree/master/difftest][差分テスト]]: モデルが変わったサービスの全操作を =awsr= と本家の両方で動かし、出力とリクエストを比べる。
-- helpの比較: モデルが変わったサービスについて、 =awsr= と本家のhelpページをバイト単位で比べる。
-- シナリオと認証の比較: 手で書いたシナリオ、 =s3= コマンドのシナリオ、 =configure= や =sso login= などの認証のコマンドを動かし、 =awsr= と本家の結果を比べる。
+- helpの比較: モデルが変わったサービスのhelpページを、バイト単位で比べる。
+- シナリオと認証の比較: 手で書いたシナリオ、 =s3= コマンドのシナリオ、 =configure= や =sso login= などの認証のコマンドを比べる。
 
 検査が終わると、 =reference/<バージョン>= のブランチをpushし、結果の表を載せたPRを作ります。
-PRの本文には、Rustへの移植が必要かを確認するため、本家のchangelogから =api-change= 以外の項目も抜き出して並べます。
-4つの検査が1つでも失敗するか、changelogに =api-change= 以外の項目があれば、PRをdraftにします。
+PRの本文には、本家のchangelogのうち =api-change= 以外の項目も並べます。
+検査が1つでも失敗するか、移植の要る項目があれば、PRをdraftにします。
 
 [[./resources/public/img/7fe084-flow.svg]]
 
 ** 変わったサービスだけを比べる
-すべてのサービスの全操作に対して差分テストを回すと、操作と引数の組み合わせは23万件を超えます。
-本家の実行結果を保存したキャッシュがない状態では、この全件の差分テストに手元の14コアのPCで約100分かかりました。
+全サービスの差分テストを回すと、本家と比べる組み合わせは23万件を超えます。
+本家の実行結果のキャッシュがないと、手元の14コアのPCで約100分かかりました。
 公開リポジトリで使うGitHub Actionsの =ubuntu-latest= は4コアなので、全件を毎日回すのは現実的ではありません。
 
 そこで、毎日の比較はモデルが変わったサービスに絞ります。
-2.39.3から2.39.5への更新では34サービスのモデルが変わり、その全操作の組み合わせは48,504件でした。
-2.39.5に上げたときのworkflowの[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]は、全体で約71分かかりました。
-内訳は、releaseビルドを含む差分テストが約44分、4,189ページあるhelpの比較が約18分です。
+2.39.3から2.39.5では34サービスのモデルが変わり、その全操作の組み合わせは48,504件でした。
+2.39.5に上げたときの[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]は全体で約71分かかりました。
+内訳は、releaseビルドを含む差分テストが約44分、4,189ページのhelpの比較が約18分です。
 
 ** 2.39.5で移植したもの
 2.39.3から2.39.5に上げたPRは[[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]]です。
@@ -18315,35 +18306,35 @@ PRの本文には、Rustへの移植が必要かを確認するため、本家�
 
 - Bearer認証のトークンをHTTPS以外のendpointへ送らない。
 - =s3 cp= 、 =s3 mv= 、 =s3 sync= で、手元からS3への転送に =--tags= を付けられる。
-- 転送が =PreconditionFailed= で失敗したとき、 =--no-overwrite= を付けた転送だけを、すでにあるファイルをskipしたものとして扱う。
+- 転送が =PreconditionFailed= で失敗したとき、 =--no-overwrite= を付けた転送だけを、すでにあるファイルのskipとして扱う。
 - =deploy install= が書く設定ファイルの権限を600にする。
 
-残りの5つは、CRTの転送クライアントとWindowsでの =aws update= に関する項目です。
-=awsr= は転送クライアントのうちCRTではなくclassicだけを実装しており、 =update= のコマンドもまだ実装していないので、この5つは移植の対象になりません。
+残りの5つは、CRTの転送クライアントとWindowsでの =aws update= の項目です。
+=awsr= は転送クライアントのうちclassicだけを実装していて、 =update= のコマンドもまだ実装していないので、この5つは移植の対象になりません。
 
-Bearer認証の変更による出力の違いは、2.39.5で増えた =account-access-runtime= のサービスの差分テストで見つかりました。
-このサービスでは24件の組み合わせで出力が一致しませんでした。
-本家は =Bearer authorization requires an HTTPS endpoint.= で止まるのに対し、移植前の =awsr= はそのままリクエストを送っていたためです。
-この変更を先にmasterへ入れると、2.39.3に合わせているmasterで本家と比べたときに、こんどはBearer認証を使う別のサービスで出力が一致しなくなります。
+Bearer認証の変更は、2.39.5で増えた =account-access-runtime= のサービスの差分テストで見つかりました。
+このサービスでは24件で出力が一致しませんでした。
+本家は =Bearer authorization requires an HTTPS endpoint.= で止まり、 =awsr= はリクエストを送っていました。
+この変更を先にmasterへ入れると、2.39.3の本家と比べたときに、こんどはBearer認証を使う別のサービスが一致しなくなります。
 そのため、本家のバージョンに依存する移植は、バージョンを上げるPRの中で行います。
-PRのブランチにmasterをmergeし、その上に移植のcommitを積んで、手元ですべての比較が通ってからPRをmasterへmergeします。
+PRのブランチにmasterをmergeし、その上に移植のcommitを積んで、手元ですべての比較が通ってからmergeしました。
 
-また、 =--tags= を付けたときの動作は既存のシナリオでは比べられないので、 =s3= コマンドのシナリオを6つ足しました。
-=awsr= のタグを付ける処理を一時的に外すと、足した6つのうちuploadを行う4つのシナリオが失敗するため、タグの動作を確かに比べられています。
+=--tags= は既存のシナリオでは比べられないので、 =s3= コマンドのシナリオを6つ足しました。
+=awsr= のタグを付ける処理を一時的に外すと、足した6つのうちuploadの4つが失敗するので、タグを確かに比べられています。
 
 ** runnerの上でだけ見つかった差分
-2.39.5のPRを作ったworkflowの[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]では、 =deploy install= と =deploy uninstall= のシナリオが3つ失敗しました。
-同じ3つのシナリオを手元のPCで動かすと、 =awsr= と本家の出力は一致します。
+2.39.5のPRを作った[[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]]では、 =deploy install= と =deploy uninstall= のシナリオが3つ失敗しました。
+同じシナリオは手元のPCでは一致します。
 
-=deploy install= と =deploy uninstall= はEC2のインスタンスの上では動かないように作られていて、 =169.254.169.254= のインスタンスメタデータサービスに問い合わせて実行環境がEC2の上かを調べます。
-[[https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners][GitHub Actionsのrunner]]はAzureかAWSの上で動いており、[[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service][Azureのメタデータのサービス]]も同じ =169.254.169.254= のアドレスを使います。
-ただし、Azureのサービスは =Metadata: true= のヘッダーがないリクエストを拒んでエラーを返します。
+=deploy install= はEC2のインスタンスの上では動かないように作られていて、 =169.254.169.254= のメタデータのサービスに問い合わせてEC2の上かを調べます。
+[[https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners][GitHub Actionsのrunner]]はAzureかAWSの上で動き、[[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service][Azureのメタデータのサービス]]も同じアドレスを使います。
+Azureのサービスは =Metadata: true= のヘッダーがない要求を拒みます。
 本家はPythonの =urlopen= でHTTPのGETを送り、エラーの応答を受けたときはEC2ではないと判断します。
-一方、 =awsr= はTCPでつながるかだけを見ていたため、このアドレスに応答するAzureのrunnerの上ではEC2の上だと判断して失敗していました。
+=awsr= はTCPでつながるかだけを見ていたので、このアドレスに何かが応答するrunnerの上ではEC2の上だと判断していました。
 
-そこで =awsr= もHTTPのGETを送り、応答のステータスが400未満のときだけEC2の上だと判断するようにしています。
-手元での確認には、 =unshare -rnm= で作ったuser namespaceの中に =169.254.169.254= で400か200を返すサーバーを立て、 =/etc/lsb-release= をUbuntuのものに差し替えた環境を使いました。
-この環境で400と200のどちらを返したときも、本家と =awsr= の出力が同じになることを確かめています。
+そこで =awsr= もHTTPのGETを送り、応答のステータスが400未満のときだけEC2の上だと判断するようにしました。
+手元の確認には、 =unshare -rnm= で作ったuser namespaceの中に =169.254.169.254= で400か200を返すサーバーを立て、 =/etc/lsb-release= をUbuntuのものに差し替えた環境を使いました。
+400と200のどちらを返しても、本家と =awsr= の出力は同じになります。
 * Lean 4で証明した関数をRustから呼べるlean-rsを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/b43a06
@@ -18657,11 +18648,10 @@ Issue / PR大歓迎です。
 :export_date: 2026-11-09 14:40
 :end:
 
-[[https://s.conao3.com/blog/2026/5499a8][lean-ritsuryo]] は日本の法令が定める期間と税額の計算をLean 4で書き、その定義が条文どおりに計算することを証明したライブラリです。
-このLeanのコードを [[https://s.conao3.com/blog/2026/b43a06][lean-rs]] でRustに変換し、それを元にcrateとブラウザだけで動くWebページを作りました。
-証明が保証するのはLeanの定義で、lean-rsの変換が正しいことを前提に、同じ計算をブラウザとRustから使えます。
-リポジトリは [[https://github.com/conao3/rust-ritsuryo][conao3/rust-ritsuryo]] で、ライセンスはApache-2.0です。
-crateは [[https://crates.io/crates/ritsuryo][crates.io]] に =ritsuryo= の名前で公開しており、この記事では0.1.0を扱います。
+[[https://s.conao3.com/blog/2026/5499a8][lean-ritsuryo]]は、日本の法令が定める期間と税額の計算をLean 4で書き、条文どおりに計算することを証明したライブラリです。
+これを[[https://s.conao3.com/blog/2026/b43a06][lean-rs]]でRustに変換して、Rustのcrateと、ブラウザだけで計算するWebページにしました。
+リポジトリは[[https://github.com/conao3/rust-ritsuryo][conao3/rust-ritsuryo]]で、ライセンスはApache-2.0です。
+crateは[[https://crates.io/crates/ritsuryo][crates.io]]に =ritsuryo= の名前で公開しています。
 
 [[github:conao3/rust-ritsuryo::Rust][Japanese statutory periods and taxes for Rust and the browser, compiled from proved Lean 4 code with lean-rs]]
 
@@ -18672,13 +18662,13 @@ https://conao3.github.io/rust-ritsuryo/
 
 [[./resources/public/img/c4f11a-page.png]]
 
-このWebページでは、期間の満了日、祝日、所得税、相続税、消費税など、lean-ritsuryoのコマンドラインツールであるCLIと同じ項目をフォームから計算できます。
+期間の満了日や祝日、所得税、相続税、消費税など、lean-ritsuryoのCLIと同じ計算をフォームから使えます。
 上の画像は、2025年分の課税総所得金額が500万円のときの所得税を計算したところです。
 納める額は584,500円になりました。
-Webページがブラウザの中で計算するため、入力した値をどこにも送りません。
+計算はブラウザの中で行うので、入力はどこにも送りません。
 
 ** Rustから呼ぶ
-=Cargo.toml= に =ritsuryo= を追加すると、WebページやCLIと同じ項目をRustの関数から計算できます。
+=Cargo.toml= に =ritsuryo= を追加すると、Rustから同じ計算を呼べます。
 
 #+begin_src toml
 [dependencies]
@@ -18713,27 +18703,27 @@ $ cargo run -q
 #+end_src
 
 =invoke= はCLIのサブコマンドとパラメータをそのまま受け取り、CLIが出力するものと同じJSONを返します。
-祝日や所得税のようによく使う項目には、上のコード例で祝日を取得している関数のように、引数と戻り値にRustの型を使う関数も用意しました。
+祝日や所得税のようによく使う計算には、引数と戻り値にRustの型を使う関数も用意しました。
 
-このcrateを使うプロジェクトは、手元にLeanが入っていなくてもcargoだけでビルドできます。
+Leanが入っていなくても、cargoだけでビルドできます。
 
 ** 仕組み
 [[./resources/public/img/c4f11a-pipeline.svg]]
 
-変換の入力には、Rustへ公開する関数だけを書いたLeanのmoduleを1つ用意しています。
-lean-rsはこのmoduleを入力にして、その中の関数から呼ばれるlean-ritsuryoの関数まで含めてRustのコードに変換します。
+変換の入力には、Rustに出す関数だけを書いたLeanのmoduleを1つ置いています。
+lean-rsはこのmoduleを、そこから呼ばれるlean-ritsuryoの関数まで含めてRustのコードにします。
 
-lean-ritsuryoのCLIは、ファイルや標準出力などのIOを扱う部分と、計算する関数の部分が分かれています。
-計算する関数はIOを使わないため、その関数をそのままRustとブラウザの両方から呼べます。
+lean-ritsuryoのCLIは、ファイルや標準出力などのIOを扱う部分と計算の部分が分かれています。
+計算の部分はIOを使わない関数なので、そのままRustとブラウザから呼べます。
 
-GitHub Pagesで公開しているWebページでは、ritsuryoのcrateをWebAssemblyにしてブラウザから呼んでいます。
-変換したRustのコードが使うlean-rsのruntimeはWebAssemblyでも動き、ファイル操作のようにIOを使う処理を呼ぶとエラーを返します。
-lean-ritsuryoの計算する関数はIOを使わないため、WebAssemblyでもそのまま動きます。
+WebページはこのcrateをWebAssemblyにして、GitHub Pagesの静的なページから呼んでいます。
+lean-rsのruntimeはWebAssemblyでも動き、ファイル操作のようにIOを使う処理はエラーを返します。
+lean-ritsuryoの計算はIOを使わないので、そのまま動きます。
 
-lean-rsでRustのコードを作るときは、変換の手順がlean-ritsuryoの証明も含めてLeanのパッケージをビルドします。
-証明が通らないとこのビルドが止まるため、Rustのコードは作られません。
+Rustのコードを作るときは、lean-ritsuryoの証明も含めてLeanのパッケージをビルドします。
+証明が通らない計算は、Rustのコードになりません。
 ただし、証明が保証するのはLeanの定義です。
-変換したRustのコードが同じ計算をすることは、lean-rsの変換が正しいことを前提にしています。
+Rustのコードが同じ計算をすることは、lean-rsの変換が正しいことに頼っています。
 
 * Lean 4で証明した関数をPythonから呼べるlean-pyを作った
 :properties:
@@ -19081,18 +19071,17 @@ LeanでPythonの関数を書けるようにし、Leanの型をpydanticのmodel�
 :end:
 
 エディタと言語サーバーはLanguage Server Protocol、略してLSPで通信します。
-いろいろなエディタと言語サーバーを使う中で、どれも仕様と違う動きをしていると感じていました。
-これを確かめる道具を探したところ、LSPには公式の適合テストがありませんでした。
-サーバーの一部の機能を検査する道具はありましたが、クライアントを検査する道具は見つかりませんでした。
+いろいろなエディタと言語サーバーを使っていて、どれも仕様の細かいところを少しずつ外しているように感じていました。
+ところが、LSPには公式の適合テストがありません。
+サーバーの一部を検査する道具はありますが、クライアントを検査する道具は見つかりませんでした。
 
-そこで、仕様に合わないメッセージを受け流さずに指摘するツールとしてlsp-touchstoneを作りました。
-lsp-touchstoneはclient、proxy、serverの3つの動かし方を持ち、通信が仕様どおりかを判定します。
-判定のうち計算を間違えやすい部分はLean 4で書いて正しさを証明し、[[https://s.conao3.com/blog/2026/b43a06][lean-rs]]でRustに変換しています。
-lsp-touchstoneのserverとproxyを使って5つのエディタとrust-analyzerにつないだところ、思っていたとおり、どれにも仕様に反する動きがありました。
-違反はどれもエディタを閉じる途中や画面に何も出ないやりとりの中に残っており、受け流さずに指摘する相手がいないと見つかりません。
+そこで、仕様に厳格なクライアントとサーバーを作り、通信が仕様どおりかを判定できるようにしました。
+判定の核になる計算はLean 4で書いて正しさを証明し、[[https://s.conao3.com/blog/2026/b43a06][lean-rs]]でRustに変換しています。
+これを5つのエディタとrust-analyzerにつないだところ、思っていたとおり、どれにも仕様に反する動きがありました。
 
+作った道具はlsp-touchstoneです。
 リポジトリは[[https://github.com/conao3/rust-lsp-touchstone][conao3/rust-lsp-touchstone]]で、ライセンスはApache-2.0です。
-この記事はlsp-touchstone 0.1.0で動かした結果をもとに書いています。
+この記事は0.1.0で動かした結果をもとに書いています。
 
 [[github:conao3/rust-lsp-touchstone::Rust][A strict LSP client, server and checking proxy for testing Language Server Protocol implementations]]
 
@@ -19101,26 +19090,26 @@ lsp-touchstoneには3つの動かし方があります。
 
 [[./resources/public/img/ccc5ed-modes.svg]]
 
-- clientでは、使う人がブラウザのweb UIから言語サーバーを起動し、リクエストや通知を手で送ります。
+- clientはブラウザのweb UIから言語サーバーを起動し、リクエストや通知を手で送ります。
 - proxyはエディタと言語サーバーのあいだに入り、すべてのメッセージを検査しながら中継します。
-- serverはエディタの言語サーバーとして動き、仕様にあるサーバーからのリクエストと通知をクライアントへ順に送ります。
+- serverはエディタの言語サーバーとして動き、仕様にあるサーバーからのリクエストと通知を順に送ります。
 
 3つとも同じ検査を使います。
-検査に使う型と、各メソッドがクライアントやサーバーの宣言するどの機能（capability）に対応するかは、LSP 3.18の仕様を機械が読める形で定義したメタモデルの =metaModel.json= から読みます。
-指摘は80種類あり、一覧は[[https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/rules.md][docs/rules.md]]にまとめています。
+検査に使う型と、各メソッドがどのcapabilityに対応するかは、LSP 3.18の仕様のメタモデル =metaModel.json= から読みます。
+指摘は80種類あり、一覧は[[https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/rules.md][docs/rules.md]]にあります。
 仕様が禁じることはerrorにし、仕様が許していても実装によって読み方が分かれることはwarningにしています。
 
 ** Leanで証明した部分
 判定する側が間違っていると、指摘も信用できません。
 そこで、計算を間違えやすい3つの部分をLeanで書き、性質を証明しました。
 
-- LSPの位置は行と文字のオフセットで表し、クライアントとサーバーが初期化のときにUTF-8、UTF-16、UTF-32のどの単位で文字を数えるかを決めます。 =😀= はUTF-32では1、UTF-16では2、UTF-8では4と数えられます。この単位のあいだで位置を変換する計算について、往復すると元に戻ることと、文字の途中を指す位置を見分けられることを証明しています。
-- =didChange= で届いた変更を、proxyやserverが手元に持つ文書の写しに適用して範囲を置き換える計算です。置き換える範囲の前後の文字列が残ること、新しい文字列がその位置に入ること、置き換えたあとの長さが元の長さから範囲の長さを引いて新しい文字列の長さを足した値になることを証明しています。
-- サーバーは進捗を =begin= 、何回かの =report= 、 =end= の順に送ります。この進捗の状態がどう移るかについて、 =end= のあとはどの進捗も受け付けないことを証明しています。
+- LSPの位置は行と文字のオフセットで表し、UTF-8、UTF-16、UTF-32のどの単位で文字を数えるかを初期化のときに決めます。 =😀= はUTF-32では1、UTF-16では2、UTF-8では4と数えます。単位のあいだの変換について、往復すると元に戻ることと、文字の途中を指す位置を見分けられることを証明しています。
+- =didChange= で届いた変更を、手元に持つ文書の写しに当てて範囲を置き換える計算です。範囲の前後が残ること、新しい文字列がその位置に入ること、長さが期待どおりになることを証明しています。
+- 進捗の状態の移り方です。サーバーは進捗を =begin= 、何回かの =report= 、 =end= の順に送ります。
 
 進捗の部分は次のように書いています。
 =TokenState= と =ProgressKind= の型の定義と、ほかの定理は省いています。
-ビルドのときにLeanが =lean!= の中のコードの証明を検査し、lean-rsがそのコードをRustの関数に変換します。
+=lean!= の中のコードは、ビルドのときにLeanが証明を検査し、lean-rsがRustの関数にします。
 
 #+begin_src rust
 lean_rust::lean! {
@@ -19142,9 +19131,8 @@ lean_rust::lean! {
 proxyは進捗の通知を受けるたびにこの =step= を呼び、 =none= が返ったら違反として報告します。
 
 ** 見つかった仕様違反
-=make check-editors= を実行すると、テスト用のスクリプトがeglot、lsp-mode、Neovim、Helix、VS Codeを人の操作なしに動かします。
-eglotとlsp-modeはどちらもEmacsの上で動くLSPクライアントで、この記事はクライアントごとに1つのエディタとして数えています。
-スクリプトはそれぞれのエディタを、lsp-touchstoneのserverにつなぐ構成と、proxyを通したrust-analyzerにつなぐ構成の2通りで別々に動かします。
+=make check-editors= を実行すると、eglot、lsp-mode、Neovim、Helix、VS Codeを人の操作なしに動かします。
+それぞれのエディタを、lsp-touchstoneのserverと、proxyを通したrust-analyzerに別々につなぎます。
 そのうえで、hover、補完、定義へのジャンプ、1行の入力、コードアクションによる編集、保存、終了の順に操作します。
 エディタとrust-analyzerはnixpkgsから入れました。
 バージョンは次のとおりです。
@@ -19156,13 +19144,13 @@ eglotとlsp-modeはどちらもEmacsの上で動くLSPクライアントで、�
 - rust-analyzer 2026-11-02
 
 *** 終わり方
-LSPでは、クライアントが =shutdown= を送り、応答を受けてから =exit= を送ってサーバーのプロセスを終わらせます。
+LSPでは、クライアントが =shutdown= を送り、応答を受けてから =exit= を送って終わります。
 =shutdown= を送ったあとのクライアントは、 =exit= のほかにリクエストも通知も送ってはいけません。
 6つの実装は、それぞれ違う形でこの手順から外れていました。
-以下で「回によって」と書いた動きは、何回か実行したうちの一部の回で起きたものです。
+「回によって」と書いたものは、何回か実行したうちの一部で出たものです。
 
-- eglotは =exit= に ="params": {}= を付けて送ります。 =exit= はparamsを持たない通知なので、lsp-touchstoneはこれをwarningにしています。
-- lsp-modeは多くの回で =exit= を送らずにサーバーのプロセスを終わらせ、一部の回では ="params": null= を付けた =exit= を送ります。JSON-RPC 2.0のparamsはオブジェクトか配列で、 =null= は仕様に合いません。
+- eglotは =exit= に ="params": {}= を付けて送ります。 =exit= はparamsを持たない通知なので、warningにしています。
+- lsp-modeは =exit= を送らずにサーバーのプロセスを終わらせ、回によっては ="params": null= を付けた =exit= を送ります。JSON-RPC 2.0のparamsはオブジェクトか配列で、 =null= は仕様に合いません。
 - Neovimはrust-analyzerとつないだとき、回によって =shutdown= のあとに =textDocument/semanticTokens= のリクエストを送ります。
 - VS Codeのクライアントは回によって =shutdown= のあとに =$/cancelRequest= を送ります。
 - Helixは回によって =exit= が届く前にサーバーのプロセスを終わらせます。
@@ -19170,7 +19158,7 @@ LSPでは、クライアントが =shutdown= を送り、応答を受けてか�
 
 *** 宣言していない機能
 LSPでは、クライアントとサーバーが =initialize= で、自分が扱える機能をcapabilityとして宣言します。
-相手が宣言していない機能のリクエストを送ると、扱えないリクエストを送ることになり仕様に反します。
+相手が宣言していない機能のリクエストは、送っても相手が扱えるとは限りません。
 
 clientのweb UIでrust-analyzerを起動し、初期化してからファイルを1つ開くと、次の指摘が出ます。
 
@@ -19185,22 +19173,22 @@ rust-analyzerは5つのエディタのどれとつないでもこのリクエス
 Helixは「メソッドが見つからない」というエラーを返し、rust-analyzerはそのまま動き続けました。
 
 *** ほかの振る舞い
-- サーバーが進捗を送るときは、先に =window/workDoneProgress/create= のリクエストで進捗のtokenを作り、クライアントから応答を受けてからそのtokenで進捗を送り始める決まりです。しかし、rust-analyzerは =window/workDoneProgress/create= の応答を受ける前に、そのtokenで進捗を送り始めるという違反をすることがあります。
-- lsp-modeは、Emacsが最初の保存でファイルをバックアップの =main.rs~= に改名するとき、 =workspace/willRenameFiles= をサーバーに送り、エディタが内部で作るバックアップを人の操作によるファイルの改名として誤って知らせてしまいます。
-- lsp-touchstoneのserverは、位置を数える単位をクライアントが示した中から =utf-32= 、 =utf-8= 、 =utf-16= の優先順で選びます。eglot、lsp-mode、Neovim、Helixは =utf-32= を含めて示すのでserverが =utf-32= を選び、VS Codeのクライアントは仕様で必須の =utf-16= だけを示すので =utf-16= になります。
+- rust-analyzerは =window/workDoneProgress/create= の応答を受ける前に、そのtokenで進捗を送り始めることがあります。
+- lsp-modeは、Emacsが最初の保存でファイルをバックアップの =main.rs~= に改名するとき、 =workspace/willRenameFiles= をサーバーに送ります。
+- serverは、位置を数える単位をクライアントが示した中から =utf-32= 、 =utf-8= 、 =utf-16= の順に選びます。eglot、lsp-mode、Neovim、Helixでは =utf-32= になり、VS Codeのクライアントは =utf-16= しか示しません。
 
 *** 正しく動いたところ
 serverはコードアクションから =workspace/applyEdit= でエディタに編集を送ります。
-そのあとエディタが送る =didChange= から文書の中身を計算し、送った編集を適用した文書と一致するかを確かめます。
+そのあとエディタが送る =didChange= から文書の中身を計算し、送った編集を当てた文書と一致するかを確かめます。
 5つのエディタはすべて、編集を正しく適用しました。
 
 編集の適用のように画面に結果が出る機能は、おかしければ使う人がすぐ気づきます。
-一方、今回見つかった違反はどれもエディタを閉じる途中や、画面に何も出ないやりとりの中で起きていました。
-実際のエディタや言語サーバーは仕様に合わないメッセージを受けても止まらずに受け流すので、違反をした側には違反を知らせる反応が返りません。
+見つかった違反はどれもエディタを閉じる途中や、画面に何も出ないやりとりの中で起きていました。
+実際のエディタや言語サーバーは仕様に合わないメッセージを受けても止まらずに受け流すので、違反をした側には何も返りません。
 違反を見つけるには、受け流さずに指摘する相手が要ります。
 
 ** 使い方
-使う人は、proxyを起動するコマンドを言語サーバーのコマンドとしてエディタの設定に書きます。
+proxyを起動するコマンドを、言語サーバーのコマンドとしてエディタに渡します。
 eglotなら次のように書きます。
 
 #+begin_src elisp
@@ -19211,7 +19199,7 @@ eglotなら次のように書きます。
 #+end_src
 
 =--server-command-args= のあとには、本来の言語サーバーのコマンドを書きます。
-=--web-ui-port= を付けると、lsp-touchstoneが通信をその場で表示するweb UIのURLを標準エラーに出します。
+=--web-ui-port= を付けると、通信をその場で表示するweb UIのURLを標準エラーに出します。
 lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の詳細は[[https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/editors.md][docs/editors.md]]にあります。
 * CPython 3.15.2にPEP 638の構文マクロを実装した
 :properties:
