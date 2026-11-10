@@ -53,6 +53,35 @@
   node)
 
 
+(defn inline-text
+  [node]
+  (cond
+    (nil? node) ""
+    (instance? org.commonmark.node.Text node) (.getLiteral node)
+    (instance? org.commonmark.node.Code node) (.getLiteral node)
+    :else (->> (take-while some? (iterate #(.getNext %) (.getFirstChild node)))
+               (map inline-text)
+               (apply str))))
+
+
+(defn join-cjk-lines
+  [node]
+  (let [wide? #(re-matches #"[\p{IsHan}\p{IsHiragana}\p{IsKatakana}\p{InCJKSymbolsAndPunctuation}\p{InHalfwidthAndFullwidthForms}]" (str %))
+        alnum? #(re-matches #"[\p{IsLatin}\p{Nd}]" (str %))]
+    (loop [child (.getFirstChild node)]
+      (when child
+        (let [next-child (.getNext child)]
+          (if (instance? org.commonmark.node.SoftLineBreak child)
+            (let [before (last (inline-text (.getPrevious child)))
+                  after (first (inline-text next-child))]
+              (when (or (and (wide? before) (or (wide? after) (alnum? after)))
+                        (and (alnum? before) (wide? after)))
+                (.unlink child)))
+            (join-cjk-lines child))
+          (recur next-child)))))
+  node)
+
+
 (defn node-worker
   [script]
   (delay
@@ -156,7 +185,6 @@
                                (instance? org.commonmark.node.Code %) (.getLiteral %)
                                (instance? org.commonmark.node.SoftLineBreak %) " "))
                       (apply str)
-                      (#(str/replace % #"(?<=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}、。）」])\s+(?=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}（「])" ""))
                       str/trim)]
     (cond
       (str/blank? text) nil
@@ -171,7 +199,7 @@
                       (keep #(re-matches #"(\w+):\s*(.*)" %))
                       (map (fn [[_ k v]] [(keyword (str/lower-case k)) v]))
                       (into {}))
-        document (.parse markdown-parser (or body ""))]
+        document (join-cjk-lines (.parse markdown-parser (or body "")))]
     {:metadata metadata
      :description (markdown-description document)
      :html (.render markdown-renderer (link-images document))}))
