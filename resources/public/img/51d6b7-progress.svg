@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="500" viewBox="0 0 1060 500" font-family="'DejaVu Sans Mono', 'Menlo', monospace" font-size="19">
+<rect x="0" y="0" width="1060" height="500" rx="16" fill="#ffffff"/>
+<text x="32" y="48" font-size="21" font-weight="bold" fill="#222">#assay proved.step</text>
+<text y="96" fill="#555"><tspan x="32">mutant</tspan>
+<tspan x="560">T1</tspan>
+<tspan x="612">T2</tspan>
+<tspan x="664">T3</tspan>
+<tspan x="716">T4</tspan>
+<tspan x="768">T5</tspan>
+<tspan x="820">T6</tspan>
+<tspan x="872">T7</tspan>
+<tspan x="930">verdict</tspan></text>
+<line x1="32" y1="110" x2="1028" y2="110" stroke="#ccc"/>
+<text y="146" fill="#222"><tspan x="32">step := fun _ _ =&gt; none</tspan>
+<tspan x="566" fill="#999">·</tspan>
+<tspan x="618" fill="#999">?</tspan>
+<tspan x="670" fill="#999">?</tspan>
+<tspan x="722" fill="#999">·</tspan>
+<tspan x="774" fill="#999">·</tspan>
+<tspan x="826" fill="#999">?</tspan>
+<tspan x="878" fill="#c62828">✗</tspan>
+<tspan x="930" fill="#555">killed</tspan></text>
+<text y="190" fill="#222"><tspan x="32">| .begun, .report =&gt; none</tspan>
+<tspan x="566" fill="#999">·</tspan>
+<tspan x="618" fill="#999">·</tspan>
+<tspan x="670" fill="#999">·</tspan>
+<tspan x="722" fill="#999">·</tspan>
+<tspan x="774" fill="#999">·</tspan>
+<tspan x="826" fill="#999">·</tspan>
+<tspan x="878" fill="#c62828">✗</tspan>
+<tspan x="930" fill="#555">killed</tspan></text>
+<text y="234" fill="#222"><tspan x="32">add | .created, .report =&gt; some .begun</tspan>
+<tspan x="566" fill="#999">·</tspan>
+<tspan x="618" fill="#c62828">✗</tspan>
+<tspan x="670" fill="#999">·</tspan>
+<tspan x="722" fill="#999">·</tspan>
+<tspan x="774" fill="#999">·</tspan>
+<tspan x="826" fill="#c62828">✗</tspan>
+<tspan x="878" fill="#999">·</tspan>
+<tspan x="930" fill="#555">killed</tspan></text>
+<rect x="24" y="251" width="1012" height="38" rx="6" fill="#fff3cd"/>
+<text y="278" fill="#222"><tspan x="32">add | .begun, .begin =&gt; some .begun</tspan>
+<tspan x="566" fill="#999">·</tspan>
+<tspan x="618" fill="#999">·</tspan>
+<tspan x="670" fill="#999">·</tspan>
+<tspan x="722" fill="#999">·</tspan>
+<tspan x="774" fill="#999">·</tspan>
+<tspan x="826" fill="#999">·</tspan>
+<tspan x="878" fill="#999">·</tspan>
+<tspan x="930" fill="#c62828" font-weight="bold">HOLE</tspan></text>
+<line x1="32" y1="304" x2="1028" y2="304" stroke="#ccc"/>
+<text x="32" y="340" fill="#555">T1 ended_accepts_nothing</text>
+<text x="32" y="370" fill="#555">T2 only_begin_leaves_created.1</text>
+<text x="32" y="400" fill="#555">T3 only_begin_leaves_created.2</text>
+<text x="32" y="430" fill="#555">T4 begun_never_returns_to_created</text>
+<text x="600" y="340" fill="#555">T5 nothing_after_end</text>
+<text x="600" y="370" fill="#555">T6 accepted_runs_begin_first</text>
+<text x="600" y="400" fill="#555">T7 begin_reports_end</text>
+<text y="470" fill="#555"><tspan x="32" fill="#c62828">✗</tspan><tspan x="56">反例がある</tspan><tspan x="220">·</tspan><tspan x="244">成り立つ</tspan><tspan x="380">?</tspan><tspan x="404">前提を満たす入力が足りない</tspan></text>
+</svg>
