@@ -6,6 +6,7 @@ html {
     font-size: var(--body-size-m);
     line-height: var(--cjk-line-height-200);
     margin: 0 1rem;
+    text-autospace: normal;
 }
 
 body {
@@ -376,6 +377,7 @@ pre {
     line-height: var(--code-line-height);
     overflow-x: auto;
     padding: var(--spacing-300);
+    text-autospace: no-autospace;
 }
 
 pre code {
