@@ -19440,6 +19440,302 @@ $ ./python -m test test_macros
 CPythonのテスト全体では、子プロセスの実行ファイルの名前を調べる =test_profiling= の1つがNixの環境で失敗し、ほかは通ります。
 どこに何を足したかはリポジトリのREADMEにまとめています。
 
+* Clojure標準ライブラリ概観
+:properties:
+:export_file_name: generated/contents/blog/2025/a56493
+:export_date: 2025-02-26
+:export_draft: t
+:end:
+
+言語を学ぶとき、まずは公式が言語に添付してくれているライブラリを把握することが重要です。
+全ての情報源は [[https://clojure.org/api/api][Clojure - API Documentation]] からです。
+
+概観としては以下のようになっています。
+
+- Clojure API
+  - clojure.core :: 標準でuseされている
+  - clojure.data
+  - clojure.datafy
+  - clojure.edn
+  - clojure.inspector
+  - clojure.instant
+  - clojure.java.basis
+  - clojure.java.browse
+  - clojure.java.io
+  - clojure.java.javadoc
+  - clojure.java.process
+  - clojure.java.shell
+  - clojure.main
+  - clojure.math
+  - clojure.pprint
+  - clojure.reflect
+  - clojure.repl
+  - clojure.set
+  - clojure.stacktrace
+  - clojure.string
+  - clojure.template
+  - clojure.test
+  - clojure.tools.deps.interop
+  - clojure.walk
+  - clojure.xml
+  - clojure.zip
+- [[https://clojure.github.io/clojure/javadoc/][Clojure Java API]]
+- Clojure contrib
+  - algo.generic :: Generic versions of common functions (Stable)
+  - algo.monads :: Monad macros and Definitions (Stable)
+  - core.async :: Facilities for asynchronous programming and communication (Active)
+  - core.cache :: A caching library implementing various cache strategies (Active)
+  - core.contracts :: Contracts programming in Clojure (Inactive)
+  - core.incubator :: Functions proposed for core inclusion (Inactive)
+  - core.logic :: A logic programming library based on miniKanren (Stable)
+  - core.match :: Pattern match and predicate dispatch (Stable)
+  - core.memoize :: A manipulable, pluggable, memoization framework (Active)
+  - core.rrb-vector :: RRB-Tree-based vectors (Active)
+  - core.typed :: Gradual typing (Active)
+  - core.unify :: Unification library (Stable)
+  - data.avl :: AVL trees (Stable)
+  - data.codec :: Native codec implementations (Stable)
+  - data.csv :: Reading and writing CSV files (Stable)
+  - data.finger-tree :: Finger trees (Stable)
+  - data.fressian :: Extensible binary Data Notation (Stable)
+  - data.generators :: Random data generators (Inactive)
+  - data.int-map :: Maps and sets optimized for integer keys (Stable)
+  - data.json :: JSON encoding / decoding (Stable)
+  - data.priority-map :: Priority maps (Stable)
+  - data.xml :: Lazy XML parsing (Stable)
+  - data.zip :: Manipulating zippers (Stable)
+  - java.classpath :: Classpath utilities (Stable)
+  - java.data :: Work with Java Beans (Active)
+  - java.jdbc :: JDBC-based SQL interface (Stable)
+  - java.jmx :: JMX interface (Stable)
+  - math.combinatorics :: Lazy sequences for common combinatorial functions (Stable)
+  - math.numeric-tower :: Math functions and numeric tower (Stable)
+  - test.check :: Property testing framework (Active)
+  - test.generative :: Test data generation and execution harness (Inactive)
+  - tools.analyzer :: Analyzer framework for Clojure code (Active)
+  - tools.analyzer.jvm :: JVM-specific passes for tools.analyzer (Active)
+  - tools.build :: Functions for writing Clojure build programs (Active)
+  - tools.cli :: Command-line argument processor (Active)
+  - tools.deps :: Deps as data and classpath construction (Active)
+  - tools.deps.cli :: Deps functions for use with Clojure CLI (Active)
+  - tools.deps.graph :: Create dependency graphs for deps.edn projects (Active)
+  - tools.gitlibs :: Tools for retrieving, caching, and using git-based projects (Active)
+  - tools.emitter.jvm :: JVM bytecode generator (Active)
+  - tools.logging :: Logging tools (Active)
+  - tools.macro :: Tools for macro writers (Stable)
+  - tools.namespace :: Tools for working with namespace declarations (Stable)
+  - tools.nrepl :: Network REPL (Inactive)
+  - tools.reader :: Clojure reader (Active)
+  - tools.tools :: A Clojure CLI tool for managing CLI tools (Active)
+  - tools.trace :: Execution tracing (Stable)
+
+「Clojure API」はClojureに標準添付されているライブラリです。
+そのため追加の依存なしで利用することができます。
+
+「Clojure Java API」はJavaから見たときのClojureの公開APIです。
+とはいえIFnなど基本的なインターフェースのみ公開されています。
+
+「Clojure Contrib」は元々ひとつの巨大ライブラリだったものを整理してそれぞれのライブラリに分割したものです。
+
+* Clojureの初見ライブラリの探り方
+:properties:
+:export_file_name: generated/contents/blog/2025/7d3c20
+:export_date: 2025-02-26
+:export_draft: t
+:end:
+
+作者のREADMEを見るのが定石ですが、ClojureはREPL文化のため処理系と対話しながらインターフェースを調査しながら動かすことも可能です。
+ここでは clojure.data.csv を使いたくなったとします。
+
+** 依存解決
+まずは依存解決する必要があります。
+ここで重要なのは使いたいライブラリが *mavenで* どういう名前なのかです。
+実際のところ、これを調べるためにはGitHubのREADMEを見るしかありません。
+clojure.data.csv の場合、 [[https://github.com/clojure/data.csv][clojure/data.csv]] が公式のGitHubです。
+
+これを見ると deps.edn の表記が以下であることが分かります。
+
+#+begin_src clojure
+org.clojure/data.csv {:mvn/version "1.1.0"}
+#+end_src
+
+しかし、ここでREADME上のバージョン情報が更新されているとは限りません。
+mavenを見に行くと [[https://mvnrepository.com/artifact/org.clojure/data.csv][org.clojure/data.csv]] を見つけることができ、ここで最新のバージョンが =1.1.0= であることが確かめられました。
+
+=deps.edn= 表記はそのまま =clojure.repl.deps/add-lib= に渡すことができます。
+
+#+begin_src clojure
+user> (add-lib 'org.clojure/data.csv {:mvn/version "1.1.0"})
+#+end_src
+
+これで依存解決は完了です。
+
+** requireしてみる
+名前空間の調査に入りますが、ここでも問題があります。
+Clojureに対してどういう名前で公開されているかを調べる必要があります。
+公式のREADMEを見ると以下の表記があるため、 =clojure.data.csv= が名前空間であることが分かります。
+
+#+begin_src clojure
+(require '[clojure.data.csv :as csv]
+         '[clojure.java.io :as io])
+#+end_src
+
+=require= した名前空間は =:as= を使って別名を付けることができます。
+雰囲気で付けてください (えっ
+
+大まかに分けてそのままにするか、ある程度のレベルだけ省略するとするか、最後だけ採用するか、1文字にするかくらいの選択肢があります。
+
+- clojure.data.csv
+- data.csv
+- csv
+- c
+
+ここで付ける命名は名前空間での名前のため、変数名とは衝突しません。
+
+** 公開関数を調べる
+公開 *関数* というのは正確には誤りで、実際には *Var* という単位で取得できます。
+それを取得するには =clojure.core/ns-publics= という関数を利用します。
+
+#+begin_src clojure
+user> (ns-publics 'clojure.data.csv)
+{read-csv #'clojure.data.csv/read-csv,
+ Read-CSV-From #'clojure.data.csv/Read-CSV-From,
+ read-csv-from #'clojure.data.csv/read-csv-from,
+ write-csv #'clojure.data.csv/write-csv}
+#+end_src
+
+このように =ns-publics= はシンボルとVarのマップを取得することができます。
+
+この構造が得ることができれば以下のようにVarを分類できます。
+
+#+begin_src clojure
+(-> (->> (ns-publics 'clojure.data.csv)
+         (map (fn [[key val]]
+                [key (cond
+                       (fn? (var-get val)) :fn
+                       :else :else)]))
+         (group-by second))
+    (update-vals (partial map first)))
+;;=> {:fn (read-csv read-csv-from write-csv),
+;;    :else (Read-CSV-From)}
+#+end_src
+
+* Clojure標準ライブラリ - clojure.core
+:properties:
+:export_file_name: generated/contents/blog/2025/8d05b2
+:export_date: 2025-02-26
+:export_draft: t
+:end:
+
+=clojure.core= は標準でuseされているライブラリで、つまり名前空間の指定なしで使うことができる関数群です。
+一方で便利っぽい関数が全て一つの名前空間にごった煮になっているため、初心者としてこのライブラリを見るとその数に圧倒されるかもしれません。
+内容については同人誌にまとめたので詳しくは「[[https://techbookfest.org/product/f7rPGt7NeeDuqxYdE3Teyc?productVariantID=hATFZbCg6sJxMt5dCXPn4x][めだかのclojure.core学校]]」で。
+
+* Clojure標準ライブラリ - clojure.data
+:properties:
+:export_file_name: generated/contents/blog/2025/cadb41
+:export_date: 2025-02-26
+:export_draft: t
+:end:
+
+** 依存
+Clojure標準ライブラリのため、追加の依存は必要ありません。
+
+** require
+この記事では以下で =require= されているものとします
+#+begin_src clojure
+(require '[clojure.data :as data])
+#+end_src
+
+** 概観
+#+begin_src clojure
+(-> (->> (ns-publics 'clojure.data)
+         (map (fn [[key val]]
+                [key (cond
+                       (fn? (var-get val)) :fn
+                       :else :else)]))
+         (group-by second))
+    (update-vals (partial map first)))
+;;=> {:fn (diff
+;;         equality-partition
+;;         diff-similar),
+;;    :else (EqualityPartition
+;;           Diff)}
+#+end_src
+
+https://clojure.github.io/clojure/clojure.data-api.html
+
+=diff= のみが公開APIで、その他の関数は実装詳細だという旨が記載されています。
+
+** 使い方
+*** diff
+#+begin_src clojure
+(defn diff
+  "Recursively compares a and b, returning a tuple of
+  [things-only-in-a things-only-in-b things-in-both].
+  Comparison rules:
+
+  * For equal a and b, return [nil nil a].
+  * Maps are subdiffed where keys match and values differ.
+  * Sets are never subdiffed.
+  * All sequential things are treated as associative collections
+    by their indexes, with results returned as vectors.
+  * Everything else (including strings!) is treated as
+    an atom and compared for equality."
+  {:added "1.3"}
+  [a b]
+  (if (= a b)
+    [nil nil a]
+    (if (= (equality-partition a) (equality-partition b))
+      (diff-similar a b)
+      (atom-diff a b))))
+#+end_src
+
+#+begin_src clojure
+(t/deftest diff-test
+  (t/testing "official"
+    (t/is (= [nil nil nil] (data/diff nil nil)))
+    (t/is (= [1 2 nil] (data/diff 1 2)))
+    (t/is (= [nil nil [1 2 3]] (data/diff [1 2 3] '(1 2 3))))
+    (t/is (= [1 [:a :b] nil] (data/diff 1 [:a :b])))
+    (t/is (= [{:a 1} :b nil] (data/diff {:a 1} :b)))
+    (t/is (= [:team #{:p1 :p2} nil] (data/diff :team #{:p1 :p2})))
+    (t/is (= [{0 :a} [:a] nil] (data/diff {0 :a} [:a])))
+    (t/is (= [nil [nil 2] [1]] (data/diff [1] [1 2])))
+    (t/is (= [nil nil [1 2]] (data/diff [1 2] (into-array [1 2]))))
+    (t/is (= [#{:a} #{:b} #{:c :d}] (data/diff #{:a :c :d} #{:b :c :d})))
+    (t/is (= [nil nil {:a 1}] (data/diff {:a 1} {:a 1})))
+    (t/is (= [{:a #{2}} {:a #{4}} {:a #{3}}] (data/diff {:a #{2 3}} {:a #{3 4}})))
+    (t/is (= [#{1} #{3} #{2}] (data/diff (HashSet. [1 2]) (HashSet. [2 3]))))
+    (t/is (= [nil nil [1 2]] (data/diff [1 2] (into-array [1 2]))))
+    (t/is (= [nil nil [1 2]] (data/diff (into-array [1 2]) [1 2])))
+    (t/is (= [{:a {:c [1]}} {:a {:c [0]}} {:a {:c [nil 2] :b 1}}] (data/diff {:a {:b 1 :c [1 2]}} {:a {:b 1 :c [0 2]}})))
+    (t/is (= [{:a nil} {:a false} {:b nil :c false}] (data/diff {:a nil :b nil :c false} {:a false :b nil :c false}))))
+
+  (t/testing "map"
+    (t/is (= [{:b {:d 3}} {:b {:d 4}} {:a 1, :b {:c 2}}]
+             (data/diff {:a 1 :b {:c 2 :d 3}}
+                        {:a 1 :b {:c 2 :d 4}})))))
+#+end_src
+
+- =equal= の場合、 =[nil nil a]= が返却される。
+  これは実装から明らかですね
+- マップの場合、キーが一致し値が異なる部分については再帰的に差分を取る。
+  #+begin_src clojure
+    (t/is (= [{:b {:d 3}} {:b {:d 4}} {:a 1, :b {:c 2}}]
+             (data/diff {:a 1 :b {:c 2 :d 3}}
+                        {:a 1 :b {:c 2 :d 4}})))
+  #+end_src
+  これは直感的な動作になっていますね
+- セットは再帰的に差分を取らない。
+  #+begin_src clojure
+    (t/is (= [#{[1 2]} #{[2 3] 5} #{4 3}]
+             (data/diff #{[1 2] 3 4}
+                        #{[2 3] 3 4 5})))
+  #+end_src
+  セットの場合、要素がコレクションだったとしても再帰的に比較しません。そのためこの例では =1= がセット内のリスト内の共通要素ですが、全体が差分として計算されています。
+  セットの場合、順序が存在しないのでそもそも =[1 2]= と =[2 3]= を比較しなければならないということを判断するのが難しいです。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
