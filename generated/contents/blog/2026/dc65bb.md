@@ -1,5 +1,5 @@
 Title: Lean 4で証明した関数をPythonから呼べるlean-pyを作った
-Date: 2026-11-09 15:46
+Date: 2026-11-11 13:59
 Draft: true
 
 
