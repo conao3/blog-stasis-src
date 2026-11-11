@@ -18729,7 +18729,6 @@ Rustのコードが同じ計算をすることは、lean-rsの変換が正しい
 :properties:
 :export_file_name: generated/contents/blog/2026/dc65bb
 :export_date: 2026-11-11 13:59
-:export_draft: t
 :end:
 
 Lean 4で書いて証明した関数をPythonから呼べるようにする、lean-pyを作りました。
