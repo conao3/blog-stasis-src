@@ -153,7 +153,7 @@ article > header {
     margin-bottom: var(--spacing-600);
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5 {
     word-break: auto-phrase;
 }
 
@@ -201,16 +201,16 @@ article > header .post-meta {
     width: 14px;
 }
 
-.content h1,
 .content h2,
 .content h3,
 .content h4,
+.content h5,
 .post-list h2 {
     color: var(--gray-900);
     line-height: var(--heading-cjk-line-height);
 }
 
-.content h1,
+.content h2,
 .post-list h2 {
     border-bottom: var(--border-width-100) solid var(--gray-300);
     font-size: var(--heading-cjk-size-l);
@@ -218,13 +218,13 @@ article > header .post-meta {
     padding-bottom: var(--spacing-100);
 }
 
-.content h2 {
+.content h3 {
     font-size: var(--heading-cjk-size-m);
     margin: var(--spacing-600) 0 var(--spacing-200);
 }
 
-.content h3,
-.content h4 {
+.content h4,
+.content h5 {
     font-size: var(--heading-cjk-size-s);
     margin: var(--spacing-500) 0 var(--spacing-200);
 }
@@ -448,7 +448,7 @@ pre code {
         font-size: var(--heading-cjk-size-l);
     }
 
-    .content h1,
+    .content h2,
     .post-list h2 {
         font-size: var(--heading-cjk-size-m);
     }

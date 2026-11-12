@@ -13,6 +13,8 @@
 
 (def blog-name "Conao3 Notes")
 (def site-url "https://s.conao3.com")
+(def site-description
+  "conao3 (Naoya Yamashita) の技術ブログ。Emacs Lisp、Lean 4、Clojure、Rust、Python、TypeScript で作ったものと調べたことを書いています。")
 (def stasis-config {:stasis/ignore-nil-pages? true})
 
 
@@ -192,6 +194,16 @@
       :else text)))
 
 
+(defn demote-headings
+  [document]
+  (doseq [node (tree-seq some?
+                         #(take-while some? (iterate (fn [node] (.getNext node)) (.getFirstChild %)))
+                         document)
+          :when (instance? org.commonmark.node.Heading node)]
+    (.setLevel node (min 6 (inc (.getLevel node)))))
+  document)
+
+
 (defn parse-markdown
   [s]
   (let [[header body] (str/split s #"\n\n" 2)
@@ -202,7 +214,7 @@
         document (join-cjk-lines (.parse markdown-parser (or body "")))]
     {:metadata metadata
      :description (markdown-description document)
-     :html (.render markdown-renderer (link-images document))}))
+     :html (.render markdown-renderer (link-images (demote-headings document)))}))
 
 
 (defn slurp-binary-directory
@@ -227,6 +239,18 @@
 (defn og-image-path
   [path]
   (str "/og" (str/replace path #"\.html$" ".png")))
+
+
+(defn rfc3339
+  [datetime]
+  (let [s (str/replace datetime " " "T")
+        local (java.time.LocalDateTime/parse
+                (cond
+                  (re-matches #"\d{4}-\d{2}-\d{2}" s) (str s "T00:00")
+                  :else (subs s 0 (min 19 (count s)))))
+        zone (if (neg? (compare s "2026-04-01")) "Asia/Tokyo" "America/Toronto")]
+    (.format (.atZone local (java.time.ZoneId/of zone))
+             java.time.format.DateTimeFormatter/ISO_OFFSET_DATE_TIME)))
 
 
 (defn markdown-path
@@ -328,6 +352,42 @@
        "- llms.txt: " site-url "/llms.txt\n"))
 
 
+(defn xml-escape
+  [s]
+  (-> (str s)
+      (str/replace "&" "&amp;")
+      (str/replace "<" "&lt;")
+      (str/replace ">" "&gt;")
+      (str/replace "\"" "&quot;")))
+
+
+(defn atom-feed
+  [posts]
+  (let [entries (take 30 posts)]
+    (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+         "<feed xmlns=\"http://www.w3.org/2005/Atom\" xml:lang=\"ja\">\n"
+         "  <title>" (xml-escape blog-name) "</title>\n"
+         "  <subtitle>" (xml-escape site-description) "</subtitle>\n"
+         "  <id>" site-url "/</id>\n"
+         "  <link rel=\"alternate\" type=\"text/html\" href=\"" site-url "/\"/>\n"
+         "  <link rel=\"self\" type=\"application/atom+xml\" href=\"" site-url "/feed.xml\"/>\n"
+         "  <updated>" (rfc3339 (:datetime (second (first entries)))) "</updated>\n"
+         "  <author><name>conao3 (Naoya Yamashita)</name><uri>" site-url (portfolio/urls :en) "</uri></author>\n"
+         "  <icon>" site-url "/assets/icon.jpg</icon>\n"
+         (->> entries
+              (map (fn [[path {:keys [title url datetime description lang]}]]
+                     (str "  <entry>\n"
+                          "    <title>" (xml-escape title) "</title>\n"
+                          "    <id>" url "</id>\n"
+                          "    <link rel=\"alternate\" type=\"text/html\" href=\"" url "\"/>\n"
+                          "    <published>" (rfc3339 datetime) "</published>\n"
+                          "    <updated>" (rfc3339 datetime) "</updated>\n"
+                          (when description (str "    <summary xml:lang=\"" (or lang "ja") "\">" (xml-escape description) "</summary>\n"))
+                          "  </entry>\n")))
+              (apply str))
+         "</feed>\n")))
+
+
 (defn sitemap-xml
   [pages]
   (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -368,22 +428,26 @@
                 "name" blog-name
                 "url" (str site-url "/")
                 "inLanguage" "ja"
-                "description" (str "conao3 (Naoya Yamashita) の技術ブログ")
+                "description" site-description
                 "author" author}
                (assoc author "description" (get-in portfolio/pages [:en :description]))]}
 
     post?
     {"@context" "https://schema.org"
-     "@type" "BlogPosting"
-     "headline" title
-     "description" description
-     "url" (page-url path)
-     "mainEntityOfPage" (page-url path)
-     "datePublished" datetime
-     "inLanguage" (or lang "ja")
-     "image" (str site-url (og-image-path path))
-     "author" author
-     "publisher" author}
+     "@graph" [{"@type" "BlogPosting"
+                "headline" title
+                "description" description
+                "url" (page-url path)
+                "mainEntityOfPage" (page-url path)
+                "datePublished" (rfc3339 datetime)
+                "inLanguage" (or lang "ja")
+                "image" (str site-url (og-image-path path))
+                "isPartOf" {"@type" "Blog" "name" blog-name "url" (str site-url "/")}
+                "author" author
+                "publisher" author}
+               {"@type" "BreadcrumbList"
+                "itemListElement" [{"@type" "ListItem" "position" 1 "name" blog-name "item" (str site-url "/")}
+                                   {"@type" "ListItem" "position" 2 "name" title "item" (page-url path)}]}]}
 
     (= og-type "profile")
     {"@context" "https://schema.org"
@@ -393,14 +457,24 @@
      "mainEntity" (assoc author "description" description)}))
 
 
+(def og-locales
+  {"ja" "ja_JP" "en" "en_US"})
+
+
 (defn render-page
-  [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown?] :as page}]
+  [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown? post? datetime alternates] :as page}]
   (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
-                      [:title (format "%s - %s" title blog-name)]
+                      [:title (if (= title blog-name) blog-name (format "%s - %s" title blog-name))]
+                      [:meta {:name "author" :content "conao3 (Naoya Yamashita)"}]
+                      [:meta {:name "theme-color" :content "#1d1d1d"}]
                       [:link {:rel "icon" :href "/assets/icon.jpg"}]
+                      [:link {:rel "apple-touch-icon" :href "/assets/icon.jpg"}]
+                      [:link {:rel "alternate" :type "application/atom+xml" :title blog-name :href "/feed.xml"}]
+                      (for [[hreflang href] alternates]
+                        [:link {:rel "alternate" :hreflang hreflang :href (str site-url href)}])
                       (when-not not-found?
                         [:link {:rel "canonical" :href (page-url path)}])
                       (when markdown?
@@ -413,11 +487,20 @@
                       [:meta {:property "og:type" :content (or og-type (if (= path "/index.html") "website" "article"))}]
                       [:meta {:property "og:url" :content (page-url path)}]
                       (when-not not-found?
-                        [:meta {:property "og:image" :content (str site-url (og-image-path path))}])
+                        (list [:meta {:property "og:image" :content (str site-url (og-image-path path))}]
+                              [:meta {:property "og:image:width" :content "1200"}]
+                              [:meta {:property "og:image:height" :content "630"}]
+                              [:meta {:property "og:image:alt" :content title}]))
                       [:meta {:property "og:site_name" :content blog-name}]
+                      [:meta {:property "og:locale" :content (get og-locales (or lang "ja") "ja_JP")}]
+                      (when (and post? datetime)
+                        (list [:meta {:property "article:published_time" :content (rfc3339 datetime)}]
+                              [:meta {:property "article:author" :content (str site-url (portfolio/urls :en))}]))
                       (when description
                         [:meta {:property "og:description" :content description}])
                       [:meta {:name "twitter:card" :content "summary_large_image"}]
+                      [:meta {:name "twitter:site" :content "@conao_3"}]
+                      [:meta {:name "twitter:creator" :content "@conao_3"}]
                       (when-let [data (json-ld path page)]
                         [:script {:type "application/ld+json"}
                          (hiccup/raw (str/replace (json/write-str data :escape-slash false :escape-unicode false) "</" "<\\/"))])
@@ -530,7 +613,16 @@
         posts (->> contents
                    (filter (comp :post? second))
                    (sort-by (fn [[k v]] [(:datetime v) k]))
-                   reverse)]
+                   reverse)
+        portfolio-alternates (let [langs (filter #(contains? contents (portfolio/paths %)) [:en :ja])]
+                               (when (< 1 (count langs))
+                                 (concat (map (fn [lang] [(name lang) (portfolio/urls lang)]) langs)
+                                         [["x-default" (portfolio/urls :en)]])))
+        contents (-> contents
+                     (update "/index.html" assoc
+                             :description site-description
+                             :date (:date (second (first posts))))
+                     (update-vals #(cond-> % (:portfolio? %) (assoc :alternates portfolio-alternates))))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
        :markdown (-> (into {}
@@ -540,7 +632,8 @@
                             "/404.md" not-found-markdown))
        :agents {"/sitemap.xml" (sitemap-xml (dissoc contents "/404.html"))
                 "/robots.txt" robots-txt
-                "/llms.txt" (llms-txt posts)}
+                "/llms.txt" (llms-txt posts)
+                "/feed.xml" (atom-feed posts)}
        :og-images (into {}
                         (keep (fn [[path page]]
                                (when-not (:not-found? page)
