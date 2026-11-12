@@ -229,14 +229,182 @@
   (str "/og" (str/replace path #"\.html$" ".png")))
 
 
+(defn markdown-path
+  [path]
+  (str/replace path #"\.html$" ".md"))
+
+
+(def author
+  {"@type" "Person"
+   "name" "Naoya Yamashita"
+   "alternateName" "conao3"
+   "url" (str site-url (portfolio/urls :en))
+   "image" (str site-url "/assets/icon.jpg")
+   "jobTitle" "Software Engineer"
+   "sameAs" ["https://github.com/conao3"
+             "https://x.com/conao_3"
+             "https://www.linkedin.com/in/conao3/"
+             portfolio/tech-book-fest]})
+
+
+(defn decode-tex
+  [s]
+  (str/trim (String. (.decode (java.util.Base64/getDecoder) s) "UTF-8")))
+
+
+(defn plain-markdown
+  [body]
+  (-> body
+      (str/replace #"<div class=\"github-card\" data-repo=\"([^\"]+)\"><a href=\"([^\"]+)\">.*?(?:<span class=\"github-card-description\">(.*?)</span>.*?)?</a></div>"
+                   (fn [[_ repo href description]]
+                     (str "[" repo "](" href ")" (when description (str ": " description)))))
+      (str/replace #"<(?:span|div) class=\"math display\" data-tex=\"([^\"]*)\"></(?:span|div)>"
+                   (fn [[_ tex]] (str "$$" (decode-tex tex) "$$")))
+      (str/replace #"<span class=\"math\" data-tex=\"([^\"]*)\"></span>"
+                   (fn [[_ tex]] (str "$" (decode-tex tex) "$")))
+      (str/replace #"<span class=\"footnote\">(?:<sup>, </sup>)?<sup><button [^>]*>(\d+)</button></sup><span class=\"footnote-body\"[^>]*>.*?</span></span>"
+                   "[^$1]")
+      (str/replace #"(?m)^<sup><a id=\"fn\.(\d+)\" href=\"#fnr\.\d+\">\d+</a></sup> " "[^$1]: ")
+      (str/replace #"\]\((?:\.\./)+resources/public/" (str "](" site-url "/"))
+      (str/replace #"\n{3,}" "\n\n")
+      str/trim))
+
+
+(defn post-markdown
+  [{:keys [title date url]} body]
+  (str "# " title "\n\n"
+       (when date (str "Date: " date "\n"))
+       "URL: " url "\n"
+       "Author: conao3 (Naoya Yamashita)\n\n"
+       (plain-markdown body) "\n"))
+
+
+(defn post-list-markdown
+  [posts]
+  (->> posts
+       (map (fn [[path {:keys [title date]}]]
+              (str "- " date " [" title "](" site-url (markdown-path path) ")")))
+       (str/join "\n")))
+
+
+(defn index-markdown
+  [posts]
+  (str "# " blog-name "\n\n"
+       "conao3 (Naoya Yamashita) の技術ブログです。Emacs Lisp、Lean 4、Clojure、Rust、Python、TypeScript などで作ったものと調べたことを日本語で書いています。\n\n"
+       "- Portfolio (English): " site-url (portfolio/urls :en) "\n"
+       "- ポートフォリオ: " site-url (portfolio/urls :ja) "\n"
+       "- GitHub: https://github.com/conao3\n"
+       "- X: https://x.com/conao_3\n"
+       "- Sitemap: " site-url "/sitemap.xml\n\n"
+       "各記事は、記事の URL に `Accept: text/markdown` を付けて取るか、末尾に `.md` を付けた URL で Markdown として読めます。\n\n"
+       "## Blogs\n\n"
+       (post-list-markdown posts) "\n"))
+
+
+(defn llms-txt
+  [posts]
+  (str "# " blog-name "\n\n"
+       "> conao3 (Naoya Yamashita) の個人の技術ブログ。Emacs Lisp のパッケージ (leaf.el など)、Lean 4 で証明した関数を他の言語から呼ぶライブラリ (lean-leanfran)、Clojure・Rust・Python・TypeScript での開発の記録を日本語で書いている。\n\n"
+       "## When to use\n\n"
+       "- conao3 が作った OSS (leaf.el、ox-zenn、lean-clj、lean-rs、lean-py、awsr、plamo-tr-local など) の使い方・設計・作った理由を調べるとき。\n"
+       "- Emacs の設定と Emacs Lisp、Lean 4 での証明と他の言語からの呼び出し、Rust・Python・Clojure のツール作りについて、日本語の実例を探すとき。\n"
+       "- conao3 の経歴や活動を確かめるとき (Portfolio のページ)。\n\n"
+       "## How to read\n\n"
+       "- 記事の URL に `Accept: text/markdown` を付けて GET すると Markdown が返る。末尾に `.md` を付けた URL でも同じ Markdown を取れる。\n"
+       "- 全ページの一覧は " site-url "/sitemap.xml にある。\n\n"
+       "## Pages\n\n"
+       "- [Portfolio (English)](" site-url (portfolio/urls :en) ")\n"
+       "- [ポートフォリオ](" site-url (portfolio/urls :ja) ")\n\n"
+       "## Blogs\n\n"
+       (post-list-markdown posts) "\n"))
+
+
+(def not-found-markdown
+  (str "# 404 Not Found\n\n"
+       "お探しのページは、移動したか削除された可能性があります。\n"
+       "The page you are looking for may have been moved or deleted.\n\n"
+       "- Home: " site-url "/\n"
+       "- Sitemap: " site-url "/sitemap.xml\n"
+       "- llms.txt: " site-url "/llms.txt\n"))
+
+
+(defn sitemap-xml
+  [pages]
+  (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+       "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n"
+       (->> pages
+            (sort-by first)
+            (map (fn [[path {:keys [date]}]]
+                   (str "  <url><loc>" (page-url path) "</loc>"
+                        (when date (str "<lastmod>" date "</lastmod>"))
+                        "</url>\n")))
+            (apply str))
+       "</urlset>\n"))
+
+
+(def ai-user-agents
+  ["GPTBot" "OAI-SearchBot" "ChatGPT-User" "ClaudeBot" "Claude-User" "Claude-SearchBot"
+   "PerplexityBot" "Perplexity-User" "Google-Extended" "Applebot-Extended" "CCBot"])
+
+
+(def robots-txt
+  (str "User-agent: *\n"
+       "Content-Signal: search=yes, ai-input=yes, ai-train=no\n"
+       "Allow: /\n\n"
+       (->> ai-user-agents
+            (map #(str "User-agent: " % "\n"))
+            (apply str))
+       "Content-Signal: search=yes, ai-input=yes, ai-train=no\n"
+       "Allow: /\n\n"
+       "Sitemap: " site-url "/sitemap.xml\n"))
+
+
+(defn json-ld
+  [path {:keys [title description lang datetime post? og-type]}]
+  (cond
+    (= path "/index.html")
+    {"@context" "https://schema.org"
+     "@graph" [{"@type" "WebSite"
+                "name" blog-name
+                "url" (str site-url "/")
+                "inLanguage" "ja"
+                "description" (str "conao3 (Naoya Yamashita) の技術ブログ")
+                "author" author}
+               (assoc author "description" (get-in portfolio/pages [:en :description]))]}
+
+    post?
+    {"@context" "https://schema.org"
+     "@type" "BlogPosting"
+     "headline" title
+     "description" description
+     "url" (page-url path)
+     "mainEntityOfPage" (page-url path)
+     "datePublished" datetime
+     "inLanguage" (or lang "ja")
+     "image" (str site-url (og-image-path path))
+     "author" author
+     "publisher" author}
+
+    (= og-type "profile")
+    {"@context" "https://schema.org"
+     "@type" "ProfilePage"
+     "url" (page-url path)
+     "inLanguage" lang
+     "mainEntity" (assoc author "description" description)}))
+
+
 (defn render-page
-  [path {:keys [title body description lang og-type draft? portfolio-href not-found?]}]
+  [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown?] :as page}]
   (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
                       [:title (format "%s - %s" title blog-name)]
                       [:link {:rel "icon" :href "/assets/icon.jpg"}]
+                      (when-not not-found?
+                        [:link {:rel "canonical" :href (page-url path)}])
+                      (when markdown?
+                        [:link {:rel "alternate" :type "text/markdown" :href (markdown-path path)}])
                       (when not-found?
                         [:meta {:name "robots" :content "noindex"}])
                       (when description
@@ -250,6 +418,9 @@
                       (when description
                         [:meta {:property "og:description" :content description}])
                       [:meta {:name "twitter:card" :content "summary_large_image"}]
+                      (when-let [data (json-ld path page)]
+                        [:script {:type "application/ld+json"}
+                         (hiccup/raw (str/replace (json/write-str data :escape-slash false :escape-unicode false) "</" "<\\/"))])
                       [:style (hiccup/raw (inline-style))]
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
@@ -315,6 +486,8 @@
                                         :lang (:lang (:metadata p))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
+                                        :markdown? true
+                                        :source (second (str/split v #"\n\n" 2))
                                         :body (:html p)}]
                                [path (assoc obj :body (render-content obj))])))
                       (into {})
@@ -353,9 +526,21 @@
                                                   [:div {:class "content"}
                                                    [:p "お探しのページは、移動したか削除された可能性があります。"]
                                                    [:p {:lang "en"} "The page you are looking for may have been moved or deleted."]
-                                                   [:p [:a {:href "/"} "トップページへ"] " / " [:a {:href (portfolio/urls :ja)} "ポートフォリオ"] " / " [:a {:href (portfolio/urls :en) :lang "en"} "Portfolio"]]]])}))]
+                                                   [:p [:a {:href "/"} "トップページへ"] " / " [:a {:href (portfolio/urls :ja)} "ポートフォリオ"] " / " [:a {:href (portfolio/urls :en) :lang "en"} "Portfolio"]]]])}))
+        posts (->> contents
+                   (filter (comp :post? second))
+                   (sort-by (fn [[k v]] [(:datetime v) k]))
+                   reverse)]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
+       :markdown (-> (into {}
+                           (map (fn [[path page]] [(markdown-path path) (post-markdown page (:source page))]))
+                           posts)
+                     (assoc "/index.md" (index-markdown posts)
+                            "/404.md" not-found-markdown))
+       :agents {"/sitemap.xml" (sitemap-xml (dissoc contents "/404.html"))
+                "/robots.txt" robots-txt
+                "/llms.txt" (llms-txt posts)}
        :og-images (into {}
                         (keep (fn [[path page]]
                                (when-not (:not-found? page)

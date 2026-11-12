@@ -70,7 +70,9 @@ make build
 
 ## Deployment
 
-The site is the Cloudflare Worker `blog-stasis-src`, which serves `target/` as static assets on the custom domain s.conao3.com (`wrangler.toml`). Workers Builds is connected to this repository: pushing to `master` runs `./bin/build` and then `npx wrangler deploy`.
+The site is the Cloudflare Worker `blog-stasis-src`, which serves `target/` as static assets on the custom domain s.conao3.com (`wrangler.toml`). Deploy by running the `deploy` workflow (`.github/workflows/deploy.yml`) on `master`; it runs `make build` and then `npx wrangler deploy`.
+
+The Worker script (`worker/index.js`) runs before the static assets. A request whose `Accept` header names `text/markdown` at least as high as `text/html` gets the Markdown version of the page (`<path>.md`, built from `generated/contents/`) with `Vary: Accept`, and a missing page then returns `404.md` with status 404. HTML responses carry a `Link` header pointing to the Markdown version, `sitemap.xml` and `llms.txt`. The build also writes `robots.txt`, `sitemap.xml`, `llms.txt`, and JSON-LD (`WebSite` and `Person` on the top page, `BlogPosting` on posts).
 
 The build reads the Markdown files committed under `generated/contents/`, so a post goes live only after its exported Markdown is committed. Posts and pages marked as drafts (`Draft: true` in the Markdown header, or `:export_draft: t` in `contents.org`) appear on the dev server but are left out of the build.
 
