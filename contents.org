@@ -20260,18 +20260,22 @@ Leanの組み込みの関数は、LeanのCのruntimeの =lean.h= に合わせて
 LeanでTypeScriptの関数を書けるようにし、Leanの型をStandard Schemaのschemaにし、TypeScriptの関数をLeanで証明できるようにしました。
 使い方を1つずつ試せるサンプルは[[https://github.com/conao3/lean-leanfran/tree/master/TypeScript/samples][samples]]にあります。
 
-* Leanで証明した関数を4つの言語で使うleanfranを作った
+* LeanとRust・Python・TypeScript・Clojureを双方向につなぐleanfranを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/23d62c
 :export_date: 2026-11-13 12:21
 :end:
 Lean 4で書いて証明した関数を、Rust、Python、TypeScript、Clojureから呼べるleanfranを作りました。
-Leanのコンパイラの中間表現から各言語のソースを生成し、その言語のライブラリとして使えるようにします。
+逆向きに、各言語で書いた関数をLeanに翻訳し、その性質を証明することもできます。
+Leanで証明した実装をアプリケーションに組み込む使い方と、普段の言語で書いた実装をLeanで検証する使い方があります。
+Leanから各言語への生成では、コンパイラの中間表現を読み、その言語のライブラリを作ります。
 生成したコードは、各言語の実行環境とleanfranの実行時ライブラリで動きます。
 リポジトリは[[https://github.com/conao3/lean-leanfran][conao3/lean-leanfran]]で、ライセンスはApache-2.0です。
 この記事はv0.5.0の機能を紹介します。
 
 [[github:conao3/lean-leanfran::TypeScript][Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure]]
+
+[[./resources/public/img/23d62c-backends.svg]]
 
 ** 証明した関数をアプリケーションで使う
 Leanは関数を書き、その関数の性質を証明できる言語です。
@@ -20294,10 +20298,9 @@ Leanはこの証明を検査し、すべての自然数で等式が成り立つ�
 leanfranはLeanの関数からアプリケーションの言語のソースを生成します。
 日付や金額の計算、データの整列、状態遷移のような関数をLeanで書き、画面やHTTPの処理を普段使っている言語で書く使い方を想定しています。
 
-[[./resources/public/img/23d62c-backends.svg]]
-
-** 4つの出力先
-leanfranには、出力先の言語ごとに4つのバックエンドがあります。
+** 対応する4つの言語
+leanfranは、Rust、Python、TypeScript、Clojureに対応しています。
+各言語に、Leanからコードを生成する機能と、その言語の関数をLeanに翻訳して検証する機能があります。
 パッケージはそれぞれの言語のレジストリから入れられます。
 
 | 言語 | パッケージ | ソースと使い方 |
@@ -20352,7 +20355,44 @@ Pythonではpydanticのモデルとしてデータを扱えます。
 ** 普段の言語で書いた関数の検証
 逆向きに、Rustなどで書いた関数をLeanの仕様と比べる使い方もあります。
 対応する範囲の関数をLeanに翻訳し、その翻訳について定理を証明します。
-TypeScriptでは、関数に =model= を付け、仕様との一致を表す =refines= や、戻り値の条件を表す =ensures= を指定します。
+
+Rustでは =#[lean_rust::model]= を付けた関数を、CharonとAeneasを使ってLeanのモデルに翻訳します。
+たとえば、入力を2倍し、上限を超えるときは =u32::MAX= を返す関数です。
+[[https://github.com/conao3/lean-leanfran/tree/v0.5.0/Rust/samples/steps/10-ensures][10-ensuresのサンプル]]から抜き出しています。
+
+#+begin_src rust
+#[lean_rust::model(ensures(ge = double::ge))]
+pub fn saturating_double(x: u32) -> u32 {
+    if x > u32::MAX / 2 {
+        u32::MAX
+    } else {
+        x * 2
+    }
+}
+#+end_src
+
+=double::ge= は「戻り値が入力以上になる」という仕様です。
+Leanで次のように定義しています。
+
+#+begin_src lean
+def ge (x r : Std.U32) : Bool := decide (x.val ≤ r.val)
+#+end_src
+
+=cargo lean-rust extract= を実行すると、Rustの関数を翻訳したLeanのモデルと、仕様を満たすことを述べる命題が生成されます。
+サンプルの =lean/Proofs/SaturatingDouble.lean= には、その命題の証明があります。
+
+#+begin_src lean
+theorem saturating_double.proof.ge : saturating_double.obligation.ge := by
+  intro x
+  unfold saturating_double _root_.double.ge
+  step* <;> simp_all [core.num.U32.MAX, U32.rMax] <;> scalar_tac
+#+end_src
+
+=cargo lean-rust check= がこの証明を検査します。
+ここでは、どの入力でも戻り値が入力以上になることに加え、実行される掛け算でオーバーフローしないことも証明します。
+アプリケーションではRustで書いた関数を実行し、その性質をLeanで検証できます。
+
+TypeScriptでも同じ向きの検証ができ、関数に =model= を付け、仕様との一致を表す =refines= や、戻り値の条件を表す =ensures= を指定します。
 
 このとき証明する対象はLeanに翻訳した関数です。
 元の言語での実行に結び付けるには、翻訳が意味を保つことと、翻訳時の前提を守ることが必要です。
