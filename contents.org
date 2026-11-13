@@ -20264,7 +20264,6 @@ LeanでTypeScriptの関数を書けるようにし、Leanの型をStandard Schem
 :properties:
 :export_file_name: generated/contents/blog/2026/23d62c
 :export_date: 2026-11-13 12:21
-:export_draft: t
 :end:
 Lean 4で書いて証明した関数を、Rust、Python、TypeScript、Clojureから呼べるleanfranを作りました。
 Leanのコンパイラの中間表現から各言語のソースを生成し、その言語のライブラリとして使えるようにします。
