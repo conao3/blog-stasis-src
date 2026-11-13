@@ -20356,7 +20356,7 @@ Pythonではpydanticのモデルとしてデータを扱えます。
 逆向きに、Rustなどで書いた関数をLeanの仕様と比べる使い方もあります。
 対応する範囲の関数をLeanに翻訳し、その翻訳について定理を証明します。
 
-Rustでは =#[lean_rust::model]= を付けた関数を、CharonとAeneasを使ってLeanのモデルに翻訳します。
+Rustでは =#[lean_rust::model]= を付けた関数をLeanのモデルに翻訳します。
 たとえば、入力を2倍し、上限を超えるときは =u32::MAX= を返す関数です。
 [[https://github.com/conao3/lean-leanfran/tree/v0.5.0/Rust/samples/steps/10-ensures][10-ensuresのサンプル]]から抜き出しています。
 

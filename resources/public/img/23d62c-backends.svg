@@ -15,7 +15,7 @@
 <rect x="370" y="340" width="260" height="140" rx="12" fill="#e1f5ed"/>
 <rect x="720" y="340" width="240" height="140" rx="12" fill="#eef1f5"/>
 <g text-anchor="middle"><text x="160" y="390" class="node">Lean 4</text><text x="160" y="432" class="description">翻訳したモデル</text><text x="160" y="461" class="description">性質を証明する</text>
-<text x="500" y="390" class="node">leanfran</text><text x="500" y="432" class="description">対応する関数を翻訳</text><text x="500" y="461" class="description">RustはCharon + Aeneas</text>
+<text x="500" y="390" class="node">leanfran</text><text x="500" y="432" class="description">対応する関数を翻訳</text>
 <text x="840" y="390" class="node">Rust / Python</text><text x="840" y="425" class="node">TypeScript / Clojure</text><text x="840" y="460" class="description">各言語で書いた関数</text></g>
 </g>
 <g fill="none" stroke-width="3"><path d="M285 150H355" stroke="#276749" marker-end="url(#forward)"/><path d="M635 150H705" stroke="#276749" marker-end="url(#forward)"/><path d="M715 410H645" stroke="#285ea8" marker-end="url(#reverse)"/><path d="M365 410H295" stroke="#285ea8" marker-end="url(#reverse)"/></g>
