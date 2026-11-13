@@ -1,21 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="510" viewBox="0 0 1000 510">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="408" viewBox="0 0 1000 510">
 <rect width="1000" height="510" rx="16" fill="white"/>
 <defs><marker id="forward" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#276749" stroke-width="1.5"/></marker><marker id="reverse" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#285ea8" stroke-width="1.5"/></marker></defs>
 <g font-family="sans-serif" fill="#172b4d">
-<text x="40" y="48" font-size="25" font-weight="bold">Leanで証明した関数を、普段の言語で使う</text>
+<text x="40" y="48" font-size="30" font-weight="bold">Leanで証明した関数を、普段の言語で使う</text>
 <rect x="40" y="85" width="240" height="130" rx="12" fill="#e7f0ff"/>
 <rect x="370" y="85" width="260" height="130" rx="12" fill="#e1f5ed"/>
 <rect x="720" y="85" width="240" height="130" rx="12" fill="#eef1f5"/>
-<g text-anchor="middle"><text x="160" y="130" font-size="25">Lean 4</text><text x="160" y="174" font-size="20">関数と性質の証明</text>
-<text x="500" y="130" font-size="25">leanfran</text><text x="500" y="174" font-size="20">中間表現からコード生成</text>
-<text x="840" y="125" font-size="21">Rust / Python</text><text x="840" y="160" font-size="21">TypeScript / Clojure</text><text x="840" y="195" font-size="19">アプリから呼び出す</text></g>
-<text x="40" y="300" font-size="25" font-weight="bold">普段の言語で書いた関数を、Leanで検証する</text>
+<g text-anchor="middle"><text x="160" y="130" font-size="30">Lean 4</text><text x="160" y="174" font-size="26">関数と性質の証明</text>
+<text x="500" y="130" font-size="30">leanfran</text><text x="500" y="174" font-size="22">中間表現からコード生成</text>
+<text x="840" y="125" font-size="26">Rust / Python</text><text x="840" y="160" font-size="26">TypeScript / Clojure</text><text x="840" y="195" font-size="26">アプリから呼び出す</text></g>
+<text x="40" y="300" font-size="30" font-weight="bold">普段の言語で書いた関数を、Leanで検証する</text>
 <rect x="40" y="340" width="240" height="140" rx="12" fill="#e7f0ff"/>
 <rect x="370" y="340" width="260" height="140" rx="12" fill="#e1f5ed"/>
 <rect x="720" y="340" width="240" height="140" rx="12" fill="#eef1f5"/>
-<g text-anchor="middle"><text x="160" y="390" font-size="25">Lean 4</text><text x="160" y="432" font-size="20">翻訳したモデル</text><text x="160" y="461" font-size="20">性質を証明する</text>
-<text x="500" y="390" font-size="25">leanfran</text><text x="500" y="432" font-size="20">対応する関数を翻訳</text><text x="500" y="461" font-size="19">RustはCharon + Aeneas</text>
-<text x="840" y="390" font-size="21">Rust / Python</text><text x="840" y="425" font-size="21">TypeScript / Clojure</text><text x="840" y="460" font-size="19">各言語で書いた関数</text></g>
+<g text-anchor="middle"><text x="160" y="390" font-size="30">Lean 4</text><text x="160" y="432" font-size="26">翻訳したモデル</text><text x="160" y="461" font-size="26">性質を証明する</text>
+<text x="500" y="390" font-size="30">leanfran</text><text x="500" y="432" font-size="26">対応する関数を翻訳</text><text x="500" y="461" font-size="22">RustはCharon + Aeneas</text>
+<text x="840" y="390" font-size="26">Rust / Python</text><text x="840" y="425" font-size="26">TypeScript / Clojure</text><text x="840" y="460" font-size="26">各言語で書いた関数</text></g>
 </g>
 <g fill="none" stroke-width="3"><path d="M285 150H355" stroke="#276749" marker-end="url(#forward)"/><path d="M635 150H705" stroke="#276749" marker-end="url(#forward)"/><path d="M715 410H645" stroke="#285ea8" marker-end="url(#reverse)"/><path d="M365 410H295" stroke="#285ea8" marker-end="url(#reverse)"/></g>
 </svg>
