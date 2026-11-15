@@ -63,8 +63,15 @@ def main():
     threads.sort(key=lambda r: priority.get(r['label'], 5))
     fig, axes = plt.subplots(7, 3, figsize=(13, 13), sharex=True, sharey=True)
     for ax, row in zip(axes.flat, threads):
-        points = row['points']
-        ax.plot([stamp(p['at']) for p in points], [p['input'] / 1000 for p in points],
+        xs, ys = [], []
+        for p in row['points']:
+            at = stamp(p['at'])
+            if xs and at - xs[-1] > dt.timedelta(minutes=30):
+                xs.append(at)
+                ys.append(float('nan'))
+            xs.append(at)
+            ys.append(p['input'] / 1000)
+        ax.plot(xs, ys,
                 color=palette[0 if row['label'] == 'Main' else 1 if row['label'] == 'Meta' else 2], lw=1.2)
         for c in row['compactions']:
             ax.axvline(stamp(c['end']), color='#111111', ls=':', lw=1)
