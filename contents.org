@@ -20490,7 +20490,7 @@ T3 Codeで複数のAIエージェントを動かし、PayProofという請求書
 ** 作ったものとイベントの条件
 
 参加したのは2026年11月14日にトロントで開催された [[https://cerebralvalley.ai/e/mongodb-toronto-hackathon][Agents in Context Toronto: a MongoDB Hackathon]] です。
-MongoDB Atlasを使って業務を進めるAIエージェントを作るイベントで、課題はAgents You Can Audit、Memory You Can Govern、Finish the Jobの3つでした。
+MongoDB Atlasを使って業務を進めるAIエージェントを作るイベントで、 [[https://cerebralvalley.ai/e/mongodb-toronto-hackathon/details][参加者ガイド]] に示された課題はAgents You Can Audit、Memory You Can Govern、Finish the Jobの3つでした。
 私はAgents You Can Auditを選びました。
 チームは1人から4人まで組め、開会の10:00から提出締切の17:00までは7時間です。
 提出物は公開リポジトリ、1分のデモ動画、短い作品説明でした。
