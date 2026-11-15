@@ -20448,7 +20448,8 @@ T3 Codeで複数のAIエージェントを動かし、PayProofという請求書
 ** 作ったものとイベントの条件
 
 参加したのは2026年11月14日にトロントで開催された [[https://cerebralvalley.ai/e/mongodb-toronto-hackathon][Agents in Context Toronto: a MongoDB Hackathon]] です。
-MongoDB Atlasを使い、実際の業務を継続して処理できるエージェントを作るイベントで、私は「Agents You Can Audit」という課題を選びました。
+MongoDB Atlasを使い、実際の業務を継続して処理できるエージェントを作るイベントです。
+課題はAgents You Can Audit、Memory You Can Govern、Finish the Jobの3つから1つを選ぶ形で、私はAgents You Can Auditを選びました。
 提出締切は17:00で、公開リポジトリ、1分のデモ動画、短い作品説明が必要でした。
 
 PayProofは請求書のメールに普段と違う振込先が書いてあったら、支払いを保留するアプリです。
