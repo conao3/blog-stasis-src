@@ -20499,7 +20499,6 @@ Leanの型と仕様を、複数の言語で使う共通語にしたいと考え�
 :properties:
 :export_file_name: generated/contents/blog/2026/bd0d48
 :export_date: 2026-11-14 20:15
-:export_draft: t
 :end:
 
 トロントのMongoDBハッカソンに1人で参加しました。
@@ -20960,7 +20959,6 @@ PayProof自体も人間の確認と特定の支払いへの承認を扱うアプ
 :properties:
 :export_file_name: generated/contents/blog/2026/2baf8e
 :export_date: 2026-11-14 20:15
-:export_draft: t
 :export_lang: en
 :end:
 
