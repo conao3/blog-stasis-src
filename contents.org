@@ -96,11 +96,53 @@
      (format "<span class=\"github-card-star\">%s<span>Star</span><span class=\"github-card-star-count\" hidden></span></span>" stasis-md-github-star-icon)
      "</span></a></div>")))
 
+(org-link-set-parameters "tweet")
+
+(defconst stasis-md-x-logo
+  "<svg class=\"tweet-card-logo\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\"/></svg>")
+
+(defun stasis-md-tweet-time (id)
+  (let ((ms (+ (ash (string-to-number id) -22) 1288834974657)))
+    (seconds-to-time (/ ms 1000))))
+
+(defun stasis-md-tweet-card (path desc)
+  (let* ((parts (split-string path "::"))
+         (status (car parts))
+         (zone (or (cadr parts) "Asia/Tokyo"))
+         (user (car (split-string status "/")))
+         (id (cadr (split-string status "/")))
+         (time (stasis-md-tweet-time id))
+         (images (seq-filter
+                  (lambda (file) (file-exists-p (concat "resources/public" file)))
+                  (mapcar (lambda (n) (format "/img/tweet-%s-%d.jpg" id n)) '(1 2 3 4)))))
+    (concat
+     (format "<div class=\"tweet-card\"><a href=\"https://x.com/%s/status/%s\">" user id)
+     "<span class=\"tweet-card-header\">"
+     (if (string= user "conao_3") "<img class=\"tweet-card-avatar\" src=\"/assets/icon.jpg\" alt=\"\">" "")
+     (format "<span class=\"tweet-card-author\"><strong>%s</strong><span>@%s</span></span>"
+             (if (string= user "conao_3") "conao3" user) user)
+     stasis-md-x-logo
+     "</span>"
+     (if desc
+         (format "<span class=\"tweet-card-text\">%s</span>" (org-html-encode-plain-text (string-trim desc)))
+       "")
+     (if images
+         (concat (format "<span class=\"tweet-card-media\" data-count=\"%d\">" (length images))
+                 (mapconcat (lambda (src) (format "<img src=\"%s\" alt=\"ポストの画像\" loading=\"lazy\">" src)) images "")
+                 "</span>")
+       "")
+     (format "<time class=\"tweet-card-time\" datetime=\"%s\">%s</time>"
+             (format-time-string "%FT%T%z" time zone)
+             (format-time-string "%Y-%m-%d %H:%M" time zone))
+     "</a></div>")))
+
 (defun stasis-md-link (link desc info)
   (let ((type (org-element-property :type link)))
     (cond
      ((string= type "github")
       (stasis-md-github-card (org-element-property :path link) desc))
+     ((string= type "tweet")
+      (stasis-md-tweet-card (org-element-property :path link) desc))
      ((string= type "file")
       (let* ((path (org-element-property :path link))
              (new-path (file-relative-name (expand-file-name path)
@@ -20489,6 +20531,8 @@ T3 Codeでは複数の会話を開き、担当ごとに仕事を進めました�
 最終的な集計にはメインとメタに加えて18の派生スレッドが入っています。
 ただし、20体が同時に動いていたわけではありません。
 
+[[tweet:conao_3/2121637194242892170::America/Toronto][ハーネス作り込んでないけどt3-codeのおかげで結構自立動作してくれてるな]]
+
 [[./resources/public/img/bd0d48-hackathon-activity.svg]]
 
 横軸は当日のトロント時刻です。
@@ -20505,6 +20549,8 @@ T3 Codeでは複数の会話を開き、担当ごとに仕事を進めました�
 最初の入力は「今日のイベントの準備しよう」でした。
 リポジトリを作るのは10時以降と決め、それまではルールや提出条件を調べてもらうことにしました。
 ガイドとDiscordで開発開始時刻が食い違っていましたが、当日9:25の運営の回答で開会前からコーディングしてよいと分かりました。
+
+[[tweet:conao_3/2121609435038531999::America/Toronto][Hackathon day in Toronto! #MongoDB #Hackathon]]
 
 9:47には提出用の1分動画をプレーンテキストから作れるツールの調査を頼みました。
 最初に起動したClaudeの調査担当は利用制限で止まってしまい、私が了承してCodexへ切り替えています。
@@ -20538,6 +20584,8 @@ T3 Codeでは複数の会話を開き、担当ごとに仕事を進めました�
 ただし、確かめられたのはHTTPの範囲までです。
 文字サイズ、動画の操作、マイク、スマートフォンの表示には問題が残っていて、それは後で私が実際に使って見つけることになります。
 
+[[tweet:conao_3/2121632169579958378::America/Toronto][実装はLLMがやるから人間は軽食を食べるだけである。がんばえー]]
+
 *** 10:50〜11:18 割り込みのあとに元の依頼が残る
 
 最初に気になったのはSteerの挙動でした。
@@ -20563,6 +20611,8 @@ Steerでコンテキストが消えたと確かめられたわけではありま
 動画はRemotionで実画面、図、字幕、BGMを合成する構成です。
 字幕については10:31の時点で「BIIM兄貴スタイルをトロントで披露しましょう」と注文していました。
 左に実演、右に図解、下に字幕の欄を固定し、英語の字幕を長めに表示します。
+
+[[tweet:conao_3/2121628054669717985::America/Toronto][I will introduce BIIM bro style to toronto bros!]]
 
 作っている途中で次の場面へ移るタイミングが分からないと感じ、右側の説明欄に時間のバーを足しました。
 秒数をラベルで書くより、バーとレイアウトで分かるようにしてほしい、とも頼んでいます。
@@ -20827,7 +20877,7 @@ T3の画面に出ていた使用量の履歴をそのまま復元した値では
 
 ** 記録と集計方法
 
-時系列はT3 Codeの会話と実行記録、CodexとClaudeのネイティブログ、当日保存した運営の案内、Git履歴、当日の私のTwitterの投稿を突き合わせて組み立てました。
+時系列はT3 Codeの会話と実行記録、CodexとClaudeのネイティブログ、当日保存した運営の案内、Git履歴を突き合わせて組み立てました。
 作業ログと使用量の集計は当日の20:08までが対象で、結果発表と作品一覧にはその後の録音や画面も使っています。
 集計したのはメインとメタとその子孫の20スレッドで、この記事を書くために使ったトークンは含めていません。
 Museとの連絡内容は時系列の参考にしましたが、Muse自身の実行ログは使用量の集計に入れていません。
@@ -20845,6 +20895,8 @@ Museとの連絡内容は時系列の参考にしましたが、Muse自身の実
 
 最後に [[https://cerebralvalley.ai/e/mongodb-toronto-hackathon/hackathon/gallery][公式の作品一覧]] を見たら、98作品のうち、PayProofは7番目に載っていました。
 上からLegacy Siege、suture、Musory、One Lesson、Phylax Tower、Day Oneと決勝の6チームが並び、そのすぐ次がPayProofです。
+
+[[tweet:conao_3/2121791043125359076::America/Toronto][Oh my!!!! MY PROJECT IS LISTED 7TH IN THE GALLERY!!! Top 6 teams are today's finalist. And of course, #1 is Legacy Siege!! Congrats :tada: #MongoDB #Hackathon #Toronto]]
 
 #+begin_quote
 非公式7位!!

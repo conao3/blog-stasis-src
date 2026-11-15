@@ -282,6 +282,9 @@
       (str/replace #"<div class=\"github-card\" data-repo=\"([^\"]+)\"><a href=\"([^\"]+)\">.*?(?:<span class=\"github-card-description\">(.*?)</span>.*?)?</a></div>"
                    (fn [[_ repo href description]]
                      (str "[" repo "](" href ")" (when description (str ": " description)))))
+      (str/replace #"<div class=\"tweet-card\"><a href=\"([^\"]+)\">.*?<span class=\"tweet-card-author\"><strong>[^<]*</strong><span>([^<]+)</span></span>.*?(?:<span class=\"tweet-card-text\">(.*?)</span>.*?)?</a></div>"
+                   (fn [[_ href user text]]
+                     (str "[" user "](" href ")" (when text (str ": " text)))))
       (str/replace #"<(?:span|div) class=\"math display\" data-tex=\"([^\"]*)\"></(?:span|div)>"
                    (fn [[_ tex]] (str "$$" (decode-tex tex) "$$")))
       (str/replace #"<span class=\"math\" data-tex=\"([^\"]*)\"></span>"
