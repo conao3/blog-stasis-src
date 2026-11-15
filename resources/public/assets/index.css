@@ -592,3 +592,81 @@ pre code {
     color: var(--gray-600);
     font-size: var(--body-size-xs);
 }
+
+.youtube-card {
+    margin: 0 0 var(--spacing-300);
+}
+
+.youtube-card a {
+    background-color: var(--gray-75);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: var(--corner-radius-200);
+    box-sizing: border-box;
+    color: var(--gray-900);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-200);
+    max-width: 560px;
+    padding: var(--spacing-200);
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.youtube-card a:hover {
+    border-color: var(--gray-500);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.4);
+}
+
+.youtube-card-thumb {
+    aspect-ratio: 16 / 9;
+    border-radius: var(--corner-radius-100);
+    display: block;
+    overflow: hidden;
+    position: relative;
+}
+
+.youtube-card-thumb img {
+    border-radius: 0;
+    display: block;
+    height: 100%;
+    margin: 0;
+    object-fit: cover;
+    width: 100%;
+}
+
+.youtube-card-play {
+    height: 48px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px;
+}
+
+.youtube-card-play-bg {
+    fill: #212121;
+    fill-opacity: 0.8;
+    transition: fill 0.15s, fill-opacity 0.15s;
+}
+
+.youtube-card a:hover .youtube-card-play-bg {
+    fill: #f00;
+    fill-opacity: 1;
+}
+
+.youtube-card-player {
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--corner-radius-100);
+    display: block;
+    width: 100%;
+}
+
+.youtube-card-title {
+    font-size: var(--body-size-s);
+    overflow-wrap: anywhere;
+}
+
+.youtube-card:has(.youtube-card-player) {
+    max-width: 560px;
+}

@@ -285,6 +285,9 @@
       (str/replace #"<div class=\"tweet-card\"><a href=\"([^\"]+)\">.*?<span class=\"tweet-card-author\"><strong>[^<]*</strong><span>([^<]+)</span></span>.*?(?:<span class=\"tweet-card-text\">(.*?)</span>.*?)?</a></div>"
                    (fn [[_ href user text]]
                      (str "[" user "](" href ")" (when text (str ": " text)))))
+      (str/replace #"<div class=\"youtube-card\" data-id=\"[^\"]+\"><a href=\"([^\"]+)\">.*?(?:<span class=\"youtube-card-title\">(.*?)</span>.*?)?</a></div>"
+                   (fn [[_ href title]]
+                     (str "[" (or title "YouTube") "](" href ")")))
       (str/replace #"<(?:span|div) class=\"math display\" data-tex=\"([^\"]*)\"></(?:span|div)>"
                    (fn [[_ tex]] (str "$$" (decode-tex tex) "$$")))
       (str/replace #"<span class=\"math\" data-tex=\"([^\"]*)\"></span>"
@@ -512,7 +515,9 @@
                       (when (str/includes? body "data-tex")
                         [:script {:src "/assets/math.js" :defer true}])
                       (when (str/includes? body "class=\"github-card\"")
-                        [:script {:src "/assets/github-card.js" :defer true}])]
+                        [:script {:src "/assets/github-card.js" :defer true}])
+                      (when (str/includes? body "class=\"youtube-card\"")
+                        [:script {:src "/assets/youtube-card.js" :defer true}])]
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"}

@@ -136,6 +136,23 @@
              (format-time-string "%Y-%m-%d %H:%M" time zone))
      "</a></div>")))
 
+(org-link-set-parameters "youtube")
+
+(defconst stasis-md-play-icon
+  "<svg class=\"youtube-card-play\" viewBox=\"0 0 68 48\" aria-hidden=\"true\"><path class=\"youtube-card-play-bg\" d=\"M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z\"/><path fill=\"#fff\" d=\"M45 24 27 14v20z\"/></svg>")
+
+(defun stasis-md-youtube-card (id desc)
+  (concat
+   (format "<div class=\"youtube-card\" data-id=\"%s\"><a href=\"https://www.youtube.com/watch?v=%s\">" id id)
+   "<span class=\"youtube-card-thumb\">"
+   (format "<img src=\"/img/youtube-%s.jpg\" alt=\"動画のサムネイル\" loading=\"lazy\">" id)
+   stasis-md-play-icon
+   "</span>"
+   (if desc
+       (format "<span class=\"youtube-card-title\">%s</span>" (org-html-encode-plain-text (string-trim desc)))
+     "")
+   "</a></div>"))
+
 (defun stasis-md-link (link desc info)
   (let ((type (org-element-property :type link)))
     (cond
@@ -143,6 +160,8 @@
       (stasis-md-github-card (org-element-property :path link) desc))
      ((string= type "tweet")
       (stasis-md-tweet-card (org-element-property :path link) desc))
+     ((string= type "youtube")
+      (stasis-md-youtube-card (org-element-property :path link) desc))
      ((string= type "file")
       (let* ((path (org-element-property :path link))
              (new-path (file-relative-name (expand-file-name path)
@@ -20512,6 +20531,8 @@ PayProofは、請求書のメールを読んで振込まで処理するエージ
 
 [[https://conao3.github.io/ts-payproof/][紹介サイト]]、[[https://conao3.github.io/ts-payproof/slides/][スライド]]、[[https://conao3.github.io/ts-payproof/cue/][スマートフォン用カンペ]]、[[https://www.youtube.com/watch?v=QneL7pynr7k][提出した1分動画]] を公開しています。
 ソースコードのライセンスはApache-2.0です。
+
+[[youtube:QneL7pynr7k][PayProof | Verify bank changes before invoice payments | MongoDB Toronto Hackathon]]
 
 ** T3 Codeでの体制
 
