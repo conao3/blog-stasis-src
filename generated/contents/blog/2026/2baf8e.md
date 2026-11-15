@@ -116,7 +116,7 @@ The bars include time spent waiting for tools and reports, so a bar's length is 
 My first message of the day was "Let's get ready for today's event."
 According to the organizers, all code had to be written during the event, but we could plan and design before it.
 I felt a little late, and hurried to pick a topic and design the product's features.
-The participant guide said development started at 10:45, but at 9:25 the organizers answered that we could start writing code before the opening.
+The participant guide said development started at 10:45, but at 9:25 the organizers answered that we could start writing code right away.
 I decided to create the repository after the 10:00 opening, and started by going through the rules and submission requirements with an agent.
 
 <div class="tweet-card"><a href="https://x.com/conao_3/status/2121609435038531999"><span class="tweet-card-header"><img class="tweet-card-avatar" src="/assets/icon.jpg" alt=""><span class="tweet-card-author"><strong>conao3</strong><span>@conao_3</span></span><svg class="tweet-card-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span><span class="tweet-card-text">Hackathon day in Toronto! #MongoDB #Hackathon</span><span class="tweet-card-media" data-count="2"><img src="/img/tweet-2121609435038531999-1.jpg" alt="ポストの画像" loading="lazy"><img src="/img/tweet-2121609435038531999-2.jpg" alt="ポストの画像" loading="lazy"></span><time class="tweet-card-time" datetime="2026-11-14T09:21:21-0500">2026-11-14 09:21</time></a></div>

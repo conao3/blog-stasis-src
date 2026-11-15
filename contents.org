@@ -20583,7 +20583,7 @@ PayProofは、請求書のメールを読んで振込まで処理するエージ
 最初の入力は「今日のイベントの準備しよう」でした。
 運営の回答では、コードは当日の時間内にすべて書く必要がありましたが、計画や構想はイベント前から用意してよいことになっていました。
 私は少し乗り遅れたなと思いながら、急いで題材を選んでプロダクトの機能を設計することになりました。
-参加者ガイドでは開発の開始が10:45でしたが、9:25に運営から、開会前でも書き始めてよいと回答がありました。
+参加者ガイドでは開発の開始が10:45でしたが、9:25に運営から、今から書き始めてよいと回答がありました。
 リポジトリは開会の10時以降に作ることにして、まずはルールや提出条件をエージェントと一緒に調べ始めています。
 
 [[tweet:conao_3/2121609435038531999::America/Toronto][Hackathon day in Toronto! #MongoDB #Hackathon]]
@@ -21047,7 +21047,7 @@ The bars include time spent waiting for tools and reports, so a bar's length is 
 My first message of the day was "Let's get ready for today's event."
 According to the organizers, all code had to be written during the event, but we could plan and design before it.
 I felt a little late, and hurried to pick a topic and design the product's features.
-The participant guide said development started at 10:45, but at 9:25 the organizers answered that we could start writing code before the opening.
+The participant guide said development started at 10:45, but at 9:25 the organizers answered that we could start writing code right away.
 I decided to create the repository after the 10:00 opening, and started by going through the rules and submission requirements with an agent.
 
 [[tweet:conao_3/2121609435038531999::America/Toronto][Hackathon day in Toronto! #MongoDB #Hackathon]]
