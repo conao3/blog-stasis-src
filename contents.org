@@ -10,7 +10,11 @@
     (latex-fragment . stasis-md-latex)
     (latex-environment . stasis-md-latex)
     (footnote-reference . stasis-md-footnote-reference)
-    (src-block . stasis-md-src-block)))
+    (src-block . stasis-md-src-block)
+    (line-break . stasis-md-line-break)))
+
+(defun stasis-md-line-break (_line-break _contents _info)
+  "<br>\n")
 
 (defun stasis-md-template (contents info)
   (concat
