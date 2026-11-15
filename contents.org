@@ -20503,6 +20503,8 @@ T3 Codeで複数のAIエージェントを動かし、PayProofという請求書
 ファイナリストのピッチには進めませんでしたが、かなり楽しかったです。
 当日のエージェントとの会話履歴とGitのコミットをたどって振り返ります。
 
+[[tweet:conao_3/2121788103505703299::America/Toronto][The most exciting hackathon! Thanks mongoDB! I'll post a recap blog soon!]]
+
 [[github:conao3/ts-payproof::TypeScript][Auditable invoice agent for Canadian construction businesses. Built for Agents in Context Toronto.]]
 
 ** イベントと作ったもの
