@@ -20904,7 +20904,6 @@ PayProof自体も人間の確認と特定の支払いへの承認を扱うアプ
 モデルの出力トークンに含まれるreasoningの内訳を、出力に重ねて足すこともしていません。
 
 図の元になる [[./resources/public/img/bd0d48-hackathon-data.json][時刻と使用量の集計データ]] と、[[https://github.com/conao3/blog-stasis-src/blob/master/bin/hackathon-20261114-plots.py][図の生成スクリプト]] も置きました。
-会話の本文、資格情報、個人の連絡先を含む生ログは公開していません。
 
 ** おわりに
 
