@@ -21169,7 +21169,7 @@ The worker also confirmed, in a test that fed in a synthesized spoken question, 
 *** 14:10 The first submission
 
 The official deadline was 17:00, and our internal target was 16:00.
-At 13:45 an agent uploaded the first video to YouTube, and at 13:47 I asked, "Should we submit now and overwrite it later?"
+At 13:45 an agent uploaded the first video to YouTube, and at 13:47 I asked, "Can we submit now and overwrite it later?"
 
 Meta checked how to edit a submission after sending it, and Main filled in the form.
 I reviewed the answers, approved the click on Submit as a separate step, and saw the submitted status at 14:10.
