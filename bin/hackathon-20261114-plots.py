@@ -107,6 +107,54 @@ def main():
     fig.tight_layout()
     save(fig, 'usage')
 
+    milestones = [
+        ('09:27', 'First prompt'),
+        ('10:07', 'Repository created'),
+        ('10:42', 'Core implementation committed'),
+        ('10:50', 'Independent HTTP check reported'),
+        ('11:54', 'Site and slides committed'),
+        ('13:28', 'Voice round trip via API'),
+        ('14:10', 'First submission'),
+        ('16:17', 'Voice works with my own mic'),
+        ('16:56', 'Final video submitted'),
+        ('18:52', 'First-round judging done'),
+        ('19:54', 'Finalists announced'),
+    ]
+
+    def local(hm):
+        h, m = map(int, hm.split(':'))
+        return dt.datetime(2026, 11, 14, h, m, tzinfo=tz)
+
+    fig, ax = plt.subplots(figsize=(13, 5.2))
+    ax.axhline(0, color='#999999', lw=1)
+    levels = [1.6, -1.6, 0.9, -0.9, 2.3]
+    for i, (hm, label) in enumerate(milestones):
+        at = local(hm)
+        level = levels[i % len(levels)]
+        ax.vlines(at, 0, level, color='#bbbbbb', lw=1)
+        ax.plot([at], [0], 'o', color=palette[0], ms=6, zorder=3)
+        align = 'left' if hm < '10:00' else 'right' if '16:00' <= hm <= '17:00' else 'center'
+        ax.text(at, level + (0.12 if level > 0 else -0.12), f'{hm}  {label}',
+                ha=align, va='bottom' if level > 0 else 'top', fontsize=10)
+    ax.vlines(local('17:00'), -0.5, 0.5, color=palette[1], ls='--', lw=1.5)
+    ax.text(local('17:00'), 0.6, '17:00 deadline', color=palette[1], ha='left', va='bottom', fontsize=10)
+    for (start, end, label, y) in [('10:42', '16:56', '6h14m from core implementation to final video', 3.1),
+                                   ('14:10', '16:56', '2h46m from first submission to final update', -3.1)]:
+        ax.annotate('', xy=(local(end), y), xytext=(local(start), y),
+                    arrowprops=dict(arrowstyle='<->', color='#555555', lw=1))
+        ax.text(local(start) + (local(end) - local(start)) / 2, y + (0.12 if y > 0 else -0.12), label,
+                ha='center', va='bottom' if y > 0 else 'top', fontsize=10, color='#555555')
+    ax.set_xlim(local('09:00'), local('20:30'))
+    ax.set_ylim(-3.7, 3.7)
+    ax.set_yticks([])
+    ax.spines['left'].set_visible(False)
+    ax.xaxis.set_major_locator(mdates.HourLocator(tz=tz))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M', tz=tz))
+    ax.set_xlabel('2026-11-14 Toronto (EST)')
+    ax.set_title('Milestones of the day', loc='left')
+    fig.tight_layout()
+    save(fig, 'timeline')
+
 
 if __name__ == '__main__':
     main()
