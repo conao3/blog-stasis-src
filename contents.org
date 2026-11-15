@@ -20502,7 +20502,6 @@ T3 Codeで複数のAIエージェントを動かし、PayProofという請求書
 
 ファイナリストのピッチには進めませんでしたが、かなり楽しかったです。
 当日のエージェントとの会話履歴とGitのコミットをたどって振り返ります。
-時系列の構成は [[https://zenn.dev/luvtechno/articles/isucon2026-competition-day][ISUCON2026で優勝しました 当日編]] を参考にしました。
 
 [[github:conao3/ts-payproof::TypeScript][Auditable invoice agent for Canadian construction businesses. Built for Agents in Context Toronto.]]
 
