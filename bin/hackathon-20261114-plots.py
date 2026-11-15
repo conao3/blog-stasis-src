@@ -58,11 +58,11 @@ def main():
     fig.tight_layout()
     save(fig, 'activity')
 
-    codex = [r for r in rows if 'Sonnet' not in r['label']]
+    threads = list(rows)
     priority = {'Main': 0, 'Meta': 1, 'payproof_implementation': 2, 'video_tools': 3, 'pitch_deck': 4}
-    codex.sort(key=lambda r: priority.get(r['label'], 5))
+    threads.sort(key=lambda r: priority.get(r['label'], 5))
     fig, axes = plt.subplots(7, 3, figsize=(13, 13), sharex=True, sharey=True)
-    for ax, row in zip(axes.flat, codex):
+    for ax, row in zip(axes.flat, threads):
         points = row['points']
         ax.plot([stamp(p['at']) for p in points], [p['input'] / 1000 for p in points],
                 color=palette[0 if row['label'] == 'Main' else 1 if row['label'] == 'Meta' else 2], lw=1.2)
@@ -76,9 +76,9 @@ def main():
         ax.xaxis.set_major_locator(mdates.HourLocator(byhour=[10, 14, 18], tz=tz))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M', tz=tz))
         ax.tick_params(labelbottom=True, labelsize=8)
-    for ax in list(axes.flat)[len(codex):]:
+    for ax in list(axes.flat)[len(threads):]:
         ax.set_visible(False)
-    fig.suptitle('Request input size for each Codex thread', x=.06, ha='left', fontsize=16)
+    fig.suptitle('Request input size for each thread', x=.06, ha='left', fontsize=16)
     fig.text(.06, .952, 'Thousands of input tokens per response; dotted lines mark completed compactions. Not cumulative usage.', fontsize=10)
     fig.supylabel('Input tokens (thousands)', fontsize=11)
     fig.supxlabel('Toronto (EST)', fontsize=11)
