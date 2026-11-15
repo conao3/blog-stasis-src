@@ -11,10 +11,16 @@
     (latex-environment . stasis-md-latex)
     (footnote-reference . stasis-md-footnote-reference)
     (src-block . stasis-md-src-block)
-    (line-break . stasis-md-line-break)))
+    (line-break . stasis-md-line-break)
+    (paragraph . stasis-md-paragraph)))
+
+(defconst stasis-md-paragraph-break "\nSTASIS-MD-PARAGRAPH-BREAK\n")
 
 (defun stasis-md-line-break (_line-break _contents _info)
-  "<br>\n")
+  stasis-md-paragraph-break)
+
+(defun stasis-md-paragraph (paragraph contents info)
+  (string-replace stasis-md-paragraph-break "\n\n" (org-md-paragraph paragraph contents info)))
 
 (defun stasis-md-template (contents info)
   (concat
@@ -128,8 +134,9 @@
      stasis-md-x-logo
      "</span>"
      (if desc
-         (format "<span class=\"tweet-card-text\">%s</span>"
-                 (mapconcat #'org-html-encode-plain-text (split-string (string-trim desc) "\n") "<br>"))
+         (mapconcat (lambda (line) (format "<span class=\"tweet-card-text\">%s</span>" (org-html-encode-plain-text line)))
+                    (split-string (string-trim desc) "\n" t "[ \t]+")
+                    "")
        "")
      (if images
          (concat (format "<span class=\"tweet-card-media\" data-count=\"%d\">" (length images))
