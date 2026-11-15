@@ -20533,6 +20533,8 @@ PayProofは、請求書のメールを読んで振込まで処理するエージ
 
 [[youtube:QneL7pynr7k][PayProof | Verify bank changes before invoice payments | MongoDB Toronto Hackathon]]
 
+提出した作品は [[https://cerebralvalley.ai/e/mongodb-toronto-hackathon/hackathon/gallery?project=1][公式の作品ページ]] でも見られます。
+
 ** T3 Codeでの体制
 
 [[https://t3.codes][T3 Code]] は、最近私が使っている、コーディングエージェントを操作するアプリです。
