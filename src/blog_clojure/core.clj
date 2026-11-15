@@ -284,7 +284,7 @@
                      (str "[" repo "](" href ")" (when description (str ": " description)))))
       (str/replace #"<div class=\"tweet-card\"><a href=\"([^\"]+)\">.*?<span class=\"tweet-card-author\"><strong>[^<]*</strong><span>([^<]+)</span></span>.*?(?:<span class=\"tweet-card-text\">(.*?)</span>.*?)?</a></div>"
                    (fn [[_ href user text]]
-                     (str "[" user "](" href ")" (when text (str ": " text)))))
+                     (str "[" user "](" href ")" (when text (str ": " (str/replace text "<br>" "\n"))))))
       (str/replace #"<div class=\"youtube-card\" data-id=\"[^\"]+\"><a href=\"([^\"]+)\">.*?(?:<span class=\"youtube-card-title\">(.*?)</span>.*?)?</a></div>"
                    (fn [[_ href title]]
                      (str "[" (or title "YouTube") "](" href ")")))
