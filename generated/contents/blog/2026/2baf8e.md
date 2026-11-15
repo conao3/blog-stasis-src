@@ -418,7 +418,7 @@ I changed direction in both Main and Meta, so Meta had to track those changes al
 
 Meta read everything I said in full, and from the agents' long reports it picked out only the progress and blockers it needed.
 I gave Meta the job of finishing its own research and delivering to Main only the information that would change Main's next decision.
-At 10:48 I also told Meta to do the meta-level information work itself and not to ask Main to research things.
+At 10:48 I gave Meta this instruction in my own words as well: do the meta-level information work on its own, and do not ask Main to research things.
 
 In the end, adding Meta was a good call.
 Meta caught news from the organizers and deadline notices and passed them to Main, so Main stayed focused on the code and the deliverables until the end.
