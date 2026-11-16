@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="250" viewBox="0 40 880 250" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+  </defs>
+  <rect y="40" width="880" height="250" fill="#ffffff"/>
+  <g font-size="15" font-weight="bold" fill="#222" text-anchor="middle">
+    <rect x="20" y="60" width="140" height="70" rx="8" fill="#f4f4f4" stroke="#888"/>
+    <text x="90" y="100">Leanのソース</text>
+    <rect x="195" y="60" width="140" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="265" y="90">Lean adapter</text>
+    <rect x="370" y="60" width="140" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="440" y="90">Rust renderer</text>
+    <rect x="545" y="60" width="140" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="615" y="90">再解析と照合</text>
+    <rect x="720" y="60" width="140" height="70" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <text x="790" y="100">整形結果</text>
+    <rect x="445" y="205" width="340" height="70" rx="8" fill="#fbf0e6" stroke="#c08850"/>
+    <text x="615" y="235">そのコマンドだけ退避</text>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="265" y="112">Lean本体のparser</text>
+    <text x="265" y="126">とformatter</text>
+    <text x="440" y="112">規約の規則と</text>
+    <text x="440" y="126">行幅で配置</text>
+    <text x="615" y="112">構文木とコメント</text>
+    <text x="615" y="126">と再整形の一致</text>
+    <text x="615" y="258">改行をソースのまま保つ → 原文のまま残す</text>
+  </g>
+  <g stroke="#555" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <line x1="160" y1="95" x2="193" y2="95"/>
+    <line x1="335" y1="95" x2="368" y2="95"/>
+    <line x1="510" y1="95" x2="543" y2="95"/>
+    <line x1="685" y1="95" x2="718" y2="95"/>
+    <line x1="615" y1="130" x2="615" y2="203" stroke-dasharray="5 4"/>
+    <path d="M785,240 L820,240 L820,132" stroke-dasharray="5 4"/>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="352" y="86">文書</text>
+    <text x="702" y="86">一致</text>
+    <text x="645" y="172" text-anchor="start">不一致</text>
+  </g>
+</svg>
