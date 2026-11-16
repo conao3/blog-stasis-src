@@ -21422,15 +21422,15 @@ I also prepared the explanations and diagrams for the presentation, the cue shee
 With the fast implementation and the work it took to get my instructions through, I think it was a day where I got a full taste of working with AI.
 
 I did not make it to the finalist pitches, but I had fun.
-* Lean 4のソースをLean本体のparserで整形するleanwispを作った
+* Lean 4をLean本体のparserで整形するleanwispを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/d60a7d
 :export_date: 2026-11-17 07:00
 :export_draft: t
 :end:
 
-Lean 4のソースフォーマッタleanwispを作りました。
-Lean本体のparserでソースを読み、Leanのformatterが作る文書を、Leanの標準ライブラリとMathlibのスタイルガイドから決めた形に並べ直します。
+Lean 4のフォーマッタleanwispを作りました。
+Lean本体のparserで読み、Leanのformatterが作る文書を、Leanの標準ライブラリとMathlibのスタイルガイドから決めた形に並べ直します。
 整形した結果はもう一度Leanで解析し、構文木とコメントが元と一致すること、再び整形しても変わらないことをコマンドごとに確かめます。
 leanwispをMathlibの31ファイルに掛けると、すべてのファイルが整形後もコンパイルでき、Mathlib自身のスタイルのlinterの警告は0のままでした。
 
@@ -21475,7 +21475,7 @@ def sumTo (n : Nat) : Nat := Id.run do
 
 =:= や演算子の前後に空白を入れ、1行に収まる定理は属性ごと1行にします。
 =instance= のフィールドは =where= の次の行に移り、 =do= のブロックは宣言の始まりから2桁の字下げにそろいました。
-出力は構文と行幅だけで決まるので、元のソースの改行の入れ方が違っても同じ形になります。
+出力は構文と行幅だけで決まるので、元の改行の入れ方が違っても同じ形になります。
 
 ** Lean本体のparserを使う理由
 Leanでは、ファイルの中で新しい記法を足せます。
@@ -21523,7 +21523,7 @@ Leanは字下げや改行で意味が変わる言語です。
 構文木が元と一致すること、コメントの中身と順序が元と一致すること、再び整形しても同じ結果になることを確かめます。
 
 どれかが合わないときは合わないコマンドを特定し、まず元の改行を保ったまま行の中の空白と字下げだけを整えます。
-それでも合わなければ、そのコマンドだけ元のソースのまま残します。
+それでも合わなければ、そのコマンドだけ元のまま残します。
 ファイルのほかの部分は整形したままです。
 Leanにformatterが無い構文も、そのコマンドを元のまま残します。
 
@@ -21573,7 +21573,7 @@ nix run github:conao3/rust-leanwisp -- \
 =check-source= は整形で変わるファイルがあると終了コード254で終わるので、CIで使えます。
 =--paths= にディレクトリを渡すと、中の =.lean= ファイルをまとめて整形します。
 
-エディタからは標準入力のソースを整形して標準出力に返すフィルタとして呼べます。
+エディタからは標準入力を整形して標準出力に返すフィルタとして呼べます。
 
 #+begin_src sh
 leanwisp --output text source format-source --source file:///dev/stdin
