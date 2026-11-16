@@ -19277,7 +19277,6 @@ lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の
 :properties:
 :export_file_name: generated/contents/blog/2026/f4154e
 :export_date: 2026-11-16 10:34
-:export_draft: t
 :end:
 
 [[https://peps.python.org/pep-0638/][PEP 638]]はPythonに構文マクロを足す提案です。
