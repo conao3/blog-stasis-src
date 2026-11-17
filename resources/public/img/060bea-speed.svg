@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="838" viewBox="0 0 1100 838" font-family="Noto Sans JP, sans-serif">
+<rect x="0" y="0" width="1100" height="838" rx="16" fill="#ffffff"/>
+<text x="30" y="48" font-size="24" font-weight="bold" fill="#222">Mathlibでの応答時間の中央値 (ms、短いほど速い)</text>
+<rect x="30" y="70" width="22" height="22" fill="#d9622b"/><text x="62" y="88" font-size="19" fill="#222">Leansail</text>
+<rect x="190" y="70" width="22" height="22" fill="#9a9a9a"/><text x="222" y="88" font-size="19" fill="#222">Lean本体 (lean --server)</text>
+<text x="334" y="158" font-size="19" text-anchor="end" fill="#222">ハイライト (初回)</text>
+<rect x="350" y="126" width="83.1" height="24" fill="#d9622b"/>
+<text x="441.1" y="145" font-size="19" fill="#222">118ms</text>
+<rect x="350" y="156" width="475.1" height="24" fill="#9a9a9a"/>
+<text x="833.1" y="175" font-size="19" fill="#222">674ms</text>
+<text x="334" y="236" font-size="19" text-anchor="end" fill="#222">ハイライト (2回目以降)</text>
+<rect x="350" y="204" width="3.0" height="24" fill="#d9622b"/>
+<text x="361.0" y="223" font-size="19" fill="#222">0.92ms</text>
+<rect x="350" y="234" width="474.2" height="24" fill="#9a9a9a"/>
+<text x="832.2" y="253" font-size="19" fill="#222">672ms</text>
+<text x="334" y="314" font-size="19" text-anchor="end" font-family="monospace" fill="#222">semantic tokens</text>
+<rect x="350" y="282" width="3.0" height="24" fill="#d9622b"/>
+<text x="361.0" y="301" font-size="19" fill="#222">4.0ms</text>
+<rect x="350" y="312" width="52.7" height="24" fill="#9a9a9a"/>
+<text x="410.7" y="331" font-size="19" fill="#222">75ms</text>
+<text x="334" y="392" font-size="19" text-anchor="end" fill="#222">補完</text>
+<rect x="350" y="360" width="49.7" height="24" fill="#d9622b"/>
+<text x="407.7" y="379" font-size="19" fill="#222">70ms</text>
+<rect x="350" y="390" width="227.3" height="24" fill="#9a9a9a"/>
+<text x="585.3" y="409" font-size="19" fill="#222">322ms</text>
+<text x="334" y="470" font-size="19" text-anchor="end" font-family="monospace" fill="#222">workspace/symbol</text>
+<rect x="350" y="438" width="61.7" height="24" fill="#d9622b"/>
+<text x="419.7" y="457" font-size="19" fill="#222">87ms</text>
+<rect x="350" y="468" width="600.0" height="24" fill="#9a9a9a"/>
+<text x="958.0" y="487" font-size="19" fill="#222">851ms</text>
+<text x="334" y="548" font-size="19" text-anchor="end" fill="#222">参照</text>
+<rect x="350" y="516" width="9.2" height="24" fill="#d9622b"/>
+<text x="367.2" y="535" font-size="19" fill="#222">13ms</text>
+<rect x="350" y="546" width="14.7" height="24" fill="#9a9a9a"/>
+<text x="372.7" y="565" font-size="19" fill="#222">21ms</text>
+<text x="334" y="626" font-size="19" text-anchor="end" fill="#222">定義</text>
+<rect x="350" y="594" width="9.4" height="24" fill="#d9622b"/>
+<text x="367.4" y="613" font-size="19" fill="#222">13ms</text>
+<rect x="350" y="624" width="15.2" height="24" fill="#9a9a9a"/>
+<text x="373.2" y="643" font-size="19" fill="#222">21ms</text>
+<text x="334" y="704" font-size="19" text-anchor="end" font-family="monospace" fill="#222">hover</text>
+<rect x="350" y="672" width="3.0" height="24" fill="#d9622b"/>
+<text x="361.0" y="691" font-size="19" fill="#222">1.4ms</text>
+<rect x="350" y="702" width="3.0" height="24" fill="#9a9a9a"/>
+<text x="361.0" y="721" font-size="19" fill="#222">1.4ms</text>
+<text x="334" y="782" font-size="19" text-anchor="end" font-family="monospace" fill="#222">plainGoal</text>
+<rect x="350" y="750" width="3.0" height="24" fill="#d9622b"/>
+<text x="361.0" y="769" font-size="19" fill="#222">1.6ms</text>
+<rect x="350" y="780" width="3.0" height="24" fill="#9a9a9a"/>
+<text x="361.0" y="799" font-size="19" fill="#222">1.4ms</text>
+</svg>
