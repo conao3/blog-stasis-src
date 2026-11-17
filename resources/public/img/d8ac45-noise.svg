@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="500" viewBox="0 0 1100 500" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
+<rect width="1100" height="500" rx="16" fill="#ffffff"/>
+<text x="30" y="48" font-size="24" font-weight="bold" fill="#222">同じ定理を8回ずつ記録した値</text>
+<circle cx="41" cy="81" r="9" fill="#4a7fb5"/><text x="62" y="88" font-size="19" fill="#222">負荷をかけないとき</text>
+<circle cx="281" cy="81" r="9" fill="#d9622b"/><text x="302" y="88" font-size="19" fill="#222">同じ4コアに負荷をかけたとき</text>
+<text x="30" y="140" font-size="19" font-weight="bold" fill="#222">経過時間 (ms)</text>
+<line x1="250" y1="270" x2="1040" y2="270" stroke="#888" stroke-width="1.2"/>
+<line x1="250.0" y1="160" x2="250.0" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="250.0" y="294" font-size="15" fill="#444" text-anchor="middle">0</text>
+<line x1="362.9" y1="160" x2="362.9" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="362.9" y="294" font-size="15" fill="#444" text-anchor="middle">10</text>
+<line x1="475.7" y1="160" x2="475.7" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="475.7" y="294" font-size="15" fill="#444" text-anchor="middle">20</text>
+<line x1="588.6" y1="160" x2="588.6" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="588.6" y="294" font-size="15" fill="#444" text-anchor="middle">30</text>
+<line x1="701.4" y1="160" x2="701.4" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="701.4" y="294" font-size="15" fill="#444" text-anchor="middle">40</text>
+<line x1="814.3" y1="160" x2="814.3" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="814.3" y="294" font-size="15" fill="#444" text-anchor="middle">50</text>
+<line x1="927.1" y1="160" x2="927.1" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="927.1" y="294" font-size="15" fill="#444" text-anchor="middle">60</text>
+<line x1="1040.0" y1="160" x2="1040.0" y2="270" stroke="#e2e2e2" stroke-width="1"/>
+<text x="1040.0" y="294" font-size="15" fill="#444" text-anchor="middle">70</text>
+<text x="234" y="196" font-size="15" fill="#444" text-anchor="end">負荷をかけないとき</text>
+<circle cx="372.0" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="377.1" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="373.8" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="374.4" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="395.7" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="376.4" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="367.9" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="366.6" cy="190" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<text x="415.7" y="196" font-size="15" fill="#222">10.3〜12.9</text>
+<text x="234" y="241" font-size="15" fill="#444" text-anchor="end">負荷をかけたとき</text>
+<circle cx="488.1" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="499.9" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="808.1" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="512.5" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="501.8" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="887.9" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="791.9" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="720.7" cy="235" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<text x="907.9" y="241" font-size="15" fill="#222">21.1〜56.5</text>
+<text x="30" y="330" font-size="19" font-weight="bold" fill="#222">heartbeat</text>
+<line x1="250" y1="460" x2="1040" y2="460" stroke="#888" stroke-width="1.2"/>
+<line x1="250.0" y1="350" x2="250.0" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="250.0" y="484" font-size="15" fill="#444" text-anchor="middle">0</text>
+<line x1="362.9" y1="350" x2="362.9" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="362.9" y="484" font-size="15" fill="#444" text-anchor="middle">20,000</text>
+<line x1="475.7" y1="350" x2="475.7" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="475.7" y="484" font-size="15" fill="#444" text-anchor="middle">40,000</text>
+<line x1="588.6" y1="350" x2="588.6" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="588.6" y="484" font-size="15" fill="#444" text-anchor="middle">60,000</text>
+<line x1="701.4" y1="350" x2="701.4" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="701.4" y="484" font-size="15" fill="#444" text-anchor="middle">80,000</text>
+<line x1="814.3" y1="350" x2="814.3" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="814.3" y="484" font-size="15" fill="#444" text-anchor="middle">100,000</text>
+<line x1="927.1" y1="350" x2="927.1" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="927.1" y="484" font-size="15" fill="#444" text-anchor="middle">120,000</text>
+<line x1="1040.0" y1="350" x2="1040.0" y2="460" stroke="#e2e2e2" stroke-width="1"/>
+<text x="1040.0" y="484" font-size="15" fill="#444" text-anchor="middle">140,000</text>
+<text x="234" y="386" font-size="15" fill="#444" text-anchor="end">負荷をかけないとき</text>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
+<text x="910.2" y="386" font-size="15" fill="#222">8回とも113,455</text>
+<text x="234" y="431" font-size="15" fill="#444" text-anchor="end">負荷をかけたとき</text>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
+<text x="910.2" y="431" font-size="15" fill="#222">8回とも113,455</text>
+</svg>
