@@ -19874,8 +19874,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
 * Leanの定理が実装を縛っているかを、壊した実装を走らせて確かめるleanassayを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
-:export_date: 2026-11-10 14:35
-:export_draft: t
+:export_date: 2026-11-17 12:43
 :export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone
 :end:
 
@@ -19890,7 +19889,7 @@ Leanでは定理も実装も実行できます。
 
 作った道具はleanassayです。
 リポジトリは[[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]]で、ライセンスはApache-2.0です。
-この記事はLean 4.35.0とleanassay 0.1.0で動かした結果をもとに書いています。
+この記事はLean 4.35.0とleanassay 0.2.0で動かした結果をもとに書いています。
 
 [[github:conao3/lean-leanassay::Lean][Check whether your Lean theorems pin down your implementation, by running broken implementations against them]]
 
