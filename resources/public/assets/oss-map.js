@@ -246,7 +246,7 @@
   });
   root.querySelector('.oss-map-interactive').hidden = false;
   area.value = '0'; area.onchange();
-  new ResizeObserver(() => { if (area.value === 'all') fit(); else area.onchange(); }).observe(svg);
+  // Resizing the viewport preserves the camera; only explicit controls change scale.
   function restore() {
     const params = new URL(location.href).searchParams;
     const id = params.get('oss'), savedArea = params.get('oss-area');

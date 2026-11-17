@@ -16,7 +16,8 @@ The English and Japanese portfolio pages include an interactive map after the ex
 | Pan | Drag the map, or focus it and press arrow keys | Change translation; dragging must not select a project |
 | Alignment | Initialize, fit, zoom out or change area | Anchor the map or selected area at the top left; panning cannot introduce blank space before the map origin |
 | Overview | Click Fit all | Fit the complete map from the top-left corner of the canvas |
-| Fullscreen | Click Fullscreen, then click again or press Escape | Fill the existing browser viewport with the map and controls; never call the native fullscreen API or resize the browser window |
+| Fullscreen | Click Fullscreen, then click again or press Escape | Fill the existing browser viewport with the map and controls; keep the map transform and block size unchanged on entry and exit; never call the native fullscreen API or resize the browser window |
+| Viewport resize | Expand the map or resize the browser | Preserve the current pan and zoom, including after manually zooming or fitting all; only explicit zoom, fit, area or project navigation changes the camera |
 | Script unavailable | Read the expandable text list | All 44 projects and outgoing relationships remain available without JavaScript |
 
 Build with `nix develop -c make build`. Validate changes in a real browser, including node selection, zoom, drag and narrow layouts; JavaScript syntax checks alone do not establish that the map works in its delivery environment.
