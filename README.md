@@ -58,6 +58,7 @@ A static blog built with [Stasis](https://github.com/magnars/stasis), a simple a
    - `export_title` - Article title
    - `export_file_name` - Output filename
    - `export_date` - Publication date
+   - `export_tags` - Space-separated tags (optional, `[a-z0-9-]` only). Each tag gets a page at `/tags/<tag>` and the tag index is `/tags/`
 3. Export to Markdown from Emacs: `M-x my/stasis-export`
 
 ## Building

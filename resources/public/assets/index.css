@@ -24,6 +24,11 @@ body > header {
     padding-bottom: var(--spacing-200);
 }
 
+body > header nav {
+    display: flex;
+    gap: var(--spacing-300);
+}
+
 body > header nav a {
     color: var(--gray-700);
     font-size: var(--body-size-s);
@@ -199,6 +204,44 @@ article > header .post-meta {
     fill: currentColor;
     height: 14px;
     width: 14px;
+}
+
+.post-tags,
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-100);
+    list-style: none;
+    padding: 0;
+}
+
+.post-tags {
+    margin: var(--spacing-200) 0 0;
+}
+
+.post-tags a,
+.tag-list a {
+    background-color: var(--gray-100);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: 9999px;
+    color: var(--gray-800);
+    display: inline-flex;
+    font-size: var(--body-size-xs);
+    gap: var(--spacing-75);
+    line-height: 1;
+    padding: var(--spacing-75) var(--spacing-200);
+    text-decoration: none;
+}
+
+.post-tags a:hover,
+.tag-list a:hover {
+    background-color: var(--gray-300);
+    color: var(--gray-900);
+}
+
+.tag-list .tag-count {
+    color: var(--gray-600);
+    font-variant-numeric: tabular-nums;
 }
 
 .content h2,

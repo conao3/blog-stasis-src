@@ -3,7 +3,7 @@
 * org
 #+begin_src elisp
 (org-export-define-derived-backend 'stasis-md 'md
-  :options-alist '((:draft "DRAFT" nil nil t) (:lang "LANG" nil nil t))
+  :options-alist '((:draft "DRAFT" nil nil t) (:lang "LANG" nil nil t) (:tags "TAGS" nil nil split))
   :translate-alist
   '((template . stasis-md-template)
     (link . stasis-md-link)
@@ -28,6 +28,7 @@
    (format "Date: %s\n" (car (plist-get info :date)))
    (if (plist-get info :draft) "Draft: true\n" "")
    (if (plist-get info :lang) (format "Lang: %s\n" (plist-get info :lang)) "")
+   (if (plist-get info :tags) (format "Tags: %s\n" (string-join (plist-get info :tags) " ")) "")
    "\n\n"
    contents))
 
@@ -17604,6 +17605,7 @@ If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 :properties:
 :export_file_name: generated/contents/blog/2026/4e5aa2
 :export_date: 2026-11-05 20:05
+:export_tags: lean clojure
 :end:
 
 Lean 4で書いて証明した関数をClojureから呼び、Clojureで書いた関数の性質をLeanで証明するためのライブラリとしてlean-cljを作りました。
@@ -18412,6 +18414,7 @@ Azureのサービスは =Metadata: true= のヘッダーがない要求を拒み
 :properties:
 :export_file_name: generated/contents/blog/2026/b43a06
 :export_date: 2026-11-09 09:58
+:export_tags: lean rust
 :end:
 
 Lean 4で書いて証明した関数をRustから呼べるようにする、lean-rsを作りました。
@@ -18802,6 +18805,7 @@ Rustのコードが同じ計算をすることは、lean-rsの変換が正しい
 :properties:
 :export_file_name: generated/contents/blog/2026/dc65bb
 :export_date: 2026-11-11 13:59
+:export_tags: lean python
 :end:
 
 Lean 4で書いて証明した関数をPythonから呼べるようにする、lean-pyを作りました。
@@ -19277,6 +19281,7 @@ lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の
 :properties:
 :export_file_name: generated/contents/blog/2026/f4154e
 :export_date: 2026-11-16 10:34
+:export_tags: python cpython
 :end:
 
 [[https://peps.python.org/pep-0638/][PEP 638]]はPythonに構文マクロを足す提案です。
@@ -20336,6 +20341,7 @@ LeanでTypeScriptの関数を書けるようにし、Leanの型をStandard Schem
 :properties:
 :export_file_name: generated/contents/blog/2026/23d62c
 :export_date: 2026-11-13 12:21
+:export_tags: lean rust python typescript clojure
 :end:
 Lean 4で書いて証明した関数を、Rust、Python、TypeScript、Clojureから呼べるleanfranを作りました。
 逆向きに、各言語で書いた関数をLeanに翻訳し、その性質を証明することもできます。

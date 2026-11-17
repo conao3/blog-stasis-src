@@ -301,10 +301,25 @@
       str/trim))
 
 
+(defn tag-path
+  [tag]
+  (str "/tags/" tag ".html"))
+
+
+(defn parse-tags
+  [s]
+  (let [tags (some-> s str/trim not-empty (str/split #"\s+"))]
+    (doseq [tag tags]
+      (when-not (re-matches #"[a-z0-9-]+" tag)
+        (throw (ex-info (str "Invalid tag: " tag) {:tag tag}))))
+    (vec tags)))
+
+
 (defn post-markdown
-  [{:keys [title date url]} body]
+  [{:keys [title date url tags]} body]
   (str "# " title "\n\n"
        (when date (str "Date: " date "\n"))
+       (when (seq tags) (str "Tags: " (str/join ", " tags) "\n"))
        "URL: " url "\n"
        "Author: conao3 (Naoya Yamashita)\n\n"
        (plain-markdown body) "\n"))
@@ -427,7 +442,7 @@
 
 
 (defn json-ld
-  [path {:keys [title description lang datetime post? og-type]}]
+  [path {:keys [title description lang datetime post? og-type tags]}]
   (cond
     (= path "/index.html")
     {"@context" "https://schema.org"
@@ -441,17 +456,18 @@
 
     post?
     {"@context" "https://schema.org"
-     "@graph" [{"@type" "BlogPosting"
-                "headline" title
-                "description" description
-                "url" (page-url path)
-                "mainEntityOfPage" (page-url path)
-                "datePublished" (rfc3339 datetime)
-                "inLanguage" (or lang "ja")
-                "image" (str site-url (og-image-path path))
-                "isPartOf" {"@type" "Blog" "name" blog-name "url" (str site-url "/")}
-                "author" author
-                "publisher" author}
+     "@graph" [(cond-> {"@type" "BlogPosting"
+                           "headline" title
+                           "description" description
+                           "url" (page-url path)
+                           "mainEntityOfPage" (page-url path)
+                           "datePublished" (rfc3339 datetime)
+                           "inLanguage" (or lang "ja")
+                           "image" (str site-url (og-image-path path))
+                           "isPartOf" {"@type" "Blog" "name" blog-name "url" (str site-url "/")}
+                           "author" author
+                           "publisher" author}
+                 (seq tags) (assoc "keywords" tags))
                {"@type" "BreadcrumbList"
                 "itemListElement" [{"@type" "ListItem" "position" 1 "name" blog-name "item" (str site-url "/")}
                                    {"@type" "ListItem" "position" 2 "name" title "item" (page-url path)}]}]}
@@ -525,6 +541,7 @@
                         [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
                         blog-name]
                        [:nav
+                        [:a {:href "/tags/"} (if (= lang "en") "Tags" "タグ")]
                         (when portfolio-href
                           [:a {:href portfolio-href} (if (= lang "en") "Portfolio" "ポートフォリオ")])]]
                       (when draft?
@@ -546,7 +563,7 @@
 
 
 (defn render-content
-  [{:keys [title body date datetime url post?]}]
+  [{:keys [title body date datetime url post? tags]}]
   (hiccup/html
     [:article
      [:header
@@ -556,8 +573,53 @@
          [:time {:datetime datetime} date]
          [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
           (hiccup/raw x-logo)
-          "ポスト"]])]
+          "ポスト"]])
+      (when (seq tags)
+        [:ul {:class "post-tags"}
+         (for [tag tags]
+           [:li [:a {:href (tag-path tag)} (str "#" tag)]])])]
      [:div {:class "content"} (hiccup/raw body)]]))
+
+
+(defn post-list-items
+  [posts]
+  [:ul
+   (->> posts
+        (sort-by (fn [[k v]] [(:datetime v) k]))
+        reverse
+        (map (fn [[k v]] [:li [:time {:datetime (:datetime v)} (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))])
+
+
+(defn tag-pages
+  [posts]
+  (let [by-tag (->> posts
+                    (mapcat (fn [[path page]] (map (fn [tag] [tag [path page]]) (:tags page))))
+                    (group-by first)
+                    (#(update-vals % (partial map second))))
+        latest-date #(->> % (keep (comp :date second)) sort last)]
+    (when (seq by-tag)
+      (into {"/tags/index.html"
+             {:title "タグ"
+              :description "Conao3 Notes の記事に付けたタグの一覧。"
+              :date (latest-date posts)
+              :body (hiccup/html
+                      [:article
+                       [:header [:h1 "タグ"]]
+                       [:ul {:class "tag-list"}
+                        (for [[tag tagged] (sort-by (fn [[tag tagged]] [(- (count tagged)) tag]) by-tag)]
+                          [:li [:a {:href (tag-path tag)} (str "#" tag) [:span {:class "tag-count"} (count tagged)]]])]])}}
+            (map (fn [[tag tagged]]
+                   [(tag-path tag)
+                    {:title (str "#" tag)
+                     :description (str "タグ「" tag "」を付けた記事の一覧。")
+                     :date (latest-date tagged)
+                     :body (hiccup/html
+                             [:article
+                              [:header [:h1 (str "#" tag)]]
+                              [:section {:class "post-list"}
+                               (post-list-items tagged)]
+                              [:p [:a {:href "/tags/"} "タグの一覧へ"]]])}]))
+            by-tag))))
 
 
 (defn site
@@ -576,6 +638,7 @@
                                         :date (some-> (:date (:metadata p)) (subs 0 10))
                                         :datetime (some-> (:date (:metadata p)) (str/replace " " "T"))
                                         :lang (:lang (:metadata p))
+                                        :tags (parse-tags (:tags (:metadata p)))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
                                         :markdown? true
@@ -602,14 +665,11 @@
         blog-inx (hiccup/html
                    [:section {:class "post-list"}
                     [:h2 "Blogs"]
-                    [:ul
-                     (->> (dissoc contents "/index.html")
-                          (remove (comp :portfolio? second))
-                          (sort-by (fn [[k v]] [(:datetime v) k]))
-                          reverse
-                          (map (fn [[k v]] [:li [:time {:datetime (:datetime v)} (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))]])
+                    (post-list-items (->> (dissoc contents "/index.html")
+                                          (remove (comp :portfolio? second))))])
         contents (-> contents
                      (update-in ["/index.html" :body] #(str % blog-inx))
+                     (merge (tag-pages (filter (comp :post? second) contents)))
                      (assoc "/404.html" {:title "ページが見つかりません"
                                          :not-found? true
                                          :body (hiccup/html
