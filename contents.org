@@ -19949,7 +19949,7 @@ leanassayは、実行できる定理しか確かめられません。
 Lean 4で書いて証明した関数をTypeScriptから呼べるようにする、lean-tsを作りました。
 Leanのstructureと帰納型はStandard Schemaのschemaになるのでzodのschemaと同じようにHonoのバリデータにそのまま渡せますし、逆向きに、TypeScriptで書いた関数をLeanに訳してその性質をLeanで証明することもできます。
 
-リポジトリは[[https://github.com/conao3/lean-leanfran/tree/master/TypeScript][conao3/lean-leanfranのTypeScript/]]で、ライセンスはApache-2.0です。
+リポジトリは[[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript][conao3/lean-leanfranのlangs/TypeScript/]]で、ライセンスはApache-2.0です。
 npmには =lean-ts= の名前で公開していて、この記事は0.5.0で動かした結果をもとに書いています。
 
 lean-tsはLeanのコンパイラの中間表現をTypeScriptのソースに変換するもので、生成したTypeScriptは =lean-ts= のパッケージだけで動き、実行するときにLeanは要りません。
@@ -19976,7 +19976,7 @@ CLIはnixで入れられます。
 
 #+begin_src console
 $ npm i lean-ts
-$ nix profile install 'github:conao3/lean-leanfran?dir=TypeScript'
+$ nix profile install github:conao3/lean-leanfran#typescript
 #+end_src
 
 証明を検査するときは、Lean 4.35.0の =lake= も =PATH= に要ります。
@@ -20128,7 +20128,7 @@ structure LeanTsModels.pricing.LineItem where
 =min= などの制約は証明を持つフィールドになるので、Leanの証明の中で =1 ≤ qty= を前提として使えます。
 zodの =int()= は安全な整数を表すので上限の =9007199254740991= も前提になり、下限が0以上の整数はLeanの =Nat= になります。
 
-次の例は、サンプルの[[https://github.com/conao3/lean-leanfran/tree/master/TypeScript/samples/pricing-api][pricing-api]]から抜き出したものです。
+次の例は、サンプルの[[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript/samples/pricing-api][pricing-api]]から抜き出したものです。
 structureの =Order= が =LineItem= とLeanの帰納型 =Discount= を持っていて、この =Order= をHonoのリクエストの型にしています。
 
 #+begin_src typescript
@@ -20302,7 +20302,7 @@ lean-tsは、Leanのコンパイラが最後に作る中間表現を読み、関
 そのため、 =Array= に要素を足していくループは、Cにコンパイルしたときと同じく要素数に比例する時間で終わります。
 配列に100万個の要素を足し、更新し、合計するループは0.44秒で、Cにコンパイルしたものは0.016秒でした。
 
-計測した値は[[https://github.com/conao3/lean-leanfran/tree/master/TypeScript#performance][READMEのPerformance]]に載せています。
+計測した値は[[https://github.com/conao3/lean-leanfran/blob/master/docs/typescript-guide.md#performance][ガイドのPerformance]]に載せています。
 
 Leanの組み込みの関数は、LeanのCのruntimeの =lean.h= に合わせて、同じ振る舞いをTypeScriptで書いています。
 テストでは同じLeanのプログラムをCにコンパイルして動かしたときと、TypeScriptに変換して動かしたときの出力を比べていて、標準出力と標準エラー出力と終了コードが一致します。
@@ -20311,7 +20311,7 @@ Leanの組み込みの関数は、LeanのCのruntimeの =lean.h= に合わせて
 
 ** おわりに
 LeanでTypeScriptの関数を書けるようにし、Leanの型をStandard Schemaのschemaにし、TypeScriptの関数をLeanで証明できるようにしました。
-使い方を1つずつ試せるサンプルは[[https://github.com/conao3/lean-leanfran/tree/master/TypeScript/samples][samples]]にあります。
+使い方を1つずつ試せるサンプルは[[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript/samples][samples]]にあります。
 
 * LeanとRust・Python・TypeScript・Clojureを双方向につなぐleanfranを作った
 :properties:
