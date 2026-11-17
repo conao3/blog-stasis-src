@@ -11,7 +11,7 @@ The English and Japanese portfolio pages include an interactive map after the ex
 | Initial rendering | Open either portfolio page | 44 nodes, 15 edges; start with the Lean area; every node shows its name and a wrapping description, with height derived from its line count |
 | Selection | Click/tap a project, or focus it and press Enter/Space | Highlight its connections and show descriptions, relationship labels and linked project names |
 | Share selection | Select a project, then reload the URL containing `oss` | Restore the selection and bring it into view |
-| Area | Select an area | Center that group; store the chosen area in `oss-area` |
+| Area | Select an area | Align that group at the top left; store the chosen area in `oss-area` |
 | Zoom | Use +/−, Ctrl/Command-wheel or a two-pointer pinch | Change scale around the zoom center |
 | Pan | Drag the map, or focus it and press arrow keys | Change translation; dragging must not select a project |
 | Alignment | Initialize, fit, zoom out or change area | Anchor the map or selected area at the top left; panning cannot introduce blank space before the map origin |
