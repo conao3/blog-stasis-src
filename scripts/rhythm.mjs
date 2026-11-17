@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs";
 
 const id = process.argv[2];
 if (!id) {
-  console.error("usage: node scripts/rhythm.mjs <article ID>");
+  console.error("usage: node scripts/rhythm.mjs <article ID> [org file]");
   process.exit(2);
 }
 
-const source = readFileSync("contents.org", "utf8");
+const source = readFileSync(process.argv[3] ?? "contents.org", "utf8");
 const article = source
   .split(/\n(?=\* )/)
   .find((a) => a.includes(`:export_file_name: generated/contents/blog/`) && a.includes(`/${id}\n`));

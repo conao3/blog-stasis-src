@@ -21587,7 +21587,7 @@ infixl:65 " +++ " => Nat.add
 
 [[./resources/public/img/d60a7d-pipeline.svg]]
 
-整形はLean adapterとRust rendererの2段で行います。
+整形はLean adapterとRust rendererの2つのレイヤーで行います。
 Leanで書いたadapterがLeanの各構文に登録されたformatterを呼んで改行の候補と字下げを持つ文書を作り、Rustのrendererがその文書のレイアウトを行幅に合わせて決めます。
 
 ** スタイルガイドから決めた形
