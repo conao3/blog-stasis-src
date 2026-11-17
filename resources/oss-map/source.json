@@ -8,7 +8,7 @@
     {
       "ja": "Emacs",
       "en": "Emacs",
-      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
+      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "feather.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
     },
     {
       "ja": "翻訳と文書",
@@ -39,6 +39,7 @@
     "leaf-keywords.el": ["外部パッケージ向けの leaf のキーワード", "Extra leaf keywords for external packages"],
     "leaf-tree.el": ["leaf の設定をサイドバーに木で表示", "Side bar tree of a leaf-based init.el"],
     "leaf-convert.el": ["既存の Elisp の設定を leaf に変換", "Convert Elisp configuration to leaf"],
+    "feather.el": ["並列に非同期でインストールするパッケージマネージャ", "Parallel Emacs package manager with async installs"],
     "keg.el": ["Elisp パッケージの開発ツール", "Elisp package development tooling"],
     "leaner-ts-mode.el": ["tree-sitter で動く Lean 4 のメジャーモード", "Lean 4 major mode with tree-sitter"],
     "cort.el": ["Emacs の単体テストフレームワーク", "Emacs unit test framework"],
@@ -79,6 +80,7 @@
     ["leaf-tree.el", "leaf.el", "設定を木で表示", "shows config as a tree"],
     ["leaf-convert.el", "leaf.el", "設定を leaf に変換", "converts config to leaf"],
     ["leaf-convert.el", "leaf-keywords.el", "利用", "uses"],
+    ["leaf-keywords.el", "feather.el", "feather に対応", "adds feather support"],
     ["leaner-ts-mode.el", "keg.el", "開発に利用", "develops with"],
     ["rust-plamo-tr", "rust-plamo-tr-po", "翻訳を提供", "provides translation"],
     ["rust-plamo-tr-po", "emacs-doc", "マニュアルを翻訳", "translates the manuals"],

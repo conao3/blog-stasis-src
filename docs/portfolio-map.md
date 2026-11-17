@@ -1,10 +1,10 @@
 # Portfolio project map
 
-The English and Japanese portfolio pages include a map of 40 open-source projects and 14 relationships, placed after the open-source list. It adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
+The English and Japanese portfolio pages include a map of 41 open-source projects and 15 relationships, placed after the open-source list. It adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
 
 ## Data and layout
 
-- `resources/oss-map/source.json` holds the hand-written data: five groups with their project IDs, a one-line Japanese and English description for every project, and the relationships as `[from, to, ja, en]`. Projects whose README marks them deprecated or moved are left out of the map and the open-source list. Every relationship stays within one group, and only relationships stated in the projects' READMEs are included.
+- `resources/oss-map/source.json` holds the hand-written data: five groups with their project IDs, a one-line Japanese and English description for every project, and the relationships as `[from, to, ja, en]`. Projects fully replaced by another repository (their README points to the repository that continues the work) are left out of the map and the open-source list. Every relationship stays within one group, and only relationships stated in the projects' READMEs are included.
 - `make oss-map` (`scripts/oss-map-layout.mjs`, using `elkjs` from `devDependencies`) computes the layout and writes `resources/public/assets/oss-map.json`. Connected projects in each group are placed by ELK's layered algorithm from left to right with orthogonal edges and inline labels; unconnected projects follow in a grid. Groups are stacked top to bottom with a common width. Run it after editing `source.json` and commit both files.
 - Blocks are 208 × 72 px. A description must fit in two lines in both languages; the browser check below catches overflow.
 

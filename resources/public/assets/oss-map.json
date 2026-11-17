@@ -1,6 +1,6 @@
 {
  "width": 1077.6,
- "height": 1806,
+ "height": 1820,
  "nodeWidth": 208,
  "nodeHeight": 72,
  "groups": [
@@ -18,13 +18,13 @@
    "x": 0,
    "y": 428,
    "width": 1077.6,
-   "height": 454
+   "height": 468
   },
   {
    "ja": "翻訳と文書",
    "en": "Translation and documents",
    "x": 0,
-   "y": 898,
+   "y": 912,
    "width": 1077.6,
    "height": 324
   },
@@ -32,7 +32,7 @@
    "ja": "AWS とサーバー",
    "en": "AWS and servers",
    "x": 0,
-   "y": 1238,
+   "y": 1252,
    "width": 1077.6,
    "height": 228
   },
@@ -40,7 +40,7 @@
    "ja": "エージェントと開発環境",
    "en": "Agents and development environments",
    "x": 0,
-   "y": 1482,
+   "y": 1496,
    "width": 1077.6,
    "height": 324
   }
@@ -125,7 +125,7 @@
    "en": "Declarative init.el configuration for Emacs",
    "url": "https://github.com/conao3/leaf.el",
    "x": 740.8,
-   "y": 606
+   "y": 620
   },
   {
    "id": "leaf-keywords.el",
@@ -134,7 +134,7 @@
    "en": "Extra leaf keywords for external packages",
    "url": "https://github.com/conao3/leaf-keywords.el",
    "x": 319.2,
-   "y": 606
+   "y": 696
   },
   {
    "id": "leaf-tree.el",
@@ -143,7 +143,7 @@
    "en": "Side bar tree of a leaf-based init.el",
    "url": "https://github.com/conao3/leaf-tree.el",
    "x": 319.2,
-   "y": 694
+   "y": 568
   },
   {
    "id": "leaf-convert.el",
@@ -152,7 +152,16 @@
    "en": "Convert Elisp configuration to leaf",
    "url": "https://github.com/conao3/leaf-convert.el",
    "x": 20,
-   "y": 594
+   "y": 684
+  },
+  {
+   "id": "feather.el",
+   "group": 1,
+   "ja": "並列に非同期でインストールするパッケージマネージャ",
+   "en": "Parallel Emacs package manager with async installs",
+   "url": "https://github.com/conao3/feather.el",
+   "x": 740.8,
+   "y": 708
   },
   {
    "id": "keg.el",
@@ -179,7 +188,7 @@
    "en": "Emacs unit test framework",
    "url": "https://github.com/conao3/cort.el",
    "x": 20,
-   "y": 790
+   "y": 804
   },
   {
    "id": "ppp.el",
@@ -188,7 +197,7 @@
    "en": "Pretty printer for Emacs Lisp",
    "url": "https://github.com/conao3/ppp.el",
    "x": 244,
-   "y": 790
+   "y": 804
   },
   {
    "id": "ts-elispore",
@@ -197,7 +206,7 @@
    "en": "Find Emacs packages hosted on GitHub",
    "url": "https://github.com/conao3/ts-elispore",
    "x": 468,
-   "y": 790
+   "y": 804
   },
   {
    "id": "eglot-lsp-settings.el",
@@ -206,7 +215,7 @@
    "en": "Install language servers automatically",
    "url": "https://github.com/conao3/eglot-lsp-settings.el",
    "x": 692,
-   "y": 790
+   "y": 804
   },
   {
    "id": "rust-plamo-tr",
@@ -215,7 +224,7 @@
    "en": "PLaMo Translate on the command line",
    "url": "https://github.com/conao3/rust-plamo-tr",
    "x": 20,
-   "y": 946
+   "y": 960
   },
   {
    "id": "rust-plamo-tr-po",
@@ -224,7 +233,7 @@
    "en": "Translate gettext PO files with PLaMo",
    "url": "https://github.com/conao3/rust-plamo-tr-po",
    "x": 428,
-   "y": 946
+   "y": 960
   },
   {
    "id": "emacs-doc",
@@ -233,7 +242,7 @@
    "en": "Japanese translation of the GNU Emacs manuals",
    "url": "https://github.com/conao3/emacs-doc",
    "x": 849.6,
-   "y": 946
+   "y": 960
   },
   {
    "id": "rust-plamo-tr-local",
@@ -242,7 +251,7 @@
    "en": "Translate with PLaMo 3 on your machine",
    "url": "https://github.com/conao3/rust-plamo-tr-local",
    "x": 20,
-   "y": 1042
+   "y": 1056
   },
   {
    "id": "rust-overhear",
@@ -251,7 +260,7 @@
    "en": "Transcripts, dual subtitles and vocabulary study",
    "url": "https://github.com/conao3/rust-overhear",
    "x": 244,
-   "y": 1042
+   "y": 1056
   },
   {
    "id": "orglyth.el",
@@ -260,7 +269,7 @@
    "en": "Publish a static site from Org files",
    "url": "https://github.com/conao3/orglyth.el",
    "x": 468,
-   "y": 1042
+   "y": 1056
   },
   {
    "id": "ox-zenn.el",
@@ -269,7 +278,7 @@
    "en": "Export Org documents for Zenn",
    "url": "https://github.com/conao3/ox-zenn.el",
    "x": 692,
-   "y": 1042
+   "y": 1056
   },
   {
    "id": "ox-deck.el",
@@ -278,7 +287,7 @@
    "en": "Export Org documents as slide decks",
    "url": "https://github.com/conao3/ox-deck.el",
    "x": 20,
-   "y": 1130
+   "y": 1144
   },
   {
    "id": "wasm-wasmo",
@@ -287,7 +296,7 @@
    "en": "In-process AWS mock in one WebAssembly module",
    "url": "https://github.com/conao3/wasm-wasmo",
    "x": 20,
-   "y": 1286
+   "y": 1300
   },
   {
    "id": "bun-bunsai",
@@ -296,7 +305,7 @@
    "en": "Local AWS API emulator built with Bun",
    "url": "https://github.com/conao3/bun-bunsai",
    "x": 244,
-   "y": 1286
+   "y": 1300
   },
   {
    "id": "rust-awscli",
@@ -305,7 +314,7 @@
    "en": "Output-compatible AWS CLI v2 in Rust",
    "url": "https://github.com/conao3/rust-awscli",
    "x": 468,
-   "y": 1286
+   "y": 1300
   },
   {
    "id": "rust-sqs-poller",
@@ -314,7 +323,7 @@
    "en": "SQS poller that backs off while the queue is empty",
    "url": "https://github.com/conao3/rust-sqs-poller",
    "x": 692,
-   "y": 1286
+   "y": 1300
   },
   {
    "id": "ts-apollo-server-integration-hono",
@@ -323,7 +332,7 @@
    "en": "Apollo Server on Hono",
    "url": "https://github.com/conao3/ts-apollo-server-integration-hono",
    "x": 20,
-   "y": 1374
+   "y": 1388
   },
   {
    "id": "lambda-helper.ts",
@@ -332,7 +341,7 @@
    "en": "Helpers for AWS Lambda",
    "url": "https://github.com/conao3/lambda-helper.ts",
    "x": 244,
-   "y": 1374
+   "y": 1388
   },
   {
    "id": "nix-sel4",
@@ -341,7 +350,7 @@
    "en": "Build seL4 Microkit systems with Nix",
    "url": "https://github.com/conao3/nix-sel4",
    "x": 20,
-   "y": 1530
+   "y": 1544
   },
   {
    "id": "nix-sel4-example",
@@ -350,7 +359,7 @@
    "en": "Bootable seL4 system built with nix-sel4",
    "url": "https://github.com/conao3/nix-sel4-example",
    "x": 414.4,
-   "y": 1530
+   "y": 1544
   },
   {
    "id": "nix-agents",
@@ -359,7 +368,7 @@
    "en": "home-manager module for multiple coding agents",
    "url": "https://github.com/conao3/nix-agents",
    "x": 20,
-   "y": 1626
+   "y": 1640
   },
   {
    "id": "rust-relaykit",
@@ -368,7 +377,7 @@
    "en": "Communication gateway between AI agents",
    "url": "https://github.com/conao3/rust-relaykit",
    "x": 244,
-   "y": 1626
+   "y": 1640
   },
   {
    "id": "rust-inspect-jsonl",
@@ -377,7 +386,7 @@
    "en": "Inspect Claude and Codex session logs",
    "url": "https://github.com/conao3/rust-inspect-jsonl",
    "x": 468,
-   "y": 1626
+   "y": 1640
   },
   {
    "id": "rust-outbound-manifest",
@@ -386,7 +395,7 @@
    "en": "Check outbound messages against sealed approvals",
    "url": "https://github.com/conao3/rust-outbound-manifest",
    "x": 692,
-   "y": 1626
+   "y": 1640
   },
   {
    "id": "rust-document-packet",
@@ -395,7 +404,7 @@
    "en": "Reproducible PDF checks, overlays and rendering",
    "url": "https://github.com/conao3/rust-document-packet",
    "x": 20,
-   "y": 1714
+   "y": 1728
   },
   {
    "id": "rust-devo",
@@ -404,7 +413,7 @@
    "en": "Run tmux development workflows from a small DSL",
    "url": "https://github.com/conao3/rust-devo",
    "x": 244,
-   "y": 1714
+   "y": 1728
   }
  ],
  "edges": [
@@ -568,16 +577,32 @@
    "points": [
     [
      527.2,
-     642
+     720
+    ],
+    [
+     539.2,
+     720
+    ],
+    [
+     539.2,
+     712
+    ],
+    [
+     724.8,
+     712
+    ],
+    [
+     724.8,
+     674
     ],
     [
      740.8,
-     642
+     674
     ]
    ],
    "label": [
     634,
-    654
+    724
    ]
   },
   {
@@ -588,24 +613,24 @@
    "points": [
     [
      527.2,
-     730
+     604
     ],
     [
      724.8,
-     730
+     604
     ],
     [
      724.8,
-     660
+     638
     ],
     [
      740.8,
-     660
+     638
     ]
    ],
    "label": [
     634,
-    742
+    616
    ]
   },
   {
@@ -616,32 +641,24 @@
    "points": [
     [
      228,
-     618
+     708
     ],
     [
      240,
-     618
+     708
     ],
     [
      240,
-     589
-    ],
-    [
-     724.8,
-     589
-    ],
-    [
-     724.8,
-     624
+     656
     ],
     [
      740.8,
-     624
+     656
     ]
    ],
    "label": [
     423.2,
-    577
+    668
    ]
   },
   {
@@ -652,16 +669,36 @@
    "points": [
     [
      228,
-     642
+     732
     ],
     [
      319.2,
-     642
+     732
     ]
    ],
    "label": [
     273.6,
-    654
+    744
+   ]
+  },
+  {
+   "from": "leaf-keywords.el",
+   "to": "feather.el",
+   "ja": "feather に対応",
+   "en": "adds feather support",
+   "points": [
+    [
+     527.2,
+     744
+    ],
+    [
+     740.8,
+     744
+    ]
+   ],
+   "label": [
+    634,
+    756
    ]
   },
   {
@@ -692,16 +729,16 @@
    "points": [
     [
      228,
-     982
+     996
     ],
     [
      428,
-     982
+     996
     ]
    ],
    "label": [
     328,
-    994
+    1008
    ]
   },
   {
@@ -712,16 +749,16 @@
    "points": [
     [
      636,
-     982
+     996
     ],
     [
      849.6,
-     982
+     996
     ]
    ],
    "label": [
     742.8,
-    994
+    1008
    ]
   },
   {
@@ -732,16 +769,16 @@
    "points": [
     [
      228,
-     1566
+     1580
     ],
     [
      414.4,
-     1566
+     1580
     ]
    ],
    "label": [
     321.2,
-    1578
+    1592
    ]
   }
  ]
