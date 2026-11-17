@@ -22244,7 +22244,7 @@ Lean 4のプロジェクトで、宣言ごとのelaborationのコストを記録
 コストの単位は、Leanがelaborationの途中で数えているheartbeatです。
 同じ定理を、マシンに負荷をかけないときとかけたときに8回ずつ記録しました。
 経過時間の平均は11 msから36 msに延び、heartbeatは16回とも113,455でした。
-ほかのジョブと計算機を分け合うCIでも、宣言ごとの1%の増加を検出できます。
+ほかのジョブと計算機を分け合うCIでも、1回ずつの記録を比べて宣言ごとの増加を検出できます。
 
 リポジトリは[[https://github.com/conao3/rust-leanwake][conao3/rust-leanwake]]で、ライセンスはApache-2.0です。
 この記事はLean 4.35.0とLeanwake 0.1.0で動かした結果をもとに書いています。
@@ -22337,7 +22337,8 @@ heartbeatなら1回の記録で比べられます。
 
 =lean= コマンドと言語サーバーは既定で、elaborationを[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L35-L46][複数のスレッド]]で進めます。
 heartbeatはスレッドごとに数えるので、別のスレッドに回った証明の分はコマンドの値に入りません。
-=(List.range 1200).length = 1200= を =decide +kernel= で示す定理は、同期では475,276 heartbeat、既定の非同期では6,084 heartbeatでした。
+=(List.range 1200).length = 1200= を =decide +kernel= で示す定理は、Leanwakeの記録では475,283 heartbeatです。
+同じ定理をLeanのAPIで非同期のまま測ると、6,084 heartbeatでした。
 Leanwakeは =Elab.async= を =false= にして、すべてのコマンドを同期でelaborateします。
 
 実際のプロジェクトでは、同じコミットを2回記録しても、一部のコマンドのheartbeatが一致しません。
@@ -22368,8 +22369,9 @@ Heartbeats  ElapsedNs   Path                              Key                   
 #+end_src
 
 893コマンドのうち、上位3つの定理が全体のheartbeatの45%を占めています。
-記録は4コアで43〜45秒かかりました。
-同じ対象の =lake build= は48秒です。
+記録はビルド済みのプロジェクトでは4コアで43〜45秒かかりました。
+ビルド前の状態からは依存のビルドを含めて88秒です。
+同じプロジェクトの =lake build= は48秒でした。
 
 heartbeatがいちばん多い =pen1_no_return_tiers= は、無申告加算税の額についての次の定理です。
 
@@ -22413,7 +22415,7 @@ Heartbeats  Depth  Range        Class            Kind
 ** 構成
 [[./resources/public/img/d8ac45-flow.svg]]
 
-Leanwakeの構成は、Rustで書いたhostとLeanで書いたadapterの2つです。
+Leanwakeの構成はRustで書いたhostとLeanで書いたadapterの2つです。
 hostはLakeに尋ねて対象のファイルを列挙し、ファイルごとにadapterのプロセスを起動します。
 adapterは =import= を読み込み、コマンドを1つずつelaborateして、その前後でheartbeatのカウンタを読みます。
 
