@@ -22204,8 +22204,6 @@ LEFT OUTER JOIN LATERAL (
 権限の式を入れたクエリも、購読も、最後は1本のSQLになっていました。
 Hasuraの動きで分からないところは、Explain APIが返すSQLを読むと確かめられます。
 
-||||||| parent of fb10e4a (add ritsulint draft)
-
 * 日本の全法令8,986件から改正で取り残された引用を見つけるlinterのritsulintを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/2a0865
