@@ -172,8 +172,8 @@
         text (fn [item] (if ja? (:ja item) (:en item)))]
     [:section {:id "oss-map" :class "oss-map" :data-oss-map "true" :data-lang (name lang)}
      [:h3 (label "OSS のつながり" "How my projects connect")]
-     [:p (label (str "公開している OSS のうち " (count (:nodes data)) " 件を分野ごとに並べました。矢印は依存を表し、矢印の先が使われる側です。ラベルは、矢印の元のプロジェクトが先のプロジェクトをどう使うかを示します。")
-                (str (count (:nodes data)) " of my open-source projects, grouped by area. Each arrow points from a project to one it depends on, and its label says how it is used."))]
+     [:p (label (str "公開している OSS のうち " (count (:nodes data)) " 件を分野ごとに並べました。")
+                (str (count (:nodes data)) " of my open-source projects, grouped by area."))]
      [:div {:class "oss-map-frame" :hidden true :aria-label (label "OSS のつながりの図" "Project map")}
       [:div {:class "oss-map-bar"}
        [:div {:class "oss-map-areas" :role "group" :aria-label (label "分野へ移動" "Go to area")}
@@ -186,13 +186,10 @@
         [:button {:type "button" :data-action "fit"} (label "全体" "Fit")]
         [:button {:type "button" :data-action "expand" :aria-pressed "false"} (label "全画面" "Full view")]]]
       [:div {:class "oss-map-body"}
-       [:div {:class "oss-map-viewport" :tabindex 0 :aria-describedby "oss-map-hint"
+       [:div {:class "oss-map-viewport" :tabindex 0
               :aria-label (label "OSS のつながりの図" "Project map")}
         [:div {:class "oss-map-world"}]]
-       [:aside {:class "oss-map-detail" :hidden true :aria-live "polite"}]]
-      [:p {:class "oss-map-hint" :id "oss-map-hint"}
-       (label "ホイールかドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。"
-              "Scroll or drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections.")]]
+       [:aside {:class "oss-map-detail" :hidden true :aria-live "polite"}]]]
      [:details {:class "oss-map-list"}
       [:summary (label "一覧で見る" "View as a list")]
       (for [[i group] (map-indexed vector (:groups data))]

@@ -1008,12 +1008,6 @@ pre code {
     font-weight: 600;
 }
 
-.oss-map-hint {
-    color: var(--gray-700);
-    font-size: var(--body-size-xs);
-    margin: var(--spacing-100) 0 0;
-}
-
 .oss-map.is-expanded .oss-map-frame {
     background: var(--gray-100);
     box-sizing: border-box;
@@ -1040,6 +1034,10 @@ pre code {
 .oss-map.is-expanded .oss-map-detail {
     flex: none;
     max-height: 35%;
+}
+
+.oss-map-list {
+    margin-top: var(--spacing-300);
 }
 
 .oss-map-list summary {

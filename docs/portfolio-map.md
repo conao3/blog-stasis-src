@@ -10,7 +10,7 @@ The English and Japanese portfolio pages include a map of 41 open-source project
 
 ## Page
 
-`portfolio.clj` renders the heading, lead paragraph, the area and zoom controls, the map frame, a hint, a complete list in `<details>` and the JSON. `core.clj` loads `oss-map.js` with `defer` only on pages containing the map. The script draws groups and arrows in one SVG and the projects as buttons on top of it, all inside one transformed layer. The frame has the width of the text column.
+`portfolio.clj` renders the heading, lead paragraph, the area and zoom controls, the map frame, a complete list in `<details>` and the JSON. `core.clj` loads `oss-map.js` with `defer` only on pages containing the map. The script draws groups and arrows in one SVG and the projects as buttons on top of it, all inside one transformed layer. The frame has the width of the text column.
 
 | Feature | Action | Expected result |
 |---|---|---|
