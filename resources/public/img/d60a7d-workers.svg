@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="400" viewBox="0 0 880 400" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+  </defs>
+  <rect width="880" height="400" fill="#ffffff"/>
+  <rect x="20" y="150" width="840" height="230" rx="10" fill="#fafafa" stroke="#999" stroke-dasharray="6 4"/>
+  <g font-size="15" font-weight="bold" fill="#222" text-anchor="middle">
+    <rect x="20" y="30" width="200" height="74" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="120" y="61">leanwisp</text>
+    <rect x="282" y="38" width="200" height="74" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <rect x="276" y="34" width="200" height="74" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <rect x="270" y="30" width="200" height="74" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <text x="370" y="61">ワーカー</text>
+    <rect x="520" y="30" width="200" height="74" rx="8" fill="#fbf0e6" stroke="#c08850"/>
+    <text x="620" y="61">Leanのプロセス</text>
+    <rect x="40" y="235" width="170" height="70" rx="8" fill="#f4f4f4" stroke="#888"/>
+    <text x="125" y="264">.olean</text>
+    <rect x="250" y="200" width="170" height="60" rx="8" fill="#fbf0e6" stroke="#c08850"/>
+    <text x="335" y="226">環境の構築</text>
+    <rect x="465" y="200" width="170" height="60" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="550" y="226">Leanで解析</text>
+    <rect x="680" y="200" width="160" height="60" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <text x="760" y="226">Rustで配置</text>
+    <rect x="250" y="305" width="170" height="60" rx="8" fill="#fbf0e6" stroke="#c08850"/>
+    <text x="335" y="331">環境の構築</text>
+    <rect x="465" y="305" width="170" height="60" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="550" y="331">Leanで解析</text>
+    <rect x="680" y="305" width="160" height="60" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <text x="760" y="331">Rustで配置</text>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="120" y="84">importの組で振り分ける</text>
+    <text x="370" y="84">CPUの数だけ並べる</text>
+    <text x="620" y="84">ワーカーごとに1つ起動する</text>
+    <text x="125" y="286">モジュールのデータ</text>
+    <text x="335" y="246">定数の表と記法の登録</text>
+    <text x="550" y="246">文書を作り、結果を照合</text>
+    <text x="760" y="246">行幅に合わせて並べる</text>
+    <text x="335" y="351">定数の表と記法の登録</text>
+    <text x="550" y="351">文書を作り、結果を照合</text>
+    <text x="760" y="351">行幅に合わせて並べる</text>
+  </g>
+  <g font-size="12" fill="#444">
+    <text x="36" y="174">1つのワーカーの中で、受け持つファイルごとに繰り返す</text>
+    <text x="250" y="193">ファイル1</text>
+    <text x="250" y="298">ファイル2</text>
+  </g>
+  <g stroke="#555" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <line x1="220" y1="67" x2="268" y2="67"/>
+    <line x1="482" y1="67" x2="518" y2="67"/>
+    <line x1="620" y1="104" x2="620" y2="148" stroke-dasharray="5 4"/>
+    <path d="M210,258 L230,258 L230,230 L248,230"/>
+    <path d="M210,282 L230,282 L230,335 L248,335"/>
+    <line x1="420" y1="230" x2="463" y2="230"/>
+    <line x1="420" y1="335" x2="463" y2="335"/>
+    <line x1="635" y1="220" x2="678" y2="220"/>
+    <line x1="680" y1="242" x2="637" y2="242"/>
+    <line x1="635" y1="325" x2="678" y2="325"/>
+    <line x1="680" y1="347" x2="637" y2="347"/>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="657" y="213">文書</text>
+    <text x="657" y="257">結果</text>
+    <text x="657" y="318">文書</text>
+    <text x="657" y="362">結果</text>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="end">
+    <text x="226" y="224">読む</text>
+    <text x="226" y="324">使い回す</text>
+  </g>
+</svg>
