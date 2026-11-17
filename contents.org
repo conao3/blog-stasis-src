@@ -22072,7 +22072,6 @@ Hasuraの動きで分からないところは、Explain APIが返すSQLを読む
 :export_file_name: generated/contents/blog/2026/2a0865
 :export_date: 2026-11-17 16:37
 :export_tags: rust lean japanese-law linter formal-verification release rust-ritsulint lean-leanfran
-:export_draft: t
 :end:
 
 日本の法令を検査するlinterのritsulintを作りました。
