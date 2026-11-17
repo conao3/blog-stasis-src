@@ -1,257 +1,300 @@
-import { forceLayout, routeEdge } from './oss-map-layout.mjs';
-
 (() => {
   'use strict';
   const root = document.querySelector('[data-oss-map]');
   if (!root) return;
-  const data = JSON.parse(root.querySelector('.oss-map-data').textContent);
+  const map = JSON.parse(root.querySelector('.oss-map-data').textContent);
   const ja = root.dataset.lang === 'ja';
-  const label = (j, e) => ja ? j : e;
-  const svg = root.querySelector('svg');
+  const t = (j, e) => ja ? j : e;
+  const text = item => ja ? item.ja : item.en;
+  const frame = root.querySelector('.oss-map-frame');
+  const viewport = root.querySelector('.oss-map-viewport');
+  const world = root.querySelector('.oss-map-world');
   const detail = root.querySelector('.oss-map-detail');
-  const area = root.querySelector('select');
+  const zoomLabel = root.querySelector('.oss-map-scale');
+  const expandButton = root.querySelector('[data-action="expand"]');
   const ns = 'http://www.w3.org/2000/svg';
-  const measure = document.createElement('canvas').getContext('2d');
-  measure.font = `20px ${getComputedStyle(svg).fontFamily}`;
-  function wrapDescription(text) {
-    const lines = []; let line = '';
-    for (const part of (ja ? Array.from(text) : text.split(/(\s+)/))) {
-      if (line && measure.measureText(line + part).width > 471) {
-        lines.push(line.trim()); line = '';
-      }
-      line += part;
-    }
-    if (line.trim()) lines.push(line.trim());
-    return lines;
-  }
-  const { nodes, groups: groupBounds, width, height } = forceLayout(data.nodes.map(n => {
-    const lines = wrapDescription(ja ? n.description : n.enDescription);
-    const groupIndex = data.groups.findIndex(([, ids]) => ids.includes(n.id));
-    return { ...n, lines, groupIndex, width: 495, height: 56 + lines.length * 24 };
-  }), data.edges);
-  const byId = new Map(nodes.map(n => [n.id, n]));
-  let x = 0, y = 0, scale = 1;
-  const nodeElements = new Map(), edgeElements = [];
-  function element(tag, attrs, parent, text) {
+  const MARGIN = 16, MIN_SCALE = 0.2, MAX_SCALE = 2;
+  const byId = new Map(map.nodes.map(n => [n.id, n]));
+
+  function svgElement(tag, attrs, parent, content) {
     const el = document.createElementNS(ns, tag);
     for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
-    if (text !== undefined) el.textContent = text;
+    if (content !== undefined) el.textContent = content;
     parent.append(el);
     return el;
   }
-  const defs = element('defs', {}, svg);
-  const marker = element('marker', { id: 'oss-map-arrow', markerWidth: 12, markerHeight: 12,
-    refX: 11, refY: 6, orient: 'auto', markerUnits: 'userSpaceOnUse' }, defs);
-  element('path', { d: 'M0 0 L12 6 L0 12', fill: 'context-stroke' }, marker);
-  const world = element('g', { class: 'oss-map-world' }, svg);
-  const wires = element('g', { class: 'oss-map-wires' }, world);
-  data.groups.forEach(([name], i) => {
-    element('text', { x: groupBounds[i].x + 24, y: groupBounds[i].y + 34,
-      class: 'oss-map-group' }, world, ja ? name : data.groupNames[i]);
-  });
-  data.edges.forEach(([from, to, relation], i) => {
-    const a = byId.get(from), b = byId.get(to);
-    const route = routeEdge(a, b, nodes, i);
-    const merged = relation === '統合';
-    const el = element('path', { d: route.d, class: 'oss-map-edge' + (merged ? ' is-merge' : ''),
-      'data-from': from, 'data-to': to, 'data-obstacle-hits': route.hits,
-      'marker-end': 'url(#oss-map-arrow)', 'stroke-linejoin': 'round' }, wires);
-    edgeElements.push(el);
-    if (merged) {
-      const { x, y, vertical } = route.label;
-      element('text', { x, y: y - 7, class: 'oss-map-edge-label', 'text-anchor': 'middle',
-        transform: vertical ? 'rotate(-90 ' + x + ' ' + y + ')' : '' }, wires, label('統合', 'Merged into'));
+  function htmlElement(tag, attrs, parent, content) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+    if (content !== undefined) el.textContent = content;
+    parent?.append(el);
+    return el;
+  }
+  function roundedPath(points, radius = 6) {
+    let d = `M${points[0][0]},${points[0][1]}`;
+    for (let i = 1; i < points.length - 1; i++) {
+      const [px, py] = points[i - 1], [x, y] = points[i], [nx, ny] = points[i + 1];
+      const r = Math.min(radius, Math.hypot(x - px, y - py) / 2, Math.hypot(nx - x, ny - y) / 2);
+      const ax = x - Math.sign(x - px) * r, ay = y - Math.sign(y - py) * r;
+      const bx = x + Math.sign(nx - x) * r, by = y + Math.sign(ny - y) * r;
+      d += ` L${ax},${ay} Q${x},${y} ${bx},${by}`;
     }
+    const [lx, ly] = points.at(-1);
+    return d + ` L${lx},${ly}`;
+  }
+
+  world.style.width = `${map.width}px`;
+  world.style.height = `${map.height}px`;
+  const svg = svgElement('svg', { width: map.width, height: map.height, viewBox: `0 0 ${map.width} ${map.height}`, 'aria-hidden': 'true' }, world);
+  const defs = svgElement('defs', {}, svg);
+  for (const name of ['default', 'merge', 'active']) {
+    const marker = svgElement('marker', { id: `oss-map-arrow-${name}`, class: `oss-map-arrow is-${name}`, markerWidth: 8, markerHeight: 8,
+      refX: 7, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse' }, defs);
+    svgElement('path', { d: 'M0,0 L8,4 L0,8 Z' }, marker);
+  }
+  map.groups.forEach(group => {
+    svgElement('rect', { class: 'oss-map-group', x: group.x, y: group.y, width: group.width, height: group.height, rx: 8 }, svg);
+    svgElement('text', { class: 'oss-map-group-title', x: group.x + 20, y: group.y + 30 }, svg, text(group));
   });
-  nodes.forEach(n => {
-    const el = element('g', { class: 'oss-map-node', 'data-node': n.id, role: 'button',
-      tabindex: 0, 'aria-label': `${n.id}: ${ja ? n.description : n.enDescription}`, 'aria-pressed': 'false' }, world);
-    element('rect', { x: n.x, y: n.y, width: 495, height: n.height, rx: 5 }, el);
-    element('text', { x: n.x + 12, y: n.y + 28 }, el, n.id);
-    const description = element('text', { class: 'oss-map-description', x: n.x + 12, y: n.y + 56 }, el);
-    n.lines.forEach((line, i) => element('tspan', { x: n.x + 12, dy: i ? 24 : 0 }, description, line));
-    nodeElements.set(n.id, el);
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(n.id); reveal(n); }
+  const edgeElements = map.edges.map(edge => {
+    const marker = edge.kind === 'merge' ? 'merge' : 'default';
+    const g = svgElement('g', { class: `oss-map-edge is-${edge.kind}` }, svg);
+    const path = svgElement('path', { d: roundedPath(edge.points), 'marker-end': `url(#oss-map-arrow-${marker})` }, g);
+    svgElement('text', { x: edge.label[0], y: edge.label[1], 'dominant-baseline': 'central' }, g, text(edge));
+    return { edge, g, path, marker };
+  });
+  const nodeElements = new Map();
+  for (const node of map.nodes) {
+    const button = htmlElement('button', { type: 'button', class: 'oss-map-node', 'data-id': node.id, 'aria-pressed': 'false' }, world);
+    button.style.left = `${node.x}px`;
+    button.style.top = `${node.y}px`;
+    button.style.width = `${map.nodeWidth}px`;
+    button.style.height = `${map.nodeHeight}px`;
+    htmlElement('span', { class: 'oss-map-node-name' }, button, node.id);
+    htmlElement('span', { class: 'oss-map-node-description' }, button, text(node));
+    button.addEventListener('click', () => {
+      if (suppressClick) return;
+      select(selected === node.id ? null : node.id);
     });
-    el.addEventListener('focus', () => reveal(n));
-  });
+    button.addEventListener('focus', () => reveal(node));
+    nodeElements.set(node.id, button);
+  }
+
+  let x = MARGIN, y = MARGIN, scale = 1, selected = null, suppressClick = false;
+  function clamp() {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const w = map.width * scale, h = map.height * scale;
+    x = Math.min(MARGIN, Math.max(x, Math.min(MARGIN, vw - MARGIN - w)));
+    y = Math.min(MARGIN, Math.max(y, Math.min(MARGIN, vh - MARGIN - h)));
+  }
   function draw() {
-    x = Math.min(0, x); y = Math.min(0, y);
-    world.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
+    clamp();
+    world.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    zoomLabel.textContent = `${Math.round(scale * 100)}%`;
   }
-  function fit() {
-    scale = Math.min(svg.clientWidth / width, svg.clientHeight / height);
-    x = 0; y = 0;
-    area.value = 'all'; draw();
-  }
-  function reveal(n) {
-    if (n.x * scale + x < 0 || (n.x + 495) * scale + x > svg.clientWidth ||
-        n.y * scale + y < 0 || (n.y + n.height) * scale + y > svg.clientHeight) {
-      scale = Math.max(0.3, Math.min(1.2, svg.clientWidth / 550));
-      x = (24 - n.x) * scale;
-      y = (24 - n.y) * scale;
-      draw();
-    }
-  }
-  function zoom(factor, cx = 0, cy = 0) {
-    const next = Math.max(0.12, Math.min(3, scale * factor));
+  function zoomTo(next, cx = viewport.clientWidth / 2, cy = viewport.clientHeight / 2) {
+    next = Math.max(MIN_SCALE, Math.min(MAX_SCALE, next));
     x = cx - (cx - x) * next / scale;
     y = cy - (cy - y) * next / scale;
-    scale = next; draw();
+    scale = next;
+    draw();
   }
-  function choose(id, writeUrl = true) {
-    const node = byId.get(id);
-    if (!node) return;
-    const connected = new Set([id]);
-    data.edges.forEach(([from, to], i) => {
-      const active = from === id || to === id;
-      edgeElements[i].classList.toggle('is-active', active);
-      if (active) { connected.add(from); connected.add(to); }
-    });
-    nodeElements.forEach((el, key) => {
-      el.setAttribute('aria-pressed', String(key === id));
-      el.classList.toggle('is-connected', connected.has(key));
-      el.classList.toggle('is-muted', !connected.has(key));
-    });
+  function fitAll() {
+    scale = Math.max(MIN_SCALE, Math.min(1, (viewport.clientWidth - 2 * MARGIN) / map.width, (viewport.clientHeight - 2 * MARGIN) / map.height));
+    x = MARGIN; y = MARGIN;
+    draw();
+  }
+  function showGroup(index) {
+    const group = map.groups[index];
+    scale = 1;
+    x = MARGIN - group.x; y = MARGIN - group.y;
+    draw();
+  }
+  function reveal(node) {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const visible = () => {
+      const left = x + node.x * scale, top = y + node.y * scale;
+      return left >= 0 && top >= 0 && left + map.nodeWidth * scale <= vw && top + map.nodeHeight * scale <= vh;
+    };
+    if (visible() && scale >= 0.6) return;
+    const group = map.groups[node.group];
+    scale = 1;
+    x = Math.min(MARGIN - group.x, vw - MARGIN - node.x - map.nodeWidth);
+    y = Math.min(MARGIN - group.y, vh - MARGIN - node.y - map.nodeHeight);
+    draw();
+  }
+
+  function nameButton(id) {
+    const button = htmlElement('button', { type: 'button', class: 'oss-map-link' }, null, id);
+    button.addEventListener('click', () => { select(id); nodeElements.get(id).focus({ preventScroll: true }); });
+    return button;
+  }
+  function renderDetail(node) {
     detail.replaceChildren();
-    const link = document.createElement('a');
-    link.href = node.url; link.textContent = id; detail.append(link);
-    const description = document.createElement('p');
-    description.textContent = ja ? node.description : node.enDescription;
-    detail.append(description);
-    const list = document.createElement('ul');
-    data.edges.forEach(([from, to, text], i) => {
-      if (from !== id && to !== id) return;
-      const li = document.createElement('li');
-      li.append(`${from} → `);
-      const a = document.createElement('a'); a.href = `https://github.com/conao3/${to}`;
-      a.textContent = to; li.append(a, `: ${ja ? text : data.edgeLabels[i]}`); list.append(li);
-    });
-    if (list.children.length) detail.append(list);
-    else {
-      const p = document.createElement('p');
-      p.textContent = label('この図には直接の関係線を掲載していません。', 'No direct relationship is documented on this map.');
-      detail.append(p);
+    const header = htmlElement('div', { class: 'oss-map-detail-header' }, detail);
+    htmlElement('h4', {}, header, node.id);
+    const close = htmlElement('button', { type: 'button', class: 'oss-map-close', 'aria-label': t('閉じる', 'Close') }, header, '×');
+    close.addEventListener('click', () => { select(null); nodeElements.get(node.id).focus({ preventScroll: true }); });
+    htmlElement('p', {}, detail, text(node));
+    const related = map.edges.filter(e => e.from === node.id || e.to === node.id);
+    if (related.length) {
+      const list = htmlElement('ul', { class: 'oss-map-relations' }, detail);
+      for (const edge of related) {
+        const item = htmlElement('li', {}, list);
+        const from = edge.from === node.id ? htmlElement('strong', {}, null, edge.from) : nameButton(edge.from);
+        const to = edge.to === node.id ? htmlElement('strong', {}, null, edge.to) : nameButton(edge.to);
+        item.append(from, ' → ', to);
+        htmlElement('span', { class: 'oss-map-relation' }, item, text(edge));
+      }
+    }
+    htmlElement('a', { href: node.url, class: 'oss-map-github' }, detail, t('GitHub で見る', 'View on GitHub'));
+  }
+  function select(id, { writeUrl = true } = {}) {
+    selected = byId.has(id) ? id : null;
+    const connected = new Set(selected ? [selected] : []);
+    for (const { edge, g, path, marker } of edgeElements) {
+      const active = selected !== null && (edge.from === selected || edge.to === selected);
+      if (active) { connected.add(edge.from); connected.add(edge.to); }
+      g.classList.toggle('is-active', active);
+      g.classList.toggle('is-muted', selected !== null && !active);
+      path.setAttribute('marker-end', `url(#oss-map-arrow-${active ? 'active' : marker})`);
+    }
+    for (const [key, button] of nodeElements) {
+      button.setAttribute('aria-pressed', String(key === selected));
+      button.classList.toggle('is-muted', selected !== null && !connected.has(key));
+    }
+    root.classList.toggle('has-selection', selected !== null);
+    detail.hidden = selected === null;
+    if (selected) {
+      renderDetail(byId.get(selected));
+      requestAnimationFrame(() => {
+        reveal(byId.get(selected));
+        if (writeUrl && !root.classList.contains('is-expanded')) detail.scrollIntoView({ block: 'nearest' });
+      });
     }
     if (writeUrl) {
-      const url = new URL(location.href); url.searchParams.set('oss', id);
-      history.replaceState(null, '', url);
-    }
-  }
-  root.querySelector('[data-action="zoom-in"]').onclick = () => zoom(1.3);
-  root.querySelector('[data-action="zoom-out"]').onclick = () => zoom(1 / 1.3);
-  root.querySelector('[data-action="fit"]').onclick = fit;
-  const fullscreenButton = root.querySelector('[data-action="fullscreen"]');
-  let previousOverflow = '';
-  function closeExpanded() {
-    root.classList.remove('is-expanded');
-    root.removeAttribute('role'); root.removeAttribute('aria-modal'); root.removeAttribute('aria-label');
-    document.body.style.overflow = previousOverflow;
-    fullscreenButton.textContent = label('全画面', 'Fullscreen');
-    fullscreenButton.focus();
-  }
-  fullscreenButton.onclick = () => {
-    if (root.classList.contains('is-expanded')) { closeExpanded(); return; }
-    previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    root.classList.add('is-expanded');
-    root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true');
-    root.setAttribute('aria-label', label('OSSの関係図', 'Open-source project map'));
-    fullscreenButton.textContent = label('元の表示に戻す', 'Exit fullscreen');
-  };
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && root.classList.contains('is-expanded')) closeExpanded();
-    if (e.key === 'Tab' && root.classList.contains('is-expanded')) {
-      const controls = [...root.querySelectorAll('button, select, a[href], [tabindex="0"]')]
-        .filter(el => el.getClientRects().length);
-      const first = controls[0], last = controls.at(-1);
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
-  area.onchange = event => {
-    if (event) {
       const url = new URL(location.href);
-      if (area.value === 'all') url.searchParams.delete('oss-area');
-      else url.searchParams.set('oss-area', area.value);
-      history.replaceState(null, '', url);
-    }
-    if (area.value === 'all') { fit(); return; }
-    const index = Number(area.value);
-    const bounds = groupBounds[index];
-    scale = Math.min(svg.clientWidth / bounds.width, svg.clientHeight / bounds.height, 1.5);
-    x = -bounds.x * scale; y = -bounds.y * scale;
-    draw();
-  };
-  svg.addEventListener('wheel', e => {
-    if (!e.ctrlKey && !e.metaKey) return;
-    e.preventDefault(); const b = svg.getBoundingClientRect();
-    zoom(Math.exp(-e.deltaY * 0.006), e.clientX - b.left, e.clientY - b.top);
-  }, { passive: false });
-  const pointers = new Map(); let gesture = null, dragging = false;
-  function beginGesture() {
-    const ps = [...pointers.values()];
-    if (ps.length === 1) gesture = { x, y, px: ps[0].x, py: ps[0].y, id: ps[0].node };
-    else if (ps.length >= 2) {
-      const cx = (ps[0].x + ps[1].x) / 2, cy = (ps[0].y + ps[1].y) / 2;
-      gesture = { distance: Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y), scale,
-        wx: (cx - x) / scale, wy: (cy - y) / scale };
-      dragging = true;
+      if (selected) url.searchParams.set('oss', selected);
+      else url.searchParams.delete('oss');
+      history.replaceState(history.state, '', url);
     }
   }
-  svg.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return;
-    const b = svg.getBoundingClientRect();
-    pointers.set(e.pointerId, { x: e.clientX - b.left, y: e.clientY - b.top, node: e.target.closest('[data-node]')?.dataset.node });
-    if (pointers.size === 1) dragging = false;
-    svg.setPointerCapture(e.pointerId); beginGesture();
+
+  root.querySelector('[data-action="zoom-in"]').addEventListener('click', () => zoomTo(scale * 1.25));
+  root.querySelector('[data-action="zoom-out"]').addEventListener('click', () => zoomTo(scale / 1.25));
+  root.querySelector('[data-action="fit"]').addEventListener('click', fitAll);
+  root.querySelectorAll('[data-area]').forEach(button => button.addEventListener('click', () => showGroup(Number(button.dataset.area))));
+
+  let previousOverflow = '';
+  function setExpanded(expanded) {
+    root.classList.toggle('is-expanded', expanded);
+    expandButton.setAttribute('aria-pressed', String(expanded));
+    expandButton.textContent = expanded ? t('元に戻す', 'Exit full view') : t('全画面', 'Full view');
+    if (expanded) {
+      previousOverflow = document.documentElement.style.overflow;
+      document.documentElement.style.overflow = 'hidden';
+      frame.setAttribute('role', 'dialog');
+      frame.setAttribute('aria-modal', 'true');
+    } else {
+      document.documentElement.style.overflow = previousOverflow;
+      frame.removeAttribute('role');
+      frame.removeAttribute('aria-modal');
+    }
+    draw();
+  }
+  expandButton.addEventListener('click', () => setExpanded(!root.classList.contains('is-expanded')));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      if (selected && root.contains(document.activeElement)) { select(null); return; }
+      if (root.classList.contains('is-expanded')) { setExpanded(false); expandButton.focus(); }
+      return;
+    }
+    if (event.key === 'Tab' && root.classList.contains('is-expanded')) {
+      const items = [...frame.querySelectorAll('button, a[href], [tabindex="0"]')].filter(el => el.getClientRects().length);
+      const first = items[0], last = items.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    }
   });
-  svg.addEventListener('pointermove', e => {
-    if (!pointers.has(e.pointerId)) return;
-    const b = svg.getBoundingClientRect(), old = pointers.get(e.pointerId);
-    pointers.set(e.pointerId, { ...old, x: e.clientX - b.left, y: e.clientY - b.top });
-    const ps = [...pointers.values()];
-    if (ps.length >= 2 && gesture.distance) {
-      scale = Math.max(0.12, Math.min(3, gesture.scale * Math.hypot(ps[0].x - ps[1].x, ps[0].y - ps[1].y) / gesture.distance));
-      x = (ps[0].x + ps[1].x) / 2 - gesture.wx * scale;
-      y = (ps[0].y + ps[1].y) / 2 - gesture.wy * scale;
-    } else if (ps.length === 1 && gesture) {
-      const dx = ps[0].x - gesture.px, dy = ps[0].y - gesture.py;
-      if (Math.abs(dx) + Math.abs(dy) > 5) dragging = true;
+
+  viewport.addEventListener('wheel', event => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    const box = viewport.getBoundingClientRect();
+    zoomTo(scale * Math.exp(-event.deltaY * 0.004), event.clientX - box.left, event.clientY - box.top);
+  }, { passive: false });
+  const pointers = new Map();
+  let gesture = null, moved = false;
+  function startGesture() {
+    const points = [...pointers.values()];
+    if (points.length === 1) gesture = { x, y, px: points[0].x, py: points[0].y };
+    else {
+      const [a, b] = points;
+      const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+      gesture = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale, wx: (cx - x) / scale, wy: (cy - y) / scale };
+      moved = true;
+    }
+  }
+  viewport.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || detail.contains(event.target)) return;
+    const box = viewport.getBoundingClientRect();
+    pointers.set(event.pointerId, { x: event.clientX - box.left, y: event.clientY - box.top });
+    if (pointers.size === 1) moved = false;
+    startGesture();
+  });
+  viewport.addEventListener('pointermove', event => {
+    if (!pointers.has(event.pointerId)) return;
+    const box = viewport.getBoundingClientRect();
+    pointers.set(event.pointerId, { x: event.clientX - box.left, y: event.clientY - box.top });
+    const points = [...pointers.values()];
+    if (points.length >= 2 && gesture.distance) {
+      const [a, b] = points;
+      scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, gesture.scale * Math.hypot(a.x - b.x, a.y - b.y) / gesture.distance));
+      x = (a.x + b.x) / 2 - gesture.wx * scale;
+      y = (a.y + b.y) / 2 - gesture.wy * scale;
+    } else if (points.length === 1 && gesture) {
+      const dx = points[0].x - gesture.px, dy = points[0].y - gesture.py;
+      if (!moved && Math.hypot(dx, dy) > 4) {
+        moved = true;
+        viewport.setPointerCapture(event.pointerId);
+        viewport.classList.add('is-dragging');
+      }
+      if (!moved) return;
       x = gesture.x + dx; y = gesture.y + dy;
     }
     draw();
   });
-  function endPointer(e) {
-    if (!pointers.has(e.pointerId)) return;
-    const id = gesture?.id;
-    pointers.delete(e.pointerId);
-    if (e.type === 'pointerup' && !dragging && id) choose(id);
-    if (pointers.size) beginGesture(); else gesture = null;
-  }
-  svg.addEventListener('pointerup', endPointer);
-  svg.addEventListener('pointercancel', endPointer);
-  svg.addEventListener('keydown', e => {
-    const moves = { ArrowLeft: [70, 0], ArrowRight: [-70, 0], ArrowUp: [0, 70], ArrowDown: [0, -70] };
-    if (moves[e.key]) { e.preventDefault(); x += moves[e.key][0]; y += moves[e.key][1]; draw(); }
-    else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoom(1.3); }
-    else if (e.key === '-') { e.preventDefault(); zoom(1 / 1.3); }
-    else if (e.key === '0') { e.preventDefault(); fit(); }
-  });
-  root.querySelector('.oss-map-interactive').hidden = false;
-  area.value = '0'; area.onchange();
-  // Resizing the viewport preserves the camera; only explicit controls change scale.
-  function restore() {
-    const params = new URL(location.href).searchParams;
-    const id = params.get('oss'), savedArea = params.get('oss-area');
-    if (savedArea !== null && /^[0-5]$/.test(savedArea)) {
-      area.value = savedArea; area.onchange();
-    } else if (byId.has(id)) {
-      area.value = String(data.groups.findIndex(([, ids]) => ids.includes(id)));
-      area.onchange();
+  function endPointer(event) {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.delete(event.pointerId);
+    if (pointers.size) { startGesture(); return; }
+    gesture = null;
+    viewport.classList.remove('is-dragging');
+    if (moved) {
+      suppressClick = true;
+      setTimeout(() => { suppressClick = false; });
+    } else if (event.type === 'pointerup' && selected && !event.target.closest('.oss-map-node')) {
+      select(null);
     }
-    if (byId.has(id)) { choose(id, false); reveal(byId.get(id)); }
   }
-  restore(); window.addEventListener('popstate', restore);
+  viewport.addEventListener('pointerup', endPointer);
+  viewport.addEventListener('pointercancel', endPointer);
+  viewport.addEventListener('keydown', event => {
+    if (event.target !== viewport) return;
+    const step = 80, moves = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+    if (moves[event.key]) { event.preventDefault(); x += moves[event.key][0]; y += moves[event.key][1]; draw(); }
+    else if (event.key === '+' || event.key === '=') { event.preventDefault(); zoomTo(scale * 1.25); }
+    else if (event.key === '-') { event.preventDefault(); zoomTo(scale / 1.25); }
+    else if (event.key === '0') { event.preventDefault(); fitAll(); }
+  });
+  new ResizeObserver(draw).observe(viewport);
+
+  function restore() {
+    const id = new URL(location.href).searchParams.get('oss');
+    select(id, { writeUrl: false });
+  }
+  frame.hidden = false;
+  draw();
+  restore();
+  window.addEventListener('popstate', restore);
 })();

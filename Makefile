@@ -25,3 +25,7 @@ SPECTRUM_FILE += typography.json
 
 .PHONY: fetch
 fetch: $(SPECTRUM_FILE:%=resources/specturm/%)
+
+.PHONY: oss-map
+oss-map:
+	node scripts/oss-map-layout.mjs

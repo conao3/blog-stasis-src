@@ -1,24 +1,29 @@
 # Portfolio project map
 
-The English and Japanese portfolio pages include an interactive map after the existing open-source list. The map adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
+The English and Japanese portfolio pages include a map of 44 open-source projects and 18 relationships, placed after the open-source list. It adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
 
-`resources/public/assets/oss-map.json` contains 44 projects and 18 documented relationships, collected on 2026-11-17. Only public project names, descriptions, GitHub URLs and README-backed relationships are included. Groups are editorial categories, not dependency claims. Edge labels distinguish merges, code generation, extensions, development tooling and validation. The three former backends `lean-py`, `lean-ts` and `lean-clj` each point to `lean-leanfran` with a labeled, dashed merge arrow, matching the migration notices at the top of their public READMEs.
+## Data and layout
 
-`portfolio.clj` renders the headings, controls, JSON payload and a complete text fallback. `core.clj` includes `oss-map.js` as a module only on pages containing the map. `oss-map-layout.mjs` computes a deterministic force layout: springs bring connected projects closer, group attraction keeps topics together, repulsion and rectangular collision constraints keep descriptions apart. The simulation settles once before drawing; expanding, panning and resizing never restart it. Connections route around block rectangles and terminate at their borders. The scripts create SVG nodes and connections using the site's Spectrum colors, without external packages.
+- `resources/oss-map/source.json` holds the hand-written data: five groups with their project IDs, a one-line Japanese and English description for every project, and the relationships as `[from, to, kind, ja, en]`. `kind` is `merge` (a former repository merged into another, drawn as a dashed arrow) or `link`. Every relationship stays within one group, and only relationships stated in the projects' READMEs are included.
+- `make oss-map` (`scripts/oss-map-layout.mjs`, using `elkjs` from `devDependencies`) computes the layout and writes `resources/public/assets/oss-map.json`. Connected projects in each group are placed by ELK's layered algorithm from left to right with orthogonal edges and inline labels; unconnected projects follow in a grid. Groups are stacked top to bottom with a common width. Run it after editing `source.json` and commit both files.
+- Blocks are 208 × 72 px. A description must fit in two lines in both languages; the browser check below catches overflow.
+
+## Page
+
+`portfolio.clj` renders the heading, lead paragraph, the area and zoom controls, the map frame, a hint, a complete list in `<details>` and the JSON. `core.clj` loads `oss-map.js` with `defer` only on pages containing the map. The script draws groups and arrows in one SVG and the projects as buttons on top of it, all inside one transformed layer. The frame is wider than the text column, up to 1440 px.
 
 | Feature | Action | Expected result |
 |---|---|---|
-| Initial rendering | Open either portfolio page | 44 nodes, 18 edges; no overlapping block rectangles; start with the Lean area; every node shows its name and a wrapping description, with height derived from its line count |
-| Merged projects | Open the Lean area or select leanfran | Three visible, labeled arrows point from lean-py/lean-ts/lean-clj into leanfran; their routes do not cross block interiors |
-| Selection | Click/tap a project, or focus it and press Enter/Space | Highlight its connections and show descriptions, relationship labels and linked project names |
-| Share selection | Select a project, then reload the URL containing `oss` | Restore the selection and bring it into view |
-| Area | Select an area | Align that group at the top left; store the chosen area in `oss-area` |
-| Zoom | Use +/−, Ctrl/Command-wheel or a two-pointer pinch | Change scale around the zoom center |
-| Pan | Drag the map, or focus it and press arrow keys | Change translation; dragging must not select a project |
-| Alignment | Initialize, fit, zoom out or change area | Anchor the map or selected area at the top left; panning cannot introduce blank space before the map origin |
-| Overview | Click Fit all | Fit the complete map from the top-left corner of the canvas |
-| Fullscreen | Click Fullscreen, then click again or press Escape | Fill the existing browser viewport with the map and controls; keep the map transform and block size unchanged on entry and exit; never call the native fullscreen API or resize the browser window |
-| Viewport resize | Expand the map or resize the browser | Preserve the current pan and zoom, including after manually zooming or fitting all; only explicit zoom, fit, area or project navigation changes the camera |
-| Script unavailable | Read the expandable text list | All 44 projects and outgoing relationships remain available without JavaScript |
+| Initial view | Open either portfolio page | 100%, the map's top-left corner at the frame's top-left; every block shows its name and description without clipping |
+| Area | Click an area button | 100%, that group's top-left corner at the frame's top-left |
+| Zoom | −/+ buttons, `-`/`+` keys on the focused map, Ctrl/⌘ + wheel, pinch | Scale changes around the centre or the pointer; the percentage updates |
+| Fit | Click Fit or press `0` | The whole map from the top-left corner |
+| Pan | Drag, or arrow keys on the focused map | The map moves; it never leaves blank space before its top-left corner; a drag does not select |
+| Selection | Click a block, or Tab to it and press Enter | The block and its arrows are highlighted, other blocks dim, and the panel below the map shows the description, each relationship with links to the other projects, and the GitHub link; `?oss=<id>` is written to the URL |
+| Clear selection | Click the panel's ×, click empty space, or press Escape | Highlight and panel disappear; `oss` is removed from the URL |
+| Restore | Open a URL with `?oss=<id>`, or go back/forward | The project is selected and brought into view at 100% |
+| Full view | Click Full view; click again or press Escape | The frame fills the browser window without resizing the window; scale and position stay the same on entry and exit |
+| Narrow screens | 390 px width | No horizontal page scroll; the panel follows the map |
+| Without JavaScript | Open the list | All projects with descriptions and outgoing relationships |
 
-Build with `nix develop -c make build`. Validate changes in a real browser, including node selection, zoom, drag and narrow layouts; JavaScript syntax checks alone do not establish that the map works in its delivery environment.
+Check these in a real browser after any change, including the browser console.

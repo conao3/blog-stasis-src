@@ -1,0 +1,95 @@
+{
+  "groups": [
+    {
+      "ja": "Lean と形式検証",
+      "en": "Lean and formal verification",
+      "nodes": ["lean-leanfran", "lean-py", "lean-ts", "lean-clj", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-assay", "rust-leanwisp", "lean-todo-app"]
+    },
+    {
+      "ja": "Emacs",
+      "en": "Emacs",
+      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "feather.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
+    },
+    {
+      "ja": "翻訳と文書",
+      "en": "Translation and documents",
+      "nodes": ["rust-plamo-tr", "rust-plamo-tr-po", "emacs-doc", "rust-plamo-tr-local", "rust-overhear", "orglyth.el", "ox-zenn.el", "ox-deck.el"]
+    },
+    {
+      "ja": "AWS とサーバー",
+      "en": "AWS and servers",
+      "nodes": ["wasm-wasmo", "bun-bunsai", "rust-awscli", "rust-sqs-poller", "ts-apollo-server-integration-hono", "lambda-helper.ts"]
+    },
+    {
+      "ja": "エージェントと開発環境",
+      "en": "Agents and development environments",
+      "nodes": ["nix-sel4", "nix-sel4-example", "nix-agents", "rust-relaykit", "rust-inspect-jsonl", "rust-outbound-manifest", "rust-document-packet", "rust-devo"]
+    }
+  ],
+  "nodes": {
+    "lean-leanfran": ["Lean で証明した関数を 4 言語のコードに変換", "Prove functions in Lean, run them in four languages"],
+    "lean-py": ["Python 版。leanfran に統合済み", "Python backend, merged into leanfran"],
+    "lean-ts": ["TypeScript 版。leanfran に統合済み", "TypeScript backend, merged into leanfran"],
+    "lean-clj": ["Clojure 版。leanfran に統合済み", "Clojure backend, merged into leanfran"],
+    "lean-ritsuryo": ["法令の期間計算を Lean で定義して証明", "Japanese statutory periods, defined and proved in Lean"],
+    "rust-ritsuryo": ["法令の期間と税の計算を Rust とブラウザで使う", "Statutory periods and taxes for Rust and the browser"],
+    "rust-leansail": ["Rust と Lean で作る Lean の言語サーバー", "Lean language server with a Rust host"],
+    "rust-lsp-touchstone": ["LSP の実装を試験するクライアントとプロキシ", "Strict LSP client, server and proxy for testing"],
+    "lean-assay": ["壊した実装を流し、定理が実装を縛れているか調べる", "Run broken implementations to test theorem strength"],
+    "rust-leanwisp": ["Lean 4 のコード整形ツール", "Lean 4 source formatter"],
+    "lean-todo-app": ["状態遷移を Lean で検証した Todo アプリ", "Todo app with a Lean-verified state core"],
+    "leaf.el": ["init.el のパッケージ設定を宣言的に書く", "Declarative init.el package configuration"],
+    "leaf-keywords.el": ["外部パッケージ向けの leaf のキーワード", "Extra leaf keywords for external packages"],
+    "leaf-tree.el": ["leaf の設定をサイドバーに木で表示", "Side bar tree of a leaf-based init.el"],
+    "leaf-convert.el": ["既存の Elisp の設定を leaf に変換", "Convert Elisp configuration to leaf"],
+    "feather.el": ["並列で動く Emacs のパッケージマネージャー", "Parallel Emacs package manager"],
+    "keg.el": ["Elisp パッケージの開発ツール", "Elisp package development tool"],
+    "leaner-ts-mode.el": ["tree-sitter で動く Lean 4 のメジャーモード", "Lean 4 major mode with tree-sitter"],
+    "cort.el": ["Emacs の単体テストフレームワーク", "Emacs unit test framework"],
+    "ppp.el": ["Emacs Lisp の値を整形して表示", "Pretty printer for Emacs Lisp"],
+    "ts-elispore": ["GitHub にある Emacs パッケージを探す", "Find Emacs packages hosted on GitHub"],
+    "eglot-lsp-settings.el": ["言語サーバーを自動でインストール", "Install language servers automatically"],
+    "rust-plamo-tr": ["PLaMo 翻訳をコマンドラインで使う", "PLaMo Translate on the command line"],
+    "rust-plamo-tr-po": ["gettext の PO ファイルを PLaMo 翻訳で訳す", "Translate gettext PO files with PLaMo"],
+    "emacs-doc": ["GNU Emacs のマニュアルの日本語訳", "Japanese translation of the GNU Emacs manuals"],
+    "rust-plamo-tr-local": ["手元で動かす PLaMo 3 で翻訳する", "Translate with PLaMo 3 on your machine"],
+    "rust-overhear": ["音声の文字起こし、二言語字幕、単語学習", "Transcripts, dual subtitles and vocabulary study"],
+    "orglyth.el": ["Org mode から静的サイトを作る", "Publish a static site from Org files"],
+    "ox-zenn.el": ["Org の文書を Zenn 向けに書き出す", "Export Org documents for Zenn"],
+    "ox-deck.el": ["Org の文書をスライドに書き出す", "Export Org documents as slide decks"],
+    "wasm-wasmo": ["WebAssembly で動くプロセス内の AWS モック", "In-process AWS mock in one WebAssembly module"],
+    "bun-bunsai": ["Bun で作るローカルの AWS エミュレーター", "Local AWS API emulator built with Bun"],
+    "rust-awscli": ["出力互換の AWS CLI v2 を Rust で再実装", "Output-compatible AWS CLI v2 in Rust"],
+    "rust-sqs-poller": ["キューが空のときは間隔を延ばす SQS のポーラー", "SQS poller that backs off while the queue is empty"],
+    "ts-apollo-server-integration-hono": ["Apollo Server を Hono で動かす", "Apollo Server on Hono"],
+    "lambda-helper.ts": ["AWS Lambda で使うヘルパー", "Helpers for AWS Lambda"],
+    "nix-sel4": ["seL4 Microkit のシステムを Nix でビルド", "Build seL4 Microkit systems with Nix"],
+    "nix-sel4-example": ["nix-sel4 で作る起動できる seL4 のシステム", "Bootable seL4 system built with nix-sel4"],
+    "nix-agents": ["コーディングエージェントを Nix で複数動かす", "Run coding agents as multiple instances with Nix"],
+    "rust-relaykit": ["AI エージェント間の通信ゲートウェイ", "Communication gateway between AI agents"],
+    "rust-inspect-jsonl": ["Claude と Codex のセッションログを調べる", "Inspect Claude and Codex session logs"],
+    "rust-outbound-manifest": ["送信前のメッセージと添付を承認と照らして検査", "Check outbound messages against sealed approvals"],
+    "rust-document-packet": ["PDF の検査・重ね書き・生成を JSON で再現", "Reproducible PDF checks, overlays and rendering"],
+    "rust-devo": ["小さな DSL から tmux の開発環境を起動", "Run tmux development workflows from a small DSL"]
+  },
+  "edges": [
+    ["lean-py", "lean-leanfran", "merge", "統合", "merged"],
+    ["lean-ts", "lean-leanfran", "merge", "統合", "merged"],
+    ["lean-clj", "lean-leanfran", "merge", "統合", "merged"],
+    ["lean-leanfran", "rust-ritsuryo", "link", "Rust を生成", "generates Rust"],
+    ["lean-ritsuryo", "rust-ritsuryo", "link", "証明済みの計算", "proved logic"],
+    ["lean-leanfran", "rust-leansail", "link", "規則を生成", "generates rules"],
+    ["lean-leanfran", "rust-lsp-touchstone", "link", "規則を生成", "generates rules"],
+    ["rust-lsp-touchstone", "rust-leansail", "link", "通信を検査", "tests sessions"],
+    ["lean-assay", "rust-lsp-touchstone", "link", "定理を検査", "tests theorems"],
+    ["leaf-keywords.el", "leaf.el", "link", "キーワードを追加", "adds keywords"],
+    ["leaf-tree.el", "leaf.el", "link", "木で表示", "tree view"],
+    ["leaf-convert.el", "leaf.el", "link", "leaf に変換", "converts"],
+    ["leaf-convert.el", "leaf-keywords.el", "link", "利用", "uses"],
+    ["feather.el", "leaf-keywords.el", "link", "leaf と連携", "integrates"],
+    ["keg.el", "leaner-ts-mode.el", "link", "開発に利用", "dev tooling"],
+    ["rust-plamo-tr", "rust-plamo-tr-po", "link", "翻訳を提供", "translates"],
+    ["rust-plamo-tr-po", "emacs-doc", "link", "マニュアルを翻訳", "translates manuals"],
+    ["nix-sel4", "nix-sel4-example", "link", "ビルドを提供", "provides the build"]
+  ]
+}

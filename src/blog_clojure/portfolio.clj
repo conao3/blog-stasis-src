@@ -168,44 +168,45 @@
   [lang]
   (let [ja? (= lang :ja)
         data (json/read-str (slurp (io/resource "public/assets/oss-map.json")) :key-fn keyword)
-        label (fn [ja en] (if ja? ja en))]
-    [:section {:id "oss-map" :data-oss-map "true" :data-lang (name lang)}
-     [:h3 (label "OSSのつながり" "How my projects connect")]
-     [:p (label "44件のプロジェクトを用途でまとめました。線はREADMEで確認できた統合・コード生成・拡張・検査などの関係です。"
-                "44 projects grouped by purpose. Lines show relationships documented in their READMEs, including merges, code generation, extensions and validation.")]
-     [:div {:class "oss-map-interactive" :hidden true}
-      [:div {:class "oss-map-toolbar"}
-       [:button {:type "button" :data-action "zoom-in"} (label "拡大 ＋" "Zoom in +")]
-       [:button {:type "button" :data-action "zoom-out"} (label "縮小 −" "Zoom out −")]
-       [:button {:type "button" :data-action "fit"} (label "全体を見る" "Fit all")]
-       [:button {:type "button" :data-action "fullscreen"} (label "全画面" "Fullscreen")]
-       [:label (label "分野 " "Area ")
-        [:select {:class "oss-map-area"}
-         [:option {:value "all"} (label "すべて" "All")]
-         (for [[i [group _]] (map-indexed vector (:groups data))]
-           [:option {:value i} (if ja? group (nth (:groupNames data) i))])]]]
-      [:p {:class "oss-map-help" :id "oss-map-help"}
-       (label "ドラッグで移動。Ctrl/⌘＋ホイール、またはピンチで拡大。図にフォーカスして矢印キーでも移動できます。項目を選ぶと関係を表示します。"
-              "Drag to pan. Ctrl/⌘ + wheel or pinch to zoom. Focus the map and use arrow keys to pan. Select a project to see its relationships.")]
-      [:svg {:class "oss-map-canvas" :tabindex 0 :role "group"
-             :aria-label (label "OSSの関係図" "Open-source project map") :aria-describedby "oss-map-help"}]
-      [:div {:class "oss-map-detail" :aria-live "polite"}
-       (label "プロジェクトを選んでください。" "Select a project.")]]
+        label (fn [ja en] (if ja? ja en))
+        text (fn [item] (if ja? (:ja item) (:en item)))]
+    [:section {:id "oss-map" :class "oss-map" :data-oss-map "true" :data-lang (name lang)}
+     [:h3 (label "OSS のつながり" "How my projects connect")]
+     [:p (label (str "公開している OSS のうち " (count (:nodes data)) " 件を分野ごとに並べました。矢印は、あるプロジェクトが別のプロジェクトのコードを生成する、拡張する、検査するといったつながりを表します。")
+                (str (count (:nodes data)) " of my open-source projects, grouped by area. Arrows show how one project generates code for, extends or tests another."))]
+     [:div {:class "oss-map-frame" :hidden true :aria-label (label "OSS のつながりの図" "Project map")}
+      [:div {:class "oss-map-bar"}
+       [:div {:class "oss-map-areas" :role "group" :aria-label (label "分野へ移動" "Go to area")}
+        (for [[i group] (map-indexed vector (:groups data))]
+          [:button {:type "button" :data-area i} (text group)])]
+       [:div {:class "oss-map-zoom"}
+        [:button {:type "button" :data-action "zoom-out" :aria-label (label "縮小" "Zoom out")} "−"]
+        [:span {:class "oss-map-scale" :aria-live "polite"} "100%"]
+        [:button {:type "button" :data-action "zoom-in" :aria-label (label "拡大" "Zoom in")} "+"]
+        [:button {:type "button" :data-action "fit"} (label "全体" "Fit")]
+        [:button {:type "button" :data-action "expand" :aria-pressed "false"} (label "全画面" "Full view")]]]
+      [:div {:class "oss-map-body"}
+       [:div {:class "oss-map-viewport" :tabindex 0 :aria-describedby "oss-map-hint"
+              :aria-label (label "OSS のつながりの図" "Project map")}
+        [:div {:class "oss-map-world"}]]
+       [:aside {:class "oss-map-detail" :hidden true :aria-live "polite"}]]
+      [:p {:class "oss-map-hint" :id "oss-map-hint"}
+       (label "ドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。破線の矢印は統合です。"
+              "Drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections. Dashed arrows mark merges.")]]
      [:details {:class "oss-map-list"}
-      [:summary (label "プロジェクトと関係を一覧で読む" "Read the project and relationship list")]
-      (for [[i [group ids]] (map-indexed vector (:groups data))]
-        [:section
-         [:h4 (if ja? group (nth (:groupNames data) i))]
-         [:ul
-          (for [id ids
-                :let [node (first (filter #(= id (:id %)) (:nodes data)))]]
-            [:li [:a {:href (:url node)} id] ": " (if ja? (:description node) (:enDescription node))
-             [:ul
-              (for [[j [from to text]] (map-indexed vector (:edges data))
-                    :when (= from id)]
-                [:li (str from " → ")
-                 [:a {:href (str "https://github.com/conao3/" to)} to]
-                 (str ": " (if ja? text (nth (:edgeLabels data) j)))])]])]])]
+      [:summary (label "一覧で見る" "View as a list")]
+      (for [[i group] (map-indexed vector (:groups data))]
+        (list
+          [:h4 (text group)]
+          [:ul
+           (for [node (:nodes data)
+                 :when (= i (:group node))]
+             [:li [:a {:href (:url node)} (:id node)] (label "：" ": ") (text node)
+              (when-let [edges (seq (filter #(= (:id node) (:from %)) (:edges data)))]
+                [:ul
+                 (for [edge edges]
+                   [:li "→ " [:a {:href (str "https://github.com/conao3/" (:to edge))} (:to edge)]
+                    (label (str "（" (:ja edge) "）") (str " (" (:en edge) ")"))])])])]))]
      [:script {:type "application/json" :class "oss-map-data"} (hiccup/raw (json/write-str data :escape-unicode false))]]))
 
 
