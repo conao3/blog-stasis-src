@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="400" viewBox="0 0 1000 400" font-family="Noto Sans JP, sans-serif">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker><marker id="b" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333"/></marker><marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#888"/></marker></defs>
+  <rect x="0" y="0" width="1000" height="400" rx="16" fill="#fff"/>
+  <rect x="30" y="40" width="220" height="70" rx="12" fill="#f3f4f6" stroke="#555" stroke-width="2"/>
+  <text x="140" y="70" font-size="20" font-weight="bold" text-anchor="middle" fill="#222">クライアント1</text>
+  <text x="140" y="95" font-size="16" text-anchor="middle" fill="#222">idが1の記事を購読</text>
+  <rect x="30" y="130" width="220" height="70" rx="12" fill="#f3f4f6" stroke="#555" stroke-width="2"/>
+  <text x="140" y="160" font-size="20" font-weight="bold" text-anchor="middle" fill="#222">クライアント2</text>
+  <text x="140" y="185" font-size="16" text-anchor="middle" fill="#222">idが2の記事を購読</text>
+  <text x="140" y="234" font-size="20" font-weight="bold" text-anchor="middle" fill="#222">⋮</text>
+  <rect x="30" y="250" width="220" height="70" rx="12" fill="#f3f4f6" stroke="#555" stroke-width="2"/>
+  <text x="140" y="280" font-size="20" font-weight="bold" text-anchor="middle" fill="#222">クライアントN</text>
+  <text x="140" y="305" font-size="16" text-anchor="middle" fill="#222">idがNの記事を購読</text>
+  <rect x="350" y="20" width="340" height="360" rx="12" fill="none" stroke="#0f4c81" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="370" y="52" font-size="20" font-weight="bold" fill="#0f4c81">Hasura</text>
+  <rect x="370" y="70" width="300" height="80" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="520" y="105" font-size="20" font-weight="bold" text-anchor="middle" fill="#0f4c81">束ねる</text>
+  <text x="520" y="132" font-size="16" text-anchor="middle" fill="#0f4c81">同じroleと同じ形のクエリ</text>
+  <rect x="370" y="170" width="300" height="80" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="520" y="205" font-size="20" font-weight="bold" text-anchor="middle" fill="#0f4c81">1秒ごとに再実行</text>
+  <text x="520" y="232" font-size="16" text-anchor="middle" fill="#0f4c81">100件を1本のSQLに</text>
+  <rect x="370" y="270" width="300" height="80" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="520" y="305" font-size="20" font-weight="bold" text-anchor="middle" fill="#0f4c81">前回の結果と比べる</text>
+  <text x="520" y="332" font-size="16" text-anchor="middle" fill="#0f4c81">変わった購読にだけ送る</text>
+  <rect x="770" y="170" width="210" height="80" rx="12" fill="#f8ece4" stroke="#a0410d" stroke-width="2"/>
+  <text x="875" y="205" font-size="20" font-weight="bold" text-anchor="middle" fill="#a0410d">PostgreSQL</text>
+  <text x="875" y="232" font-size="16" text-anchor="middle" fill="#a0410d">購読1件が結果1行</text>
+  <line x1="254" y1="75" x2="366" y2="94" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="254" y1="165" x2="366" y2="112" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="254" y1="272" x2="366" y2="130" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="300" y="60" font-size="16" text-anchor="middle" fill="#222">WebSocket</text>
+  <line x1="520" y1="152" x2="520" y2="166" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="520" y1="252" x2="520" y2="266" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <line x1="674" y1="195" x2="766" y2="195" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="720" y="184" font-size="16" text-anchor="middle" fill="#222">SQL</text>
+  <line x1="766" y1="225" x2="674" y2="225" stroke="#333" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a)"/>
+  <text x="720" y="249" font-size="16" text-anchor="middle" fill="#222">結果</text>
+  <line x1="366" y1="318" x2="254" y2="300" stroke="#333" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#a)"/>
+  <text x="300" y="345" font-size="16" text-anchor="middle" fill="#222">新しい結果</text>
+</svg>
