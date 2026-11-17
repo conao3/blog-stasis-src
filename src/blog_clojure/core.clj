@@ -607,7 +607,7 @@
                        [:header [:h1 "タグ"]]
                        [:ul {:class "tag-list"}
                         (for [[tag tagged] (sort-by (fn [[tag tagged]] [(- (count tagged)) tag]) by-tag)]
-                          [:li [:a {:href (tag-path tag)} (str "#" tag) [:span {:class "tag-count"} (count tagged)]]])]])}}
+                          [:li [:a (cond-> {:href (tag-path tag)} (= 1 (count tagged)) (assoc :class "tag-single")) (str "#" tag) [:span {:class "tag-count"} (count tagged)]]])]])}}
             (map (fn [[tag tagged]]
                    [(tag-path tag)
                     {:title (str "#" tag)

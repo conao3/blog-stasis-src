@@ -1,6 +1,6 @@
 Title: Emacsで最終行にポイントを動かさないようにするアドバイス
 Date: 2020-05-23
-Tags: emacs emacs-lisp advice
+Tags: emacs emacs-lisp
 
 
 

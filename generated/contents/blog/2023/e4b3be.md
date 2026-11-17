@@ -1,6 +1,6 @@
 Title: AstroでKaTeXを使いたいぞという話
 Date: 2023-03-25
-Tags: astro katex remark rehype unified ast blog
+Tags: astro ast blog
 
 
 

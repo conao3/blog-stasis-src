@@ -244,6 +244,15 @@ article > header .post-meta {
     font-variant-numeric: tabular-nums;
 }
 
+.tag-list a.tag-single {
+    opacity: 0.5;
+}
+
+.tag-list a.tag-single:hover,
+.tag-list a.tag-single:focus-visible {
+    opacity: 1;
+}
+
 .content h2,
 .content h3,
 .content h4,
