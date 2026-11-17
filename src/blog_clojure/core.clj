@@ -731,8 +731,8 @@
   [handler]
   (fn [req]
     (let [uri (:uri req)
-          html-req (when (and (not= uri "/") (not (re-find #"\.[^/]*$" uri)))
-                     (assoc req :uri (str (str/replace uri #"/$" "") ".html")))
+          html-req (when (and (not (str/ends-with? uri "/")) (not (re-find #"\.[^/]*$" uri)))
+                     (assoc req :uri (str uri ".html")))
           res (when html-req (handler html-req))]
       (if (and res (= 200 (:status res)))
         res
