@@ -21426,7 +21426,6 @@ I did not make it to the finalist pitches, but I had fun.
 :properties:
 :export_file_name: generated/contents/blog/2026/d60a7d
 :export_date: 2026-11-17 07:00
-:export_draft: t
 :end:
 
 Lean 4のフォーマッタleanwispを作りました。
