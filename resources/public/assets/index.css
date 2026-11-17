@@ -731,10 +731,6 @@ pre code {
     display: none !important;
 }
 
-.oss-map-frame {
-    margin-inline: calc(50% - min(50vw - 16px, 720px));
-}
-
 .oss-map-bar {
     align-items: center;
     display: flex;
