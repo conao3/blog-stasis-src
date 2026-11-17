@@ -722,3 +722,41 @@ pre code {
 .youtube-card:has(.youtube-card-player) {
     max-width: 560px;
 }
+
+/* The portfolio map uses the same Spectrum tokens as the rest of the site. */
+#oss-map { margin: var(--spacing-500) 0; }
+#oss-map:fullscreen { background: var(--gray-100); padding: var(--spacing-300); overflow: auto; }
+#oss-map.is-expanded { position: fixed; inset: 0; z-index: 100; margin: 0;
+    background: var(--gray-100); padding: var(--spacing-300); overflow: auto; }
+.oss-map-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-200); }
+.oss-map-toolbar button, .oss-map-toolbar select {
+    font: inherit; color: var(--gray-900); background: var(--gray-200);
+    border: var(--border-width-100) solid var(--gray-400);
+    border-radius: var(--corner-radius-100); padding: var(--spacing-100) var(--spacing-200);
+    min-height: 44px; max-width: 100%; cursor: pointer;
+}
+.oss-map-toolbar label { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-100); min-width: 0; }
+.oss-map-toolbar button:hover { background: var(--gray-300); }
+.oss-map-toolbar button:focus-visible, .oss-map-toolbar select:focus-visible,
+.oss-map-canvas:focus-visible { outline: 2px solid var(--blue-900); outline-offset: 2px; }
+.oss-map-help { font-size: var(--body-size-s); color: var(--gray-700); margin: var(--spacing-200) 0; }
+.oss-map-canvas { width: 100%; height: 580px; display: block; background: var(--gray-75);
+    border: var(--border-width-100) solid var(--gray-300); touch-action: none; cursor: grab; }
+.oss-map-canvas:active { cursor: grabbing; }
+#oss-map:fullscreen .oss-map-canvas { height: 65vh; }
+#oss-map.is-expanded .oss-map-canvas { height: 65vh; }
+.oss-map-canvas .oss-map-group { font-size: 24px; fill: var(--gray-800); font-weight: 600; }
+.oss-map-canvas .oss-map-node { cursor: pointer; }
+.oss-map-canvas .oss-map-node rect { fill: var(--gray-200); stroke: var(--gray-400); }
+.oss-map-canvas .oss-map-node text { font-size: 24px; fill: var(--gray-900); }
+.oss-map-canvas .oss-map-node[aria-pressed="true"] rect,
+.oss-map-canvas .oss-map-node:focus rect { stroke: var(--blue-900); stroke-width: 4; }
+.oss-map-canvas .oss-map-node.is-muted { opacity: 0.45; }
+.oss-map-canvas .oss-map-edge { stroke: var(--gray-500); stroke-width: 1.5; fill: none; pointer-events: none; }
+.oss-map-canvas .oss-map-edge.is-active { stroke: var(--blue-900); stroke-width: 4; }
+.oss-map-detail { padding: var(--spacing-200) 0; overflow-wrap: anywhere; }
+.oss-map-detail > a { font-weight: bold; }
+.oss-map-detail p { margin: var(--spacing-100) 0; }
+.oss-map-list summary { cursor: pointer; }
+.oss-map-list li { overflow-wrap: anywhere; }
+@media (max-width: 600px) { .oss-map-canvas { height: 460px; } }

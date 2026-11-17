@@ -1,5 +1,7 @@
 (ns blog-clojure.portfolio
   (:require
+    [clojure.data.json :as json]
+    [clojure.java.io :as io]
     [hiccup2.core :as hiccup]))
 
 
@@ -162,6 +164,50 @@
                 "高等学校教諭一種 (2020 年 3 月)"]}})
 
 
+(defn oss-map
+  [lang]
+  (let [ja? (= lang :ja)
+        data (json/read-str (slurp (io/resource "public/assets/oss-map.json")) :key-fn keyword)
+        label (fn [ja en] (if ja? ja en))]
+    [:section {:id "oss-map" :data-oss-map "true" :data-lang (name lang)}
+     [:h3 (label "OSSのつながり" "How my projects connect")]
+     [:p (label "44件のプロジェクトを用途でまとめました。線はREADMEで確認できたコード生成・拡張・検査などの関係です。"
+                "44 projects grouped by purpose. Lines show relationships documented in their READMEs, including code generation, extensions and validation.")]
+     [:div {:class "oss-map-interactive" :hidden true}
+      [:div {:class "oss-map-toolbar"}
+       [:button {:type "button" :data-action "zoom-in"} (label "拡大 ＋" "Zoom in +")]
+       [:button {:type "button" :data-action "zoom-out"} (label "縮小 −" "Zoom out −")]
+       [:button {:type "button" :data-action "fit"} (label "全体を見る" "Fit all")]
+       [:button {:type "button" :data-action "fullscreen"} (label "全画面" "Fullscreen")]
+       [:label (label "分野 " "Area ")
+        [:select {:class "oss-map-area"}
+         [:option {:value "all"} (label "すべて" "All")]
+         (for [[i [group _]] (map-indexed vector (:groups data))]
+           [:option {:value i} (if ja? group (nth (:groupNames data) i))])]]]
+      [:p {:class "oss-map-help" :id "oss-map-help"}
+       (label "ドラッグで移動。Ctrl/⌘＋ホイール、またはピンチで拡大。図にフォーカスして矢印キーでも移動できます。項目を選ぶと関係を表示します。"
+              "Drag to pan. Ctrl/⌘ + wheel or pinch to zoom. Focus the map and use arrow keys to pan. Select a project to see its relationships.")]
+      [:svg {:class "oss-map-canvas" :tabindex 0 :role "group"
+             :aria-label (label "OSSの関係図" "Open-source project map") :aria-describedby "oss-map-help"}]
+      [:div {:class "oss-map-detail" :aria-live "polite"}
+       (label "プロジェクトを選んでください。" "Select a project.")]]
+     [:details {:class "oss-map-list"}
+      [:summary (label "プロジェクトと関係を一覧で読む" "Read the project and relationship list")]
+      (for [[i [group ids]] (map-indexed vector (:groups data))]
+        [:section
+         [:h4 (if ja? group (nth (:groupNames data) i))]
+         [:ul
+          (for [id ids
+                :let [node (first (filter #(= id (:id %)) (:nodes data)))]]
+            [:li [:a {:href (:url node)} id] ": " (if ja? (:description node) (:enDescription node))
+             [:ul
+              (for [[j [from to text source]] (map-indexed vector (:edges data))
+                    :when (= from id)]
+                [:li (str from " → " to ": " (if ja? text (nth (:edgeLabels data) j))) " ("
+                 [:a {:href (str "https://github.com/conao3/" source)} (label "根拠" "Source")] ")"])]])]])]
+     [:script {:type "application/json" :class "oss-map-data"} (hiccup/raw (json/write-str data :escape-unicode false))]]))
+
+
 (defn body
   [lang langs]
   (let [{:keys [title role description summary links headings open-source maintained
@@ -195,6 +241,7 @@
             [:ul
              (for [[project href text stars] projects]
                [:li [:a {:href href} [:strong project]] " (★ " stars "): " text])]]]
+          (oss-map lang)
           [:h2 (:experience headings)]
           (for [{:keys [heading period items]} experience]
             (list

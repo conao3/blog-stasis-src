@@ -1,0 +1,507 @@
+{
+  "checked": "2026-11-17",
+  "scope": "conao3 public non-fork repositories; selected relationship map",
+  "groups": [
+    [
+      "Lean・形式検証",
+      [
+        "lean-leanfran",
+        "lean-ritsuryo",
+        "rust-ritsuryo",
+        "lean-assay",
+        "lean-todo-app",
+        "lean-py",
+        "lean-ts",
+        "lean-clj"
+      ]
+    ],
+    [
+      "エディタ・言語サーバー",
+      [
+        "rust-leansail",
+        "rust-lsp-touchstone",
+        "rust-leanwisp",
+        "leaner-ts-mode.el",
+        "ts-elispore",
+        "eglot-lsp-settings.el"
+      ]
+    ],
+    [
+      "Emacs の設定とパッケージ",
+      [
+        "leaf.el",
+        "leaf-keywords.el",
+        "leaf-tree.el",
+        "leaf-convert.el",
+        "feather.el",
+        "keg.el",
+        "cort.el",
+        "ppp.el"
+      ]
+    ],
+    [
+      "翻訳・文書・発信",
+      [
+        "rust-plamo-tr",
+        "rust-plamo-tr-po",
+        "emacs-doc",
+        "rust-plamo-tr-local",
+        "rust-overhear",
+        "orglyth.el",
+        "ox-zenn.el",
+        "ox-deck.el"
+      ]
+    ],
+    [
+      "AWS・アプリ開発",
+      [
+        "wasm-wasmo",
+        "bun-bunsai",
+        "rust-awscli",
+        "rust-sqs-poller",
+        "ts-apollo-server-integration-hono",
+        "lambda-helper.ts"
+      ]
+    ],
+    [
+      "エージェント・実行環境",
+      [
+        "nix-agents",
+        "rust-relaykit",
+        "rust-inspect-jsonl",
+        "rust-outbound-manifest",
+        "rust-document-packet",
+        "rust-devo",
+        "nix-sel4",
+        "nix-sel4-example"
+      ]
+    ]
+  ],
+  "nodes": [
+    {
+      "id": "lean-leanfran",
+      "group": "Lean・形式検証",
+      "description": "Leanから4言語へコード生成",
+      "url": "https://github.com/conao3/lean-leanfran",
+      "enDescription": "Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure"
+    },
+    {
+      "id": "lean-ritsuryo",
+      "group": "Lean・形式検証",
+      "description": "日本法の期間・税の計算と証明",
+      "url": "https://github.com/conao3/lean-ritsuryo",
+      "enDescription": "Japanese statutory period computations (民法 期間計算, 年齢計算, 祝日) in Lean 4 with proofs on the shipped functions, and the ritsuryo CLI"
+    },
+    {
+      "id": "rust-ritsuryo",
+      "group": "Lean・形式検証",
+      "description": "証明した計算をRust・ブラウザへ",
+      "url": "https://github.com/conao3/rust-ritsuryo",
+      "enDescription": "Japanese statutory periods and taxes for Rust and the browser, compiled from proved Lean 4 code with lean-rs"
+    },
+    {
+      "id": "lean-assay",
+      "group": "Lean・形式検証",
+      "description": "壊した実装で定理の強さを検査",
+      "url": "https://github.com/conao3/lean-assay",
+      "enDescription": "Check whether your Lean theorems pin down your implementation, by running broken implementations against them"
+    },
+    {
+      "id": "lean-todo-app",
+      "group": "Lean・形式検証",
+      "description": "Leanの状態遷移コアを使うTodo",
+      "url": "https://github.com/conao3/lean-todo-app",
+      "enDescription": "A Todo app with a Lean 4-verified state-transition core and a TanStack Start + React frontend"
+    },
+    {
+      "id": "lean-py",
+      "group": "Lean・形式検証",
+      "description": "旧Python版 → leanfranへ統合",
+      "url": "https://github.com/conao3/lean-py",
+      "enDescription": "Former Python backend, now part of leanfran"
+    },
+    {
+      "id": "lean-ts",
+      "group": "Lean・形式検証",
+      "description": "旧TypeScript版 → leanfranへ統合",
+      "url": "https://github.com/conao3/lean-ts",
+      "enDescription": "Former TypeScript backend, now part of leanfran"
+    },
+    {
+      "id": "lean-clj",
+      "group": "Lean・形式検証",
+      "description": "旧Clojure版 → leanfranへ統合",
+      "url": "https://github.com/conao3/lean-clj",
+      "enDescription": "Former Clojure backend, now part of leanfran"
+    },
+    {
+      "id": "rust-leansail",
+      "group": "エディタ・言語サーバー",
+      "description": "Rust host + Lean backendのLSP",
+      "url": "https://github.com/conao3/rust-leansail",
+      "enDescription": "A Lean language server with a Rust host and Lean-verified lifecycle rules"
+    },
+    {
+      "id": "rust-lsp-touchstone",
+      "group": "エディタ・言語サーバー",
+      "description": "LSPの厳格なクライアント・サーバー・proxy",
+      "url": "https://github.com/conao3/rust-lsp-touchstone",
+      "enDescription": "A strict LSP client, server and checking proxy for testing Language Server Protocol implementations"
+    },
+    {
+      "id": "rust-leanwisp",
+      "group": "エディタ・言語サーバー",
+      "description": "Leanソースのフォーマッター",
+      "url": "https://github.com/conao3/rust-leanwisp",
+      "enDescription": "A parser-aware Lean 4 source formatter with a Rust layout engine"
+    },
+    {
+      "id": "leaner-ts-mode.el",
+      "group": "エディタ・言語サーバー",
+      "description": "tree-sitterとEglotを使うLeanモード",
+      "url": "https://github.com/conao3/leaner-ts-mode.el",
+      "enDescription": "Lean 4 major mode using tree-sitter"
+    },
+    {
+      "id": "ts-elispore",
+      "group": "エディタ・言語サーバー",
+      "description": "GitHubのEmacsパッケージを検索",
+      "url": "https://github.com/conao3/ts-elispore",
+      "enDescription": "Find Emacs packages hosted on GitHub"
+    },
+    {
+      "id": "eglot-lsp-settings.el",
+      "group": "エディタ・言語サーバー",
+      "description": "言語サーバーの導入を支援",
+      "url": "https://github.com/conao3/eglot-lsp-settings.el",
+      "enDescription": "Auto install Language-Server powered by vim-lsp-settings"
+    },
+    {
+      "id": "leaf.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "宣言的なinit.elの設定",
+      "url": "https://github.com/conao3/leaf.el",
+      "enDescription": "Flexible, declarative, and modern init.el package configuration"
+    },
+    {
+      "id": "leaf-keywords.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "leafの追加キーワード",
+      "url": "https://github.com/conao3/leaf-keywords.el",
+      "enDescription": "Additional leaf.el keywords for external packages"
+    },
+    {
+      "id": "leaf-tree.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "leaf設定のツリービュー",
+      "url": "https://github.com/conao3/leaf-tree.el",
+      "enDescription": "Interactive side-bar feature for leaf based init.el"
+    },
+    {
+      "id": "leaf-convert.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "既存設定をleaf形式へ変換",
+      "url": "https://github.com/conao3/leaf-convert.el",
+      "enDescription": "Convert Elisp config sexp to leaf form"
+    },
+    {
+      "id": "feather.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "Emacsパッケージの管理",
+      "url": "https://github.com/conao3/feather.el",
+      "enDescription": "Parallel thread modern Emacs package manager"
+    },
+    {
+      "id": "keg.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "Elispパッケージの開発環境",
+      "url": "https://github.com/conao3/keg.el",
+      "enDescription": "Modern Elisp package development system"
+    },
+    {
+      "id": "cort.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "Emacsの単体テスト",
+      "url": "https://github.com/conao3/cort.el",
+      "enDescription": "Simplify extended Emacs unit test framework"
+    },
+    {
+      "id": "ppp.el",
+      "group": "Emacs の設定とパッケージ",
+      "description": "Elispのpretty printer",
+      "url": "https://github.com/conao3/ppp.el",
+      "enDescription": "Extended pretty printer for Emacs Lisp"
+    },
+    {
+      "id": "rust-plamo-tr",
+      "group": "翻訳・文書・発信",
+      "description": "PLaMo TranslateのCLI・ライブラリ",
+      "url": "https://github.com/conao3/rust-plamo-tr",
+      "enDescription": "Translate text from the command line with PLaMo Translate (unofficial)"
+    },
+    {
+      "id": "rust-plamo-tr-po",
+      "group": "翻訳・文書・発信",
+      "description": "gettext POファイルの翻訳",
+      "url": "https://github.com/conao3/rust-plamo-tr-po",
+      "enDescription": "Translate gettext PO files with PLaMo Translate (unofficial)"
+    },
+    {
+      "id": "emacs-doc",
+      "group": "翻訳・文書・発信",
+      "description": "GNU Emacsマニュアルの日本語訳",
+      "url": "https://github.com/conao3/emacs-doc",
+      "enDescription": "Japanese machine translation of the GNU Emacs manuals with PLaMo Translate, served at emacs-doc.conao3.com"
+    },
+    {
+      "id": "rust-plamo-tr-local",
+      "group": "翻訳・文書・発信",
+      "description": "ローカルのPLaMoで翻訳",
+      "url": "https://github.com/conao3/rust-plamo-tr-local",
+      "enDescription": "Translate text from the command line with PLaMo 3 Translate running on your machine"
+    },
+    {
+      "id": "rust-overhear",
+      "group": "翻訳・文書・発信",
+      "description": "音声の文字起こし・字幕・語学学習",
+      "url": "https://github.com/conao3/rust-overhear",
+      "enDescription": "Audio transcription, dual subtitles and vocabulary study"
+    },
+    {
+      "id": "orglyth.el",
+      "group": "翻訳・文書・発信",
+      "description": "Orgから静的ブログを公開",
+      "url": "https://github.com/conao3/orglyth.el",
+      "enDescription": "Support static blog site publishing from Org mode files"
+    },
+    {
+      "id": "ox-zenn.el",
+      "group": "翻訳・文書・発信",
+      "description": "OrgのZenn向け出力",
+      "url": "https://github.com/conao3/ox-zenn.el",
+      "enDescription": "Export Org documents for Zenn"
+    },
+    {
+      "id": "ox-deck.el",
+      "group": "翻訳・文書・発信",
+      "description": "Orgのスライド向け出力",
+      "url": "https://github.com/conao3/ox-deck.el",
+      "enDescription": "Export Org documents as slide decks"
+    },
+    {
+      "id": "wasm-wasmo",
+      "group": "AWS・アプリ開発",
+      "description": "プロセス内で動くWASMのAWSモック",
+      "url": "https://github.com/conao3/wasm-wasmo",
+      "enDescription": "Stateful in-process AWS mock for every language, powered by a single WebAssembly module"
+    },
+    {
+      "id": "bun-bunsai",
+      "group": "AWS・アプリ開発",
+      "description": "Bunで動くAWSモックサーバー",
+      "url": "https://github.com/conao3/bun-bunsai",
+      "enDescription": "Local AWS API emulator built with Bun (LocalStack alternative)"
+    },
+    {
+      "id": "rust-awscli",
+      "group": "AWS・アプリ開発",
+      "description": "AWS CLI互換のRust実装",
+      "url": "https://github.com/conao3/rust-awscli",
+      "enDescription": "A fast, output-compatible Rust reimplementation of the AWS CLI v2"
+    },
+    {
+      "id": "rust-sqs-poller",
+      "group": "AWS・アプリ開発",
+      "description": "待機間隔を調整するSQSポーラー",
+      "url": "https://github.com/conao3/rust-sqs-poller",
+      "enDescription": "An SQS poller that backs off exponentially while the queue is empty and resets the moment a message arrives"
+    },
+    {
+      "id": "ts-apollo-server-integration-hono",
+      "group": "AWS・アプリ開発",
+      "description": "Apollo ServerとHonoの接続",
+      "url": "https://github.com/conao3/ts-apollo-server-integration-hono",
+      "enDescription": "Apollo Server integration for Hono"
+    },
+    {
+      "id": "lambda-helper.ts",
+      "group": "AWS・アプリ開発",
+      "description": "AWS Lambda用ヘルパー",
+      "url": "https://github.com/conao3/lambda-helper.ts",
+      "enDescription": "Conao's helper API working on AWS Lambda"
+    },
+    {
+      "id": "nix-agents",
+      "group": "エージェント・実行環境",
+      "description": "複数のコーディングエージェントを構成",
+      "url": "https://github.com/conao3/nix-agents",
+      "enDescription": "home-manager module for running coding agents (Claude Code, Codex, pi, cursor-agent) as multiple instances"
+    },
+    {
+      "id": "rust-relaykit",
+      "group": "エージェント・実行環境",
+      "description": "エージェント間の通信ゲートウェイ",
+      "url": "https://github.com/conao3/rust-relaykit",
+      "enDescription": "Language-neutral communication gateway for AI agents"
+    },
+    {
+      "id": "rust-inspect-jsonl",
+      "group": "エージェント・実行環境",
+      "description": "Claude・Codexのログを調査",
+      "url": "https://github.com/conao3/rust-inspect-jsonl",
+      "enDescription": "Inspect Claude/Codex JSONL session logs"
+    },
+    {
+      "id": "rust-outbound-manifest",
+      "group": "エージェント・実行環境",
+      "description": "送信内容と承認の整合性を検査",
+      "url": "https://github.com/conao3/rust-outbound-manifest",
+      "enDescription": "Approval-sealed manifests for validating outbound messages and attachments before sending."
+    },
+    {
+      "id": "rust-document-packet",
+      "group": "エージェント・実行環境",
+      "description": "PDFの検査・配置・生成の再現",
+      "url": "https://github.com/conao3/rust-document-packet",
+      "enDescription": "Reproducible PDF inspection, overlays, rendering, and verification via JSON manifests."
+    },
+    {
+      "id": "rust-devo",
+      "group": "エージェント・実行環境",
+      "description": "DSLからtmux開発環境を実行",
+      "url": "https://github.com/conao3/rust-devo",
+      "enDescription": "Generate and run reproducible tmux development workflows from a small DSL."
+    },
+    {
+      "id": "nix-sel4",
+      "group": "エージェント・実行環境",
+      "description": "NixでseL4 Microkitをビルド",
+      "url": "https://github.com/conao3/nix-sel4",
+      "enDescription": "Build seL4 Microkit systems from Nix: SDK, cross-compiled protection domains, generated system descriptions and a QEMU runner"
+    },
+    {
+      "id": "nix-sel4-example",
+      "group": "エージェント・実行環境",
+      "description": "nix-sel4を使う起動可能な実例",
+      "url": "https://github.com/conao3/nix-sel4-example",
+      "enDescription": "A clone-and-boot seL4 Microkit system built with nix-sel4"
+    }
+  ],
+  "edges": [
+    [
+      "lean-leanfran",
+      "rust-ritsuryo",
+      "Rustへ生成",
+      "rust-ritsuryo"
+    ],
+    [
+      "lean-ritsuryo",
+      "rust-ritsuryo",
+      "計算ロジックの供給",
+      "rust-ritsuryo"
+    ],
+    [
+      "lean-leanfran",
+      "rust-leansail",
+      "規則をRustへ生成",
+      "rust-leansail"
+    ],
+    [
+      "lean-leanfran",
+      "rust-lsp-touchstone",
+      "検証済み規則を生成（旧名lean-rs）",
+      "rust-lsp-touchstone"
+    ],
+    [
+      "rust-lsp-touchstone",
+      "rust-leansail",
+      "実通信を検査",
+      "rust-leansail"
+    ],
+    [
+      "lean-assay",
+      "rust-lsp-touchstone",
+      "定理の強さを検査する実例",
+      "lean-assay"
+    ],
+    [
+      "leaf-keywords.el",
+      "leaf.el",
+      "キーワードを拡張",
+      "leaf-keywords.el"
+    ],
+    [
+      "leaf-tree.el",
+      "leaf.el",
+      "設定をツリー表示",
+      "leaf-tree.el"
+    ],
+    [
+      "leaf-convert.el",
+      "leaf.el",
+      "設定をleaf形式へ変換",
+      "leaf-convert.el"
+    ],
+    [
+      "leaf-convert.el",
+      "leaf-keywords.el",
+      "依存",
+      "leaf-convert.el"
+    ],
+    [
+      "feather.el",
+      "leaf-keywords.el",
+      "leafとの連携窓口",
+      "feather.el"
+    ],
+    [
+      "rust-plamo-tr",
+      "rust-plamo-tr-po",
+      "翻訳ライブラリを提供",
+      "rust-plamo-tr-po"
+    ],
+    [
+      "rust-plamo-tr-po",
+      "emacs-doc",
+      "マニュアルを翻訳",
+      "emacs-doc"
+    ],
+    [
+      "nix-sel4",
+      "nix-sel4-example",
+      "ビルド基盤を提供",
+      "nix-sel4-example"
+    ],
+    [
+      "keg.el",
+      "leaner-ts-mode.el",
+      "開発・検査に利用",
+      "leaner-ts-mode.el"
+    ]
+  ],
+  "groupNames": [
+    "Lean and verification",
+    "Editors and language servers",
+    "Emacs configuration and packages",
+    "Translation and publishing",
+    "AWS and application development",
+    "Agents and execution environments"
+  ],
+  "edgeLabels": [
+    "Generate Rust",
+    "Supply computation logic",
+    "Generate lifecycle rules",
+    "Generate verified rules (formerly lean-rs)",
+    "Validate real LSP sessions",
+    "Example of checking theorem strength",
+    "Extend keywords",
+    "Browse configuration as a tree",
+    "Convert configuration to leaf",
+    "Depend on",
+    "Integrate with leaf",
+    "Provide translation library",
+    "Translate manuals",
+    "Provide build tooling",
+    "Use for development and tests"
+  ]
+}
