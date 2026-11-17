@@ -6,7 +6,7 @@ const output = 'resources/public/assets/oss-map.json';
 const NODE_WIDTH = 208, NODE_HEIGHT = 72, GAP = 16, PADDING = 20, HEADER = 48, LABEL_HEIGHT = 18, MAX_WIDTH = 1140;
 
 const textWidth = text => [...text].reduce((width, c) => width + (c.codePointAt(0) > 0x2e80 ? 12 : 6.8), 0);
-const edges = source.edges.map(([from, to, kind, ja, en]) => ({ from, to, kind, ja, en }));
+const edges = source.edges.map(([from, to, ja, en]) => ({ from, to, ja, en }));
 const ids = source.groups.flatMap(g => g.nodes);
 for (const id of ids) if (!source.nodes[id]) throw new Error(`missing description: ${id}`);
 for (const id of Object.keys(source.nodes)) if (!ids.includes(id)) throw new Error(`node without group: ${id}`);

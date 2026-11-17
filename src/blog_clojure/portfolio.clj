@@ -46,8 +46,6 @@
                    "Rust CLI that shares Chrome DevTools Protocol (CDP) sessions across coding agents." nil]
                   ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
                    "Lean 4 library and CLI for Japanese statutory period and tax computations, each proved equal to a specification that follows the statute." nil]
-                  ["feather.el" "https://github.com/conao3/feather.el"
-                   "Parallel Emacs package manager with async installs." "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
                    "Major mode for SEML, HTML authoring in S-expressions." "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
@@ -115,8 +113,6 @@
                    "複数のコーディングエージェントで Chrome DevTools Protocol (CDP) のセッションを共有する Rust 製の CLI。" nil]
                   ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
                    "日本法の期間計算と税額計算を、条文に沿った仕様と一致する証明を付けて実装した Lean 4 のライブラリと CLI。" nil]
-                  ["feather.el" "https://github.com/conao3/feather.el"
-                   "パッケージを並列に非同期でインストールする Emacs のパッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
                    "HTML を S 式で書く SEML のメジャーモード。" "79"]
                   ["keg.el" "https://github.com/conao3/keg.el"
@@ -191,8 +187,8 @@
         [:div {:class "oss-map-world"}]]
        [:aside {:class "oss-map-detail" :hidden true :aria-live "polite"}]]
       [:p {:class "oss-map-hint" :id "oss-map-hint"}
-       (label "ドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。破線の矢印は統合です。"
-              "Drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections. Dashed arrows mark merges.")]]
+       (label "ドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。"
+              "Drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections.")]]
      [:details {:class "oss-map-list"}
       [:summary (label "一覧で見る" "View as a list")]
       (for [[i group] (map-indexed vector (:groups data))]

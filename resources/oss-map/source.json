@@ -3,12 +3,12 @@
     {
       "ja": "Lean と形式検証",
       "en": "Lean and formal verification",
-      "nodes": ["lean-leanfran", "lean-py", "lean-ts", "lean-clj", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-assay", "rust-leanwisp", "lean-todo-app"]
+      "nodes": ["lean-leanfran", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-assay", "rust-leanwisp", "lean-todo-app"]
     },
     {
       "ja": "Emacs",
       "en": "Emacs",
-      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "feather.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
+      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
     },
     {
       "ja": "翻訳と文書",
@@ -28,9 +28,6 @@
   ],
   "nodes": {
     "lean-leanfran": ["Lean で証明した関数を 4 言語のコードに変換", "Prove functions in Lean, run them in four languages"],
-    "lean-py": ["Python 版。leanfran に統合済み", "Python backend, merged into leanfran"],
-    "lean-ts": ["TypeScript 版。leanfran に統合済み", "TypeScript backend, merged into leanfran"],
-    "lean-clj": ["Clojure 版。leanfran に統合済み", "Clojure backend, merged into leanfran"],
     "lean-ritsuryo": ["法令の期間と税の計算を Lean で定義して証明", "Statutory period and tax computations, proved in Lean"],
     "rust-ritsuryo": ["法令の期間と税の計算を Rust とブラウザで使う", "Statutory periods and taxes for Rust and the browser"],
     "rust-leansail": ["Rust と Lean で作る Lean の言語サーバー", "Lean language server with a Rust host"],
@@ -42,7 +39,6 @@
     "leaf-keywords.el": ["外部パッケージ向けの leaf のキーワード", "Extra leaf keywords for external packages"],
     "leaf-tree.el": ["leaf の設定をサイドバーに木で表示", "Side bar tree of a leaf-based init.el"],
     "leaf-convert.el": ["既存の Elisp の設定を leaf に変換", "Convert Elisp configuration to leaf"],
-    "feather.el": ["並列に非同期でインストールするパッケージマネージャ", "Parallel Emacs package manager with async installs"],
     "keg.el": ["Elisp パッケージの開発ツール", "Elisp package development tooling"],
     "leaner-ts-mode.el": ["tree-sitter で動く Lean 4 のメジャーモード", "Lean 4 major mode with tree-sitter"],
     "cort.el": ["Emacs の単体テストフレームワーク", "Emacs unit test framework"],
@@ -73,23 +69,19 @@
     "rust-devo": ["小さな DSL から tmux の開発環境を起動", "Run tmux development workflows from a small DSL"]
   },
   "edges": [
-    ["lean-py", "lean-leanfran", "merge", "統合", "merged into"],
-    ["lean-ts", "lean-leanfran", "merge", "統合", "merged into"],
-    ["lean-clj", "lean-leanfran", "merge", "統合", "merged into"],
-    ["lean-leanfran", "rust-ritsuryo", "link", "Rust を生成", "generates Rust"],
-    ["lean-ritsuryo", "rust-ritsuryo", "link", "計算を提供", "provides logic"],
-    ["lean-leanfran", "rust-leansail", "link", "規則を生成", "generates rules"],
-    ["lean-leanfran", "rust-lsp-touchstone", "link", "規則を生成", "generates rules"],
-    ["rust-lsp-touchstone", "rust-leansail", "link", "通信を検査", "tests sessions"],
-    ["lean-assay", "rust-lsp-touchstone", "link", "定理を検査", "tests theorems"],
-    ["leaf-keywords.el", "leaf.el", "link", "キーワードを追加", "adds keywords"],
-    ["leaf-tree.el", "leaf.el", "link", "設定を木で表示", "shows config as a tree"],
-    ["leaf-convert.el", "leaf.el", "link", "設定を leaf に変換", "converts config to leaf"],
-    ["leaf-convert.el", "leaf-keywords.el", "link", "利用", "uses"],
-    ["leaf-keywords.el", "feather.el", "link", "feather に対応", "adds feather support"],
-    ["leaner-ts-mode.el", "keg.el", "link", "開発に利用", "develops with"],
-    ["rust-plamo-tr", "rust-plamo-tr-po", "link", "翻訳を提供", "provides translation"],
-    ["rust-plamo-tr-po", "emacs-doc", "link", "マニュアルを翻訳", "translates the manuals"],
-    ["nix-sel4", "nix-sel4-example", "link", "ビルドを提供", "provides the build"]
+    ["lean-leanfran", "rust-ritsuryo", "Rust を生成", "generates Rust"],
+    ["lean-ritsuryo", "rust-ritsuryo", "計算を提供", "provides logic"],
+    ["lean-leanfran", "rust-leansail", "規則を生成", "generates rules"],
+    ["lean-leanfran", "rust-lsp-touchstone", "規則を生成", "generates rules"],
+    ["rust-lsp-touchstone", "rust-leansail", "通信を検査", "tests sessions"],
+    ["lean-assay", "rust-lsp-touchstone", "定理を検査", "tests theorems"],
+    ["leaf-keywords.el", "leaf.el", "キーワードを追加", "adds keywords"],
+    ["leaf-tree.el", "leaf.el", "設定を木で表示", "shows config as a tree"],
+    ["leaf-convert.el", "leaf.el", "設定を leaf に変換", "converts config to leaf"],
+    ["leaf-convert.el", "leaf-keywords.el", "利用", "uses"],
+    ["leaner-ts-mode.el", "keg.el", "開発に利用", "develops with"],
+    ["rust-plamo-tr", "rust-plamo-tr-po", "翻訳を提供", "provides translation"],
+    ["rust-plamo-tr-po", "emacs-doc", "マニュアルを翻訳", "translates the manuals"],
+    ["nix-sel4", "nix-sel4-example", "ビルドを提供", "provides the build"]
   ]
 }

@@ -855,11 +855,6 @@ pre code {
     stroke-width: 1.5;
 }
 
-.oss-map-edge.is-merge path {
-    stroke: var(--blue-800);
-    stroke-dasharray: 6 4;
-}
-
 .oss-map-edge text {
     fill: var(--gray-700);
     font-size: var(--font-size-75);
@@ -885,10 +880,6 @@ pre code {
 
 .oss-map-arrow path {
     fill: var(--gray-500);
-}
-
-.oss-map-arrow.is-merge path {
-    fill: var(--blue-800);
 }
 
 .oss-map-arrow.is-active path {

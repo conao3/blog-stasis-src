@@ -47,7 +47,7 @@
   world.style.height = `${map.height}px`;
   const svg = svgElement('svg', { width: map.width, height: map.height, viewBox: `0 0 ${map.width} ${map.height}`, 'aria-hidden': 'true' }, world);
   const defs = svgElement('defs', {}, svg);
-  for (const name of ['default', 'merge', 'active']) {
+  for (const name of ['default', 'active']) {
     const marker = svgElement('marker', { id: `oss-map-arrow-${name}`, class: `oss-map-arrow is-${name}`, markerWidth: 8, markerHeight: 8,
       refX: 7, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse' }, defs);
     svgElement('path', { d: 'M0,0 L8,4 L0,8 Z' }, marker);
@@ -57,11 +57,10 @@
     svgElement('text', { class: 'oss-map-group-title', x: group.x + 20, y: group.y + 30 }, svg, text(group));
   });
   const edgeElements = map.edges.map(edge => {
-    const marker = edge.kind === 'merge' ? 'merge' : 'default';
-    const g = svgElement('g', { class: `oss-map-edge is-${edge.kind}` }, svg);
-    const path = svgElement('path', { d: roundedPath(edge.points), 'marker-end': `url(#oss-map-arrow-${marker})` }, g);
+    const g = svgElement('g', { class: 'oss-map-edge' }, svg);
+    const path = svgElement('path', { d: roundedPath(edge.points), 'marker-end': 'url(#oss-map-arrow-default)' }, g);
     svgElement('text', { x: edge.label[0], y: edge.label[1], 'dominant-baseline': 'central' }, g, text(edge));
-    return { edge, g, path, marker };
+    return { edge, g, path };
   });
   const nodeElements = new Map();
   for (const node of map.nodes) {
@@ -151,12 +150,12 @@
   function select(id, { writeUrl = true } = {}) {
     selected = byId.has(id) ? id : null;
     const connected = new Set(selected ? [selected] : []);
-    for (const { edge, g, path, marker } of edgeElements) {
+    for (const { edge, g, path } of edgeElements) {
       const active = selected !== null && (edge.from === selected || edge.to === selected);
       if (active) { connected.add(edge.from); connected.add(edge.to); }
       g.classList.toggle('is-active', active);
       g.classList.toggle('is-muted', selected !== null && !active);
-      path.setAttribute('marker-end', `url(#oss-map-arrow-${active ? 'active' : marker})`);
+      path.setAttribute('marker-end', `url(#oss-map-arrow-${active ? 'active' : 'default'})`);
     }
     for (const [key, button] of nodeElements) {
       button.setAttribute('aria-pressed', String(key === selected));
