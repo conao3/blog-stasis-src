@@ -21863,229 +21863,11 @@ FileWorkerの管理をRustに移す案も、3つのファイルを同時に解�
 
 計測の条件、全部の表、再現の手順は[[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]]にあります。
 
-* Hasuraが生成するSQLは長いが、遅いのは入れ子の一括取得だけだった
-:properties:
-:export_file_name: generated/contents/blog/2026/7b0e4f
-:export_date: 2026-11-17 01:42
-:export_tags: hasura graphql postgresql performance
-:export_draft: t
-:end:
-
-HasuraはPostgreSQLのテーブルからGraphQLのAPIを作るサーバーで、気に入って使っています。
-ただ、実行されるSQLを見ると短いGraphQLのクエリでも副問い合わせが何段も重なっていて、遅くならないのかが気になっていました。
-
-そこで、Hasuraが生成するSQLと、同じデータを返すように手で書いたSQLの速さを比べました。
-記事を20件ずつ取るようなページ単位のクエリは、どちらも2ms以内に終わりました。
-遅かったのは親と子を数万件まとめて取る入れ子のクエリだけで、手書きのおよそ2倍の時間がかかっています。
-このクエリはroot fieldを分けて書き直すと2.5倍速くなりました。
-
-比べたのはHasura GraphQL Engine v2.51.6とPostgreSQL 17.11です。
-
-** 生成されるSQL
-次のクエリは、新しい記事20件に、著者の名前とコメントの先頭5件を付けて取ります。
-
-#+begin_src graphql
-query A {
-  article(limit: 20, order_by: {published_at: desc}) {
-    id
-    title
-    author { name }
-    comments(limit: 5, order_by: {id: asc}) { body }
-  }
-}
-#+end_src
-
-[[https://hasura.io/docs/2.0/api-reference/explain/][Explain API]]にクエリを送ると、Hasuraが生成するSQLを見られます。
-上のクエリは次のSQLになりました。
-改行と字下げは私が足したものです。
-
-#+begin_src sql
-SELECT coalesce(json_agg("root" ORDER BY "root.pg.published_at" DESC NULLS FIRST), '[]' ) AS "root"
-FROM (
-  SELECT row_to_json((SELECT "_e" FROM (SELECT
-           "_root.base"."id" AS "id", "_root.base"."title" AS "title",
-           "_root.or.author"."author" AS "author",
-           "_root.ar.root.comments"."comments" AS "comments" ) AS "_e" ) ) AS "root",
-         "_root.base"."published_at" AS "root.pg.published_at"
-  FROM (SELECT * FROM "public"."article" WHERE ('true')
-        ORDER BY "published_at" DESC NULLS FIRST LIMIT 20 ) AS "_root.base"
-  LEFT OUTER JOIN LATERAL (
-    SELECT row_to_json((SELECT "_e" FROM (SELECT "_root.or.author.base"."name" AS "name" ) AS "_e" ) ) AS "author"
-    FROM (SELECT * FROM "public"."author"
-          WHERE (("_root.base"."author_id") = ("id")) LIMIT 1 ) AS "_root.or.author.base"
-  ) AS "_root.or.author" ON ('true')
-  LEFT OUTER JOIN LATERAL (
-    SELECT coalesce(json_agg("comments" ORDER BY "root.ar.root.comments.pg.id" ASC NULLS LAST), '[]' ) AS "comments"
-    FROM (
-      SELECT row_to_json((SELECT "_e" FROM (SELECT "_root.ar.root.comments.base"."body" AS "body" ) AS "_e" ) ) AS "comments",
-             "_root.ar.root.comments.base"."id" AS "root.ar.root.comments.pg.id"
-      FROM (SELECT * FROM "public"."comment" WHERE (("_root.base"."id") = ("article_id"))
-            ORDER BY "id" ASC NULLS LAST LIMIT 5 ) AS "_root.ar.root.comments.base"
-      ORDER BY "root.ar.root.comments.pg.id" ASC NULLS LAST
-    ) AS "_root.ar.root.comments"
-  ) AS "_root.ar.root.comments" ON ('true')
-  ORDER BY "root.pg.published_at" DESC NULLS FIRST
-) AS "_root"
-#+end_src
-
-GraphQLの入れ子1段が、SQLでは副問い合わせ1つになっています。
-=author= や =comments= のrelationshipを1つたどるごとに、 =LEFT OUTER JOIN LATERAL= が1つ加わります。
-JSONもSQLの中で作り、行を =row_to_json= で、配列を =json_agg= でJSONにします。
-一番外側の =json_agg= の値が応答の配列です。
-
-** SQLを1本にする設計
-[[./resources/public/img/7b0e4f-flow.svg]]
-
-Hasuraにはresolverがありません。
-[[https://hasura.io/docs/2.0/getting-started/how-it-works/index/][公式のドキュメント]]は、GraphQLのクエリをSQLにするコンパイラとしてHasuraを説明しています。
-Hasuraが受け持つのはSQLへの変換までで、行の取得と結合とJSONへの整形は、PostgreSQLが1回の実行で行います。
-
-resolverがフィールドごとにデータを取る作りでは、親の行の数だけ子のSQLを実行するN+1問題が起きます。
-Hasuraの[[https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md][設計の文書]]は、クエリ全体を1本のSQLにすればN+1問題がなくなり、データベースが全体を見て最適化できると書いています。
-SQLが長いのは、クエリの全部をこの1本に入れているからです。
-
-** 手書きのSQLとの比較
-比較には、著者1万件、記事20万件、コメント100万件のデータを使いました。
-外部キーの列にはindexを張っています。
-HasuraとPostgreSQLはDockerのコンテナで動かし、CPUをそれぞれ2コアに制限しました。
-ロールはadminで、行の権限は付けていません。
-
-測ったクエリは3つです。
-
-- Aは「生成されるSQL」の節のクエリで、記事20件に著者とコメント5件を付けます。
-- Bは記事5万件に著者を付けます。
-- Cは著者2,000人に、その記事4万件と、記事のコメント20万件を入れ子で付けます。
-
-手書きのSQLは、JOINと =json_build_object= で同じデータを返すように書きました。
-どのクエリも、HasuraのSQLと手書きのSQLが同じデータを返すことを確かめてから測っています。
-次の表は、それぞれのSQLをpsqlで15回実行した時間の中央値です。
-
-| クエリ | 応答の大きさ | HasuraのSQL | 手書きのSQL |
-|--------+--------------+-------------+-------------|
-| A      | 4.8KB        | 1.7ms       | 1.5ms       |
-| B      | 3.4MB        | 71.7ms      | 81.4ms      |
-| C      | 8.4MB        | 689ms       | 358ms       |
-
-Aの差は0.2msで、15回の測定の時間はHasuraのSQLが最小0.5msから最大3.2ms、手書きが0.4msから2.7msと範囲が重なっています。
-BはHasuraのSQLのほうが速く終わりました。
-Cだけは、手書きのおよそ2倍の時間がかかっています。
-
-HasuraにHTTPでクエリを送って応答を受け取るまでの時間は、Aが6.5ms、Bが86.5ms、Cが699msでした。
-
-** 一括取得が遅くなる仕組み
-差の理由は実行計画から分かります。
-
-HasuraのSQLでは、relationshipごとの副問い合わせを =LATERAL= で結合し、その副問い合わせの中に =LIMIT= か =json_agg= があります。
-PostgreSQLはこの副問い合わせを、親の行ごとに子のテーブルを引くNested Loopで実行しました。
-Aでは親が20行なので、indexを数十回引くだけで終わります。
-Cでは、記事のテーブルを2,000回、コメントのテーブルを4万回引いていました。
-次は、Cの =EXPLAIN (ANALYZE)= から、コストと時間の表示を省いて抜き出した行です。
-=loops= は実行した回数です。
-
-#+begin_src text
-->  Aggregate  (rows=1 loops=2000)
-      ->  Nested Loop Left Join  (rows=20 loops=2000)
-            ->  Bitmap Heap Scan on article  (rows=20 loops=2000)
-            ->  Aggregate  (rows=1 loops=40000)
-                  ->  Bitmap Heap Scan on comment  (rows=5 loops=40000)
-#+end_src
-
-Cの手書きのSQLは次のとおりです。
-
-#+begin_src sql
-WITH au AS (SELECT id, name FROM author ORDER BY id LIMIT 2000),
-c AS (
-  SELECT co.article_id, json_agg(json_build_object('body', co.body)) AS comments
-  FROM comment co
-  JOIN article a ON a.id = co.article_id
-  JOIN au ON au.id = a.author_id
-  GROUP BY co.article_id
-),
-ar AS (
-  SELECT a.author_id,
-         json_agg(json_build_object(
-           'id', a.id, 'title', a.title,
-           'comments', coalesce(c.comments, '[]'))) AS articles
-  FROM article a
-  JOIN au ON au.id = a.author_id
-  LEFT JOIN c ON c.article_id = a.id
-  GROUP BY a.author_id
-)
-SELECT coalesce(json_agg(json_build_object(
-         'id', au.id, 'name', au.name,
-         'articles', coalesce(ar.articles, '[]')) ORDER BY au.id), '[]')
-FROM au
-LEFT JOIN ar ON ar.author_id = au.id
-#+end_src
-
-PostgreSQLはこのSQLの3つのテーブルをHash Joinで結合しました。
-コメントのテーブルを読むのは1回です。
-
-Bが遅くならなかったのは、PostgreSQL 14で入った[[https://www.postgresql.org/docs/14/release-14.html][Memoize]]が、Nested Loopの内側の結果をキャッシュしていたからです。
-5万件の記事に対して、著者のテーブルを引いたのは1万回でした。
-Memoizeを無効にして測ると、BのHasuraのSQLは71.7msから116.1msに延びました。
-
-** Hasuraの機能での書き直し
-Cのような一括取得は、Hasuraの機能だけで速くできます。
-Cは次のクエリです。
-
-#+begin_src graphql
-query C {
-  author(limit: 2000, order_by: {id: asc}) {
-    id
-    name
-    articles {
-      id
-      title
-      comments { body }
-    }
-  }
-}
-#+end_src
-
-これを2つの書き方に直しました。
-
-1つめは、入れ子をやめてroot fieldを3つ並べる書き方です。
-
-#+begin_src graphql
-query D {
-  author(limit: 2000, order_by: {id: asc}) { id name }
-  article(where: {author_id: {_lte: 2000}}) { id title author_id }
-  comment(where: {article: {author_id: {_lte: 2000}}}) { article_id body }
-}
-#+end_src
-
-=comment= の =where= でrelationshipを使うと、SQLでは =EXISTS= の副問い合わせになり、PostgreSQLはHash Joinを選びました。
-クライアントが =author_id= と =article_id= を使って入れ子を組み立てます。
-この書き方を使えるのは、親を選ぶ条件を子の =where= にも書けるときです。
-このデータでは著者のidが1から順に並ぶので、 =author_id= が2000以下という条件は、先頭の2,000人を選ぶ =limit: 2000= と同じ著者を選びます。
-
-2つめは、手書きのSQLを[[https://hasura.io/docs/2.0/schema/postgres/native-queries/][Native Query]]としてHasuraに登録する書き方です。
-Community EditionでNative Queryを使えるのは、v2.28.0からです。
-Hasuraは登録したSQLをCTEとして実行し、そのCTEの外側のSELECTでJSONにします。
-記事とコメントは =json= 型の1つのフィールドになるので、その中の項目をGraphQLで選べなくなります。
-
-次の表は、HasuraにHTTPでクエリを送って15回測った時間の中央値です。
-
-| 取り方             | 時間  | 応答の大きさ |
-|--------------------+-------+--------------|
-| 入れ子             | 699ms | 8.4MB        |
-| root fieldを分ける | 280ms | 12.5MB       |
-| Native Query       | 375ms | 9.1MB        |
-
-root fieldを分けると2.5倍、Native Queryでは1.9倍速くなりました。
-root fieldを分けた応答が大きいのは、 =author_id= と =article_id= を行ごとに持つからです。
-
-** 書き直すクエリ
-画面に表示するページ単位のクエリでは、生成されるSQLの長さは速さに影響しませんでした。
-書き直す価値があるのは、エクスポートや集計のように、親と子を数万件まとめて取るクエリです。
-そのクエリだけroot fieldを分けるかNative Queryにすれば、ほかのクエリはHasuraに任せたままにできます。
-
 * HasuraがGraphQLのクエリを1本のSQLにする仕組み
 :properties:
 :export_file_name: generated/contents/blog/2026/360ae9
 :export_date: 2026-11-17 02:18
-:export_tags: hasura graphql postgresql
+:export_tags: hasura graphql postgresql performance
 :export_draft: t
 :end:
 
@@ -22095,6 +21877,10 @@ HasuraはPostgreSQLのテーブルからGraphQLのAPIを作るサーバーで、
 調べると、Hasuraはresolverを持たないコンパイラでした。
 テーブルとrelationshipと権限の定義からGraphQLのschemaを作り、届いたクエリを1本のSQLに変換します。
 行の取得も結合もJSONの組み立ても、そのSQLを受け取ったPostgreSQLが行います。
+
+SQLが長いので、速さも測りました。
+ページ単位で取るクエリは、手で書いたSQLと変わらない時間で終わりました。
+親と子を数万件まとめて取る入れ子のクエリだけが、手書きのおよそ2倍の時間がかかりました。
 
 この記事はHasura GraphQL Engineのv2を対象にしています。
 載せたSQLは、PostgreSQL 17.11に接続したv2.51.6が実際に生成したものです。
@@ -22209,6 +21995,74 @@ LEFT OUTER JOIN LATERAL (
 =$1= は購読のIDの配列、 =$2= は購読ごとの変数の配列です。
 =UNNEST= がこの2つを購読1件につき1行の表にし、 =LATERAL= の中のクエリが行ごとの変数で記事を絞ります。
 結果もその行ごとに返ります。
+
+** 1本のSQLの速さ
+生成されるSQLは長いので、手で書いたSQLより遅くならないのかを測りました。
+データは著者1万件、記事20万件、コメント100万件で、外部キーの列にはindexを張っています。
+roleはadminで、HasuraとPostgreSQLはDockerのコンテナで動かし、CPUをそれぞれ2コアに制限しました。
+
+測ったクエリは3つです。
+
+- Aは「GraphQLとSQLの対応」の節のクエリで、記事20件に著者とコメント5件を付けます。
+- Bは記事5万件に著者を付けます。
+- Cは著者2,000人に、その記事4万件と、記事のコメント20万件を入れ子で付けます。
+
+手書きのSQLは、JOINと =json_build_object= で同じデータを返すように書きました。
+次の表は、それぞれのSQLをpsqlで15回実行した時間の中央値です。
+
+| クエリ | 応答の大きさ | HasuraのSQL | 手書きのSQL |
+|--------+--------------+-------------+-------------|
+| A      | 4.8KB        | 1.7ms       | 1.5ms       |
+| B      | 3.4MB        | 71.7ms      | 81.4ms      |
+| C      | 8.4MB        | 689ms       | 358ms       |
+
+Aの差は0.2msで、15回の測定の範囲は重なっています。
+BはHasuraのSQLのほうが速く終わりました。
+Cだけは、手書きのおよそ2倍の時間がかかっています。
+
+Cが遅いのは、PostgreSQLがrelationshipの副問い合わせを親の行ごとに実行したからです。
+Cの =EXPLAIN (ANALYZE)= から、コストと時間の表示を省いて次の行を抜き出しました。
+=loops= は実行した回数です。
+PostgreSQLは記事のテーブルを2,000回、コメントのテーブルを4万回引いています。
+
+#+begin_src text
+->  Aggregate  (rows=1 loops=2000)
+      ->  Nested Loop Left Join  (rows=20 loops=2000)
+            ->  Bitmap Heap Scan on article  (rows=20 loops=2000)
+            ->  Aggregate  (rows=1 loops=40000)
+                  ->  Bitmap Heap Scan on comment  (rows=5 loops=40000)
+#+end_src
+
+手書きのSQLでは、PostgreSQLは3つのテーブルをHash Joinで結合し、コメントのテーブルを1回だけ読みました。
+
+Cのような一括取得は、入れ子をやめてroot fieldを3つ並べると速くなります。
+
+#+begin_src graphql
+query D {
+  author(limit: 2000, order_by: {id: asc}) { id name }
+  article(where: {author_id: {_lte: 2000}}) { id title author_id }
+  comment(where: {article: {author_id: {_lte: 2000}}}) { article_id body }
+}
+#+end_src
+
+=comment= の =where= でrelationshipを使うと、SQLでは =EXISTS= の副問い合わせになり、PostgreSQLはHash Joinを選びました。
+クライアントが =author_id= と =article_id= を使って入れ子を組み立てます。
+この書き方を使えるのは、親を選ぶ条件を子の =where= にも書けるときです。
+このデータでは著者のidが1から順に並ぶので、 =author_id= が2000以下という条件で、先頭の2,000人を選ぶ =limit: 2000= と同じ著者を選べました。
+
+手書きのSQLを[[https://hasura.io/docs/2.0/schema/postgres/native-queries/][Native Query]]としてHasuraに登録する方法もあります。
+この方法では、記事とコメントが =json= 型の1つのフィールドになり、その中の項目をGraphQLで選べなくなります。
+
+次の表は、HasuraにHTTPでクエリを送って15回測った時間の中央値です。
+
+| 取り方             | 時間  | 応答の大きさ |
+|--------------------+-------+--------------|
+| 入れ子             | 699ms | 8.4MB        |
+| root fieldを分ける | 280ms | 12.5MB       |
+| Native Query       | 375ms | 9.1MB        |
+
+画面に表示するページ単位のクエリでは、生成されるSQLの長さは速さに影響しませんでした。
+書き直したほうがよいのは、エクスポートや集計のように、親と子を数万件まとめて取るクエリです。
 
 ** 調べ方
 権限の式を入れたクエリも、購読も、最後は1本のSQLになっていました。
