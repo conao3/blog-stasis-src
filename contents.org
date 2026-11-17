@@ -21867,7 +21867,6 @@ FileWorkerの管理をRustに移す案も、3つのファイルを同時に解�
 :export_file_name: generated/contents/blog/2026/360ae9
 :export_date: 2026-11-17 02:18
 :export_tags: hasura graphql postgresql performance
-:export_draft: t
 :end:
 
 HasuraはPostgreSQLのテーブルからGraphQLのAPIを作るサーバーで、気に入って使っています。
