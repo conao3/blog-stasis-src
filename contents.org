@@ -22070,7 +22070,7 @@ Hasuraの動きで分からないところは、Explain APIが返すSQLを読む
 :properties:
 :export_file_name: generated/contents/blog/2026/2a0865
 :export_date: 2026-11-17 16:37
-:export_tags: rust lean japanese-law linter release rust-ritsulint lean-leanfran
+:export_tags: rust lean japanese-law linter formal-verification release rust-ritsulint lean-leanfran
 :end:
 
 日本の法令を検査するlinterのritsulintを作りました。
@@ -22194,6 +22194,28 @@ Leanのコードは[[https://s.conao3.com/blog/2026/23d62c][leanfran]]でRustに
 解決できない書き方には警告を出しません。
 読替えの句59,491件のうち、同じ法令の条・項に解決して照合したのは21,847件です。
 別の法令の条を指す句は、法令名か法令番号で法令を特定できた1,220件だけを照合しています。
+
+** 読替えの意味を定理にする
+警告は「引用した文言が条文に見つからなかった」という検索の結果です。
+これを法令の意味についての主張にするために、読替え規定がすることをLeanで定義しました。
+読替え規定は、条文の中の「A」をすべて「B」に置き換える関数です。
+引用先の条文に適用しても条文が1字も変わらないとき、その読替えは何も読み替えていません。
+
+次の定理は、引用した文言が条文に現れない読替えは条文を1字も変えないことを述べます。
+すべての読替えとすべての条文について、帰納法で証明しています。
+
+#+begin_src lean
+theorem vacuous_of_absent (c : Clause α) (text : List α)
+    (h : occurs c.quoted text = false) : c.Vacuous text :=
+  applyAux_of_not_occurs c.quoted c.replacement text.length text h
+#+end_src
+
+確度が「高」の読替えの警告のうち、引用先の条・項がある35件は、ritsulintが1件ずつ定理として書き出します。
+入管法なら「第13条第7項の読替えを、e-Govにある第41条第1項の文に適用しても、文は変わらない」という定理です。
+引用先が2つある警告が1件あるので、定理は36本です。
+条文は文字コードの列として定理に入っていて、Leanのカーネルが36本を7秒ほどで検査します。
+
+定理は[[https://github.com/conao3/rust-ritsulint/blob/master/lean/Ritsulint/Findings.lean][Findings.lean]]に、定義と証明は[[https://github.com/conao3/rust-ritsulint/blob/master/lean/Ritsulint/ReadAs.lean][ReadAs.lean]]にあります。
 
 ** 警告が言えること
 警告が示すのは、e-Govのデータの上での食い違いです。
