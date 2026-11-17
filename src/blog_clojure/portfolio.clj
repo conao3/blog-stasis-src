@@ -172,8 +172,8 @@
         text (fn [item] (if ja? (:ja item) (:en item)))]
     [:section {:id "oss-map" :class "oss-map" :data-oss-map "true" :data-lang (name lang)}
      [:h3 (label "OSS のつながり" "How my projects connect")]
-     [:p (label (str "公開している OSS のうち " (count (:nodes data)) " 件を分野ごとに並べました。矢印は、あるプロジェクトが別のプロジェクトのコードを生成する、拡張する、検査するといったつながりを表します。")
-                (str (count (:nodes data)) " of my open-source projects, grouped by area. Arrows show how one project generates code for, extends or tests another."))]
+     [:p (label (str "公開している OSS のうち " (count (:nodes data)) " 件を分野ごとに並べました。矢印は依存を表し、矢印の先が使われる側です。ラベルは、矢印の元のプロジェクトが先のプロジェクトをどう使うかを示します。")
+                (str (count (:nodes data)) " of my open-source projects, grouped by area. Each arrow points from a project to one it depends on, and its label says how it is used."))]
      [:div {:class "oss-map-frame" :hidden true :aria-label (label "OSS のつながりの図" "Project map")}
       [:div {:class "oss-map-bar"}
        [:div {:class "oss-map-areas" :role "group" :aria-label (label "分野へ移動" "Go to area")}

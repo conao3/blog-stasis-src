@@ -70,11 +70,11 @@
     "rust-devo": ["小さな DSL から tmux の開発環境を起動", "Run tmux development workflows from a small DSL"]
   },
   "edges": [
-    ["lean-leanfran", "rust-ritsuryo", "Rust を生成", "generates Rust"],
-    ["lean-ritsuryo", "rust-ritsuryo", "計算を提供", "provides logic"],
-    ["lean-leanfran", "rust-leansail", "規則を生成", "generates rules"],
-    ["lean-leanfran", "rust-lsp-touchstone", "規則を生成", "generates rules"],
-    ["rust-lsp-touchstone", "rust-leansail", "通信を検査", "tests sessions"],
+    ["rust-ritsuryo", "lean-leanfran", "Rust の生成に利用", "generates Rust with"],
+    ["rust-ritsuryo", "lean-ritsuryo", "証明した計算を利用", "uses the proved logic"],
+    ["rust-leansail", "lean-leanfran", "規則の生成に利用", "generates rules with"],
+    ["rust-lsp-touchstone", "lean-leanfran", "規則の生成に利用", "generates rules with"],
+    ["rust-leansail", "rust-lsp-touchstone", "通信の検査に利用", "tests sessions with"],
     ["lean-assay", "rust-lsp-touchstone", "定理を検査", "tests theorems"],
     ["leaf-keywords.el", "leaf.el", "キーワードを追加", "adds keywords"],
     ["leaf-tree.el", "leaf.el", "設定を木で表示", "shows config as a tree"],
@@ -82,8 +82,8 @@
     ["leaf-convert.el", "leaf-keywords.el", "利用", "uses"],
     ["leaf-keywords.el", "feather.el", "feather に対応", "adds feather support"],
     ["leaner-ts-mode.el", "keg.el", "開発に利用", "develops with"],
-    ["rust-plamo-tr", "rust-plamo-tr-po", "翻訳を提供", "provides translation"],
-    ["rust-plamo-tr-po", "emacs-doc", "マニュアルを翻訳", "translates the manuals"],
-    ["nix-sel4", "nix-sel4-example", "ビルドを提供", "provides the build"]
+    ["rust-plamo-tr-po", "rust-plamo-tr", "翻訳に利用", "translates with"],
+    ["emacs-doc", "rust-plamo-tr-po", "マニュアルの翻訳に利用", "translates the manuals with"],
+    ["nix-sel4-example", "nix-sel4", "ビルドに利用", "builds with"]
   ]
 }
