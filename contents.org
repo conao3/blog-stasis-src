@@ -21848,16 +21848,10 @@ FileWorkerの時間の多くは証明の検査と型クラスの推論です。
 ファイルを開いてから最初の診断が出るまでの約6.7秒は、本体とLeansailで差がありません。
 ここはLakeの準備、import、ファイルの解析にかかる時間で、言語サーバーの外にあります。
 
-計測の条件、全部の表、再現の手順は[[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]]にあります。
-
-** 作り方
-方針は私が決めました。
-基本はLeanで書き、計測で遅いと分かった処理だけをRustに移すというものです。
-実装と計測は、CodexのGPT-6.1 Solにしてもらいました。
-Solへの依頼と、報告を読んで次に直す処理を選ぶことは、Claude Opusに任せました。
-
 計測を重ねても、Rustに移すと速くなる処理は見つかりませんでした。
 FileWorkerの管理をRustに移す案も、3つのファイルを同時に解析させて測ったうえで、効果が小さいので見送りました。
+
+計測の条件、全部の表、再現の手順は[[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]]にあります。
 
 * COMMENT Local variables
 # Local Variables:
