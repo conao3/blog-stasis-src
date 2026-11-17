@@ -21498,7 +21498,7 @@ infixl:65 " +++ " => Nat.add
 [[./resources/public/img/d60a7d-pipeline.svg]]
 
 整形はLean adapterとRust rendererの2段で行います。
-Leanで書いたadapterがLeanの各構文に登録されたformatterを呼んで改行の候補と字下げを持つ文書を作り、Rustのrendererがその文書を行幅に合わせて並べます。
+Leanで書いたadapterがLeanの各構文に登録されたformatterを呼んで改行の候補と字下げを持つ文書を作り、Rustのrendererがその文書のレイアウトを行幅に合わせて決めます。
 
 ** スタイルガイドから決めた形
 Leanのformatterの文書をそのまま並べると、Mathlibで使われている形と違う箇所があります。
@@ -21576,14 +21576,14 @@ Twice.lean:2: kept source: Unknown constant `term.pseudo.antiquot`
 Leanのプロセスはファイルごとに、まずそのファイルの =import= から環境を作ります。
 環境は、 =import= したモジュールの定数の表と、記法やformatterの登録をまとめたものです。
 モジュールのデータが入った =.olean= は最初に使うときに読み、同じプロセスの次のファイルでは読み直しません。
-環境ができたらLeanが解析して文書を作り、Rustが行幅に合わせて並べ、その結果をLeanがもう一度解析して照合します。
+環境ができたらLeanが解析して文書を作り、Rustが行幅に合わせてレイアウトを決め、その結果をLeanがもう一度解析して照合します。
 
 [[./resources/public/img/d60a7d-timeline.svg]]
 
 この図は、Mathlibの31ファイルを6つのワーカーで整形したときの、ワーカーごとの時間の使い方です。
 この回は全体で6.5秒かかりました。
 6つのワーカーの時間を合わせた39.0秒のうち、22.8秒が環境の構築です。
-Leanでの解析と照合は11.1秒、Rustでの配置と照合は2.7秒、Leanのプロセスの起動は1.2秒でした。
+Leanでの解析と照合は11.1秒、Rustでのレイアウトと照合は2.7秒、Leanのプロセスの起動は1.2秒でした。
 残りの1.1秒は、先に終わったワーカーがほかのワーカーを待っていた時間です。
 
 環境の構築が長いのは、Mathlibのモジュールが大きいからです。

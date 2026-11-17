@@ -20,13 +20,13 @@
     <rect x="465" y="200" width="170" height="60" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
     <text x="550" y="226">Leanで解析</text>
     <rect x="680" y="200" width="160" height="60" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
-    <text x="760" y="226">Rustで配置</text>
+    <text x="760" y="226">Rustでレイアウト</text>
     <rect x="250" y="305" width="170" height="60" rx="8" fill="#fbf0e6" stroke="#c08850"/>
     <text x="335" y="331">環境の構築</text>
     <rect x="465" y="305" width="170" height="60" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
     <text x="550" y="331">Leanで解析</text>
     <rect x="680" y="305" width="160" height="60" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
-    <text x="760" y="331">Rustで配置</text>
+    <text x="760" y="331">Rustでレイアウト</text>
   </g>
   <g font-size="12" fill="#444" text-anchor="middle">
     <text x="120" y="84">importの組で振り分ける</text>
@@ -35,10 +35,10 @@
     <text x="125" y="286">モジュールのデータ</text>
     <text x="335" y="246">定数の表と記法の登録</text>
     <text x="550" y="246">文書を作り、結果を照合</text>
-    <text x="760" y="246">行幅に合わせて並べる</text>
+    <text x="760" y="246">改行と字下げを決める</text>
     <text x="335" y="351">定数の表と記法の登録</text>
     <text x="550" y="351">文書を作り、結果を照合</text>
-    <text x="760" y="351">行幅に合わせて並べる</text>
+    <text x="760" y="351">改行と字下げを決める</text>
   </g>
   <g font-size="12" fill="#444">
     <text x="36" y="174">1つのワーカーの中で、受け持つファイルごとに繰り返す</text>

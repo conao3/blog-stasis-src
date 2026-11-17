@@ -21,7 +21,7 @@
     <text x="265" y="112">Lean本体のparser</text>
     <text x="265" y="126">とformatter</text>
     <text x="440" y="112">規約の規則と</text>
-    <text x="440" y="126">行幅で配置</text>
+    <text x="440" y="126">行幅でレイアウト</text>
     <text x="615" y="112">構文木とコメント</text>
     <text x="615" y="126">と再整形の一致</text>
     <text x="615" y="258">改行をソースのまま保つ → 原文のまま残す</text>

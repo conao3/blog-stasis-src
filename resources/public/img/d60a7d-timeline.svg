@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="333" viewBox="0 0 880 333" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
-<rect width="880" height="333" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="358" viewBox="0 0 880 358" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
+<rect width="880" height="358" fill="#ffffff"/>
 <text x="98" y="48.0" font-size="13" fill="#222" text-anchor="end">ワーカー1</text>
 <rect x="110.0" y="30" width="687.2" height="26" fill="#ffffff" stroke="#bbbbbb" stroke-dasharray="3 3"/>
 <rect x="110.0" y="30" width="166.8" height="26" fill="#7dbb7d"/>
@@ -206,12 +206,12 @@
 <text x="850.0" y="274" font-size="12" fill="#444" text-anchor="middle">7秒</text>
 <rect x="110" y="292" width="16" height="16" fill="#e3a35a"/>
 <text x="132" y="305" font-size="13" fill="#222">環境の構築 22.8秒</text>
-<rect x="250.66" y="292" width="16" height="16" fill="#5b7fb8"/>
-<text x="272.65999999999997" y="305" font-size="13" fill="#222">Leanでの解析と照合 11.1秒</text>
-<rect x="439.68" y="292" width="16" height="16" fill="#7dbb7d"/>
-<text x="461.68" y="305" font-size="13" fill="#222">Rustでの配置と照合 2.7秒</text>
-<rect x="620.64" y="292" width="16" height="16" fill="#a7a7a7"/>
-<text x="642.64" y="305" font-size="13" fill="#222">Leanの起動 1.2秒</text>
-<rect x="769.36" y="292" width="16" height="16" fill="#ffffff" stroke="#bbbbbb" stroke-dasharray="3 3"/>
-<text x="791.36" y="305" font-size="13" fill="#222">待ち 1.1秒</text>
+<rect x="277.5" y="292" width="16" height="16" fill="#5b7fb8"/>
+<text x="299.5" y="305" font-size="13" fill="#222">Leanでの解析と照合 11.1秒</text>
+<rect x="501.0" y="292" width="16" height="16" fill="#7dbb7d"/>
+<text x="523.0" y="305" font-size="13" fill="#222">Rustでのレイアウトと照合 2.7秒</text>
+<rect x="110" y="318" width="16" height="16" fill="#a7a7a7"/>
+<text x="132" y="331" font-size="13" fill="#222">Leanの起動 1.2秒</text>
+<rect x="274.0" y="318" width="16" height="16" fill="#ffffff" stroke="#bbbbbb" stroke-dasharray="3 3"/>
+<text x="296.0" y="331" font-size="13" fill="#222">待ち 1.1秒</text>
 </svg>
