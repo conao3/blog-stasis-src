@@ -21440,7 +21440,7 @@ leanwispをMathlibの31ファイルに掛けると、すべてのファイルが
 [[github:conao3/rust-leanwisp::Rust][A parser-aware Lean 4 source formatter with a Rust layout engine]]
 
 ** 整形の例
-空白と改行が乱れた次のソースを整形します。
+空白と改行が乱れた次の例を整形します。
 
 #+begin_src lean
 @[simp]
@@ -21493,7 +21493,7 @@ infixl:65 " +++ " => Nat.add
 #eval (3: Nat)+++4
 #+end_src
 
-1行目の記法を読み込んでからこのソースの2行目を整形するので、 =#eval (3 : Nat) +++ 4= になります。
+1行目の記法を読み込んでから2行目を整形するので、 =#eval (3 : Nat) +++ 4= になります。
 
 [[./resources/public/img/d60a7d-pipeline.svg]]
 
