@@ -22093,10 +22093,11 @@ HasuraはPostgreSQLのテーブルからGraphQLのAPIを作るサーバーで、
 [[./resources/public/img/360ae9-architecture.svg]]
 
 どの構成でも動くのは、HasuraのコンテナとPostgreSQLの2つです。
-Hasuraの中では、権限の判定、GraphQLのschemaの生成、GraphQLからSQLへの変換が、どのリクエストでも動きます。
+権限の判定、GraphQLのschemaの生成、GraphQLからSQLへの変換は、どのリクエストでも動きます。
+図では青い部品です。
 
 APIの形を決めるのはmetadataです。
-metadataは、公開するテーブル、テーブルのあいだのrelationship、roleごとの権限の定義で、ConsoleやCLIから登録します。
+metadataは、公開するテーブル、テーブルのあいだのrelationship、roleごとの権限の定義で、ConsoleやCLI、Metadata APIから登録します。
 HasuraがmetadataをJSONで保存するのはPostgreSQLの =hdb_catalog= というschemaです。
 [[https://hasura.io/docs/2.0/getting-started/how-it-works/index/][公式のドキュメント]]によると、テーブルを1つ登録すると、Hasuraはその型を作ります。
 検索、主キーでの取得、集計、追加、更新、削除、購読のフィールドも作ります。
@@ -22105,6 +22106,7 @@ HasuraがmetadataをJSONで保存するのはPostgreSQLの =hdb_catalog= とい�
 [[https://hasura.io/docs/2.0/auth/overview/][認証]]はHasuraの外で行います。
 HasuraはJWTかwebhookでroleとsession variableを受け取ります。
 ActionsとRemote Schemasは外部のAPIをschemaに加える機能で、Event Triggersは行の変更をwebhookに送る機能です。
+HasuraはMySQLやOracleなどには、[[https://hasura.io/docs/2.0/databases/data-connectors/][data connector agent]]というサービスを経由してつなぎます。
 
 ** クエリ1件の流れ
 [[./resources/public/img/360ae9-flow.svg]]
@@ -22125,60 +22127,20 @@ resolverがフィールドごとにデータを取る作りでは、親の行の
 
 ** GraphQLとSQLの対応
 検証するため、著者、記事、コメントの3つのテーブルを作りました。
-次のクエリは、公開日の新しい順に記事を20件取り、著者の名前とコメントの先頭5件を付けます。
+公開日の新しい順に記事を20件取り、著者の名前とコメントの先頭5件を付けるクエリを、[[https://hasura.io/docs/2.0/api-reference/explain/][Explain API]]に送りました。
+Explain APIは、Hasuraが生成するSQLを返すAPIです。
+次の図は、上が送ったクエリ、下が返ってきたSQLで、SQLの改行と字下げは私が足しました。
 
-#+begin_src graphql
-query A {
-  article(limit: 20, order_by: {published_at: desc}) {
-    id
-    title
-    author { name }
-    comments(limit: 5, order_by: {id: asc}) { body }
-  }
-}
-#+end_src
-
-[[https://hasura.io/docs/2.0/api-reference/explain/][Explain API]]にクエリを送ると、Hasuraが生成するSQLを見られます。
-上のクエリは次のSQLになりました。
-改行と字下げは私が足したものです。
-
-#+begin_src sql
-SELECT coalesce(json_agg("root" ORDER BY "root.pg.published_at" DESC NULLS FIRST), '[]' ) AS "root"
-FROM (
-  SELECT row_to_json((SELECT "_e" FROM (SELECT
-           "_root.base"."id" AS "id", "_root.base"."title" AS "title",
-           "_root.or.author"."author" AS "author",
-           "_root.ar.root.comments"."comments" AS "comments" ) AS "_e" ) ) AS "root",
-         "_root.base"."published_at" AS "root.pg.published_at"
-  FROM (SELECT * FROM "public"."article" WHERE ('true')
-        ORDER BY "published_at" DESC NULLS FIRST LIMIT 20 ) AS "_root.base"
-  LEFT OUTER JOIN LATERAL (
-    SELECT row_to_json((SELECT "_e" FROM (SELECT "_root.or.author.base"."name" AS "name" ) AS "_e" ) ) AS "author"
-    FROM (SELECT * FROM "public"."author"
-          WHERE (("_root.base"."author_id") = ("id")) LIMIT 1 ) AS "_root.or.author.base"
-  ) AS "_root.or.author" ON ('true')
-  LEFT OUTER JOIN LATERAL (
-    SELECT coalesce(json_agg("comments" ORDER BY "root.ar.root.comments.pg.id" ASC NULLS LAST), '[]' ) AS "comments"
-    FROM (
-      SELECT row_to_json((SELECT "_e" FROM (SELECT "_root.ar.root.comments.base"."body" AS "body" ) AS "_e" ) ) AS "comments",
-             "_root.ar.root.comments.base"."id" AS "root.ar.root.comments.pg.id"
-      FROM (SELECT * FROM "public"."comment" WHERE (("_root.base"."id") = ("article_id"))
-            ORDER BY "id" ASC NULLS LAST LIMIT 5 ) AS "_root.ar.root.comments.base"
-      ORDER BY "root.ar.root.comments.pg.id" ASC NULLS LAST
-    ) AS "_root.ar.root.comments"
-  ) AS "_root.ar.root.comments" ON ('true')
-  ORDER BY "root.pg.published_at" DESC NULLS FIRST
-) AS "_root"
-#+end_src
+[[./resources/public/img/360ae9-mapping.svg]]
 
 GraphQLの入れ子1段が、SQLでは副問い合わせ1つになっています。
 
-- =article= と引数は、記事のテーブルを =ORDER BY= と =LIMIT 20= で絞る副問い合わせになります。
-- =id= と =title= は、 =row_to_json= に渡す列です。
-- =author= は記事1件に著者1人のrelationshipで、 =LEFT OUTER JOIN LATERAL= と =LIMIT 1= の副問い合わせになります。
-- =comments= は記事1件にコメント複数のrelationshipで、 =LEFT OUTER JOIN LATERAL= の中の =json_agg= がコメントの行を配列にします。
+- 青の =article= と引数は、記事のテーブルを =ORDER BY= と =LIMIT 20= で絞る副問い合わせになります。
+- 黄の =id= と =title= は、 =row_to_json= に渡す列です。
+- 緑の =author= は記事1件に著者1人のrelationshipで、 =LEFT OUTER JOIN LATERAL= と =LIMIT 1= の副問い合わせになります。
+- 紫の =comments= は記事1件にコメント複数のrelationshipで、 =LEFT OUTER JOIN LATERAL= の中の =json_agg= がコメントの行を配列にします。
 
-一番外側の =json_agg= の値が応答の配列です。
+色を付けていない一番外側の =json_agg= の値が応答の配列です。
 
 ** 権限
 権限では、roleごとに見せる行の条件を式で定義します。
