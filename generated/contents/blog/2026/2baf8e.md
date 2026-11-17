@@ -7,6 +7,7 @@ Tags: mongodb t3-code ai-agent hackathon claude-code ts-payproof
 I joined the MongoDB hackathon in Toronto as a solo participant.
 I ran several AI agents in T3 Code and built PayProof, an invoice processing app, along with its video, website and presentation materials.
 Twenty threads took part in the work, and they completed 14 compactions.
+A compaction is when the agent replaces a long conversation history with a summary and continues from a smaller input.
 
 The core implementation landed about 35 minutes after the first commit.
 After that, I kept polishing the app and the intro video, adding small features and fixing bugs along the way.
@@ -25,7 +26,8 @@ In this post I look back on the day through my conversation history with the age
 # The event and what I built
 
 The event was [Agents in Context Toronto: a MongoDB Hackathon](https://cerebralvalley.ai/e/mongodb-toronto-hackathon), held in Toronto on November 14, 2026.
-Participants built AI agents that carry out business work with MongoDB Atlas, and the [participant guide](https://cerebralvalley.ai/e/mongodb-toronto-hackathon/details) listed three problem statements: Agents You Can Audit, Memory You Can Govern, and Finish the Job.
+Participants built AI agents that carry out business work with [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database), and the [participant guide](https://cerebralvalley.ai/e/mongodb-toronto-hackathon/details) listed three problem statements: Agents You Can Audit, Memory You Can Govern, and Finish the Job.
+The participant guide shows a login screen when you are not logged in to Cerebral Valley.
 I chose Agents You Can Audit.
 Teams could have one to four members, and we had seven hours from the 10:00 opening to the 17:00 submission deadline.
 A submission was a public repository, a one-minute demo video and a short project description.
@@ -43,7 +45,7 @@ That person confirms through the contact on file, approves the amount and the ac
 If the amount or the account changes after approval, the approval no longer counts.
 PayProof stores permissions, accounts on file, invoice versions, approvals and the action history in the Atlas Sandbox that the organizers provided, and I mocked the human business check and the payment system for the demo.
 
-Later in the day I added speech recognition and text-to-speech from ElevenLabs.
+Later in the day I added speech recognition and text-to-speech from [ElevenLabs](https://elevenlabs.io/).
 You can ask by voice "Why is this payment held?", and PayProof answers with reasons grounded in the Atlas records.
 
 I published the [project site](https://conao3.github.io/ts-payproof/), the [slides](https://conao3.github.io/ts-payproof/slides/), the [cue sheet for my phone](https://conao3.github.io/ts-payproof/cue/) and the [one-minute video I submitted](https://www.youtube.com/watch?v=QneL7pynr7k).
@@ -58,7 +60,7 @@ You can also see the submission on its [official project page](https://cerebralv
 
 [T3 Code](https://t3.codes) is an app I have been using lately to drive coding agents.
 It runs Claude Code, Codex, OpenCode and other agents that I am already logged in to, all from one screen.
-It is open source, well made, and handles many sessions in one window.
+It is [open source](https://github.com/pingdotgg/t3code), well made, and handles many sessions in one window.
 I did most of the work in a conversation between me and one thread I call Main.
 Main launched worker threads for implementation, video and other tasks, and pulled their results together.
 Meta was a conversation I added later.
@@ -106,6 +108,7 @@ The final count includes Main, Meta and 18 worker threads.
 
 Bars show the run intervals that T3 Code recorded, dots show model responses, and black diamonds show completed compactions.
 The bars include time spent waiting for tools and reports, so a bar's length is not the model's compute time.
+The row names in the figures are thread names: payproof\_implementation is the implementation worker, video\_tools the video worker, pitch\_deck the slides worker, live\_start the live start state worker, and voice\_autoplay the audio autoplay worker.
 
 
 # How the day went
@@ -138,13 +141,13 @@ When Main launched a worker, it also told the worker which files it could change
 ## 10:07 The trouble with Steer
 
 The first thing that bothered me was how Steer behaves.
-T3 Code lets you send more input while an agent is running, but in my experience the agent sometimes answered the extra question and then dropped the original request.
+T3 Code lets you send more input while an agent is running, and sending it so that it interrupts the current work is called a [Steer](https://github.com/pingdotgg/t3code/blob/main/docs/user/composer.md#send-while-the-agent-is-working), but in my experience the agent sometimes answered the extra question and then dropped the original request.
 That morning several messages were waiting in Main's queue, so at 10:07 I asked Meta how to use Steer.
 Meta told me to add a note asking the agent to resume its original task after answering, and at 10:10 it sent that rule to Main as well.
 
 Then I tried steering Meta itself, and the same thing happened.
 At that time Meta was checking how many people had joined the event.
-Luma showed 15 people, but the venue had far more.
+The event's page on [Luma](https://luma.com/), an event listing service, showed 15 people, but the venue had far more.
 In the middle of that check, I asked Meta about an announcement at the venue, and Meta answered that question and ended its turn without finishing the headcount.
 At 11:15 I said, "Look into the headcount and report back. Steering really does make it forget."
 
@@ -195,7 +198,7 @@ The organizers answered at 11:37, and at 12:11 Meta passed the answer to Main as
 
 ## The 11:00 hour: the video and the website
 
-The video uses Remotion to combine screen recordings, diagrams, captions and background music.
+The video uses [Remotion](https://www.remotion.dev/) to combine screen recordings, diagrams, captions and background music.
 At first I considered burning the captions into the video, but at 10:31 I asked for something else: "Instead of subtitles, it may be better to set aside a dedicated caption area on the screen. Let's show Toronto the BIIM style."
 The BIIM style is a layout common in explainer videos on Niconico, a Japanese video site.
 It fixes a demo on the left, a diagram on the right and a caption area at the bottom, and keeps each caption on screen for a long time.
@@ -266,7 +269,7 @@ The slides included screencasts, and I thought they showed well enough how the p
 If I spent all three minutes on the demo, though, I could not explain the problem PayProof solves.
 The judges had to understand the background within the three minutes either way, so I decided to play the one-minute video whether or not it got its own slot.
 If it did not, I would play it in the first minute and shrink the live demo to the remaining two.
-The video explains everything on its own, background included, so I removed every background slide and kept only the Summary slide with the architecture diagram.
+The video explains everything on its own, background included, so I removed every background slide and cut the deck to three: the video, the demo, and the Summary slide with the architecture diagram.
 I asked for a male voice to narrate the video, and planned to end the live demo by returning to the Summary slide.
 
 The narration uses the en-US-Grant voice of Microsoft MAI-Voice-2.1-Flash.
@@ -277,7 +280,7 @@ The agents spelled out that an approval is tied to one specific payment and that
 They also showed that the server checks the permissions and the current invoice version again.
 
 From around 15:20 I also set up the demo laptop with the agents.
-Screenkey shows the keys and shortcuts I type at the bottom of the screen, and highlight-pointer draws a yellow circle around the cursor that turns red while I click.
+[Screenkey](https://www.thregr.org/~wavexx/software/screenkey/) shows the keys and shortcuts I type at the bottom of the screen, and [highlight-pointer](https://github.com/swillner/highlight-pointer) draws a yellow circle around the cursor that turns red while I click.
 I also enlarged the cursor itself to 72 px.
 I wanted the audience to follow with their eyes where I clicked and what I typed, on top of what I said.
 So the AI and I prepared the demo laptop as well as the app and the script.
@@ -476,7 +479,7 @@ From then on, Main checked that each update to the submission could be viewed wh
 
 ## What I decided
 
-In the second half of the day, I asked one by one for things I needed to present: the big-picture summary, the architecture diagram, an English script at B1 level, and the cue sheet for my iPhone.
+In the second half of the day, I asked one by one for things I needed to present: the big-picture summary, the architecture diagram, an English script at CEFR B1 level, and the cue sheet for my iPhone.
 What I kept deciding in the second half was less what to build and more what I needed to understand, what to show, and for how many seconds.
 
 I checked and approved everything before it went out to an outside service.

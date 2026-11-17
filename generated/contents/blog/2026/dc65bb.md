@@ -8,6 +8,7 @@ Leanのstructureと帰納型はpydanticのmodelになるのでFastAPIのリク�
 
 リポジトリは[conao3/lean-py](https://github.com/conao3/lean-py)で、ライセンスはApache-2.0です。
 PyPIには `lean-python` の名前で公開していて、この記事は0.2.0で動かした結果をもとに書いています。
+lean-pyは現在[leanfran](https://s.conao3.com/blog/2026/23d62c)のPythonのバックエンドになっていて、リポジトリは[conao3/lean-leanfranのlangs/Python/](https://github.com/conao3/lean-leanfran/tree/master/langs/Python)、パッケージの名前は `leanfran` です。
 
 lean-pyはLeanのコンパイラの中間表現をPythonのソースに変換していて、生成したPythonは `lean-python` のパッケージとpydanticだけで動くので、実行するときにLeanは要りません。
 [lean-clj](https://s.conao3.com/blog/2026/4e5aa2)と[lean-rs](https://s.conao3.com/blog/2026/b43a06)はLeanの関数をClojureとRustから呼ぶもので、lean-pyは同じ仕組みをPythonに移したものです。
@@ -38,7 +39,7 @@ $ uv add lean-python
 $ nix profile install github:conao3/lean-py
 ```
 
-証明を検査するときは、Lean 4.35.0の `lake` も `PATH` に要ります。
+証明を検査するときは、LeanのビルドツールであるLean 4.35.0の `lake` も `PATH` に要ります。
 
 `lean(...)` にはLeanのソースを文字列のまま書いて、パッケージの中のmoduleで呼びます。
 
@@ -61,7 +62,7 @@ def Range.width (r : Range) : Nat := r.hi - r.lo
 """)
 ```
 
-`double_eq` は、 `double` の定義を展開してから、自然数と整数の線形算術を解くタクティクの `omega` で等式を示しています。
+`double_eq` は、 `double` の定義を展開してから、自然数と整数の線形算術を解くタクティクの[omega](https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#omega)で等式を示しています。
 `lean-py sync` はパッケージのmoduleを読み込んで `lean(...)` のブロックを集め、 `lake build` で証明を検査して、検査が通ればブロックのLeanのコードをPythonに変換して `demo/_lean/` に書き出します。
 
 ```console
@@ -284,6 +285,8 @@ def clamp(x: int, lo: int, hi: int) -> int:
 
 `refines` は `clamp` がすべての入力で `clampSpec` と同じ値を返すという主張で、 `requires` は前提、 `ensures` は結果が満たす条件です。
 `@model` は関数をそのまま返すので、 `clamp` は普通のPythonの関数として動きます。
+証明の対象はlean-pyがPythonの関数から訳したLeanの関数で、訳がPythonの実行と同じ計算をすることは、lean-pyの変換が正しいことに頼っています。
+保証するのは関数が値を返したときの値で、 `while` のループが止まることは示しません。
 
 `lean-py check` は関数をLeanの `do` 記法に訳して主張ごとに証明すべき命題を作るのですが、Leanの `do` 記法には変数の再代入、 `for` 、 `while` 、途中の `return` があるので、Pythonの文がほぼそのまま対応します。
 
@@ -368,10 +371,10 @@ lean-pyは、Leanのコンパイラが最後に作る中間表現を読んで、
 
 Pythonの実行時のライブラリにも参照カウントを持たせて、配列への追加や更新は参照が1つのときにその場で行うようにしたので、 `Array` に要素を足していくループは、Cにコンパイルしたときと同じく要素数に比例する時間で終わります。
 
-Leanの組み込みの関数は、LeanのCのruntimeの `lean.h` に合わせて、同じ振る舞いをPythonで書いています。
+Leanの組み込みの関数は、LeanのCのruntimeの[lean.h](https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h)に合わせて、同じ振る舞いをPythonで書いています。
 同じLeanのプログラムをCにコンパイルして動かしたときと、Pythonに変換して動かしたときの出力を比べるテストがあり、標準出力と標準エラー出力が1文字の違いもなく一致しています。
 
-速さはCにコンパイルしたものより数倍から百倍ほど遅く、計測した値はREADMEに載せています。
+速さはCにコンパイルしたものより数倍から百倍ほど遅く、計測した値は[READMEのPerformance](https://github.com/conao3/lean-py/tree/v0.2.0#performance)に載せています。
 
 
 # おわりに

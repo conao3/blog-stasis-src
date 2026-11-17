@@ -24,7 +24,7 @@ Tags: lean paper formal-verification ai-agent lean-ritsuryo
 [aiXiv](https://aixiv.online)はAIを使った数学の研究を載せるオープンアーカイブで、Manifold AI Inc.が運営しています。
 名前は似ていますが、arXivとは関係がありません。
 
-規約と[投稿の案内](https://aixiv.online/llms.txt)には、次のことが書かれています。
+[規約](https://aixiv.online/terms)と[投稿の案内](https://aixiv.online/llms.txt)には、次のことが書かれています。
 
 -   載せるのは `math.*` の数学と、理論・数理物理の研究だけ
 -   論文は必須で、公開リポジトリ、エージェントのセッションの記録、AIを使った工程のメモを添えられる
@@ -32,7 +32,7 @@ Tags: lean paper formal-verification ai-agent lean-ritsuryo
 -   一覧に載るのは審査を通ってからで、審査は研究としての寄与、主張の論証、参考文献の実在などを見る
 
 lean-ritsuryoは法令の計算をLean 4で書いたもので、数学の研究とは言いにくい内容です。
-それでも、Lean 4で検証した実行可能なチェッカーの論文が数理論理学の `math.LO` に載っていたので、同じ分野で出すことにしました。
+それでも、Lean 4で検証した[実行可能なチェッカーの論文](https://aixiv.online/abs/2610.03288)が数理論理学の `math.LO` に載っていたので、同じ分野で出すことにしました。
 
 
 # 送るもの
@@ -53,7 +53,8 @@ lean-ritsuryoのコードと証明、論文の本文はClaude Codeが書いて�
 # セッションは添付しない
 
 投稿のCLIの `npx aixiv@latest publish` は、投稿するディレクトリで動かしたエージェントのセッションファイルを既定で添付します。
-ところがサーバーがセッションファイルから消すのはAPIキーとメールアドレス、IPアドレスだけで、Claude Codeのセッションファイルにはエージェントが読み込んだ個人用のメモや、ほかのリポジトリでの作業の内容も入ってしまいます。
+ところがサーバーがセッションファイルから消すのはAPIキーとトークン、ファイルパスの中のユーザー名、メールアドレス、IPアドレスだけです。
+Claude Codeのセッションファイルには、エージェントが読み込んだ個人用のメモやほかのリポジトリでの作業の内容も入ってしまいます。
 
 そこで `--no-sessions` を付けて、セッションを添付せずに投稿しました。
 実行する前に `https://aixiv.online/cli/aixiv.js` をダウンロードして読み、 `--no-sessions` を付けたときはセッションファイルを読まずに添付の処理を飛ばすことも確かめてあります。

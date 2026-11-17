@@ -7,8 +7,8 @@ Tags: lean rust lsp formal-verification testing release rust-lsp-touchstone
 いろいろなエディタと言語サーバーを使っていて、どれも仕様の細かいところを少しずつ外しているように感じていたのですが、LSPには公式の適合テストがなく、サーバーの一部を検査する道具はあってもクライアントを検査する道具は見つかりませんでした。
 
 そこで、仕様に厳格なクライアントとサーバーを作って、通信が仕様どおりかを判定できるようにしました。
-判定の中心になる計算はLean 4で書いて正しさを証明し、[lean-rs](https://s.conao3.com/blog/2026/b43a06)でRustに変換しています。
-これを5つのエディタとrust-analyzerにつないでみたところ、思っていたとおり、どれにも仕様に反する動きがありました。
+判定のうち計算を間違えやすい3つの部分はLean 4で書いて性質を証明し、[lean-rs](https://s.conao3.com/blog/2026/b43a06)でRustに変換しています。
+これを5つのエディタとrust-analyzerにつないでみたところ、lsp-mode、Neovim、VS Code、rust-analyzerには仕様が禁じる動きがあり、eglotとHelixにも仕様の読み方が分かれる動きがありました。
 
 作った道具はlsp-touchstoneで、リポジトリは[conao3/rust-lsp-touchstone](https://github.com/conao3/rust-lsp-touchstone)、ライセンスはApache-2.0です。
 この記事の結果は0.1.0で動かしたものです。
@@ -26,8 +26,9 @@ lsp-touchstoneには3つの動かし方があります。
 -   proxyはエディタと言語サーバーのあいだに入り、すべてのメッセージを検査しながら中継します。
 -   serverはエディタの言語サーバーとして動き、仕様にあるサーバーからのリクエストと通知を順に送ります。
 
-3つとも同じ検査を使っていて、検査に使う型と、各メソッドがどのcapabilityに対応するかは、LSP 3.18の仕様のメタモデル `metaModel.json` から読んでいます。
-指摘は80種類あり (一覧は[docs/rules.md](https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/rules.md)にあります)、仕様が禁じることはerrorに、仕様が許していても実装によって読み方が分かれることはwarningにしています。
+3つとも同じ検査を使っています。
+検査に使う型と、各メソッドがどのcapability (クライアントとサーバーが初期化のときに宣言する、自分が扱える機能) に対応するかは、LSP 3.18の仕様のメタモデル[metaModel.json](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#metaModel)から読んでいます。
+指摘は80種類あり (一覧は[docs/rules.md](https://github.com/conao3/rust-lsp-touchstone/blob/89ca481/docs/rules.md)にあります)、仕様が禁じることはerrorに、仕様が許していても実装によって読み方が分かれることはwarningにしています。
 
 
 # Leanで証明した部分
@@ -76,11 +77,15 @@ proxyは進捗の通知を受けるたびにこの `step` を呼んで、 `none`
 
 ## 終わり方
 
-LSPでは、クライアントが `shutdown` を送り、応答を受けてから `exit` を送って終わるのですが、 `shutdown` を送ったあとのクライアントは、 `exit` のほかにリクエストも通知も送ってはいけないことになっています。
-6つの実装は、それぞれ違う形でこの手順から外れていました (「回によって」と書いたものは、何回か実行したうちの一部で出たものです)。
+LSPでは、クライアントが `shutdown` を送り、応答を受けてから `exit` を送って終わります。
+[仕様](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#shutdown)は、 `shutdown` を送ったあとのクライアントが `exit` のほかにリクエストも通知も送ってはいけないと定めています。
 
--   eglotは `exit` に `"params": {}` を付けて送ります。 `exit` はparamsを持たない通知なので、warningにしています。
--   lsp-modeは `exit` を送らずにサーバーのプロセスを終わらせ、回によっては `"params": null` を付けた `exit` を送ります。JSON-RPC 2.0のparamsはオブジェクトか配列で、 `null` は仕様に合いません。
+> Clients must not send any requests or notifications other than `exit` to a server to which they have sent a shutdown request. Clients should also wait with sending the `exit` notification until they have received a response from the `shutdown` request.
+
+6つの実装は、それぞれ違う形でこの手順から外れていて、eglotとHelixのものはwarning、ほかの4つのものはerrorです (「回によって」と書いたものは、何回か実行したうちの一部で出たものです)。
+
+-   eglotは `exit` に `"params": {}` を付けて送ります。[仕様のexit](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#exit)はparamsを持たない通知なので、warningにしています。
+-   lsp-modeは `exit` を送らずにサーバーのプロセスを終わらせ、回によっては `"params": null` を付けた `exit` を送ります。[JSON-RPC 2.0](https://www.jsonrpc.org/specification#parameter_structures)は「If present, parameters for the rpc call MUST be provided as a Structured value. Either by-position through an Array or by-name through an Object.」と定めていて、 `null` は仕様に合いません。
 -   Neovimはrust-analyzerとつないだとき、回によって `shutdown` のあとに `textDocument/semanticTokens` のリクエストを送ります。
 -   VS Codeのクライアントは回によって `shutdown` のあとに `$/cancelRequest` を送ります。
 -   Helixは回によって `exit` が届く前にサーバーのプロセスを終わらせます。
@@ -95,7 +100,7 @@ clientのweb UIでrust-analyzerを起動し、初期化してからファイル�
 
 ![img](../../../../resources/public/img/ccc5ed-finding.png)
 
-rust-analyzerが `workspace/diagnostic/refresh` のリクエストを送っていますが、仕様はこのリクエストに対応するクライアントのcapabilityを `workspace.diagnostics.refreshSupport` と定めていて、lsp-touchstoneのclientはこれを宣言していません。
+rust-analyzerが `workspace/diagnostic/refresh` のリクエストを送っていますが、[仕様](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#diagnostic_refresh)はこのリクエストに対応するクライアントのcapabilityを `workspace.diagnostics.refreshSupport` と定めていて、lsp-touchstoneのclientはこれを宣言していません。
 
 rust-analyzerは5つのエディタのどれとつないでもこのリクエストを送っていて、5つのエディタはどれも `refreshSupport` を宣言していないのに、eglot、lsp-mode、Neovim、VS Codeは `"result": null` で成功を返しました。
 Helixは「メソッドが見つからない」というエラーを返しましたが、rust-analyzerはそのまま動き続けました。
@@ -103,7 +108,7 @@ Helixは「メソッドが見つからない」というエラーを返しまし
 
 ## ほかの振る舞い
 
--   rust-analyzerは `window/workDoneProgress/create` の応答を受ける前に、そのtokenで進捗を送り始めることがあります。
+-   rust-analyzerは[window/workDoneProgress/create](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#window_workDoneProgress_create)の応答を受ける前に、そのtokenで進捗を送り始めることがあります。仕様は応答がエラーのときにそのtokenで進捗を送ることを禁じているので、応答を待たずに送ると、エラーが返ったときに違反になります。
 -   lsp-modeは、Emacsが最初の保存でファイルをバックアップの `main.rs~` に改名するとき、 `workspace/willRenameFiles` をサーバーに送ります。
 -   serverは、位置を数える単位をクライアントが示した中から `utf-32` 、 `utf-8` 、 `utf-16` の順に選びます。eglot、lsp-mode、Neovim、Helixでは `utf-32` になり、VS Codeのクライアントは `utf-16` しか示しません。
 
