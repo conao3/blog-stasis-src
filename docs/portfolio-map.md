@@ -14,8 +14,9 @@ The English and Japanese portfolio pages include an interactive map after the ex
 | Area | Select an area | Center that group; store the chosen area in `oss-area` |
 | Zoom | Use +/−, Ctrl/Command-wheel or a two-pointer pinch | Change scale around the zoom center |
 | Pan | Drag the map, or focus it and press arrow keys | Change translation; dragging must not select a project |
-| Overview | Click Fit all | Fit the complete map in the canvas |
-| Fullscreen | Click Fullscreen, then click again | Enter and exit fullscreen; use a viewport overlay when the browser rejects native fullscreen (Escape also closes this overlay) |
+| Alignment | Initialize, fit, zoom out or change area | Anchor the map or selected area at the top left; panning cannot introduce blank space before the map origin |
+| Overview | Click Fit all | Fit the complete map from the top-left corner of the canvas |
+| Fullscreen | Click Fullscreen, then click again or press Escape | Fill the existing browser viewport with the map and controls; never call the native fullscreen API or resize the browser window |
 | Script unavailable | Read the expandable text list | All 44 projects and outgoing relationships remain available without JavaScript |
 
 Build with `nix develop -c make build`. Validate changes in a real browser, including node selection, zoom, drag and narrow layouts; JavaScript syntax checks alone do not establish that the map works in its delivery environment.

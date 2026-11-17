@@ -81,23 +81,25 @@
     });
     el.addEventListener('focus', () => reveal(n));
   });
-  function draw() { world.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`); }
+  function draw() {
+    x = Math.min(0, x); y = Math.min(0, y);
+    world.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
+  }
   function fit() {
     scale = Math.min(svg.clientWidth / width, svg.clientHeight / height);
-    x = (svg.clientWidth - width * scale) / 2;
-    y = (svg.clientHeight - height * scale) / 2;
+    x = 0; y = 0;
     area.value = 'all'; draw();
   }
   function reveal(n) {
     if (n.x * scale + x < 0 || (n.x + 495) * scale + x > svg.clientWidth ||
         n.y * scale + y < 0 || (n.y + n.height) * scale + y > svg.clientHeight) {
       scale = Math.max(0.3, Math.min(1.2, svg.clientWidth / 550));
-      x = svg.clientWidth / 2 - (n.x + 247.5) * scale;
-      y = svg.clientHeight / 2 - (n.y + n.height / 2) * scale;
+      x = (24 - n.x) * scale;
+      y = (24 - n.y) * scale;
       draw();
     }
   }
-  function zoom(factor, cx = svg.clientWidth / 2, cy = svg.clientHeight / 2) {
+  function zoom(factor, cx = 0, cy = 0) {
     const next = Math.max(0.12, Math.min(3, scale * factor));
     x = cx - (cx - x) * next / scale;
     y = cy - (cy - y) * next / scale;
@@ -149,27 +151,29 @@
   let previousOverflow = '';
   function closeExpanded() {
     root.classList.remove('is-expanded');
+    root.removeAttribute('role'); root.removeAttribute('aria-modal'); root.removeAttribute('aria-label');
     document.body.style.overflow = previousOverflow;
     fullscreenButton.textContent = label('全画面', 'Fullscreen');
     fullscreenButton.focus();
   }
-  fullscreenButton.onclick = async () => {
+  fullscreenButton.onclick = () => {
     if (root.classList.contains('is-expanded')) { closeExpanded(); return; }
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await root.requestFullscreen();
-    } catch (_) {
-      previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      root.classList.add('is-expanded');
-      fullscreenButton.textContent = label('元の表示に戻す', 'Exit fullscreen');
-    }
+    previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    root.classList.add('is-expanded');
+    root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', label('OSSの関係図', 'Open-source project map'));
+    fullscreenButton.textContent = label('元の表示に戻す', 'Exit fullscreen');
   };
-  document.addEventListener('fullscreenchange', () => {
-    fullscreenButton.textContent = document.fullscreenElement ? label('元の表示に戻す', 'Exit fullscreen') : label('全画面', 'Fullscreen');
-  });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && root.classList.contains('is-expanded')) closeExpanded();
+    if (e.key === 'Tab' && root.classList.contains('is-expanded')) {
+      const controls = [...root.querySelectorAll('button, select, a[href], [tabindex="0"]')]
+        .filter(el => el.getClientRects().length);
+      const first = controls[0], last = controls.at(-1);
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
   });
   area.onchange = event => {
     if (event) {
@@ -181,7 +185,7 @@
     if (area.value === 'all') { fit(); return; }
     const index = Number(area.value);
     scale = Math.min(svg.clientWidth / 550, svg.clientHeight / groupHeights[index], 1.5);
-    x = (svg.clientWidth - 550 * scale) / 2 - (index % 3) * 560 * scale;
+    x = -(index % 3) * 560 * scale;
     y = -rowY[Math.floor(index / 3)] * scale;
     draw();
   };
