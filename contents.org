@@ -19875,7 +19875,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
 :export_date: 2026-11-17 12:43
-:export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone
+:export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
 :end:
 
 証明が通っても、壊れた実装が同じ定理を満たすなら、その定理は実装について何も保証していません。
@@ -19886,6 +19886,7 @@ Leanでは定理も実装も実行できます。
 そこで、定理に出てくる関数をわざと壊し、壊した版でも定理が成り立つかを実行して確かめる道具を作りました。
 自分で証明を書いたlsp-touchstoneの定理に当てて確かめました。
 仕様に反する状態機械や、UTF-16の幅を間違えた変換でも、すべての定理が成り立つことが分かりました。
+Leanで書いた関数をRustに変換して使っている自作のツール6つにも当てると、2つのツールで合わせて56の穴が見つかり、定理を足してすべてなくしました。
 
 作った道具はleanassayです。
 リポジトリは[[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]]で、ライセンスはApache-2.0です。
@@ -19996,6 +19997,42 @@ leanassayは、UTF-16で2と数える境界の比較を =<= から =≤= に替�
 
 定理を足したあとは、進捗の19、位置の72の壊し方のどれも穴として残りませんでした。
 [[https://github.com/conao3/rust-lsp-touchstone/commit/f77cc2b][定理を足したcommit]]と、足す前と後の[[https://github.com/conao3/lean-leanassay/tree/master/AssayTest][監査の結果]]はリポジトリにあります。
+
+** 自作のツールに当てた結果
+lsp-touchstoneのほかにも、自作のツールが6つあります。
+どれもLeanで書いた関数を[[https://github.com/conao3/lean-leanfran][leanfran]]でRustに変換して使っています。
+Rustから呼ぶ関数すべてに =#assay= を当て、 =make check= で監査するようにしました。
+
+| ツール | 関数 | 壊し方 | 弾いた | 穴 |
+|---|---|---|---|---|
+| [[https://github.com/conao3/rust-leanwisp][leanwisp]] (Leanのフォーマッタ) | 24 | 155 | 140 | 0 |
+| [[https://github.com/conao3/rust-leansail][leansail]] (Leanの言語サーバー) | 7 | 420 | 385 | 0 |
+| [[https://github.com/conao3/rust-leankeel][leankeel]] (Leanのlinter) | 7 | 40 | 40 | 0 |
+| [[https://github.com/conao3/rust-leanwake][leanwake]] (Leanの遅くなった宣言の検出) | 3 | 10 | 10 | 0 |
+| [[https://github.com/conao3/rust-ritsuryo][ritsuryo]] (法令の期間と税額の計算) | 5 | 14 | 10 | 0 |
+| [[https://github.com/conao3/rust-ritsulint][ritsulint]] (法令のlinter) | 16 | 200 | 134 | 0 |
+| 合計 | 62 | 839 | 719 | 0 |
+
+壊し方のうち弾いていないのは、型が合わずに作れなかった版と、試した入力で元と同じ値を返した版です。
+
+当てる前の穴は、leanwispに17、leansailに39でした。
+定理が1つも触れていない関数も、ritsuryoに6つ、leanwispに4つ、leankeelに1つありました。
+
+定理が上限だけや一方向だけを述べていたところに、多くの穴がありました。
+leanwispの =softblockIndent= は、字下げの幅を =min indent.toNat (base + 2)= で決める関数です。
+定理は、結果がどちらの値も超えないことだけを述べていました。
+そのため、いつも0を返す版や =+= を =-= に替えた版も定理を通ります。
+結果がどちらかの値に等しいという定理を足すと、この穴はなくなりました。
+
+leansailでは、言語サーバーの状態の移り方 =transition= に39の穴がありました。
+元の定理は、 =running= に移ったなら前の状態はこのどれかであるという含意の形でした。
+この形では前提を満たす入力が63のうち3つしかなく、leanassayは壊した版の多くを確かめられません。
+含意の定理を =↔= の形に書き直し、移った先の状態ごとに =↔= の定理を足すと、39の穴はすべてなくなりました。
+
+穴はどれも定理の書き漏らしでした。
+関数の定義を直したところはありません。
+いまはどのツールも、 =make check= で穴がないことを確かめています。
+leansailで足した定理の1つ =initializing_iff_initialize= を消すと、29の穴が出てビルドが失敗します。
 
 ** 証明が壊れるかで判定する道具との違い
 Leanには、関数を壊して定理を確かめる道具がすでにあります。
