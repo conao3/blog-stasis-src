@@ -21710,7 +21710,6 @@ Mathlibで確かめたのは31ファイルで、残りのファイルには掛�
 :export_file_name: generated/contents/blog/2026/060bea
 :export_date: 2026-11-17 14:45
 :export_tags: lean rust lsp mathlib performance formal-verification release rust-leansail lean-leanfran rust-lsp-touchstone
-:export_draft: t
 :end:
 
 Leanの言語サーバーLeansailを作りました。
