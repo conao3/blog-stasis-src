@@ -21705,7 +21705,7 @@ leanwisp --output text source format-source --source file:///dev/stdin
 Mathlibで確かめたのは31ファイルで、残りのファイルには掛けていません。
 対応しているのはLean 4.35.0です。
 
-* Lean本体の言語サーバーを組み込んだLeansailを作り、遅い処理だけをLeanで直した
+* Lean本体と応答が同じで最大700倍速い言語サーバーLeansailを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/060bea
 :export_date: 2026-11-17 14:45
@@ -21716,7 +21716,7 @@ Mathlibで確かめたのは31ファイルで、残りのファイルには掛�
 Leanの言語サーバーLeansailを作りました。
 Lean本体の言語サーバー =Lean.Server= をそのまま組み込み、Mathlibで計測して遅いと分かった処理だけを直しています。
 応答の中身は本体と同じです。
-ハイライトは5.5倍、補完は4.6倍、 =workspace/symbol= は8.8倍速くなりました。
+同じ文書への2回目以降のハイライトは本体の約700倍、初回のハイライトは5.5倍、補完は4.6倍、 =workspace/symbol= は8.8倍速くなりました。
 直した処理はすべてLeanで書いた部分にあります。
 Rustで書いた部分はエディタとのあいだの中継と、Leanで証明した規則の実行だけです。
 
