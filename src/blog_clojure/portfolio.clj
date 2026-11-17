@@ -201,10 +201,11 @@
                 :let [node (first (filter #(= id (:id %)) (:nodes data)))]]
             [:li [:a {:href (:url node)} id] ": " (if ja? (:description node) (:enDescription node))
              [:ul
-              (for [[j [from to text source]] (map-indexed vector (:edges data))
+              (for [[j [from to text]] (map-indexed vector (:edges data))
                     :when (= from id)]
-                [:li (str from " → " to ": " (if ja? text (nth (:edgeLabels data) j))) " ("
-                 [:a {:href (str "https://github.com/conao3/" source)} (label "根拠" "Source")] ")"])]])]])]
+                [:li (str from " → ")
+                 [:a {:href (str "https://github.com/conao3/" to)} to]
+                 (str ": " (if ja? text (nth (:edgeLabels data) j)))])]])]])]
      [:script {:type "application/json" :class "oss-map-data"} (hiccup/raw (json/write-str data :escape-unicode false))]]))
 
 

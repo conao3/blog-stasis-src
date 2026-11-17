@@ -99,12 +99,12 @@
     description.textContent = ja ? node.description : node.enDescription;
     detail.append(description);
     const list = document.createElement('ul');
-    data.edges.forEach(([from, to, text, source], i) => {
+    data.edges.forEach(([from, to, text], i) => {
       if (from !== id && to !== id) return;
       const li = document.createElement('li');
-      li.append(`${from} → ${to}: ${ja ? text : data.edgeLabels[i]} (`);
-      const a = document.createElement('a'); a.href = `https://github.com/conao3/${source}`;
-      a.textContent = label('根拠', 'Source'); li.append(a, ')'); list.append(li);
+      li.append(`${from} → `);
+      const a = document.createElement('a'); a.href = `https://github.com/conao3/${to}`;
+      a.textContent = to; li.append(a, `: ${ja ? text : data.edgeLabels[i]}`); list.append(li);
     });
     if (list.children.length) detail.append(list);
     else {
