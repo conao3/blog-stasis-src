@@ -1,5 +1,6 @@
 Title: MELPAのパッケージページにHomepageリンクが追加
 Date: 2020-05-27
+Tags: emacs melpa package-management
 
 
 MELPAの公式がツイートしてた。

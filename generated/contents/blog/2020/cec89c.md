@@ -1,5 +1,6 @@
 Title: リストに関数を適用して最初にnon-nilを返した値を得る方法
 Date: 2020-05-26
+Tags: emacs-lisp list seq
 
 
 このような関数をさくっと使いたい。

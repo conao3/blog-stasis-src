@@ -1,5 +1,6 @@
 Title: dioxus-tui入門 - 0.2.2
 Date: 2022-12-16
+Tags: rust dioxus tui macro tutorial advent-calendar
 
 
 

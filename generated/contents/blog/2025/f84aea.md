@@ -1,5 +1,6 @@
 Title: 日本語レポートから始めるorg-modeとEmacs
 Date: 2025-12-02
+Tags: emacs org-mode nix advent-calendar tutorial
 
 
 この記事は[Emacs Advent Calendar 2025](https://qiita.com/advent-calendar/2025/emacs)の4日目の記事です。

@@ -1,6 +1,7 @@
 Title: A day at a MongoDB hackathon with 20 AI threads
 Date: 2026-11-14 20:15
 Lang: en
+Tags: mongodb t3-code ai-agent hackathon claude-code ts-payproof
 
 
 I joined the MongoDB hackathon in Toronto as a solo participant.

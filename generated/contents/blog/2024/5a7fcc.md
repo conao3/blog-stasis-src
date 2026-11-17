@@ -1,5 +1,6 @@
 Title: Hello Stasis
 Date: 2024-12-21
+Tags: clojure stasis blog release blog-stasis-src
 
 
 私はconao3.comを持っていて、どうせ何回ブログを作っても飽きるので初めからサブドメインで用意するようにしています。

@@ -1,5 +1,6 @@
 Title: [正式リリース]leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする
 Date: 2019-06-15
+Tags: emacs use-package package-management release leaf-el leaf-keywords-el
 
 
 私は去年の[8月](https://github.com/conao3/dotfiles/commit/fd06cea5dd040ec1fb34225a3f3202200e00801e)から.emacs.d/init.elの大改革を行っており、その副産物としての成果物を[Emacs Advent Calendar 2018](https://qiita.com/advent-calendar/2018/emacs)や[東京Emacs勉強会 端午の節句](https://tokyo-emacs.connpass.com/event/128038/)などで共有させて頂いていました。

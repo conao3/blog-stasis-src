@@ -1,5 +1,6 @@
 Title: Leanの論文をaiXivに投稿した
 Date: 2026-11-04 14:43
+Tags: lean aixiv paper formal-verification ai-agent lean-ritsuryo
 
 
 [Leanで書く証明付きの日付と税計算](https://s.conao3.com/blog/2026/5499a8)で紹介したlean-ritsuryoについて、英語の論文を書いてaiXivに投稿しました。
