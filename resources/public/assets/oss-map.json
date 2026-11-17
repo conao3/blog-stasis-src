@@ -1,6 +1,6 @@
 {
- "width": 1302,
- "height": 1809,
+ "width": 1336,
+ "height": 1820,
  "nodeWidth": 208,
  "nodeHeight": 72,
  "groups": [
@@ -9,7 +9,7 @@
    "en": "Lean and formal verification",
    "x": 0,
    "y": 0,
-   "width": 1302,
+   "width": 1336,
    "height": 412
   },
   {
@@ -17,31 +17,31 @@
    "en": "Emacs",
    "x": 0,
    "y": 428,
-   "width": 1302,
-   "height": 457
+   "width": 1336,
+   "height": 468
   },
   {
    "ja": "翻訳と文書",
    "en": "Translation and documents",
    "x": 0,
-   "y": 901,
-   "width": 1302,
+   "y": 912,
+   "width": 1336,
    "height": 324
   },
   {
    "ja": "AWS とサーバー",
    "en": "AWS and servers",
    "x": 0,
-   "y": 1241,
-   "width": 1302,
+   "y": 1252,
+   "width": 1336,
    "height": 228
   },
   {
    "ja": "エージェントと開発環境",
    "en": "Agents and development environments",
    "x": 0,
-   "y": 1485,
-   "width": 1302,
+   "y": 1496,
+   "width": 1336,
    "height": 324
   }
  ],
@@ -52,7 +52,7 @@
    "ja": "Lean で証明した関数を 4 言語のコードに変換",
    "en": "Prove functions in Lean, run them in four languages",
    "url": "https://github.com/conao3/lean-leanfran",
-   "x": 332.8,
+   "x": 366.8,
    "y": 136
   },
   {
@@ -85,10 +85,10 @@
   {
    "id": "lean-ritsuryo",
    "group": 0,
-   "ja": "法令の期間計算を Lean で定義して証明",
-   "en": "Japanese statutory periods, defined and proved in Lean",
+   "ja": "法令の期間と税の計算を Lean で定義して証明",
+   "en": "Statutory period and tax computations, proved in Lean",
    "url": "https://github.com/conao3/lean-ritsuryo",
-   "x": 332.8,
+   "x": 366.8,
    "y": 48
   },
   {
@@ -97,7 +97,7 @@
    "ja": "法令の期間と税の計算を Rust とブラウザで使う",
    "en": "Statutory periods and taxes for Rust and the browser",
    "url": "https://github.com/conao3/rust-ritsuryo",
-   "x": 706.8,
+   "x": 740.8,
    "y": 84
   },
   {
@@ -106,16 +106,16 @@
    "ja": "Rust と Lean で作る Lean の言語サーバー",
    "en": "Lean language server with a Rust host",
    "url": "https://github.com/conao3/rust-leansail",
-   "x": 1074,
+   "x": 1108,
    "y": 200
   },
   {
    "id": "rust-lsp-touchstone",
    "group": 0,
-   "ja": "LSP の実装を試験するクライアントとプロキシ",
+   "ja": "LSP を試験するクライアント・サーバー・プロキシ",
    "en": "Strict LSP client, server and proxy for testing",
    "url": "https://github.com/conao3/rust-lsp-touchstone",
-   "x": 706.8,
+   "x": 740.8,
    "y": 212
   },
   {
@@ -124,7 +124,7 @@
    "ja": "壊した実装を流し、定理が実装を縛れているか調べる",
    "en": "Run broken implementations to test theorem strength",
    "url": "https://github.com/conao3/lean-assay",
-   "x": 332.8,
+   "x": 366.8,
    "y": 224
   },
   {
@@ -148,11 +148,11 @@
   {
    "id": "leaf.el",
    "group": 1,
-   "ja": "init.el のパッケージ設定を宣言的に書く",
-   "en": "Declarative init.el package configuration",
+   "ja": "Emacs の宣言的な init.el 設定",
+   "en": "Declarative init.el configuration for Emacs",
    "url": "https://github.com/conao3/leaf.el",
-   "x": 730,
-   "y": 609
+   "x": 740.8,
+   "y": 620
   },
   {
    "id": "leaf-keywords.el",
@@ -160,8 +160,8 @@
    "ja": "外部パッケージ向けの leaf のキーワード",
    "en": "Extra leaf keywords for external packages",
    "url": "https://github.com/conao3/leaf-keywords.el",
-   "x": 362,
-   "y": 609
+   "x": 319.2,
+   "y": 696
   },
   {
    "id": "leaf-tree.el",
@@ -169,8 +169,8 @@
    "ja": "leaf の設定をサイドバーに木で表示",
    "en": "Side bar tree of a leaf-based init.el",
    "url": "https://github.com/conao3/leaf-tree.el",
-   "x": 362,
-   "y": 697
+   "x": 319.2,
+   "y": 568
   },
   {
    "id": "leaf-convert.el",
@@ -179,24 +179,24 @@
    "en": "Convert Elisp configuration to leaf",
    "url": "https://github.com/conao3/leaf-convert.el",
    "x": 20,
-   "y": 568
+   "y": 684
   },
   {
    "id": "feather.el",
    "group": 1,
-   "ja": "並列で動く Emacs のパッケージマネージャー",
-   "en": "Parallel Emacs package manager",
+   "ja": "並列に非同期でインストールするパッケージマネージャ",
+   "en": "Parallel Emacs package manager with async installs",
    "url": "https://github.com/conao3/feather.el",
-   "x": 20,
-   "y": 656
+   "x": 740.8,
+   "y": 708
   },
   {
    "id": "keg.el",
    "group": 1,
    "ja": "Elisp パッケージの開発ツール",
-   "en": "Elisp package development tool",
+   "en": "Elisp package development tooling",
    "url": "https://github.com/conao3/keg.el",
-   "x": 20,
+   "x": 380.4,
    "y": 476
   },
   {
@@ -205,7 +205,7 @@
    "ja": "tree-sitter で動く Lean 4 のメジャーモード",
    "en": "Lean 4 major mode with tree-sitter",
    "url": "https://github.com/conao3/leaner-ts-mode.el",
-   "x": 366.8,
+   "x": 20,
    "y": 476
   },
   {
@@ -215,7 +215,7 @@
    "en": "Emacs unit test framework",
    "url": "https://github.com/conao3/cort.el",
    "x": 20,
-   "y": 793
+   "y": 804
   },
   {
    "id": "ppp.el",
@@ -224,7 +224,7 @@
    "en": "Pretty printer for Emacs Lisp",
    "url": "https://github.com/conao3/ppp.el",
    "x": 244,
-   "y": 793
+   "y": 804
   },
   {
    "id": "ts-elispore",
@@ -233,7 +233,7 @@
    "en": "Find Emacs packages hosted on GitHub",
    "url": "https://github.com/conao3/ts-elispore",
    "x": 468,
-   "y": 793
+   "y": 804
   },
   {
    "id": "eglot-lsp-settings.el",
@@ -242,7 +242,7 @@
    "en": "Install language servers automatically",
    "url": "https://github.com/conao3/eglot-lsp-settings.el",
    "x": 692,
-   "y": 793
+   "y": 804
   },
   {
    "id": "rust-plamo-tr",
@@ -251,7 +251,7 @@
    "en": "PLaMo Translate on the command line",
    "url": "https://github.com/conao3/rust-plamo-tr",
    "x": 20,
-   "y": 949
+   "y": 960
   },
   {
    "id": "rust-plamo-tr-po",
@@ -259,8 +259,8 @@
    "ja": "gettext の PO ファイルを PLaMo 翻訳で訳す",
    "en": "Translate gettext PO files with PLaMo",
    "url": "https://github.com/conao3/rust-plamo-tr-po",
-   "x": 360,
-   "y": 949
+   "x": 428,
+   "y": 960
   },
   {
    "id": "emacs-doc",
@@ -268,8 +268,8 @@
    "ja": "GNU Emacs のマニュアルの日本語訳",
    "en": "Japanese translation of the GNU Emacs manuals",
    "url": "https://github.com/conao3/emacs-doc",
-   "x": 754.4,
-   "y": 949
+   "x": 849.6,
+   "y": 960
   },
   {
    "id": "rust-plamo-tr-local",
@@ -278,7 +278,7 @@
    "en": "Translate with PLaMo 3 on your machine",
    "url": "https://github.com/conao3/rust-plamo-tr-local",
    "x": 20,
-   "y": 1045
+   "y": 1056
   },
   {
    "id": "rust-overhear",
@@ -287,7 +287,7 @@
    "en": "Transcripts, dual subtitles and vocabulary study",
    "url": "https://github.com/conao3/rust-overhear",
    "x": 244,
-   "y": 1045
+   "y": 1056
   },
   {
    "id": "orglyth.el",
@@ -296,7 +296,7 @@
    "en": "Publish a static site from Org files",
    "url": "https://github.com/conao3/orglyth.el",
    "x": 468,
-   "y": 1045
+   "y": 1056
   },
   {
    "id": "ox-zenn.el",
@@ -305,7 +305,7 @@
    "en": "Export Org documents for Zenn",
    "url": "https://github.com/conao3/ox-zenn.el",
    "x": 692,
-   "y": 1045
+   "y": 1056
   },
   {
    "id": "ox-deck.el",
@@ -314,7 +314,7 @@
    "en": "Export Org documents as slide decks",
    "url": "https://github.com/conao3/ox-deck.el",
    "x": 20,
-   "y": 1133
+   "y": 1144
   },
   {
    "id": "wasm-wasmo",
@@ -323,7 +323,7 @@
    "en": "In-process AWS mock in one WebAssembly module",
    "url": "https://github.com/conao3/wasm-wasmo",
    "x": 20,
-   "y": 1289
+   "y": 1300
   },
   {
    "id": "bun-bunsai",
@@ -332,7 +332,7 @@
    "en": "Local AWS API emulator built with Bun",
    "url": "https://github.com/conao3/bun-bunsai",
    "x": 244,
-   "y": 1289
+   "y": 1300
   },
   {
    "id": "rust-awscli",
@@ -341,7 +341,7 @@
    "en": "Output-compatible AWS CLI v2 in Rust",
    "url": "https://github.com/conao3/rust-awscli",
    "x": 468,
-   "y": 1289
+   "y": 1300
   },
   {
    "id": "rust-sqs-poller",
@@ -350,7 +350,7 @@
    "en": "SQS poller that backs off while the queue is empty",
    "url": "https://github.com/conao3/rust-sqs-poller",
    "x": 692,
-   "y": 1289
+   "y": 1300
   },
   {
    "id": "ts-apollo-server-integration-hono",
@@ -359,7 +359,7 @@
    "en": "Apollo Server on Hono",
    "url": "https://github.com/conao3/ts-apollo-server-integration-hono",
    "x": 20,
-   "y": 1377
+   "y": 1388
   },
   {
    "id": "lambda-helper.ts",
@@ -368,7 +368,7 @@
    "en": "Helpers for AWS Lambda",
    "url": "https://github.com/conao3/lambda-helper.ts",
    "x": 244,
-   "y": 1377
+   "y": 1388
   },
   {
    "id": "nix-sel4",
@@ -377,7 +377,7 @@
    "en": "Build seL4 Microkit systems with Nix",
    "url": "https://github.com/conao3/nix-sel4",
    "x": 20,
-   "y": 1533
+   "y": 1544
   },
   {
    "id": "nix-sel4-example",
@@ -386,16 +386,16 @@
    "en": "Bootable seL4 system built with nix-sel4",
    "url": "https://github.com/conao3/nix-sel4-example",
    "x": 414.4,
-   "y": 1533
+   "y": 1544
   },
   {
    "id": "nix-agents",
    "group": 4,
-   "ja": "コーディングエージェントを Nix で複数動かす",
-   "en": "Run coding agents as multiple instances with Nix",
+   "ja": "AI エージェントを複数動かす home-manager モジュール",
+   "en": "home-manager module for multiple coding agents",
    "url": "https://github.com/conao3/nix-agents",
    "x": 20,
-   "y": 1629
+   "y": 1640
   },
   {
    "id": "rust-relaykit",
@@ -404,7 +404,7 @@
    "en": "Communication gateway between AI agents",
    "url": "https://github.com/conao3/rust-relaykit",
    "x": 244,
-   "y": 1629
+   "y": 1640
   },
   {
    "id": "rust-inspect-jsonl",
@@ -413,7 +413,7 @@
    "en": "Inspect Claude and Codex session logs",
    "url": "https://github.com/conao3/rust-inspect-jsonl",
    "x": 468,
-   "y": 1629
+   "y": 1640
   },
   {
    "id": "rust-outbound-manifest",
@@ -422,7 +422,7 @@
    "en": "Check outbound messages against sealed approvals",
    "url": "https://github.com/conao3/rust-outbound-manifest",
    "x": 692,
-   "y": 1629
+   "y": 1640
   },
   {
    "id": "rust-document-packet",
@@ -431,7 +431,7 @@
    "en": "Reproducible PDF checks, overlays and rendering",
    "url": "https://github.com/conao3/rust-document-packet",
    "x": 20,
-   "y": 1717
+   "y": 1728
   },
   {
    "id": "rust-devo",
@@ -440,7 +440,7 @@
    "en": "Run tmux development workflows from a small DSL",
    "url": "https://github.com/conao3/rust-devo",
    "x": 244,
-   "y": 1717
+   "y": 1728
   }
  ],
  "edges": [
@@ -449,27 +449,27 @@
    "to": "lean-leanfran",
    "kind": "merge",
    "ja": "統合",
-   "en": "merged",
+   "en": "merged into",
    "points": [
     [
      228,
      84
     ],
     [
-     316.8,
+     350.8,
      84
     ],
     [
-     316.8,
+     350.8,
      154
     ],
     [
-     332.8,
+     366.8,
      154
     ]
    ],
    "label": [
-    280.4,
+    297.4,
     96
    ]
   },
@@ -478,19 +478,19 @@
    "to": "lean-leanfran",
    "kind": "merge",
    "ja": "統合",
-   "en": "merged",
+   "en": "merged into",
    "points": [
     [
      228,
      172
     ],
     [
-     332.8,
+     366.8,
      172
     ]
    ],
    "label": [
-    280.4,
+    297.4,
     184
    ]
   },
@@ -499,27 +499,27 @@
    "to": "lean-leanfran",
    "kind": "merge",
    "ja": "統合",
-   "en": "merged",
+   "en": "merged into",
    "points": [
     [
      228,
      260
     ],
     [
-     316.8,
+     350.8,
      260
     ],
     [
-     316.8,
+     350.8,
      190
     ],
     [
-     332.8,
+     366.8,
      190
     ]
    ],
    "label": [
-    280.4,
+    297.4,
     272
    ]
   },
@@ -531,24 +531,24 @@
    "en": "generates Rust",
    "points": [
     [
-     540.8,
+     574.8,
      154
     ],
     [
-     552.8,
+     586.8,
      154
     ],
     [
-     552.8,
+     586.8,
      132
     ],
     [
-     706.8,
+     740.8,
      132
     ]
    ],
    "label": [
-    623.8,
+    657.8,
     144
    ]
   },
@@ -556,28 +556,28 @@
    "from": "lean-ritsuryo",
    "to": "rust-ritsuryo",
    "kind": "link",
-   "ja": "証明済みの計算",
-   "en": "proved logic",
+   "ja": "計算を提供",
+   "en": "provides logic",
    "points": [
     [
-     540.8,
+     574.8,
      84
     ],
     [
-     690.8,
+     724.8,
      84
     ],
     [
-     690.8,
+     724.8,
      108
     ],
     [
-     706.8,
+     740.8,
      108
     ]
    ],
    "label": [
-    623.8,
+    657.8,
     96
    ]
   },
@@ -589,24 +589,24 @@
    "en": "generates rules",
    "points": [
     [
-     540.8,
+     574.8,
      172
     ],
     [
-     1058,
+     1092,
      172
     ],
     [
-     1058,
+     1092,
      224
     ],
     [
-     1074,
+     1108,
      224
     ]
    ],
    "label": [
-    810.8,
+    844.8,
     184
    ]
   },
@@ -618,24 +618,24 @@
    "en": "generates rules",
    "points": [
     [
-     540.8,
+     574.8,
      190
     ],
     [
-     690.8,
+     724.8,
      190
     ],
     [
-     690.8,
+     724.8,
      236
     ],
     [
-     706.8,
+     740.8,
      236
     ]
    ],
    "label": [
-    623.8,
+    657.8,
     202
    ]
   },
@@ -647,16 +647,16 @@
    "en": "tests sessions",
    "points": [
     [
-     914.8,
+     948.8,
      248
     ],
     [
-     1074,
+     1108,
      248
     ]
    ],
    "label": [
-    994.4,
+    1028.4,
     260
    ]
   },
@@ -668,16 +668,16 @@
    "en": "tests theorems",
    "points": [
     [
-     540.8,
+     574.8,
      260
     ],
     [
-     706.8,
+     740.8,
      260
     ]
    ],
    "label": [
-    623.8,
+    657.8,
     272
    ]
   },
@@ -689,75 +689,91 @@
    "en": "adds keywords",
    "points": [
     [
-     570,
-     645
+     527.2,
+     720
     ],
     [
-     730,
-     645
+     539.2,
+     720
+    ],
+    [
+     539.2,
+     712
+    ],
+    [
+     724.8,
+     712
+    ],
+    [
+     724.8,
+     674
+    ],
+    [
+     740.8,
+     674
     ]
    ],
    "label": [
-    650,
-    657
+    634,
+    724
    ]
   },
   {
    "from": "leaf-tree.el",
    "to": "leaf.el",
    "kind": "link",
-   "ja": "木で表示",
-   "en": "tree view",
+   "ja": "設定を木で表示",
+   "en": "shows config as a tree",
    "points": [
     [
-     570,
-     733
+     527.2,
+     604
     ],
     [
-     714,
-     733
+     724.8,
+     604
     ],
     [
-     714,
-     663
+     724.8,
+     638
     ],
     [
-     730,
-     663
+     740.8,
+     638
     ]
    ],
    "label": [
-    650,
-    745
+    634,
+    616
    ]
   },
   {
    "from": "leaf-convert.el",
    "to": "leaf.el",
    "kind": "link",
-   "ja": "leaf に変換",
-   "en": "converts",
+   "ja": "設定を leaf に変換",
+   "en": "converts config to leaf",
    "points": [
     [
      228,
-     592
+     708
     ],
     [
-     714,
-     592
+     240,
+     708
     ],
     [
-     714,
-     627
+     240,
+     656
     ],
     [
-     730,
-     627
+     740.8,
+     656
     ]
    ],
    "label": [
-    466,
-    580
+    423.2,
+    668
    ]
   },
   {
@@ -769,73 +785,57 @@
    "points": [
     [
      228,
-     616
+     732
     ],
     [
-     240,
-     616
-    ],
-    [
-     240,
-     633
-    ],
-    [
-     362,
-     633
+     319.2,
+     732
     ]
    ],
    "label": [
-    295,
-    645
+    273.6,
+    744
    ]
   },
   {
-   "from": "feather.el",
-   "to": "leaf-keywords.el",
+   "from": "leaf-keywords.el",
+   "to": "feather.el",
    "kind": "link",
-   "ja": "leaf と連携",
-   "en": "integrates",
+   "ja": "feather に対応",
+   "en": "adds feather support",
    "points": [
     [
-     228,
-     692
+     527.2,
+     744
     ],
     [
-     346,
-     692
-    ],
-    [
-     346,
-     657
-    ],
-    [
-     362,
-     657
+     740.8,
+     744
     ]
    ],
    "label": [
-    295,
-    704
+    634,
+    756
    ]
   },
   {
-   "from": "keg.el",
-   "to": "leaner-ts-mode.el",
+   "from": "leaner-ts-mode.el",
+   "to": "keg.el",
    "kind": "link",
    "ja": "開発に利用",
-   "en": "dev tooling",
+   "en": "develops with",
    "points": [
     [
      228,
      512
     ],
     [
-     366.8,
+     380.4,
      512
     ]
    ],
    "label": [
-    297.4,
+    304.2,
     524
    ]
   },
@@ -844,20 +844,20 @@
    "to": "rust-plamo-tr-po",
    "kind": "link",
    "ja": "翻訳を提供",
-   "en": "translates",
+   "en": "provides translation",
    "points": [
     [
      228,
-     985
+     996
     ],
     [
-     360,
-     985
+     428,
+     996
     ]
    ],
    "label": [
-    294,
-    997
+    328,
+    1008
    ]
   },
   {
@@ -865,20 +865,20 @@
    "to": "emacs-doc",
    "kind": "link",
    "ja": "マニュアルを翻訳",
-   "en": "translates manuals",
+   "en": "translates the manuals",
    "points": [
     [
-     568,
-     985
+     636,
+     996
     ],
     [
-     754.4,
-     985
+     849.6,
+     996
     ]
    ],
    "label": [
-    661.2,
-    997
+    742.8,
+    1008
    ]
   },
   {
@@ -890,16 +890,16 @@
    "points": [
     [
      228,
-     1569
+     1580
     ],
     [
      414.4,
-     1569
+     1580
     ]
    ],
    "label": [
     321.2,
-    1581
+    1592
    ]
   }
  ]

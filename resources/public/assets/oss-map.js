@@ -82,10 +82,9 @@
 
   let x = MARGIN, y = MARGIN, scale = 1, selected = null, suppressClick = false;
   function clamp() {
-    const vw = viewport.clientWidth, vh = viewport.clientHeight;
-    const w = map.width * scale, h = map.height * scale;
-    x = Math.min(MARGIN, Math.max(x, Math.min(MARGIN, vw - MARGIN - w)));
-    y = Math.min(MARGIN, Math.max(y, Math.min(MARGIN, vh - MARGIN - h)));
+    const keep = 160;
+    x = Math.min(MARGIN, Math.max(x, keep - map.width * scale));
+    y = Math.min(MARGIN, Math.max(y, keep - map.height * scale));
   }
   function draw() {
     clamp();

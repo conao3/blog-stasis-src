@@ -1064,6 +1064,11 @@ pre code {
 }
 
 @media (max-width: 600px) {
+    .oss-map-bar button {
+        min-height: 40px;
+        min-width: 40px;
+    }
+
     .oss-map-viewport {
         height: min(65vh, 480px);
     }
