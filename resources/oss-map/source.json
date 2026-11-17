@@ -3,7 +3,7 @@
     {
       "ja": "Lean と形式検証",
       "en": "Lean and formal verification",
-      "nodes": ["lean-leanfran", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-assay", "rust-leanwisp", "lean-todo-app"]
+      "nodes": ["lean-leanfran", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-leanassay", "rust-leanwisp", "lean-todo-app"]
     },
     {
       "ja": "Emacs",
@@ -32,7 +32,7 @@
     "rust-ritsuryo": ["法令の期間と税の計算を Rust とブラウザで使う", "Statutory periods and taxes for Rust and the browser"],
     "rust-leansail": ["Rust と Lean で作る Lean の言語サーバー", "Lean language server with a Rust host"],
     "rust-lsp-touchstone": ["LSP を試験するクライアント・サーバー・プロキシ", "Strict LSP client, server and proxy for testing"],
-    "lean-assay": ["壊した実装を流し、定理が実装を縛れているか調べる", "Run broken implementations to test theorem strength"],
+    "lean-leanassay": ["壊した実装を流し、定理が実装を縛れているか調べる", "Run broken implementations to test theorem strength"],
     "rust-leanwisp": ["Lean 4 のコード整形ツール", "Lean 4 source formatter"],
     "lean-todo-app": ["状態遷移を Lean で検証した Todo アプリ", "Todo app with a Lean-verified state core"],
     "leaf.el": ["Emacs の宣言的な init.el 設定", "Declarative init.el configuration for Emacs"],
@@ -75,7 +75,7 @@
     ["rust-leansail", "lean-leanfran", "規則の生成に利用", "generates rules with"],
     ["rust-lsp-touchstone", "lean-leanfran", "規則の生成に利用", "generates rules with"],
     ["rust-leansail", "rust-lsp-touchstone", "通信の検査に利用", "tests sessions with"],
-    ["lean-assay", "rust-lsp-touchstone", "定理を検査", "tests theorems"],
+    ["lean-leanassay", "rust-lsp-touchstone", "定理を検査", "tests theorems"],
     ["leaf-keywords.el", "leaf.el", "キーワードを追加", "adds keywords"],
     ["leaf-tree.el", "leaf.el", "設定を木で表示", "shows config as a tree"],
     ["leaf-convert.el", "leaf.el", "設定を leaf に変換", "converts config to leaf"],

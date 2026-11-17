@@ -92,11 +92,11 @@
    "y": 195
   },
   {
-   "id": "lean-assay",
+   "id": "lean-leanassay",
    "group": 0,
    "ja": "壊した実装を流し、定理が実装を縛れているか調べる",
    "en": "Run broken implementations to test theorem strength",
-   "url": "https://github.com/conao3/lean-assay",
+   "url": "https://github.com/conao3/lean-leanassay",
    "x": 20,
    "y": 207
   },
@@ -558,7 +558,7 @@
    ]
   },
   {
-   "from": "lean-assay",
+   "from": "lean-leanassay",
    "to": "rust-lsp-touchstone",
    "ja": "定理を検査",
    "en": "tests theorems",
