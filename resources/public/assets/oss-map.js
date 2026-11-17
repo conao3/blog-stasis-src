@@ -9,11 +9,34 @@
   const detail = root.querySelector('.oss-map-detail');
   const area = root.querySelector('select');
   const ns = 'http://www.w3.org/2000/svg';
-  const width = 1690, height = 1100;
-  const nodes = data.nodes.map(n => {
-    const g = data.groups.findIndex(([, ids]) => ids.includes(n.id));
-    return { ...n, x: 24 + (g % 3) * 560,
-      y: 100 + Math.floor(g / 3) * 550 + data.groups[g][1].indexOf(n.id) * 51 };
+  const width = 1690;
+  const measure = document.createElement('canvas').getContext('2d');
+  measure.font = `20px ${getComputedStyle(svg).fontFamily}`;
+  function wrapDescription(text) {
+    const lines = []; let line = '';
+    for (const part of (ja ? Array.from(text) : text.split(/(\s+)/))) {
+      if (line && measure.measureText(line + part).width > 471) {
+        lines.push(line.trim()); line = '';
+      }
+      line += part;
+    }
+    if (line.trim()) lines.push(line.trim());
+    return lines;
+  }
+  const groupNodes = data.groups.map(([, ids]) => ids.map(id => {
+    const n = data.nodes.find(n => n.id === id);
+    const lines = wrapDescription(ja ? n.description : n.enDescription);
+    return { ...n, lines, height: 56 + lines.length * 24 };
+  }));
+  const groupHeights = groupNodes.map(nodes => 100 + nodes.reduce((sum, n) => sum + n.height + 12, 0));
+  const rowY = [0, Math.max(...groupHeights.slice(0, 3)) + 40];
+  const height = rowY[1] + Math.max(...groupHeights.slice(3));
+  const nodes = groupNodes.flatMap((nodes, g) => {
+    let y = rowY[Math.floor(g / 3)] + 100;
+    return nodes.map(n => {
+      const result = { ...n, x: 24 + (g % 3) * 560, y };
+      y += n.height + 12; return result;
+    });
   });
   const byId = new Map(nodes.map(n => [n.id, n]));
   let x = 0, y = 0, scale = 1;
@@ -32,14 +55,14 @@
   const world = element('g', { class: 'oss-map-world' }, svg);
   const wires = element('g', { class: 'oss-map-wires' }, world);
   data.groups.forEach(([name], i) => {
-    element('text', { x: 24 + (i % 3) * 560, y: 62 + Math.floor(i / 3) * 550,
+    element('text', { x: 24 + (i % 3) * 560, y: 62 + rowY[Math.floor(i / 3)],
       class: 'oss-map-group' }, world, ja ? name : data.groupNames[i]);
   });
   data.edges.forEach(([from, to], i) => {
     const a = byId.get(from), b = byId.get(to);
     const sameColumn = a.x === b.x;
-    const sx = a.x + 495, sy = a.y + 20;
-    const tx = sameColumn ? b.x + 495 : b.x, ty = b.y + 20;
+    const sx = a.x + 495, sy = a.y + a.height / 2;
+    const tx = sameColumn ? b.x + 495 : b.x, ty = b.y + b.height / 2;
     const lane = sameColumn ? sx + 16 + (i % 3) * 8 : (sx + tx) / 2;
     const d = `M${sx} ${sy} C${lane} ${sy} ${lane} ${ty} ${tx} ${ty}`;
     const el = element('path', { d, class: 'oss-map-edge', 'marker-end': 'url(#oss-map-arrow)' }, wires);
@@ -47,9 +70,11 @@
   });
   nodes.forEach(n => {
     const el = element('g', { class: 'oss-map-node', 'data-node': n.id, role: 'button',
-      tabindex: 0, 'aria-label': n.id, 'aria-pressed': 'false' }, world);
-    element('rect', { x: n.x, y: n.y, width: 495, height: 40, rx: 5 }, el);
+      tabindex: 0, 'aria-label': `${n.id}: ${ja ? n.description : n.enDescription}`, 'aria-pressed': 'false' }, world);
+    element('rect', { x: n.x, y: n.y, width: 495, height: n.height, rx: 5 }, el);
     element('text', { x: n.x + 12, y: n.y + 28 }, el, n.id);
+    const description = element('text', { class: 'oss-map-description', x: n.x + 12, y: n.y + 56 }, el);
+    n.lines.forEach((line, i) => element('tspan', { x: n.x + 12, dy: i ? 24 : 0 }, description, line));
     nodeElements.set(n.id, el);
     el.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(n.id); reveal(n); }
@@ -65,10 +90,10 @@
   }
   function reveal(n) {
     if (n.x * scale + x < 0 || (n.x + 495) * scale + x > svg.clientWidth ||
-        n.y * scale + y < 0 || (n.y + 40) * scale + y > svg.clientHeight) {
+        n.y * scale + y < 0 || (n.y + n.height) * scale + y > svg.clientHeight) {
       scale = Math.max(0.3, Math.min(1.2, svg.clientWidth / 550));
       x = svg.clientWidth / 2 - (n.x + 247.5) * scale;
-      y = svg.clientHeight / 2 - (n.y + 20) * scale;
+      y = svg.clientHeight / 2 - (n.y + n.height / 2) * scale;
       draw();
     }
   }
@@ -155,9 +180,9 @@
     }
     if (area.value === 'all') { fit(); return; }
     const index = Number(area.value);
-    scale = Math.min(svg.clientWidth / 550, svg.clientHeight / 530, 1.5);
+    scale = Math.min(svg.clientWidth / 550, svg.clientHeight / groupHeights[index], 1.5);
     x = (svg.clientWidth - 550 * scale) / 2 - (index % 3) * 560 * scale;
-    y = -Math.floor(index / 3) * 550 * scale;
+    y = -rowY[Math.floor(index / 3)] * scale;
     draw();
   };
   svg.addEventListener('wheel', e => {
@@ -216,8 +241,7 @@
     else if (e.key === '0') { e.preventDefault(); fit(); }
   });
   root.querySelector('.oss-map-interactive').hidden = false;
-  if (svg.clientWidth < 600) { area.value = '0'; area.onchange(); }
-  else fit();
+  area.value = '0'; area.onchange();
   new ResizeObserver(() => { if (area.value === 'all') fit(); else area.onchange(); }).observe(svg);
   function restore() {
     const params = new URL(location.href).searchParams;
