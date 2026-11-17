@@ -216,10 +216,24 @@
   });
 
   viewport.addEventListener('wheel', event => {
-    if (!event.ctrlKey && !event.metaKey) return;
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      const box = viewport.getBoundingClientRect();
+      zoomTo(scale * Math.exp(-event.deltaY * 0.004), event.clientX - box.left, event.clientY - box.top);
+      return;
+    }
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewport.clientHeight : 1;
+    const scroll = (position, delta, size, extent) => {
+      const end = Math.min(position, MARGIN, size - MARGIN - extent);
+      return Math.max(end, Math.min(Math.max(position, MARGIN), position - delta * unit));
+    };
+    const nx = scroll(x, event.deltaX, viewport.clientWidth, map.width * scale);
+    const ny = scroll(y, event.deltaY, viewport.clientHeight, map.height * scale);
+    if (nx === x && ny === y) return;
     event.preventDefault();
-    const box = viewport.getBoundingClientRect();
-    zoomTo(scale * Math.exp(-event.deltaY * 0.004), event.clientX - box.left, event.clientY - box.top);
+    x = nx;
+    y = ny;
+    draw();
   }, { passive: false });
   const pointers = new Map();
   let gesture = null, moved = false;

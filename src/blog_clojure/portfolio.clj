@@ -191,8 +191,8 @@
         [:div {:class "oss-map-world"}]]
        [:aside {:class "oss-map-detail" :hidden true :aria-live "polite"}]]
       [:p {:class "oss-map-hint" :id "oss-map-hint"}
-       (label "ドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。"
-              "Drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections.")]]
+       (label "ホイールかドラッグで移動し、ピンチか Ctrl（Mac は ⌘）を押しながらのホイールで拡大・縮小します。ブロックを選ぶと、つながりを表示します。"
+              "Scroll or drag to move. Pinch, or scroll with Ctrl (⌘ on Mac), to zoom. Select a project to see its connections.")]]
      [:details {:class "oss-map-list"}
       [:summary (label "一覧で見る" "View as a list")]
       (for [[i group] (map-indexed vector (:groups data))]

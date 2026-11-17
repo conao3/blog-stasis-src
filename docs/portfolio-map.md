@@ -18,7 +18,7 @@ The English and Japanese portfolio pages include a map of 41 open-source project
 | Area | Click an area button | 100%, that group's top-left corner at the frame's top-left |
 | Zoom | −/+ buttons, `-`/`+` keys on the focused map, Ctrl/⌘ + wheel, pinch | Scale changes around the centre or the pointer; the percentage updates |
 | Fit | Click Fit or press `0` | The whole map from the top-left corner |
-| Pan | Drag, or arrow keys on the focused map | The map moves; it never leaves blank space before its top-left corner; a drag does not select |
+| Pan | Wheel or trackpad scroll over the map, drag, or arrow keys on the focused map | The map moves; it never leaves blank space before its top-left corner; a wheel scroll stops at the map's edges and then scrolls the page; a drag does not select |
 | Selection | Click a block, or Tab to it and press Enter | The block and its arrows are highlighted, other blocks dim, and the panel below the map shows the description, each relationship with links to the other projects, and the GitHub link; `?oss=<id>` is written to the URL |
 | Clear selection | Click the panel's ×, click empty space, or press Escape | Highlight and panel disappear; `oss` is removed from the URL |
 | Restore | Open a URL with `?oss=<id>`, or go back/forward | The project is selected and brought into view at 100% |
