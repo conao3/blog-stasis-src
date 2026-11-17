@@ -536,7 +536,7 @@
                       (when (str/includes? body "class=\"youtube-card\"")
                         [:script {:src "/assets/youtube-card.js" :defer true}])
                       (when (str/includes? body "data-oss-map=\"true\"")
-                        [:script {:src "/assets/oss-map.js" :defer true}])]
+                        [:script {:src "/assets/oss-map.js" :type "module"}])]
                      [:body
                       [:header
                        [:a {:class "site-title" :href "/"}

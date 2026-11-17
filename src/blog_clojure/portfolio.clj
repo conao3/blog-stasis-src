@@ -171,8 +171,8 @@
         label (fn [ja en] (if ja? ja en))]
     [:section {:id "oss-map" :data-oss-map "true" :data-lang (name lang)}
      [:h3 (label "OSSのつながり" "How my projects connect")]
-     [:p (label "44件のプロジェクトを用途でまとめました。線はREADMEで確認できたコード生成・拡張・検査などの関係です。"
-                "44 projects grouped by purpose. Lines show relationships documented in their READMEs, including code generation, extensions and validation.")]
+     [:p (label "44件のプロジェクトを用途でまとめました。線はREADMEで確認できた統合・コード生成・拡張・検査などの関係です。"
+                "44 projects grouped by purpose. Lines show relationships documented in their READMEs, including merges, code generation, extensions and validation.")]
      [:div {:class "oss-map-interactive" :hidden true}
       [:div {:class "oss-map-toolbar"}
        [:button {:type "button" :data-action "zoom-in"} (label "拡大 ＋" "Zoom in +")]

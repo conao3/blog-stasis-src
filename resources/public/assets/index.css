@@ -758,6 +758,10 @@ pre code {
 .oss-map-canvas .oss-map-node.is-muted { opacity: 0.45; }
 .oss-map-canvas .oss-map-edge { stroke: var(--gray-500); stroke-width: 1.5; fill: none; pointer-events: none; }
 .oss-map-canvas .oss-map-edge.is-active { stroke: var(--blue-900); stroke-width: 4; }
+.oss-map-canvas .oss-map-edge.is-merge { stroke: var(--blue-800); stroke-width: 2.5; stroke-dasharray: 8 5; }
+.oss-map-canvas .oss-map-edge.is-merge.is-active { stroke: var(--blue-900); stroke-width: 4; }
+.oss-map-canvas .oss-map-edge-label { font-size: 20px; fill: var(--gray-900);
+    stroke: var(--gray-75); stroke-width: 6; paint-order: stroke; pointer-events: none; }
 .oss-map-detail { padding: var(--spacing-200) 0; overflow-wrap: anywhere; }
 .oss-map-detail > a { font-weight: bold; }
 .oss-map-detail p { margin: var(--spacing-100) 0; }

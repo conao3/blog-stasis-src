@@ -477,6 +477,24 @@
       "leaner-ts-mode.el",
       "開発・検査に利用",
       "leaner-ts-mode.el"
+    ],
+    [
+      "lean-py",
+      "lean-leanfran",
+      "統合",
+      "lean-py"
+    ],
+    [
+      "lean-ts",
+      "lean-leanfran",
+      "統合",
+      "lean-ts"
+    ],
+    [
+      "lean-clj",
+      "lean-leanfran",
+      "統合",
+      "lean-clj"
     ]
   ],
   "groupNames": [
@@ -502,6 +520,9 @@
     "Provide translation library",
     "Translate manuals",
     "Provide build tooling",
-    "Use for development and tests"
+    "Use for development and tests",
+    "Merged into",
+    "Merged into",
+    "Merged into"
   ]
 }

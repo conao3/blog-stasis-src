@@ -1,3 +1,5 @@
+import { forceLayout, routeEdge } from './oss-map-layout.mjs';
+
 (() => {
   'use strict';
   const root = document.querySelector('[data-oss-map]');
@@ -9,7 +11,6 @@
   const detail = root.querySelector('.oss-map-detail');
   const area = root.querySelector('select');
   const ns = 'http://www.w3.org/2000/svg';
-  const width = 1690;
   const measure = document.createElement('canvas').getContext('2d');
   measure.font = `20px ${getComputedStyle(svg).fontFamily}`;
   function wrapDescription(text) {
@@ -23,21 +24,11 @@
     if (line.trim()) lines.push(line.trim());
     return lines;
   }
-  const groupNodes = data.groups.map(([, ids]) => ids.map(id => {
-    const n = data.nodes.find(n => n.id === id);
+  const { nodes, groups: groupBounds, width, height } = forceLayout(data.nodes.map(n => {
     const lines = wrapDescription(ja ? n.description : n.enDescription);
-    return { ...n, lines, height: 56 + lines.length * 24 };
-  }));
-  const groupHeights = groupNodes.map(nodes => 100 + nodes.reduce((sum, n) => sum + n.height + 12, 0));
-  const rowY = [0, Math.max(...groupHeights.slice(0, 3)) + 40];
-  const height = rowY[1] + Math.max(...groupHeights.slice(3));
-  const nodes = groupNodes.flatMap((nodes, g) => {
-    let y = rowY[Math.floor(g / 3)] + 100;
-    return nodes.map(n => {
-      const result = { ...n, x: 24 + (g % 3) * 560, y };
-      y += n.height + 12; return result;
-    });
-  });
+    const groupIndex = data.groups.findIndex(([, ids]) => ids.includes(n.id));
+    return { ...n, lines, groupIndex, width: 495, height: 56 + lines.length * 24 };
+  }), data.edges);
   const byId = new Map(nodes.map(n => [n.id, n]));
   let x = 0, y = 0, scale = 1;
   const nodeElements = new Map(), edgeElements = [];
@@ -49,24 +40,28 @@
     return el;
   }
   const defs = element('defs', {}, svg);
-  const marker = element('marker', { id: 'oss-map-arrow', markerWidth: 8, markerHeight: 8,
-    refX: 7, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse' }, defs);
-  element('path', { d: 'M0 0 L8 4 L0 8', fill: 'context-stroke' }, marker);
+  const marker = element('marker', { id: 'oss-map-arrow', markerWidth: 12, markerHeight: 12,
+    refX: 11, refY: 6, orient: 'auto', markerUnits: 'userSpaceOnUse' }, defs);
+  element('path', { d: 'M0 0 L12 6 L0 12', fill: 'context-stroke' }, marker);
   const world = element('g', { class: 'oss-map-world' }, svg);
   const wires = element('g', { class: 'oss-map-wires' }, world);
   data.groups.forEach(([name], i) => {
-    element('text', { x: 24 + (i % 3) * 560, y: 62 + rowY[Math.floor(i / 3)],
+    element('text', { x: groupBounds[i].x + 24, y: groupBounds[i].y + 34,
       class: 'oss-map-group' }, world, ja ? name : data.groupNames[i]);
   });
-  data.edges.forEach(([from, to], i) => {
+  data.edges.forEach(([from, to, relation], i) => {
     const a = byId.get(from), b = byId.get(to);
-    const sameColumn = a.x === b.x;
-    const sx = a.x + 495, sy = a.y + a.height / 2;
-    const tx = sameColumn ? b.x + 495 : b.x, ty = b.y + b.height / 2;
-    const lane = sameColumn ? sx + 16 + (i % 3) * 8 : (sx + tx) / 2;
-    const d = `M${sx} ${sy} C${lane} ${sy} ${lane} ${ty} ${tx} ${ty}`;
-    const el = element('path', { d, class: 'oss-map-edge', 'marker-end': 'url(#oss-map-arrow)' }, wires);
+    const route = routeEdge(a, b, nodes, i);
+    const merged = relation === '統合';
+    const el = element('path', { d: route.d, class: 'oss-map-edge' + (merged ? ' is-merge' : ''),
+      'data-from': from, 'data-to': to, 'data-obstacle-hits': route.hits,
+      'marker-end': 'url(#oss-map-arrow)', 'stroke-linejoin': 'round' }, wires);
     edgeElements.push(el);
+    if (merged) {
+      const { x, y, vertical } = route.label;
+      element('text', { x, y: y - 7, class: 'oss-map-edge-label', 'text-anchor': 'middle',
+        transform: vertical ? 'rotate(-90 ' + x + ' ' + y + ')' : '' }, wires, label('統合', 'Merged into'));
+    }
   });
   nodes.forEach(n => {
     const el = element('g', { class: 'oss-map-node', 'data-node': n.id, role: 'button',
@@ -184,9 +179,9 @@
     }
     if (area.value === 'all') { fit(); return; }
     const index = Number(area.value);
-    scale = Math.min(svg.clientWidth / 550, svg.clientHeight / groupHeights[index], 1.5);
-    x = -(index % 3) * 560 * scale;
-    y = -rowY[Math.floor(index / 3)] * scale;
+    const bounds = groupBounds[index];
+    scale = Math.min(svg.clientWidth / bounds.width, svg.clientHeight / bounds.height, 1.5);
+    x = -bounds.x * scale; y = -bounds.y * scale;
     draw();
   };
   svg.addEventListener('wheel', e => {
