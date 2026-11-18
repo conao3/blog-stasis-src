@@ -484,6 +484,10 @@
   {"ja" "ja_JP" "en" "en_US"})
 
 
+(def feed-icon
+  "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"5\" cy=\"19\" r=\"2.5\"/><path d=\"M2.5 9.5a12 12 0 0 1 12 12h-3a9 9 0 0 0-9-9z\"/><path d=\"M2.5 2.5a19 19 0 0 1 19 19h-3a16 16 0 0 0-16-16z\"/></svg>")
+
+
 (defn render-page
   [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown? post? datetime alternates] :as page}]
   (hiccup.page/html5 {:lang (or lang "ja")}
@@ -543,9 +547,12 @@
                         [:img {:src "/assets/icon.jpg" :alt "" :width 32 :height 32}]
                         blog-name]
                        [:nav
-                        [:a {:href "/tags/"} (if (= lang "en") "Tags" "タグ")]
+                        [:a {:href "/tags/"} "Tags"]
+                        [:a {:class "feed-link" :href "/feed.xml" :type "application/atom+xml" :aria-label "Feed"}
+                         (hiccup/raw feed-icon)
+                         [:span {:class "feed-label"} "Feed"]]
                         (when portfolio-href
-                          [:a {:href portfolio-href} (if (= lang "en") "Portfolio" "ポートフォリオ")])]]
+                          [:a {:href portfolio-href} "Portfolio"])]]
                       (when draft?
                         [:p {:class "draft-banner"} "下書き: 開発用サーバーでだけ表示し、本番のビルドには出しません。"])
                       [:main (hiccup/raw body)]

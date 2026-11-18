@@ -33,10 +33,23 @@ body > header nav a {
     color: var(--gray-700);
     font-size: var(--body-size-s);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 body > header nav a:hover {
     color: var(--gray-900);
+}
+
+body > header nav .feed-link {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--spacing-75);
+}
+
+body > header nav .feed-link svg {
+    fill: currentColor;
+    height: 12px;
+    width: 12px;
 }
 
 .draft-banner {
@@ -503,6 +516,15 @@ pre code {
     .content h2,
     .post-list h2 {
         font-size: var(--heading-cjk-size-m);
+    }
+
+    body > header nav .feed-label {
+        display: none;
+    }
+
+    body > header nav .feed-link svg {
+        height: 16px;
+        width: 16px;
     }
 }
 
