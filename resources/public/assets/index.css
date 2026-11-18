@@ -52,6 +52,45 @@ body > header nav .feed-link svg {
     width: 12px;
 }
 
+.feed-copy {
+    display: flex;
+    gap: var(--spacing-100);
+    margin-bottom: var(--spacing-200);
+}
+
+.feed-copy input {
+    background-color: var(--gray-200);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: var(--corner-radius-100);
+    color: var(--gray-900);
+    flex: 1;
+    font-family: var(--code-font-family), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: var(--body-size-s);
+    min-width: 0;
+    padding: var(--spacing-100) var(--spacing-200);
+}
+
+.feed-copy button {
+    background-color: var(--gray-200);
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: var(--corner-radius-100);
+    color: var(--gray-900);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--body-size-s);
+    font-weight: bold;
+    padding: var(--spacing-100) var(--spacing-200);
+    white-space: nowrap;
+}
+
+.feed-copy button:hover {
+    background-color: var(--gray-300);
+}
+
+.feed-copy button[hidden] {
+    display: none;
+}
+
 .draft-banner {
     background-color: var(--gray-200);
     border: var(--border-width-100) dashed var(--gray-500);

@@ -410,6 +410,30 @@
          "</feed>\n")))
 
 
+(defn feed-page
+  [feed-xml date]
+  (let [feed-url (str site-url "/feed.xml")
+        lines (str/split-lines feed-xml)
+        rest-count (dec (count (filter #(= "  <entry>" %) lines)))
+        head (let [n (count (take-while #(not= "  </entry>" %) lines))]
+               (str/join "\n" (concat (take (inc n) lines) [(str "  <!-- 残りの " rest-count " 件の entry -->") "</feed>"])))]
+    {:title "フィード"
+     :description "Conao3 Notes の新着記事を配る Atom フィードの URL と中身。"
+     :date date
+     :body (hiccup/html
+             [:article
+              [:header [:h1 "フィード"]]
+              [:div {:class "content"}
+               [:p "新着記事を Atom フィード (XML) で配っています。Feedly や Inoreader などのフィードリーダーに、次の URL を登録してください。"]
+               [:div {:class "feed-copy"}
+                [:input {:type "text" :readonly true :value feed-url :aria-label "フィードの URL"}]
+                [:button {:type "button" :hidden true} "コピー"]]
+               [:p [:a {:href "/feed.xml"} "feed.xml を開く"]]
+               [:h2 "feed.xml の冒頭"]
+               [:p "新しい順に記事のタイトル・URL・日時・要約が入っています。最初の 1 件までを抜き出すと次のとおりです。"]
+               (hiccup/raw (highlight "xml" head))]])}))
+
+
 (defn sitemap-xml
   [pages]
   (str "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -535,6 +559,8 @@
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
                         [:script {:src "/assets/math.js" :defer true}])
+                      (when (str/includes? body "class=\"feed-copy\"")
+                        [:script {:src "/assets/feed.js" :defer true}])
                       (when (str/includes? body "class=\"github-card\"")
                         [:script {:src "/assets/github-card.js" :defer true}])
                       (when (str/includes? body "class=\"youtube-card\"")
@@ -548,7 +574,7 @@
                         blog-name]
                        [:nav
                         [:a {:href "/tags/"} "Tags"]
-                        [:a {:class "feed-link" :href "/feed.xml" :type "application/atom+xml" :aria-label "Feed"}
+                        [:a {:class "feed-link" :href "/feed/" :aria-label "Feed"}
                          (hiccup/raw feed-icon)
                          [:span {:class "feed-label"} "Feed"]]
                         (when portfolio-href
@@ -692,6 +718,7 @@
                    (filter (comp :post? second))
                    (sort-by (fn [[k v]] [(:datetime v) k]))
                    reverse)
+        feed-xml (atom-feed posts)
         portfolio-alternates (let [langs (filter #(contains? contents (portfolio/paths %)) [:en :ja])]
                                (when (< 1 (count langs))
                                  (concat (map (fn [lang] [(name lang) (portfolio/urls lang)]) langs)
@@ -700,6 +727,7 @@
                      (update "/index.html" assoc
                              :description site-description
                              :date (:date (second (first posts))))
+                     (assoc "/feed/index.html" (feed-page feed-xml (:date (second (first posts)))))
                      (update-vals #(cond-> % (:portfolio? %) (assoc :alternates portfolio-alternates))))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
@@ -711,7 +739,7 @@
        :agents {"/sitemap.xml" (sitemap-xml (dissoc contents "/404.html"))
                 "/robots.txt" robots-txt
                 "/llms.txt" (llms-txt posts)
-                "/feed.xml" (atom-feed posts)}
+                "/feed.xml" feed-xml}
        :og-images (into {}
                         (keep (fn [[path page]]
                                (when-not (:not-found? page)
