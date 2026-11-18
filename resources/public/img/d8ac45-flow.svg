@@ -10,7 +10,7 @@
 <text x="500.0" y="136" font-size="15" fill="#444" text-anchor="middle">コマンドごとの時間を測る</text>
 <rect x="760" y="70" width="310" height="120" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
 <text x="915.0" y="106" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">時間の長い順の一覧</text>
-<text x="915.0" y="136" font-size="15" fill="#444" text-anchor="middle">秒と全体に占める割合</text>
+<text x="915.0" y="136" font-size="15" fill="#444" text-anchor="middle">かかった時間と全体に占める割合</text>
 <line x1="260" y1="130.0" x2="348" y2="130.0" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
 <line x1="650" y1="130.0" x2="758" y2="130.0" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
 <text x="30" y="276" font-size="19" font-weight="bold" fill="#222">内訳の計測</text>
