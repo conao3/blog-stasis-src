@@ -22091,6 +22091,7 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 :export_file_name: generated/contents/blog/2026/d8ac45
 :export_date: 2026-11-17 10:10
 :export_tags: lean rust performance ci formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
+:export_draft: t
 :end:
 
 Lean 4のプロジェクトで、宣言ごとのelaborationのコストを記録して比べるCLI、Leanwakeを作りました。
