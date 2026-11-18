@@ -22086,76 +22086,133 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 
 改正案を作る段階で同じ検査にかければ、取り残された引用は公布の前に見つかります。
 
-* Lean 4の証明を15%遅くした1行をCIで検出するLeanwakeを作った
+* Lean 4で時間のかかっている証明とtacticの位置を1コマンドで出すLeanwakeを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/d8ac45
-:export_date: 2026-11-17 10:10
-:export_tags: lean rust performance ci formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
+:export_date: 2026-11-18 18:08
+:export_tags: lean rust performance profiler formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
 :export_draft: t
 :end:
 
-Lean 4のプロジェクトで、宣言ごとのelaborationのコストを記録して比べるCLI、Leanwakeを作りました。
-変更の前と後でそれぞれ記録を取って比べ、遅くなった宣言があれば終了コード254で終わります。
+Lean 4のプロジェクトで、時間のかかっている証明を1コマンドで上から順に出すCLI、Leanwakeを作りました。
+証明ごとの秒と全体に占める割合に加えて、その証明の中で時間を使っているtacticの位置も出します。
 
-コストの単位には、Leanがelaborationの途中で数えているheartbeatを使っています。
-たとえばある定理の証明で =simp only= を =simp= に変える1行の変更では、heartbeatが34,153から39,416に15%増えて、Leanwakeはこの定理を遅くなったと判定しました。
+法令の期間と税額の計算をLeanで証明している[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]]で試してみたところ、893コマンドのうち10個の宣言がelaborationの時間の64%を使っていました。
+その中には、時間の99.9%を24行目の =omega= が使っている定理もありました。
 
-=simp only= は[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Init/Tactics.lean#L718][挙げた補題だけを使います]]が、 =simp= は =@[simp]= の付いた補題も使うので、heartbeatが増えています。
-
-試しに別の定理を、マシンに負荷をかけないときとかけたときに8回ずつ記録してみたところ、経過時間の平均は11 msから36 msに延びたのに、heartbeatは16回とも113,455でした。
-なのでほかのジョブと計算機を分け合うCIでも、1回ずつの記録を比べて宣言ごとの増加を検出できます。
+tacticごとの時間を取る計測は証明そのものを遅くするので、順位と秒はそれを取らずに測り、一覧に載る宣言だけを測り直して内訳を出しています。
 
 リポジトリは[[https://github.com/conao3/rust-leanwake][conao3/rust-leanwake]]で、ライセンスはApache-2.0です。
-この記事の結果はLean 4.35.0とLeanwake 0.1.0で動かしたものです。
+この記事の結果はLean 4.35.0とLeanwake 0.2.0で動かしたものです。
 
-[[github:conao3/rust-leanwake::Rust][Record per-declaration elaboration cost of Lake projects and detect regressions between two profiles]]
+[[github:conao3/rust-leanwake::Rust][Find the slowest proofs in a Lean 4 Lake project and the tactics that take the time]]
 
-** 遅くなった宣言の検出
-次の =Demo.lean= を持つLakeのプロジェクトで試してみます。
-
-#+begin_src lean
-def sumTo : Nat → Nat
-  | 0 => 0
-  | n + 1 => n + 1 + sumTo n
-
-theorem sumTo_hundred : sumTo 100 = 5050 := by
-  decide
-
-theorem length_append_swap (xs ys : List Nat) :
-    (xs ++ ys).length = (ys ++ xs).length := by
-  simp only [List.length_append, Nat.add_comm]
-
-theorem two_mul_le (a b : Nat) (h : a ≤ b) : 2 * a ≤ 2 * b := by
-  omega
-#+end_src
-
-=record-profile= でプロジェクトのファイルをelaborateしてコマンドごとのheartbeatをJSONに記録し、 =list-commands= でその記録をheartbeatの多い順に並べます。
+** 時間のかかっている証明を出す
+Lakeのプロジェクトのディレクトリで =list-hotspots= を実行します。
+ここではlean-ritsuryoのコミット =d79c7f5= で上位5件を出してみます。
 
 #+begin_src sh
-nix run github:conao3/rust-leanwake -- profile record-profile \
-  --project-dir . --output-file base.json
-nix run github:conao3/rust-leanwake -- profile list-commands \
-  --profile file://base.json --output table | column -t
+git clone https://github.com/conao3/lean-ritsuryo
+cd lean-ritsuryo
+git checkout d79c7f5
+nix run github:conao3/rust-leanwake -- profile list-hotspots \
+  --project-dir . --jobs 4 --limit 5 --output table
 #+end_src
 
 #+begin_src text
-Heartbeats  ElapsedNs  Path       Key                 HasErrors
-113455      10222978   Demo.lean  two_mul_le          false
-78802       9144612    Demo.lean  sumTo_hundred       false
-56178       70466931   Demo.lean  sumTo               false
-34153       3484413    Demo.lean  length_append_swap  false
+61.82 s in 893 commands and 54 files; the 5 listed take 52.7%
+Seconds  Share  Location                             Declaration                                           Heartbeats  Inside
+   8.84  14.3%  Ritsuryo/Tax/Proofs/Penalty.lean:14  Ritsuryo.Tax.Penalty.pen1_no_return_tiers              118149453  omega 24:59-24:64 x4 99.9%
+   7.84  12.7%  Ritsuryo/Tax/Proofs/Income.lean:39   Ritsuryo.Tax.Income.quickCents_bounds                  110910269  split 42:52-42:57 x194 69.6%
+   6.13   9.9%  Ritsuryo/Holiday/Check.lean:46       Ritsuryo.Holiday.checkAll                               28404434  decide 50:2-50:16 x1 99.9%
+   5.57   9.0%  Ritsuryo/Tax/Inheritance.lean:79     Ritsuryo.Tax.Inheritance.taxCentsSpec_eq_quickCents     64381705  omega 86:12-86:17 x8 95.6%
+   4.19   6.8%  Ritsuryo/Tax/Income.lean:68          Ritsuryo.Tax.Income.incomeTaxCentsSpec_eq_quickCents    35550693  omega 76:12-76:17 x7 94.6%
 #+end_src
 
-次に、 =length_append_swap= の =simp only= を =simp= に変えてみます。
+先頭の行は測ったコマンド全体のelaborationにかかった時間で、その下に宣言が時間の長い順に並びます。
+各行は左から、秒、全体に占める割合、ファイルと行、宣言の名前、heartbeat、宣言の中でいちばん時間を使っているtacticです。
+
+ビルド済みのプロジェクトではこの実行に4コアで70秒かかり、cloneした直後からだと依存のビルドを含めて102秒でした。
+同じプロジェクトの =lake build= は48秒です。
+
+[[./resources/public/img/d8ac45-hotspots.svg]]
+
+=--limit= を付けないと上位10件が出ます。
+この図は別の回の上位10件で、893コマンドのうちこの10個が全体の64%を使っていました。
+
+** 内訳の読み方
+1番目の =pen1_no_return_tiers= は無申告加算税の額についての定理で、右端に =omega 24:59-24:64 x4 99.9%= と出ています。
+
+#+begin_src lean
+theorem pen1_no_return_tiers (rate tax tax' prior : Nat) (hr : rate = 10 ∨ rate = 15) :
+    (tax + prior ≤ 3000000 → noReturnCents rate tax prior = noReturnCentsArt2 rate tax prior) ∧
+      (tax ≤ tax' → noReturnCents rate tax prior ≤ noReturnCents rate tax' prior) := by
+  unfold noReturnCents noReturnCentsArt2 tieredCents
+  rcases hr with rfl | rfl <;> constructor <;> intro h <;> omega
+#+end_src
+
+これはファイルの24行目の59桁目から64桁目にある =omega= を指していて、4回動いてこの定理の時間の99.9%を使っています。
+=<;>= で分かれた4つのゴールのそれぞれで =omega= が動くので4回になります。
+
+2番目の =quickCents_bounds= では、 =repeat' split= の =split= が194回動いて69.6%を使っていました。
+
+#+begin_src lean
+theorem quickCents_bounds (x y : Nat) (h : x ≤ y) :
+    quickCents x + 5 * (y - x) ≤ quickCents y ∧ quickCents y ≤ quickCents x + 45 * (y - x) := by
+  refine ⟨?_, ?_⟩ <;> unfold quickCents <;> repeat' split
+  all_goals omega
+#+end_src
+
+3番目の =checkAll= は =decide +kernel= の1回が99.9%です。
+tacticを持たない定義や項で書いた証明では、tacticの代わりに =addDecl= や =Meta.whnf= のような、Leanの内部の処理の名前が出ます。
+
+既定の出力はJSONで、宣言ごとに時間を使っているtacticをすべて持っているので =jq= で絞り込めます。
+
+** 2回に分けて測る理由
+[[./resources/public/img/d8ac45-flow.svg]]
+
+tacticごとの時間はLeanの[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Util/Trace.lean#L175-L199][trace.profiler]]で取るのですが、traceを取ると証明そのものが遅くなります。
+=pen1_no_return_tiers= のあるファイルだけを交互に測ってみたところ、traceなしでは8.3〜9.3秒、すべてのtraceを取ると24.0〜24.2秒でした。
+
+そこでLeanwakeは順位と秒をtraceなしの計測から取り、一覧に載る宣言だけをtraceつきで測り直しています。
+内訳には測り直したときの割合だけを使うので、表の秒にtraceの分は入りません。
+
+内訳の要らないときは =--detail none= を付けると測り直しを省けて、lean-ritsuryoでは41秒で終わります。
+
+また =lean= コマンドと言語サーバーは既定でelaborationを[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L35-L46][複数のスレッド]]で進めるので、証明が別のスレッドに回るとコマンドの時間に入りません。
+Leanwakeは =Elab.async= を =false= にして、すべてのコマンドを同期でelaborateしています。
+
+** 秒は負荷で変わる
+同じコミットで続けて2回実行したところ、合計は65.7秒と61.8秒で、1番目と2番目の宣言が入れ替わりましたが、上位5件の顔ぶれは同じでした。
+秒はマシンの負荷で変わるので、秒と並べて割合を出しています。
+
+表のheartbeatは、Leanがelaborationの途中で数えている小さなメモリ割り当ての回数で、[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L30-L33][maxHeartbeats]]の上限と同じカウンタです。
+heartbeatの順は時間の順と合わず、上の表でも =checkAll= は2,840万heartbeatで6.13秒かかっていて、6,438万heartbeatの =taxCentsSpec_eq_quickCents= の5.57秒より長くなっています。
+なので並べる単位は時間にしました。
+
+** 変更の前後を比べる
+証明を直したあとに速くなったかを確かめるときは、 =record-profile= で変更の前と後を記録して =compare-profiles= で比べます。
+比較にはheartbeatを使います。
+
+[[./resources/public/img/d8ac45-noise.svg]]
+
+この図はある定理を2つの条件で8回ずつ記録した値で、同じ4つのコアに負荷をかけると経過時間の平均は10 msから22 msに延びましたが、heartbeatは16回とも113,455でした。
+なので1回ずつの記録を比べるだけで、宣言ごとの増減が分かります。
+
+たとえば次の定理の =simp only= を =simp= に変えてみます。
 
 #+begin_src diff
+ theorem length_append_swap (xs ys : List Nat) :
+     (xs ++ ys).length = (ys ++ xs).length := by
 -  simp only [List.length_append, Nat.add_comm]
 +  simp [Nat.add_comm]
 #+end_src
 
-変更後の記録を取って =compare-profiles= で2つを比べます。
+変更の前に =base.json= 、変更の後に =head.json= を記録して、2つを比べます。
 
 #+begin_src sh
+nix run github:conao3/rust-leanwake -- profile record-profile \
+  --project-dir . --output-file base.json
 nix run github:conao3/rust-leanwake -- profile record-profile \
   --project-dir . --output-file head.json
 nix run github:conao3/rust-leanwake -- profile compare-profiles \
@@ -22170,97 +22227,14 @@ Status	BaseHeartbeats	HeadHeartbeats	DeltaHeartbeats	Path	Key
 regressed	34153	39416	5263	Demo.lean	length_append_swap
 #+end_src
 
-=length_append_swap= のheartbeatは34,153から39,416に15%増えていて、終了コードは254になるので、CIのジョブはここで失敗します。
-ちなみにこの定理のelaborationにかかった時間は、変更前が3.5 ms、変更後が4.1 msでした。
+この定理のheartbeatは34,153から39,416に15%増えていて、遅くなった宣言があると終了コードが254になります。
+=simp only= は[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Init/Tactics.lean#L718][挙げた補題だけを使います]]が、 =simp= は =@[simp]= の付いた補題も使うので、heartbeatが増えています。
 
-コマンドはファイルのパスと宣言の名前の組で突き合わせていて、片方の記録にしかないコマンドは追加または削除として数えます。
-遅くなったと判定するのは増分が1,000 heartbeatと1%の両方を超えたコマンドで、このしきい値は =--absolute-threshold-heartbeats= と =--relative-threshold-percent= で変えられます。
+遅くなったと判定するのは増分が1,000 heartbeatと1%の両方を超えたコマンドです。
+実際のプロジェクトでは同じコミットを2回記録しても一部のコマンドのheartbeatが少し動きます。
+lean-ritsuryoでは893コマンドのうち19個に最大31の差があったので、しきい値はこの差より大きく取ってあります。
 
-** heartbeatで測る理由
-heartbeatはLeanがelaborationの途中で数えている小さなメモリ割り当ての回数で、[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L30-L33][maxHeartbeats]]の上限と同じカウンタです (上限の1単位が1,000 heartbeatにあたります)。
-
-[[./resources/public/img/d8ac45-noise.svg]]
-
-この図は先ほどの =two_mul_le= を2つの条件で8回ずつ記録した値です。
-前半の8回はLeanwakeを4つのコアに固定しただけで、後半の8回では同じ4つのコアで計算を続けるプロセスを4つ動かしてみたところ、経過時間は前半が10.3〜12.9 ms、後半が21.1〜56.5 msになりました。
-それでもheartbeatは16回とも113,455で変わりません。
-経過時間で1%の増加を判定しようとすると測定を繰り返して平均を取ることになりますが、heartbeatなら1回の記録で比べられます。
-
-=lean= コマンドと言語サーバーは既定でelaborationを[[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L35-L46][複数のスレッド]]で進めるのですが、heartbeatはスレッドごとに数えるので、別のスレッドに回った証明の分はコマンドの値に入りません。
-たとえば =(List.range 1200).length = 1200= を =decide +kernel= で示す定理は、Leanwakeの記録では475,283 heartbeatですが、同じ定理をLeanのAPIで非同期のまま測ると6,084 heartbeatでした。
-そこでLeanwakeは =Elab.async= を =false= にして、すべてのコマンドを同期でelaborateしています。
-
-ただ実際のプロジェクトでは、同じコミットを2回記録しても一部のコマンドのheartbeatが一致しません。
-法令の期間と税額の計算をLeanで証明している[[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]]は、54ファイル、893コマンドで合計6億5,380万heartbeatあり、これを2回記録すると13コマンドに差があって、差の最大は8 heartbeatでした。
-[[https://github.com/conao3/lean-leanassay][leanassay]]の全ファイルでは差の最大が183です。
-ほかの宣言を変えたときにも値は少し動き、先ほどの例でも変えていない =two_mul_le= が113,455から113,551になっていました。
-既定のしきい値の1,000 heartbeatと1%はこれらの差より大きく取ってあるので、lean-ritsuryoの2回の記録を比べると、893コマンドとも変わらないと判定されます。
-
-** heartbeatの多い宣言と内訳
-lean-ritsuryoを記録して、heartbeatの多いコマンドを5つ並べてみます。
-
-#+begin_src sh
-leanwake profile record-profile --project-dir . --jobs 4 \
-  --output-file profile.json
-leanwake profile list-commands --profile file://profile.json \
-  --limit 5 --output table | column -t
-#+end_src
-
-#+begin_src text
-Heartbeats  ElapsedNs   Path                              Key                                                   HasErrors
-118149453   8771076702  Ritsuryo/Tax/Proofs/Penalty.lean  Ritsuryo.Tax.Penalty.pen1_no_return_tiers             false
-110910269   6867599166  Ritsuryo/Tax/Proofs/Income.lean   Ritsuryo.Tax.Income.quickCents_bounds                 false
-64381709    6738770487  Ritsuryo/Tax/Inheritance.lean     Ritsuryo.Tax.Inheritance.taxCentsSpec_eq_quickCents   false
-35550697    3996662401  Ritsuryo/Tax/Income.lean          Ritsuryo.Tax.Income.incomeTaxCentsSpec_eq_quickCents  false
-28404434    7752174727  Ritsuryo/Holiday/Check.lean       Ritsuryo.Holiday.checkAll                             false
-#+end_src
-
-893コマンドのうち、上位3つの定理だけで全体のheartbeatの45%を占めています。
-記録にかかった時間は、ビルド済みのプロジェクトなら4コアで43〜45秒、ビルド前の状態からだと依存のビルドを含めて88秒で、同じプロジェクトの =lake build= は48秒でした。
-
-heartbeatがいちばん多い =pen1_no_return_tiers= は、無申告加算税の額についての次の定理です。
-
-#+begin_src lean
-theorem pen1_no_return_tiers (rate tax tax' prior : Nat) (hr : rate = 10 ∨ rate = 15) :
-    (tax + prior ≤ 3000000 → noReturnCents rate tax prior = noReturnCentsArt2 rate tax prior) ∧
-      (tax ≤ tax' → noReturnCents rate tax prior ≤ noReturnCents rate tax' prior) := by
-  unfold noReturnCents noReturnCentsArt2 tieredCents
-  rcases hr with rfl | rfl <;> constructor <;> intro h <;> omega
-#+end_src
-
-=--detail steps= を付けるとコマンドの中の内訳も記録するので、 =list-steps= でこの定理の内訳から =omega= の行を取り出してみます。
-
-#+begin_src sh
-leanwake profile record-profile --project-dir . \
-  --paths Ritsuryo/Tax/Proofs/Penalty.lean --detail steps \
-  --output-file steps.json
-leanwake profile list-steps --profile file://steps.json \
-  --path Ritsuryo/Tax/Proofs/Penalty.lean \
-  --key Ritsuryo.Tax.Penalty.pen1_no_return_tiers --output table \
-  | grep -e Heartbeats -e Tactic.omega | column -t
-#+end_src
-
-#+begin_src text
-Heartbeats  Depth  Range        Class            Kind
-54184655    20     24:59-24:64  Leanwake.tactic  Lean.Parser.Tactic.omega
-54100320    20     24:59-24:64  Leanwake.tactic  Lean.Parser.Tactic.omega
-25736830    20     24:59-24:64  Leanwake.tactic  Lean.Parser.Tactic.omega
-25574245    20     24:59-24:64  Leanwake.tactic  Lean.Parser.Tactic.omega
-#+end_src
-
-=24:59-24:64= はファイルの24行目にある =omega= の位置で、 =<;>= で分かれた4つのゴールのそれぞれで =omega= が動いています。
-2つは約5,400万heartbeat、残りの2つは約2,600万heartbeatで、4つを合わせるとこの定理のheartbeatの99.9%になりました。
-
-なお内訳つきの記録はtraceを取る分だけheartbeatが増え、この定理では1億1,815万が1億5,970万になりました。
-そのため =compare-profiles= は、内訳の有無が同じ記録どうしだけを比べるようにしています。
-
-** 構成
-[[./resources/public/img/d8ac45-flow.svg]]
-
-LeanwakeはRustで書いたhostとLeanで書いたadapterの2つでできています。
-hostがLakeに尋ねて対象のファイルを列挙し、ファイルごとにadapterのプロセスを起動すると、adapterは =import= を読み込んで、コマンドを1つずつelaborateしながらその前後でheartbeatのカウンタを読みます。
-
-記録にはLeanのバージョン、同期か非同期か、内訳の有無も書き込んでおき、この条件が違う2つの記録を渡すと、 =compare-profiles= は違う項目を示してエラーで終わります。
+遅くなった宣言があるかは終了コードで分かるのでCIにも組み込めて、ワークフローの例は[[https://github.com/conao3/rust-leanwake#ci-for-a-lean-project][README]]にあります。
 
 ** Leanで証明した比較の規則
 遅くなったかどうかは次のLeanの定義で判定していて、ここでは =classify_regressed= などの補題とほかの定理は省いています。
@@ -22294,54 +22268,16 @@ theorem regression_monotone {b h h' a r : Nat}
 - 突き合わせの結果には、変更前と変更後の各コマンドがちょうど1回ずつ現れます。
 - 比較が失敗するのは、遅くなったコマンドが1つ以上あるときだけです。
 
-定理は全部で18件あり、このコードはRustのソースの =leanfran::lean!= の中に書いています。
-ビルドのときにLeanが証明を検査して[[https://s.conao3.com/blog/2026/23d62c][leanfran]]がRustの関数にするので、hostはJSONを読んでこの関数に渡し、結果を表示するだけです。
-
-** CIでの使い方
-pull requestのワークフローで、変更前と変更後のコミットをそれぞれ記録して比べます。
-
-#+begin_src yaml
-name: Elaboration costs
-on:
-  pull_request:
-permissions:
-  contents: read
-jobs:
-  profile:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: base
-      - uses: actions/checkout@v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          path: head
-      - uses: cachix/install-nix-action@v31.11.5
-      - run: nix build github:conao3/rust-leanwake --out-link leanwake
-      - run: >-
-          ./leanwake/bin/leanwake profile record-profile
-          --project-dir base --jobs 2 --output-file base.json
-      - run: >-
-          ./leanwake/bin/leanwake profile record-profile
-          --project-dir head --jobs 2 --output-file head.json
-      - run: >-
-          ./leanwake/bin/leanwake profile compare-profiles
-          --base-profile file://base.json --head-profile file://head.json
-          --output table
-#+end_src
-
-Nixのパッケージにはadapterと対応するLeanとLakeが入っていて、エラーのあるファイルも記録に入りますが、その場合の =record-profile= は終了コード254で終わります。
+定理は全部で22件あり、このコードはRustのソースの =leanfran::lean!= の中に書いています。
+ビルドのときにLeanが証明を検査して[[https://s.conao3.com/blog/2026/23d62c][leanfran]]がRustの関数にするので、Rustの側はJSONを読んでこの関数に渡し、結果を表示するだけです。
 
 ** 確かめられないこと
-heartbeatは時間の代わりにはならず、lean-ritsuryoの =quickCents_bounds= は1億1,091万heartbeatで6.9秒なのに、2,840万heartbeatの =checkAll= はelaborationに7.8秒かかりました。
-=checkAll= は =decide +kernel= でカーネルに表を評価させる定理です。
+内訳の割合は回によって動き、 =quickCents_bounds= の =split= は4回の実行で69.6%から82.6%でした。
 
 測る単位はトップレベルのコマンドなので、複数の宣言を定義するコマンドはまとめて1つの値になります。
-対応しているのはLean 4.35.0で、Leanのバージョンが違う記録どうしは比べられませんし、Mathlibでは測っていません。
+対応しているのはLean 4.35.0で、Mathlibでは測っていません。
 
-宣言ごとのheartbeatを記録して比べるツールには[[https://github.com/unbalancedparentheses/leanprof][leanprof]]もあり、Lakeのビルドのジョブごとの時間は[[https://github.com/Kha/lakeprof][lakeprof]]で測れます。
+宣言とtacticの時間は[[https://github.com/Vilin97/lean-source-profiler][lean-source-profiler]]と[[https://github.com/unbalancedparentheses/leanprof][leanprof]]でも測れて、Lakeのビルドのジョブごとの時間は[[https://github.com/Kha/lakeprof][lakeprof]]で測れます。
 Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanprover/radar][Radar]]で計測しています。
 
 * COMMENT Local variables
