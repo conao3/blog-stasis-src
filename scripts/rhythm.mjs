@@ -40,17 +40,21 @@ const mean = lengths.reduce((a, b) => a + b, 0) / lengths.length;
 const sd = Math.sqrt(lengths.reduce((a, b) => a + (b - mean) ** 2, 0) / lengths.length);
 const cv = sd / mean;
 const perParagraph = sentences.length / paragraphs.length;
+const commas = (sentences.join("").match(/、/g) ?? []).length;
+const plain = sentences.join("").replace(/\[\[[^\]]*\]\[([^\]]*)\]\]/g, "$1").replace(/\[\[[^\]]*\]\]/g, "");
+const commaRate = (commas / plain.length) * 100;
 const clefts = sentences.filter((s) => /のは、.*(です|でした|だけ)/.test(s));
 
 const failures = [];
 if (perParagraph > 2.0) failures.push(`sentences per paragraph ${perParagraph.toFixed(1)} > 2.0`);
 if (cv < 0.45) failures.push(`sentence length sd/mean ${cv.toFixed(2)} < 0.45`);
+if (commaRate > 2.0) failures.push(`読点 per 100 characters ${commaRate.toFixed(2)} > 2.0`);
 if (clefts.length > 1) failures.push(`${clefts.length} sentences of the form 〜のは、〜です > 1`);
 
 console.log(
   `${id}: ${sentences.length} sentences, ${paragraphs.length} paragraphs, ` +
     `${perParagraph.toFixed(1)} per paragraph, mean length ${mean.toFixed(1)}, sd/mean ${cv.toFixed(2)}, ` +
-    `${clefts.length} 〜のは、〜です`,
+    `${commaRate.toFixed(2)} 読点 per 100 characters, ${clefts.length} 〜のは、〜です`,
 );
 for (const s of clefts) console.log(`  のは: ${s}`);
 if (failures.length) {
