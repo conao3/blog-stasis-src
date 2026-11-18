@@ -22091,7 +22091,6 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 :export_file_name: generated/contents/blog/2026/d8ac45
 :export_date: 2026-11-18 18:08
 :export_tags: lean rust performance profiler formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
-:export_draft: t
 :end:
 
 Lean 4のプロジェクトで、時間のかかっている証明を1コマンドで上から順に出すCLI、Leanwakeを作りました。
