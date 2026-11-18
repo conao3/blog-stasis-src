@@ -19775,7 +19775,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
   セットの場合、要素がコレクションだったとしても再帰的に比較しません。そのためこの例では =1= がセット内のリスト内の共通要素ですが、全体が差分として計算されています。
   セットの場合、順序が存在しないのでそもそも =[1 2]= と =[2 3]= を比較しなければならないということを判断するのが難しいです。
 
-* おい、 LeanでMutation Test をやれ。証明品質を、測るために
+* おい、 LeanでMutation Test をやれ。定理品質を、測るために
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
 :export_date: 2026-11-17 12:43
