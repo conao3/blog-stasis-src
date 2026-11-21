@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="440" viewBox="0 0 1000 400" font-family="Noto Sans JP, sans-serif">
+<style>
+.t{fill:#1f2328;font-size:14px;font-weight:600}
+.s{fill:#59636e;font-size:12px}
+.box{fill:#ddf4ff;stroke:#0969da;stroke-width:1.5}
+.ext{fill:#fff;stroke:#818b98;stroke-width:1.5}
+.chk{fill:#dafbe1;stroke:#1a7f37;stroke-width:1.5}
+.frame{fill:none;stroke:#0969da;stroke-width:1.5;stroke-dasharray:6 4}
+.a{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.ao{stroke:#818b98;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#aho)}
+.mh{fill:#0969da}.mho{fill:#818b98}
+</style>
+<defs>
+<marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path class="mh" d="M0,0 L9,4.5 L0,9 z"/></marker>
+<marker id="aho" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path class="mho" d="M0,0 L9,4.5 L0,9 z"/></marker>
+</defs>
+<rect x="0" y="0" width="1000" height="400" rx="14" fill="#fff"/>
+<rect class="ext" x="20" y="150" width="130" height="70" rx="6"/>
+<text class="t" x="85" y="180" text-anchor="middle">人</text>
+<text class="s" x="85" y="202" text-anchor="middle">依頼・仕様・判断</text>
+<rect class="box" x="210" y="150" width="150" height="70" rx="6"/>
+<text class="t" x="285" y="180" text-anchor="middle">仕事の列</text>
+<text class="s" x="285" y="202" text-anchor="middle">タスクと状態と依存</text>
+<rect class="box" x="420" y="150" width="150" height="70" rx="6"/>
+<text class="t" x="495" y="180" text-anchor="middle">排他</text>
+<text class="s" x="495" y="202" text-anchor="middle">1件を1体だけに渡す</text>
+<rect class="frame" x="630" y="40" width="170" height="290" rx="8"/>
+<text class="s" x="715" y="62" text-anchor="middle">分けた作業場</text>
+<rect class="box" x="650" y="76" width="130" height="62" rx="6"/>
+<text class="t" x="715" y="103" text-anchor="middle">エージェント</text>
+<text class="s" x="715" y="123" text-anchor="middle">作業場 1</text>
+<rect class="box" x="650" y="154" width="130" height="62" rx="6"/>
+<text class="t" x="715" y="181" text-anchor="middle">エージェント</text>
+<text class="s" x="715" y="201" text-anchor="middle">作業場 2</text>
+<rect class="box" x="650" y="232" width="130" height="62" rx="6"/>
+<text class="t" x="715" y="259" text-anchor="middle">エージェント</text>
+<text class="s" x="715" y="279" text-anchor="middle">作業場 3</text>
+<rect class="chk" x="840" y="150" width="150" height="70" rx="6"/>
+<text class="t" x="915" y="180" text-anchor="middle">検査</text>
+<text class="s" x="915" y="202" text-anchor="middle">テスト・lint・レビュー</text>
+<path class="a" d="M150,185 L208,185"/>
+<path class="a" d="M360,185 L418,185"/>
+<path class="a" d="M570,185 L628,185"/>
+<path class="a" d="M800,185 L838,185"/>
+<path class="ao" d="M915,220 L915,365 L285,365 L285,222"/>
+<text class="s" x="600" y="357" text-anchor="middle">通らなかった仕事と、期限の切れた着手は列に戻る</text>
+<path class="ao" d="M715,40 L715,18 L85,18 L85,148"/>
+<text class="s" x="400" y="34" text-anchor="middle">判断が要るときだけ人を呼ぶ</text>
+</svg>
