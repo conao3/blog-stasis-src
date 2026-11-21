@@ -695,6 +695,11 @@ pre code {
     width: 100%;
 }
 
+.tweet-card-media[data-count="3"] img:first-child {
+    aspect-ratio: 16 / 9;
+    grid-column: span 2;
+}
+
 .tweet-card-media[data-count="1"] img {
     aspect-ratio: auto;
     max-height: 480px;

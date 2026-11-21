@@ -122,6 +122,11 @@
          (zone (or (cadr parts) "Asia/Tokyo"))
          (user (car (split-string status "/")))
          (id (cadr (split-string status "/")))
+         (name (or (caddr parts) (if (string= user "conao_3") "conao3" user)))
+         (avatar (if (string= user "conao_3")
+                     "/assets/icon.jpg"
+                   (let ((file (format "/img/tweet-avatar-%s.jpg" user)))
+                     (and (file-exists-p (concat "resources/public" file)) file))))
          (time (stasis-md-tweet-time id))
          (images (seq-filter
                   (lambda (file) (file-exists-p (concat "resources/public" file)))
@@ -129,9 +134,9 @@
     (concat
      (format "<div class=\"tweet-card\"><a href=\"https://x.com/%s/status/%s\">" user id)
      "<span class=\"tweet-card-header\">"
-     (if (string= user "conao_3") "<img class=\"tweet-card-avatar\" src=\"/assets/icon.jpg\" alt=\"\">" "")
+     (if avatar (format "<img class=\"tweet-card-avatar\" src=\"%s\" alt=\"\">" avatar) "")
      (format "<span class=\"tweet-card-author\"><strong>%s</strong><span>@%s</span></span>"
-             (if (string= user "conao_3") "conao3" user) user)
+             (org-html-encode-plain-text name) user)
      stasis-md-x-logo
      "</span>"
      (if desc
@@ -22289,7 +22294,7 @@ Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanpr
 
 コーディングエージェントを何体も並べて、人がほとんど見ないままPRがマージされていく開発を「ソフトウェア工場」と呼ぶ人が増えました。
 
-[[tweet:happy_ryo/2123942567746375930::America/Toronto][Orcaとかを使わずに、自前でコーディングエージェントを用いたソフトウェアファクトリーを実装していて、こんな感じの作りにしている。一番気を掛けているのは、窓口になるエージェント1体以外は人間が見なくて良いこと。OSSとして公開してる。]]
+[[tweet:happy_ryo/2123942567746375930::America/Toronto::いわまりょう][Orcaとかを使わずに、自前でコーディングエージェントを用いたソフトウェアファクトリーを実装していて、こんな感じの作りにしている。一番気を掛けているのは、窓口になるエージェント1体以外は人間が見なくて良いこと。OSSとして公開してる。]]
 
 このポストを見て自分でも組みたくなり、この形がどう出来てきて、いまどこまで動いているのかを調べてみました。
 
