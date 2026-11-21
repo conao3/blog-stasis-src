@@ -71,7 +71,7 @@ export default {
     const asset = await env.ASSETS.fetch(request);
     const response =
       asset.status === 200 && /^\/(img|og|assets)\//.test(url.pathname)
-        ? withHeaders(asset, { "Cache-Control": "public, max-age=3600" })
+        ? withHeaders(asset, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=604800" })
         : asset;
     if (!mdPath) return response;
     const links = [sitemapLink, llmsLink];
