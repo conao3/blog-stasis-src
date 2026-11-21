@@ -22330,50 +22330,22 @@ while :; do cat PROMPT.md | claude-code ; done
 同じ月にMETRが出した[[https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/][実験]]では、経験のあるOSSの開発者がAIを使うと作業が19%長くかかり、本人たちは20%速くなったと感じていました。
 速くなった実感と測った結果が食い違ったことは、あとで出てくる数字を読むときの前提になります。
 
-** 人が話す場所と仕事を積む場所
-OpenAIは2026年4月に出した[[https://openai.com/index/open-source-codex-orchestration-symphony/][Symphonyの記事]]で、エージェントは速いのに人の注意が足りなくなったと書いています。
-この問題に答えた道具を、私は人がどこで話すかを決めたものと、仕事をどこに積むかを決めたものの2つに分けて考えています。
+** 2026年の1月と2月、2つの動き
+2026年の1月と2月には、2種類の文章が並んで出ました。
+この形を「工場」と呼ぶ文章と、工場とは名乗らずに構成と結果を詳しく報告する文章です。
 
-人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[[https://github.com/openclaw/openclaw][OpenClaw]]です。
-用途をコーディングに限らない個人のアシスタントで、自分のマシンで動かし続けてDiscordやSlackのような普段のチャットから話しかけます。
-この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
+*** 工場と呼ぶ文章
+1月にSteve Yeggeが[[https://yegge.ai/gastown][Gas Town]]を公開しました。
+Yeggeが2025年10月に出していた仕事の台帳[[https://github.com/gastownhall/beads][Beads]]の上に作ったもので、市長役が全体を調整し、作業役の仕事を見張り役が見て、マージ役が順にマージします。
 
-OpenClawではGatewayという常駐のプロセスがセッションと道具とチャットの接続を受け持ちます。
-[[https://docs.openclaw.ai/automation/cron-jobs][スケジューラ]]が決まった時刻にエージェントを起こし、[[https://docs.openclaw.ai/tools/subagents][sub-agent]]は裏で動いて結果を頼んだ側へ知らせます。
+Yeggeはのちにこれを「the first-ever software factory」と呼んでいます。
 
-人が話す相手は1体で、起こす役と裏の作業はその後ろに隠れます。
-冒頭のポストの「窓口」と同じ形がここにあります。
-
-仕事をどこに積むかを決めた道具は、2025年6月に[[https://github.com/BloopAI/vibe-kanban][Vibe Kanban]]が、10月にSteve Yeggeの[[https://github.com/gastownhall/beads][Beads]]が出ています。
-Vibe Kanbanはカンバンのissueで仕事を計画してエージェントに渡す道具で、Beadsはエージェントの仕事を記録する台帳です。
-
-OpenAIが2026年3月にリポジトリを公開した[[https://github.com/openai/symphony][Symphony]]は、この形を広く知らせた道具だと私は見ています。
-OpenAIが自社の運用を仕様ごと公開したことで、一部の人の道具だったものが誰でも試せるものになりました。
-
-先ほどの記事によると、技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
-
-#+begin_quote
-For every open task, guarantee that an agent is running in its own workspace.
-#+end_quote
-
-SymphonyはLinearのissueを見張り、開いているタスクごとに作業場を1つ用意してエージェントを動かし続けます。
-セッションを人が見張る代わりに、issueの状態が仕事の進み具合を表します。
-
-Vercelが2026-11-18に出した[[https://vercel.com/blog/introducing-vercel-board][Vercel Board]]は、この2つを1つにまとめたものだと私は考えています。
-Boardはエージェントと人が共有する掲示板で、スレッドは会話であると同時にタスクにもなり、タスクは期限付きで1体だけに貸し出されます。
-
-** 2026年、工場と呼ばれはじめる
-2026年に入ると、この形を「工場」と呼ぶ文章が出てきます。
-Steve Yeggeは1月にBeadsの上に作った[[https://yegge.ai/gastown][Gas Town]]を公開しました。
-
-市長役が全体を調整し、作業役の仕事を見張り役が見て、マージ役が順にマージする構成で、Yeggeはのちにこれを「the first-ever software factory」と呼んでいます。
-
-Dan Shapiroも同じ1月の[[https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/][記事]]でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
-
+同じ1月にDan Shapiroが[[https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/][記事]]でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
 仕様を入れるとソフトウェアが出てくる黒い箱のことで、名前はロボットだけが働くファナックの工場から取ったと書いています。
+
 人が要らないので照明も要らない工場という、製造業の言葉です。
 
-その段階を運用していると公表したのがStrongDMで、2月に出した[[https://factory.strongdm.ai/][Software Factoryのページ]]には次の2つの決まりが載っています。
+2月にはStrongDMがその段階を運用していると公表して、[[https://factory.strongdm.ai/][Software Factoryのページ]]に次の2つの決まりを載せました。
 
 #+begin_quote
 Code must not be written by humans
@@ -22384,19 +22356,59 @@ Code must not be reviewed by humans
 Simon Willisonの[[https://simonwillison.net/2026/Feb/7/software-factory/][紹介]]によると、人が読まない代わりにエージェントには見せない検証用のシナリオを用意して、OktaやSlackのような外部サービスの模造品の上で動きを確かめるそうです。
 費用については、技術者1人あたり1日に1,000ドルをトークンに使っていなければ改善の余地があるという目安が書かれています。
 
-同じ時期には工場とは名乗らずに構成を詳しく公開した報告も出ています。
-Cursorは長時間の自律コーディングの[[https://cursor.com/blog/scaling-agents][報告]]で、全員が同じ立場でロックを取り合う構成を最初に試したものの、20体いても2、3体ぶんの速さしか出なかったと書いています。
+*** 構成と結果の報告
+同じ2か月のあいだに、工場という言葉を使わない報告も3本出ています。
+
+1月にはCursorが長時間の自律コーディングの[[https://cursor.com/blog/scaling-agents][報告]]を出しました。
+全員が同じ立場でロックを取り合う構成を最初に試したものの、20体いても2、3体ぶんの速さしか出なかったと書いています。
 
 階層をなくす構成も試してうまくいかず、最終的には計画役と作業役と判定役に分けて、この構成でブラウザを一から作らせました。
 品質を見る統合役も置いたのですが、ボトルネックになったので外したそうです。
 
-Anthropicの[[https://www.anthropic.com/engineering/building-c-compiler][Cコンパイラの実験]]は司令役を置かず、16体のClaudeがgitのリポジトリに置いたロックのファイルで仕事を分けました。
-約2,000回のセッションと2万ドルのAPIの費用で、Linuxのカーネルをビルドできる10万行のコンパイラができています。
+2月にはAnthropicが[[https://www.anthropic.com/engineering/building-c-compiler][Cコンパイラの実験]]を公開しました。
+司令役を置かず、16体のClaudeがgitのリポジトリに置いたロックのファイルで仕事を分けていて、約2,000回のセッションと2万ドルのAPIの費用でLinuxのカーネルをビルドできる10万行のコンパイラができています。
 
-OpenAIの[[https://openai.com/index/harness-engineering/][harness engineering]]の記事は、3人の技術者がCodexだけで約1,500件のPRをマージした経験を書いたもので、合言葉は「Humans steer. Agents execute.」です。
-
+同じ2月にOpenAIが出した[[https://openai.com/index/harness-engineering/][harness engineering]]の記事は、3人の技術者がCodexだけで約1,500件のPRをマージした経験を書いたもので、合言葉は「Humans steer. Agents execute.」です。
 人が層の依存の向きを決めて、Codexに書かせたlintと構造のテストで守らせています。
-コードが増える速さに人のQAが追いつかなくなったとも書いていて、OpenAIはこの経験の続きとしてSymphonyを出しました。
+
+コードが増える速さに人のQAが追いつかなくなったとも書いています。
+
+** 人が話す場所と仕事を積む場所
+OpenAIは2026年4月に出した[[https://openai.com/index/open-source-codex-orchestration-symphony/][Symphonyの記事]]で、harness engineeringの次に足りなくなったものは人の注意だったと書いています。
+技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
+
+この問題に答える道具は、工場という言葉が出てくる前の2025年から作られていました。
+私はそれを、仕事をどこに積むかを決めた道具と、人がどこで話すかを決めた道具の2つに分けて考えています。
+
+*** 仕事を積む場所
+2025年6月に[[https://github.com/BloopAI/vibe-kanban][Vibe Kanban]]が、10月に先ほどのBeadsが出ています。
+Vibe Kanbanはカンバンのissueで仕事を計画してエージェントに渡す道具で、Beadsはエージェントの仕事を記録する台帳です。
+
+OpenAIが2026年3月にリポジトリを公開した[[https://github.com/openai/symphony][Symphony]]は、この形を広く知らせた道具だと私は見ています。
+OpenAIが自社の運用を仕様ごと公開したことで、一部の人の道具だったものが誰でも試せるものになりました。
+
+#+begin_quote
+For every open task, guarantee that an agent is running in its own workspace.
+#+end_quote
+
+SymphonyはLinearのissueを見張り、開いているタスクごとに作業場を1つ用意してエージェントを動かし続けます。
+セッションを人が見張る代わりに、issueの状態が仕事の進み具合を表します。
+
+*** 人が話す場所
+人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[[https://github.com/openclaw/openclaw][OpenClaw]]です。
+用途をコーディングに限らない個人のアシスタントで、自分のマシンで動かし続けてDiscordやSlackのような普段のチャットから話しかけます。
+
+この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
+
+OpenClawではGatewayという常駐のプロセスがセッションと道具とチャットの接続を受け持ちます。
+[[https://docs.openclaw.ai/automation/cron-jobs][スケジューラ]]が決まった時刻にエージェントを起こし、[[https://docs.openclaw.ai/tools/subagents][sub-agent]]は裏で動いて結果を頼んだ側へ知らせます。
+
+人が話す相手は1体で、起こす役と裏の作業はその後ろに隠れます。
+冒頭のポストの「窓口」と同じ形がここにあります。
+
+*** 2つを1つにまとめる
+Vercelが2026年11月に出した[[https://vercel.com/blog/introducing-vercel-board][Vercel Board]]は、この2つを1つにまとめたものだと私は考えています。
+Boardはエージェントと人が共有する掲示板で、スレッドは会話であると同時にタスクにもなり、タスクは期限付きで1体だけに貸し出されます。
 
 ** いまの到達点
 並べてみると、多くの事例に仕事の列と1件を1体だけに渡す排他、エージェントごとに分けた作業場と機械による検査という共通の部品があります。

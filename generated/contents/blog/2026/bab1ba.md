@@ -45,51 +45,25 @@ while :; do cat PROMPT.md | claude-code ; done
 速くなった実感と測った結果が食い違ったことは、あとで出てくる数字を読むときの前提になります。
 
 
-# 人が話す場所と仕事を積む場所
+# 2026年の1月と2月、2つの動き
 
-OpenAIは2026年4月に出した[Symphonyの記事](https://openai.com/index/open-source-codex-orchestration-symphony/)で、エージェントは速いのに人の注意が足りなくなったと書いています。
-この問題に答えた道具を、私は人がどこで話すかを決めたものと、仕事をどこに積むかを決めたものの2つに分けて考えています。
-
-人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[OpenClaw](https://github.com/openclaw/openclaw)です。
-用途をコーディングに限らない個人のアシスタントで、自分のマシンで動かし続けてDiscordやSlackのような普段のチャットから話しかけます。
-この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
-
-OpenClawではGatewayという常駐のプロセスがセッションと道具とチャットの接続を受け持ちます。
-[スケジューラ](https://docs.openclaw.ai/automation/cron-jobs)が決まった時刻にエージェントを起こし、[sub-agent](https://docs.openclaw.ai/tools/subagents)は裏で動いて結果を頼んだ側へ知らせます。
-
-人が話す相手は1体で、起こす役と裏の作業はその後ろに隠れます。
-冒頭のポストの「窓口」と同じ形がここにあります。
-
-仕事をどこに積むかを決めた道具は、2025年6月に[Vibe Kanban](https://github.com/BloopAI/vibe-kanban)が、10月にSteve Yeggeの[Beads](https://github.com/gastownhall/beads)が出ています。
-Vibe Kanbanはカンバンのissueで仕事を計画してエージェントに渡す道具で、Beadsはエージェントの仕事を記録する台帳です。
-
-OpenAIが2026年3月にリポジトリを公開した[Symphony](https://github.com/openai/symphony)は、この形を広く知らせた道具だと私は見ています。
-OpenAIが自社の運用を仕様ごと公開したことで、一部の人の道具だったものが誰でも試せるものになりました。
-
-先ほどの記事によると、技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
-
-> For every open task, guarantee that an agent is running in its own workspace.
-
-SymphonyはLinearのissueを見張り、開いているタスクごとに作業場を1つ用意してエージェントを動かし続けます。
-セッションを人が見張る代わりに、issueの状態が仕事の進み具合を表します。
-
-Vercelが2026-11-18に出した[Vercel Board](https://vercel.com/blog/introducing-vercel-board)は、この2つを1つにまとめたものだと私は考えています。
-Boardはエージェントと人が共有する掲示板で、スレッドは会話であると同時にタスクにもなり、タスクは期限付きで1体だけに貸し出されます。
+2026年の1月と2月には、2種類の文章が並んで出ました。
+この形を「工場」と呼ぶ文章と、工場とは名乗らずに構成と結果を詳しく報告する文章です。
 
 
-# 2026年、工場と呼ばれはじめる
+## 工場と呼ぶ文章
 
-2026年に入ると、この形を「工場」と呼ぶ文章が出てきます。
-Steve Yeggeは1月にBeadsの上に作った[Gas Town](https://yegge.ai/gastown)を公開しました。
+1月にSteve Yeggeが[Gas Town](https://yegge.ai/gastown)を公開しました。
+Yeggeが2025年10月に出していた仕事の台帳[Beads](https://github.com/gastownhall/beads)の上に作ったもので、市長役が全体を調整し、作業役の仕事を見張り役が見て、マージ役が順にマージします。
 
-市長役が全体を調整し、作業役の仕事を見張り役が見て、マージ役が順にマージする構成で、Yeggeはのちにこれを「the first-ever software factory」と呼んでいます。
+Yeggeはのちにこれを「the first-ever software factory」と呼んでいます。
 
-Dan Shapiroも同じ1月の[記事](https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/)でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
-
+同じ1月にDan Shapiroが[記事](https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/)でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
 仕様を入れるとソフトウェアが出てくる黒い箱のことで、名前はロボットだけが働くファナックの工場から取ったと書いています。
+
 人が要らないので照明も要らない工場という、製造業の言葉です。
 
-その段階を運用していると公表したのがStrongDMで、2月に出した[Software Factoryのページ](https://factory.strongdm.ai/)には次の2つの決まりが載っています。
+2月にはStrongDMがその段階を運用していると公表して、[Software Factoryのページ](https://factory.strongdm.ai/)に次の2つの決まりを載せました。
 
 > Code must not be written by humans
 > 
@@ -98,19 +72,67 @@ Dan Shapiroも同じ1月の[記事](https://www.danshapiro.com/blog/2026/01/the-
 Simon Willisonの[紹介](https://simonwillison.net/2026/Feb/7/software-factory/)によると、人が読まない代わりにエージェントには見せない検証用のシナリオを用意して、OktaやSlackのような外部サービスの模造品の上で動きを確かめるそうです。
 費用については、技術者1人あたり1日に1,000ドルをトークンに使っていなければ改善の余地があるという目安が書かれています。
 
-同じ時期には工場とは名乗らずに構成を詳しく公開した報告も出ています。
-Cursorは長時間の自律コーディングの[報告](https://cursor.com/blog/scaling-agents)で、全員が同じ立場でロックを取り合う構成を最初に試したものの、20体いても2、3体ぶんの速さしか出なかったと書いています。
+
+## 構成と結果の報告
+
+同じ2か月のあいだに、工場という言葉を使わない報告も3本出ています。
+
+1月にはCursorが長時間の自律コーディングの[報告](https://cursor.com/blog/scaling-agents)を出しました。
+全員が同じ立場でロックを取り合う構成を最初に試したものの、20体いても2、3体ぶんの速さしか出なかったと書いています。
 
 階層をなくす構成も試してうまくいかず、最終的には計画役と作業役と判定役に分けて、この構成でブラウザを一から作らせました。
 品質を見る統合役も置いたのですが、ボトルネックになったので外したそうです。
 
-Anthropicの[Cコンパイラの実験](https://www.anthropic.com/engineering/building-c-compiler)は司令役を置かず、16体のClaudeがgitのリポジトリに置いたロックのファイルで仕事を分けました。
-約2,000回のセッションと2万ドルのAPIの費用で、Linuxのカーネルをビルドできる10万行のコンパイラができています。
+2月にはAnthropicが[Cコンパイラの実験](https://www.anthropic.com/engineering/building-c-compiler)を公開しました。
+司令役を置かず、16体のClaudeがgitのリポジトリに置いたロックのファイルで仕事を分けていて、約2,000回のセッションと2万ドルのAPIの費用でLinuxのカーネルをビルドできる10万行のコンパイラができています。
 
-OpenAIの[harness engineering](https://openai.com/index/harness-engineering/)の記事は、3人の技術者がCodexだけで約1,500件のPRをマージした経験を書いたもので、合言葉は「Humans steer. Agents execute.」です。
-
+同じ2月にOpenAIが出した[harness engineering](https://openai.com/index/harness-engineering/)の記事は、3人の技術者がCodexだけで約1,500件のPRをマージした経験を書いたもので、合言葉は「Humans steer. Agents execute.」です。
 人が層の依存の向きを決めて、Codexに書かせたlintと構造のテストで守らせています。
-コードが増える速さに人のQAが追いつかなくなったとも書いていて、OpenAIはこの経験の続きとしてSymphonyを出しました。
+
+コードが増える速さに人のQAが追いつかなくなったとも書いています。
+
+
+# 人が話す場所と仕事を積む場所
+
+OpenAIは2026年4月に出した[Symphonyの記事](https://openai.com/index/open-source-codex-orchestration-symphony/)で、harness engineeringの次に足りなくなったものは人の注意だったと書いています。
+技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
+
+この問題に答える道具は、工場という言葉が出てくる前の2025年から作られていました。
+私はそれを、仕事をどこに積むかを決めた道具と、人がどこで話すかを決めた道具の2つに分けて考えています。
+
+
+## 仕事を積む場所
+
+2025年6月に[Vibe Kanban](https://github.com/BloopAI/vibe-kanban)が、10月に先ほどのBeadsが出ています。
+Vibe Kanbanはカンバンのissueで仕事を計画してエージェントに渡す道具で、Beadsはエージェントの仕事を記録する台帳です。
+
+OpenAIが2026年3月にリポジトリを公開した[Symphony](https://github.com/openai/symphony)は、この形を広く知らせた道具だと私は見ています。
+OpenAIが自社の運用を仕様ごと公開したことで、一部の人の道具だったものが誰でも試せるものになりました。
+
+> For every open task, guarantee that an agent is running in its own workspace.
+
+SymphonyはLinearのissueを見張り、開いているタスクごとに作業場を1つ用意してエージェントを動かし続けます。
+セッションを人が見張る代わりに、issueの状態が仕事の進み具合を表します。
+
+
+## 人が話す場所
+
+人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[OpenClaw](https://github.com/openclaw/openclaw)です。
+用途をコーディングに限らない個人のアシスタントで、自分のマシンで動かし続けてDiscordやSlackのような普段のチャットから話しかけます。
+
+この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
+
+OpenClawではGatewayという常駐のプロセスがセッションと道具とチャットの接続を受け持ちます。
+[スケジューラ](https://docs.openclaw.ai/automation/cron-jobs)が決まった時刻にエージェントを起こし、[sub-agent](https://docs.openclaw.ai/tools/subagents)は裏で動いて結果を頼んだ側へ知らせます。
+
+人が話す相手は1体で、起こす役と裏の作業はその後ろに隠れます。
+冒頭のポストの「窓口」と同じ形がここにあります。
+
+
+## 2つを1つにまとめる
+
+Vercelが2026年11月に出した[Vercel Board](https://vercel.com/blog/introducing-vercel-board)は、この2つを1つにまとめたものだと私は考えています。
+Boardはエージェントと人が共有する掲示板で、スレッドは会話であると同時にタスクにもなり、タスクは期限付きで1体だけに貸し出されます。
 
 
 # いまの到達点
