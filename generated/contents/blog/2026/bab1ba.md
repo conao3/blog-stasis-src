@@ -24,6 +24,9 @@ Tags: ai-agent history vercel-board
 ところが同じ年に出たベンチマークの[SWE-bench](https://arxiv.org/abs/2310.06770)では、実際のGitHubのissueを解けた割合が最も良いモデルでも1.96%でした。
 2024年3月にCognitionが出した[Devin](https://cognition.com/blog/introducing-devin)は、データセットの25%を無作為に選んだ部分でこの値を13.86%にしたと発表しています。
 
+2025年2月にはAnthropicが[Claude Code](https://www.anthropic.com/news/claude-3-7-sonnet)を研究プレビューとして出しました。
+ターミナルから大きな作業をまるごと任せられるコマンドラインの道具で、このあと出てくるRalphとAnthropicの実験はClaude Codeを、OpenAIの2つの記事はCodexを使っています。
+
 流れが変わったのは2025年5月で、Cursorの[background agent](https://cursor.com/changelog/0-50)とOpenAIの[Codex](https://openai.com/index/introducing-codex/)、GitHub Copilotの[coding agent](https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/)、Googleの[Jules](https://blog.google/technology/google-labs/jules/)の公開ベータが1週間のうちに出そろいました。
 どれもタスクを渡すと離れた環境で作業してPRや差分を返すもので、Codexの発表は「work on many tasks in parallel」と書いています。
 
@@ -36,6 +39,7 @@ while :; do cat PROMPT.md | claude-code ; done
 ```
 
 同じプロンプトを繰り返し読ませて1回に1つの仕事をさせ、テストやビルドの失敗をエージェントに返して直させます。
+のちに[OpenAI](https://openai.com/index/harness-engineering/)と[Anthropic](https://www.anthropic.com/engineering/building-c-compiler)は、それぞれの記事で自分たちのループをRalphになぞらえています。
 
 同じ月にMETRが出した[実験](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)では、経験のあるOSSの開発者がAIを使うと作業が19%長くかかり、本人たちは20%速くなったと感じていました。
 速くなった実感と測った結果が食い違ったことは、あとで出てくる数字を読むときの前提になります。
@@ -48,6 +52,7 @@ OpenAIは2026年4月に出した[Symphonyの記事](https://openai.com/index/ope
 
 人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[OpenClaw](https://github.com/openclaw/openclaw)です。
 用途をコーディングに限らない個人のアシスタントで、自分のマシンで動かし続けてDiscordやSlackのような普段のチャットから話しかけます。
+この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
 
 OpenClawではGatewayという常駐のプロセスがセッションと道具とチャットの接続を受け持ちます。
 [スケジューラ](https://docs.openclaw.ai/automation/cron-jobs)が決まった時刻にエージェントを起こし、[sub-agent](https://docs.openclaw.ai/tools/subagents)は裏で動いて結果を頼んだ側へ知らせます。
@@ -55,7 +60,12 @@ OpenClawではGatewayという常駐のプロセスがセッションと道具�
 人が話す相手は1体で、起こす役と裏の作業はその後ろに隠れます。
 冒頭のポストの「窓口」と同じ形がここにあります。
 
-仕事をどこに積むかを決めた道具が、2026年3月にリポジトリが公開されたOpenAIの[Symphony](https://github.com/openai/symphony)です。
+仕事をどこに積むかを決めた道具は、2025年6月に[Vibe Kanban](https://github.com/BloopAI/vibe-kanban)が、10月にSteve Yeggeの[Beads](https://github.com/gastownhall/beads)が出ています。
+Vibe Kanbanはカンバンのissueで仕事を計画してエージェントに渡す道具で、Beadsはエージェントの仕事を記録する台帳です。
+
+OpenAIが2026年3月にリポジトリを公開した[Symphony](https://github.com/openai/symphony)は、この形を広く知らせた道具だと私は見ています。
+OpenAIが自社の運用を仕様ごと公開したことで、一部の人の道具だったものが誰でも試せるものになりました。
+
 先ほどの記事によると、技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
 
 > For every open task, guarantee that an agent is running in its own workspace.
@@ -70,7 +80,11 @@ Boardはエージェントと人が共有する掲示板で、スレッドは会
 # 2026年、工場と呼ばれはじめる
 
 2026年に入ると、この形を「工場」と呼ぶ文章が出てきます。
-Dan Shapiroは1月の[記事](https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/)でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
+Steve Yeggeは1月にBeadsの上に作った[Gas Town](https://yegge.ai/gastown)を公開しました。
+
+市長役が全体を調整し、作業役の仕事を見張り役が見て、マージ役が順にマージする構成で、Yeggeはのちにこれを「the first-ever software factory」と呼んでいます。
+
+Dan Shapiroも同じ1月の[記事](https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/)でAIの使い方を0から5までの段階に分けて、最後の段階を「Dark Factory」と呼びました。
 
 仕様を入れるとソフトウェアが出てくる黒い箱のことで、名前はロボットだけが働くファナックの工場から取ったと書いています。
 人が要らないので照明も要らない工場という、製造業の言葉です。
@@ -96,7 +110,7 @@ Anthropicの[Cコンパイラの実験](https://www.anthropic.com/engineering/bu
 OpenAIの[harness engineering](https://openai.com/index/harness-engineering/)の記事は、3人の技術者がCodexだけで約1,500件のPRをマージした経験を書いたもので、合言葉は「Humans steer. Agents execute.」です。
 
 人が層の依存の向きを決めて、Codexに書かせたlintと構造のテストで守らせています。
-コードが増える速さに人のQAが追いつかなくなったとも書いています。
+コードが増える速さに人のQAが追いつかなくなったとも書いていて、OpenAIはこの経験の続きとしてSymphonyを出しました。
 
 
 # いまの到達点
