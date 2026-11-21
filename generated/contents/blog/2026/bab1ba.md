@@ -200,6 +200,12 @@ MITのMichael Cusumanoが1991年に書いた[草稿](https://www.gregorystrachta
 
 ソフトウェアの難しさは仕様と設計と検査にあるので、書き表す手間を減らしても桁は変わらないという指摘です。
 
+2004年にはMicrosoftが[Software Factories](https://learn.microsoft.com/en-us/archive/blogs/askburton/moving-to-software-factories-2)という名前で、分野ごとの言語とひな型からアプリケーションを組み立てる道具をVisual Studioに載せようとしました。
+ほかの産業は職人仕事から部品を組み合わせる製造へ移って生産能力を増やしたというのがその主張で、東芝の再利用と同じ向きの考えです。
+
+その記事は、software factoryという言葉が創造性のない自動人形を思わせて議論を呼ぶことも認めています。
+道具を説明する[ページ](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/ff648577(v=pandp.10))には、2011年11月に古い内容になったという表示が付いています。
+
 当時の工場は人の組織と手順の話で、いまの工場はエージェントの話なので、同じ言葉でも作っているものは違います。
 それでも並べてみると、似た形が3つ見つかりました。
 
