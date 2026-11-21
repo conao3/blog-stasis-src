@@ -353,6 +353,7 @@ article > header .post-meta {
 
 .content img {
     border-radius: var(--corner-radius-200);
+    color: transparent;
     margin: var(--spacing-300) 0;
 }
 
@@ -687,6 +688,7 @@ pre code {
 
 .tweet-card-media img {
     aspect-ratio: 1;
+    background-color: var(--gray-200);
     border-radius: 0;
     display: block;
     height: auto;
