@@ -68,7 +68,11 @@ export default {
       return withHeaders(html, { Vary: "Accept", Link: `${sitemapLink}, ${llmsLink}` });
     }
 
-    const response = await env.ASSETS.fetch(request);
+    const asset = await env.ASSETS.fetch(request);
+    const response =
+      asset.status === 200 && /^\/(img|og|assets)\//.test(url.pathname)
+        ? withHeaders(asset, { "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800" })
+        : asset;
     if (!mdPath) return response;
     const links = [sitemapLink, llmsLink];
     if (response.status === 200 && (url.pathname === "/" || url.pathname.startsWith("/blog/"))) {

@@ -8,6 +8,8 @@
     [hiccup2.core :as hiccup]
     [ring.adapter.jetty :as jetty]
     [ring.middleware.content-type :as content-type]
+    [ring.middleware.file :as file]
+    [ring.middleware.not-modified :as not-modified]
     [stasis.core :as stasis]))
 
 
@@ -790,5 +792,9 @@
 (defn start-server
   [& _args]
   (jetty/run-jetty
-    (content-type/wrap-content-type (wrap-extensionless (stasis/serve-pages site stasis-config)))
+    (-> (stasis/serve-pages site stasis-config)
+        wrap-extensionless
+        (file/wrap-file "resources/public" {:index-files? false})
+        content-type/wrap-content-type
+        not-modified/wrap-not-modified)
     {:port 8080 :join? false}))
