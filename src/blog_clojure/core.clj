@@ -512,9 +512,21 @@
   "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"5\" cy=\"19\" r=\"2.5\"/><path d=\"M2.5 9.5a12 12 0 0 1 12 12h-3a9 9 0 0 0-9-9z\"/><path d=\"M2.5 2.5a19 19 0 0 1 19 19h-3a16 16 0 0 0-16-16z\"/></svg>")
 
 
+(def external-link
+  (re-pattern (str "<a (?![^>]*\\btarget=)([^>]*\\bhref=\"https?://(?!"
+                   (java.util.regex.Pattern/quote (str/replace site-url #"^https?://" ""))
+                   "[/\"])[^\"]*\"[^>]*)>")))
+
+
+(defn open-external-links-in-new-tab
+  [html]
+  (str/replace html external-link "<a $1 target=\"_blank\" rel=\"noopener noreferrer\">"))
+
+
 (defn render-page
   [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown? post? datetime alternates] :as page}]
-  (hiccup.page/html5 {:lang (or lang "ja")}
+  (open-external-links-in-new-tab
+   (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
                       [:meta {:http-equiv "Content-Type" :content "text/html; charset=utf-8"}]
                       [:meta {:name "viewport" :content "width=device-width,initial-scale=1"}]
@@ -584,7 +596,7 @@
                       [:main (hiccup/raw body)]
                       [:footer
                        [:a {:href "/"} blog-name]
-                       [:span "© conao3"]]]))
+                       [:span "© conao3"]]])))
 
 
 (def x-logo
