@@ -43,7 +43,7 @@ while :; do cat PROMPT.md | claude-code ; done
 
 # 人が話す場所と仕事を積む場所
 
-OpenAIは2026-04-27に出した[Symphonyの記事](https://openai.com/index/open-source-codex-orchestration-symphony/)で、エージェントは速いのに人の注意が足りなくなったと振り返っています。
+OpenAIは2026-04-27に出した[Symphonyの記事](https://openai.com/index/open-source-codex-orchestration-symphony/)で、エージェントは速いのに人の注意が足りなくなったと書いています。
 この問題に答えた道具を、私は人がどこで話すかを決めたものと、仕事をどこに積むかを決めたものの2つに分けて考えています。
 
 人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[OpenClaw](https://github.com/openclaw/openclaw)です。

@@ -22322,7 +22322,7 @@ while :; do cat PROMPT.md | claude-code ; done
 速くなった実感と測った結果が食い違ったことは、あとで出てくる数字を読むときの前提になります。
 
 ** 人が話す場所と仕事を積む場所
-OpenAIは2026-04-27に出した[[https://openai.com/index/open-source-codex-orchestration-symphony/][Symphonyの記事]]で、エージェントは速いのに人の注意が足りなくなったと振り返っています。
+OpenAIは2026-04-27に出した[[https://openai.com/index/open-source-codex-orchestration-symphony/][Symphonyの記事]]で、エージェントは速いのに人の注意が足りなくなったと書いています。
 この問題に答えた道具を、私は人がどこで話すかを決めたものと、仕事をどこに積むかを決めたものの2つに分けて考えています。
 
 人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[[https://github.com/openclaw/openclaw][OpenClaw]]です。
