@@ -22289,7 +22289,6 @@ Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanpr
 :export_file_name: generated/contents/blog/2026/bab1ba
 :export_date: 2026-11-21 14:20
 :export_tags: ai-agent history vercel-board
-:export_draft: t
 :end:
 
 コーディングエージェントを何体も並べて、人がほとんど見ないままPRがマージされていく開発を「ソフトウェア工場」と呼ぶ人が増えました。
