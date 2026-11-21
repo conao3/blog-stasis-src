@@ -43,7 +43,7 @@ while :; do cat PROMPT.md | claude-code ; done
 
 # 人が話す場所と仕事を積む場所
 
-OpenAIはのちにSymphonyの記事で、エージェントは速いのに人の注意が足りなくなったと書いています。
+OpenAIは2026-04-27に出した[Symphonyの記事](https://openai.com/index/open-source-codex-orchestration-symphony/)で、エージェントは速いのに人の注意が足りなくなったと振り返っています。
 この問題に答えた道具を、私は人がどこで話すかを決めたものと、仕事をどこに積むかを決めたものの2つに分けて考えています。
 
 人がどこで話すかを決めた道具として挙げたいのが、2025年11月にリポジトリが作られた[OpenClaw](https://github.com/openclaw/openclaw)です。
@@ -56,7 +56,7 @@ OpenClawではGatewayという常駐のプロセスがセッションと道具�
 冒頭のポストの「窓口」と同じ形がここにあります。
 
 仕事をどこに積むかを決めた道具が、2026年3月にリポジトリが公開されたOpenAIの[Symphony](https://github.com/openai/symphony)です。
-4月の[記事](https://openai.com/index/open-source-codex-orchestration-symphony/)によると、技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
+先ほどの記事によると、技術者は1人で3から5のセッションまでなら無理なく見られたのですが、それを超えると切り替えの負担で生産性が落ちたそうです。
 
 > For every open task, guarantee that an agent is running in its own workspace.
 
