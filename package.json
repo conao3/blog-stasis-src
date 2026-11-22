@@ -9,10 +9,10 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "elkjs": "^0.10.0",
-    "wrangler": "^4.162.0"
+    "elkjs": "^0.12.1",
+    "wrangler": "^4.166.0"
   },
-  "packageManager": "npm@12.2.2",
+  "packageManager": "npm@12.2.3",
   "overrides": {
     "undici": "^8.12.3",
     "fflate": "^0.7.5"
