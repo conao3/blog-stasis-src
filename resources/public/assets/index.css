@@ -267,6 +267,32 @@ article > header .post-meta {
     padding: 0;
 }
 
+.content .site-list {
+    list-style: none;
+    padding: 0;
+}
+
+.content .site-list > li {
+    border-top: var(--border-width-100) solid var(--gray-300);
+    margin: 0;
+    padding: var(--spacing-300) 0;
+}
+
+.site-list .site-host {
+    color: var(--gray-600);
+    display: block;
+    font-size: var(--body-size-s);
+    overflow-wrap: anywhere;
+}
+
+.content .site-list p {
+    margin: var(--spacing-100) 0 0;
+}
+
+.content .site-list .site-source {
+    font-size: var(--body-size-s);
+}
+
 .post-tags {
     margin: var(--spacing-200) 0 0;
 }

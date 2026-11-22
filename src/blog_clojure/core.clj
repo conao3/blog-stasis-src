@@ -3,6 +3,7 @@
     [clojure.data.json :as json]
     [clojure.java.io :as io]
     [blog-clojure.portfolio :as portfolio]
+    [blog-clojure.sites :as sites]
     [clojure.string :as str]
     [hiccup.page :as hiccup.page]
     [hiccup2.core :as hiccup]
@@ -341,6 +342,7 @@
        "conao3 (Naoya Yamashita) の技術ブログです。Emacs Lisp、Lean 4、Clojure、Rust、Python、TypeScript などで作ったものと調べたことを日本語で書いています。\n\n"
        "- Portfolio (English): " site-url (portfolio/urls :en) "\n"
        "- ポートフォリオ: " site-url (portfolio/urls :ja) "\n"
+       "- サイト: " site-url sites/url "\n"
        "- GitHub: https://github.com/conao3\n"
        "- X: https://x.com/conao_3\n"
        "- Sitemap: " site-url "/sitemap.xml\n\n"
@@ -362,7 +364,8 @@
        "- 全ページの一覧は " site-url "/sitemap.xml にある。\n\n"
        "## Pages\n\n"
        "- [Portfolio (English)](" site-url (portfolio/urls :en) ")\n"
-       "- [ポートフォリオ](" site-url (portfolio/urls :ja) ")\n\n"
+       "- [ポートフォリオ](" site-url (portfolio/urls :ja) ")\n"
+       "- [サイト](" site-url sites/url ")\n\n"
        "## Blogs\n\n"
        (post-list-markdown posts) "\n"))
 
@@ -591,6 +594,7 @@
                         [:a {:class "feed-link" :href "/feed/" :aria-label "Feed"}
                          (hiccup/raw feed-icon)
                          [:span {:class "feed-label"} "Feed"]]
+                        [:a {:href sites/url} "Sites"]
                         (when portfolio-href
                           [:a {:href portfolio-href} "Portfolio"])]]
                       (when draft?
@@ -741,7 +745,8 @@
                      (update "/index.html" assoc
                              :description site-description
                              :date (:date (second (first posts))))
-                     (assoc "/feed/index.html" (feed-page feed-xml (:date (second (first posts)))))
+                     (assoc "/feed/index.html" (feed-page feed-xml (:date (second (first posts))))
+                            sites/path (sites/page))
                      (update-vals #(cond-> % (:portfolio? %) (assoc :alternates portfolio-alternates))))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
