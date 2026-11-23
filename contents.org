@@ -22669,7 +22669,7 @@ $ composer require conao3/leanfran
 パッケージは64ビットのPHP 8.4以上と、GMPとTokenizerの拡張で動きます。
 生成と証明の検査には、Lean 4.35.0の =lean= と =lake= も =PATH= に要ります。
 
-=composer.json= の =autoload.psr-4= では =App\\= を =src/= に割り当てておき、 =src/Pricing.php= に次のクラスを書きます。
+=composer.json= の =autoload.psr-4= では名前空間の =App= を =src/= に割り当てておき、 =src/Pricing.php= に次のクラスを書きます。
 
 #+begin_src php
 <?php

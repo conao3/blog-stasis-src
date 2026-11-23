@@ -42,7 +42,7 @@ $ composer require conao3/leanfran
 パッケージは64ビットのPHP 8.4以上と、GMPとTokenizerの拡張で動きます。
 生成と証明の検査には、Lean 4.35.0の `lean` と `lake` も `PATH` に要ります。
 
-`composer.json` の `autoload.psr-4` では `App\\` を `src/` に割り当てておき、 `src/Pricing.php` に次のクラスを書きます。
+`composer.json` の `autoload.psr-4` では名前空間の `App` を `src/` に割り当てておき、 `src/Pricing.php` に次のクラスを書きます。
 
 ```php
 <?php
@@ -191,7 +191,7 @@ Range.ok: lo ≤ hi
 JSON Schemaでは2つのフィールドにまたがる `lo ≤ hi` を表せないので、schemaに出るのは `Nat` の下限だけです。
 この条件はコンストラクタが検査していて、配列から値を作るときや、[Valinor](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#valinor)のマッパーに生成したクラスを渡したときにも同じ検査が働きます。
 
-PHPで書いた `readonly` のクラスをLeanのstructureとして取り込むこともでき、PHPDocの `int<0, 100>` のような範囲は証明のフィールドになります。
+`#[Lean(...)]` の `models` にPHPで書いた `readonly` のクラスを渡すとLeanのstructureとして取り込めて、そのクラスのPHPDocに書いた `int<0, 100>` のような範囲は証明のフィールドになります。
 
 
 # PHPの関数をLeanで証明する
@@ -298,10 +298,10 @@ $ php verify.php
 ok
 ```
 
-`Verify::checkClass` は、0や整数の上限などの境界の値とシードを固定した乱数で200件の入力を作ります。
-そのうち `requires` を満たす入力について、PHPの `clamp` の戻り値を生成した `clampSpec` の値と比べます。
+`Verify::checkClass` は、0や整数の上限などの境界の値とシードを固定した乱数で入力を作り、 `requires` を満たす入力を200件集めます。
+その入力ごとに、PHPの `clamp` の戻り値を生成した `clampSpec` の値と比べます。
 
-実装の2つめの `if` を、 `$x >` $hi= のときに `$hi - 1` を返すように書き換えてみます。
+実装の2つめの `if` を、 `$x` が `$hi` 以上のときに `$hi - 1` を返すように書き換えてみます。
 
 ```php
 if ($x >= $hi) {
@@ -333,7 +333,7 @@ Leanの定理が保証するのは、Leanで書いた関数と、PHPから訳し
 生成したPHPや元のPHPの実行にもその性質が成り立つには、変換器とランタイムとPHPの演算のモデルが正しい必要があるので、この部分はテストで確かめています。
 
 PHPの整数の演算は64ビットの範囲で検査していて、あふれてfloatになる計算はモデルの上でも失敗になります。
-PHPDocの `int<0, 100>` のような範囲は証明の前提にならないので、証明に使う条件は `requires` に書きます。
+`#[Model(...)]` を付けた関数では、引数のPHPDocに書いた `int<0, 100>` のような範囲は証明の前提にならないので、証明に使う条件は `requires` に書きます。
 
 訳せるのはPHPの一部で、 `foreach` や `match` 、リストの添字、 `readonly` のクラスと `enum` は扱えますが、参照渡し、 `??` 、入出力を含む関数は対象外です。
 対応する構文の一覧は[PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#php-subset)にあります。
@@ -346,7 +346,7 @@ Float32の超越関数などの65件は、浮動小数点数の最小の刻み1�
 
 # おわりに
 
-[PHPのサンプル](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples)には、この記事の例のほかに、価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
+この記事の例のほかにも、[PHPのサンプル](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples)には価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
 Leanの `IO` の関数をPHPのコマンドとして動かすgreet-cliもあります。
 
 導入の手順は[PHPのREADME](https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md)、型の対応やCLIの詳細は[PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md)にあります。
