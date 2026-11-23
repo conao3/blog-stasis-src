@@ -41,6 +41,11 @@ function withHeaders(response, headers) {
   return result;
 }
 
+function permanentRedirect(response) {
+  if (response.status !== 307) return response;
+  return new Response(null, { status: 301, headers: response.headers });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -57,7 +62,7 @@ export default {
           Link: `<${url.href}>; rel="canonical"; type="text/html", ${sitemapLink}`,
         });
       }
-      const html = await env.ASSETS.fetch(request);
+      const html = permanentRedirect(await env.ASSETS.fetch(request));
       if (html.status === 404) {
         const notFound = await env.ASSETS.fetch(new Request(new URL("/404.md", url), request));
         return new Response(request.method === "HEAD" ? null : notFound.body, {
@@ -68,7 +73,7 @@ export default {
       return withHeaders(html, { Vary: "Accept", Link: `${sitemapLink}, ${llmsLink}` });
     }
 
-    const asset = await env.ASSETS.fetch(request);
+    const asset = permanentRedirect(await env.ASSETS.fetch(request));
     const response =
       asset.status === 200 && /^\/(img|og|assets)\//.test(url.pathname)
         ? withHeaders(asset, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=604800" })
