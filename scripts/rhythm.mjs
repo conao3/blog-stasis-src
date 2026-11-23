@@ -45,7 +45,10 @@ const plain = sentences.join("").replace(/\[\[[^\]]*\]\[([^\]]*)\]\]/g, "$1").re
 const commaRate = (commas / plain.length) * 100;
 const clefts = sentences.filter((s) => /のは、.*(です|でした|だけ)/.test(s));
 
-const avoidedWords = [["知らせ", "通知"]];
+const avoidedWords = [
+  ["知らせ", "通知"],
+  ["人待ち", "確認待ち"],
+];
 const proseAndHeadings = article
   .split("\n")
   .slice(1)

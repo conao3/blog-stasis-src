@@ -43,7 +43,7 @@
 <path class="a" d="M170,390 L300,390 L300,254"/>
 <text class="s" x="235" y="382" text-anchor="middle">タスクを積む</text>
 <path class="a" d="M560,250 L560,420 L174,420"/>
-<text class="s" x="367" y="440" text-anchor="middle">完了・人待ち・失敗を知らせる</text>
+<text class="s" x="367" y="440" text-anchor="middle">完了・確認待ち・失敗を通知する</text>
 <rect class="frame" x="740" y="30" width="240" height="410" rx="8"/>
 <text class="s" x="860" y="52" text-anchor="middle">ワーカーのスレッド</text>
 <rect class="box" x="760" y="65" width="200" height="70" rx="6"/>
