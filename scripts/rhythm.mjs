@@ -49,6 +49,8 @@ const avoidedWords = [
   ["知らせ", "通知"],
   ["人待ち", "確認待ち"],
   ["能力の段階", "ラベルの値をそのまま"],
+  ["エージェントを起こ", "起動"],
+  ["ワーカーを起こ", "起動"],
 ];
 const proseAndHeadings = article
   .split("\n")

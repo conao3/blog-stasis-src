@@ -120,9 +120,9 @@ SymphonyはLinearのissueを監視し、開いているタスクごとに作業�
 この記事を書いている時点でGitHubのstarは39万を超えていて、Claude Codeのリポジトリの2倍以上あります。
 
 OpenClawではGatewayという常駐プロセスがチャットとセッションと道具をつなぎます。
-決まった時刻になると[スケジューラ](https://docs.openclaw.ai/automation/cron-jobs)がエージェントを起こし、[sub-agent](https://docs.openclaw.ai/tools/subagents)は裏で動いて結果を頼んだ側に返します。
+決まった時刻になると[スケジューラ](https://docs.openclaw.ai/automation/cron-jobs)がエージェントを起動し、[sub-agent](https://docs.openclaw.ai/tools/subagents)は裏で動いて結果を頼んだ側に返します。
 
-裏でエージェントを起こして仕事を進めても、人が話す相手は冒頭のポストの「窓口」と同じく1体です。
+裏でエージェントを起動して仕事を進めても、人が話す相手は冒頭のポストの「窓口」と同じく1体です。
 
 
 ## 2つを1つにまとめる
@@ -252,7 +252,7 @@ Symphonyがタスクごとに用意する作業場や冒頭のポストの図に
 私は指揮役のエージェントのスレッド1本だけに話しかけます。
 指揮役はワーカーが1ターンで終えられる単位に仕事を分けてBoardにタスクを登録します。
 
-デスクトップの管理サーバーは着手できる状態のタスクを取り出して、ラベルで指定されたPCでワーカーのエージェントを起こします。
+デスクトップの管理サーバーは着手できる状態のタスクを取り出して、ラベルで指定されたPCでワーカーのエージェントを起動します。
 1台のPCが同時に受け持つタスクは5件までで、ワーカーのターンが終わると管理サーバーは結果をタスクの状態に反映して指揮役に通知します。
 
 設定とコードは[agent-board.nix](https://github.com/conao3/nixos-configuration/blob/master/home-manager/features/agent-board.nix)と[agent-board-server.py](https://github.com/conao3/nixos-configuration/blob/master/pkgs/agent-board-server.py)に置いてあります。

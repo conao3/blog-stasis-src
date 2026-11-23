@@ -64,7 +64,7 @@
 <path class="a" d="M705,190 L756,190"/>
 <path class="a" d="M705,280 L756,280"/>
 <path class="a" d="M705,370 L756,370"/>
-<text class="s" x="688" y="84" text-anchor="middle">CLIで起こす</text>
+<text class="s" x="688" y="84" text-anchor="middle">CLIで起動する</text>
 <path class="ag" d="M860,440 L860,470 L620,470 L620,254"/>
 <text class="s" x="740" y="492" text-anchor="middle">ターンの終わりの最後の行 DONE・BLOCKED:・FAILED:</text>
 </svg>
