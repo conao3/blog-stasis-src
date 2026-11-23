@@ -45,6 +45,14 @@ const plain = sentences.join("").replace(/\[\[[^\]]*\]\[([^\]]*)\]\]/g, "$1").re
 const commaRate = (commas / plain.length) * 100;
 const clefts = sentences.filter((s) => /のは、.*(です|でした|だけ)/.test(s));
 
+const avoidedWords = [["知らせ", "通知"]];
+const proseAndHeadings = article
+  .split("\n")
+  .slice(1)
+  .filter((line) => !/^(:|#\+)/.test(line))
+  .join("\n");
+const avoided = avoidedWords.filter(([word]) => proseAndHeadings.includes(word));
+
 const failures = [];
 if (perParagraph > 2.0) failures.push(`sentences per paragraph ${perParagraph.toFixed(1)} > 2.0`);
 if (cv < 0.45) failures.push(`sentence length sd/mean ${cv.toFixed(2)} < 0.45`);
@@ -57,6 +65,7 @@ console.log(
     `${commaRate.toFixed(2)} 読点 per 100 characters, ${clefts.length} 〜のは、〜です`,
 );
 for (const s of clefts) console.log(`  のは: ${s}`);
+for (const [word, instead] of avoided) failures.push(`uses ${word}; write ${instead}`);
 if (failures.length) {
   for (const f of failures) console.log(`FAIL: ${f}`);
   process.exit(1);
