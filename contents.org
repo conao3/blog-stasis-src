@@ -22502,7 +22502,6 @@ Symphonyがタスクごとに用意する作業場や冒頭のポストの図に
 :export_file_name: generated/contents/blog/2026/a80aa6
 :export_date: 2026-11-22 20:58
 :export_tags: ai-agent vercel-board t3-code nix
-:export_draft: t
 :end:
 
 ソフトウェア工場の事例を [[https://s.conao3.com/blog/2026/bab1ba][前の記事]] で調べたので、手元でもVercel Boardを使って工場を組んでみました。
