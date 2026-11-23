@@ -48,6 +48,7 @@ const clefts = sentences.filter((s) => /のは、.*(です|でした|だけ)/.te
 const avoidedWords = [
   ["知らせ", "通知"],
   ["人待ち", "確認待ち"],
+  ["能力の段階", "ラベルの値をそのまま"],
 ];
 const proseAndHeadings = article
   .split("\n")
