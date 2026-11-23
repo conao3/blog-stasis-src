@@ -22600,7 +22600,8 @@ heliosのT3 Codeで「redかblueか」を聞いて人待ちになったタスク
 [factory] Board task #435, which you created, is now completed. https://<Boardのホスト>/?thread=435
 #+end_example
 
-指揮役のスレッドはこのメッセージで次のターンを始めて、結果を確かめてから次のタスクを積むか、人待ちの質問に自分で答えるか私に聞くかを決めます。
+メッセージは、指揮役が作業中ならそのターンの途中に差し込まれ (steer)、止まっていれば新しいターンを始めます。
+指揮役はこれを受けて結果を確かめてから、次のタスクを積むか、人待ちの質問に自分で答えるか私に聞くかを決めます。
 私が見るのは、指揮役が確かめたあとの報告と、指揮役では決められない質問だけになります。
 
 ノートPCは移動中に眠るので、届かなかった知らせと返信は管理サーバーが1分ごとに送り直します。
@@ -22815,7 +22816,7 @@ Range.ok: lo ≤ hi
 JSON Schemaでは2つのフィールドにまたがる =lo ≤ hi= を表せないので、schemaに出るのは =Nat= の下限だけです。
 この条件はコンストラクタが検査していて、配列から値を作るときや、[[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#valinor][Valinor]]のマッパーに生成したクラスを渡したときにも同じ検査が働きます。
 
-PHPで書いた =readonly= のクラスをLeanのstructureとして取り込むこともでき、PHPDocの =int<0, 100>= のような範囲は証明のフィールドになります。
+=#[Lean(...)]= の =models= にPHPで書いた =readonly= のクラスを渡すとLeanのstructureとして取り込めて、そのクラスのPHPDocに書いた =int<0, 100>= のような範囲は証明のフィールドになります。
 
 ** PHPの関数をLeanで証明する
 逆向きの例として、値を範囲に収める =clamp= をPHPで書き、 =#[Model(...)]= でLeanの仕様と結びつけます。
@@ -22920,10 +22921,10 @@ $ php verify.php
 ok
 #+end_src
 
-=Verify::checkClass= は、0や整数の上限などの境界の値とシードを固定した乱数で200件の入力を作ります。
-そのうち =requires= を満たす入力について、PHPの =clamp= の戻り値を生成した =clampSpec= の値と比べます。
+=Verify::checkClass= は、0や整数の上限などの境界の値とシードを固定した乱数で入力を作り、 =requires= を満たす入力を200件集めます。
+その入力ごとに、PHPの =clamp= の戻り値を生成した =clampSpec= の値と比べます。
 
-実装の2つめの =if= を、 =$x >= $hi= のときに =$hi - 1= を返すように書き換えてみます。
+実装の2つめの =if= を、 =$x= が =$hi= 以上のときに =$hi - 1= を返すように書き換えてみます。
 
 #+begin_src php
         if ($x >= $hi) {
@@ -22953,7 +22954,7 @@ Leanの定理が保証するのは、Leanで書いた関数と、PHPから訳し
 生成したPHPや元のPHPの実行にもその性質が成り立つには、変換器とランタイムとPHPの演算のモデルが正しい必要があるので、この部分はテストで確かめています。
 
 PHPの整数の演算は64ビットの範囲で検査していて、あふれてfloatになる計算はモデルの上でも失敗になります。
-PHPDocの =int<0, 100>= のような範囲は証明の前提にならないので、証明に使う条件は =requires= に書きます。
+=#[Model(...)]= を付けた関数では、引数のPHPDocに書いた =int<0, 100>= のような範囲は証明の前提にならないので、証明に使う条件は =requires= に書きます。
 
 訳せるのはPHPの一部で、 =foreach= や =match= 、リストの添字、 =readonly= のクラスと =enum= は扱えますが、参照渡し、 =??= 、入出力を含む関数は対象外です。
 対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#php-subset][PHPのガイド]]にあります。
@@ -22964,7 +22965,7 @@ PHPDocの =int<0, 100>= のような範囲は証明の前提にならないの�
 Float32の超越関数などの65件は、浮動小数点数の最小の刻み1つ分の差に収まっています。
 
 ** おわりに
-[[https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples][PHPのサンプル]]には、この記事の例のほかに、価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
+この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples][PHPのサンプル]]には価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
 Leanの =IO= の関数をPHPのコマンドとして動かすgreet-cliもあります。
 
 導入の手順は[[https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md][PHPのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md][PHPのガイド]]にあります。
