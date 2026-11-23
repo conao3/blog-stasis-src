@@ -22660,7 +22660,6 @@ crates.ioへの公開のように取り消せない操作ではワーカーが�
 :properties:
 :export_file_name: generated/contents/blog/2026/ec8faf
 :export_date: 2026-11-23 01:00
-:export_draft: t
 :export_tags: lean php formal-verification code-generation release lean-leanfran
 :end:
 Lean 4で書いて証明した関数をPHPのクラスから呼べるようにするleanfranのPHP版を作りました。
