@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="556" viewBox="0 0 1000 505" font-family="Noto Sans JP, sans-serif">
+<style>
+.t{fill:#1f2328;font-size:14px;font-weight:600}
+.s{fill:#59636e;font-size:12px}
+.box{fill:#ddf4ff;stroke:#0969da;stroke-width:1.5}
+.ext{fill:#fff;stroke:#818b98;stroke-width:1.5}
+.chk{fill:#dafbe1;stroke:#1a7f37;stroke-width:1.5}
+.frame{fill:none;stroke:#0969da;stroke-width:1.5;stroke-dasharray:6 4}
+.a{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.ag{stroke:#1a7f37;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ahg)}
+.ao{stroke:#818b98;stroke-width:1.5;fill:none;marker-end:url(#aho)}
+.ln{stroke:#0969da;stroke-width:1.5;fill:none}
+.mh{fill:#0969da}.mho{fill:#818b98}.mhg{fill:#1a7f37}
+</style>
+<defs>
+<marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path class="mh" d="M0,0 L9,4.5 L0,9 z"/></marker>
+<marker id="aho" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path class="mho" d="M0,0 L9,4.5 L0,9 z"/></marker>
+<marker id="ahg" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path class="mhg" d="M0,0 L9,4.5 L0,9 z"/></marker>
+</defs>
+<rect x="0" y="0" width="1000" height="505" rx="14" fill="#fff"/>
+<rect class="ext" x="20" y="40" width="150" height="64" rx="6"/>
+<text class="t" x="95" y="67" text-anchor="middle">人</text>
+<text class="s" x="95" y="89" text-anchor="middle">話す・画面で返信する</text>
+<rect class="ext" x="20" y="370" width="150" height="64" rx="6"/>
+<text class="t" x="95" y="397" text-anchor="middle">指揮役</text>
+<text class="s" x="95" y="419" text-anchor="middle">人と話しているスレッド</text>
+<path class="ao" d="M95,104 L95,366"/>
+<text class="s" x="105" y="240">話す</text>
+<path class="ao" d="M170,72 L345,72 L345,166"/>
+<text class="s" x="257" y="64" text-anchor="middle">画面で返信</text>
+<rect class="frame" x="240" y="120" width="440" height="180" rx="8"/>
+<text class="s" x="256" y="142">helios</text>
+<rect class="box" x="260" y="170" width="170" height="80" rx="6"/>
+<text class="t" x="345" y="203" text-anchor="middle">Vercel Board</text>
+<text class="s" x="345" y="226" text-anchor="middle">タスクの列・排他・記録</text>
+<rect class="box" x="480" y="170" width="180" height="80" rx="6"/>
+<text class="t" x="570" y="203" text-anchor="middle">管理サーバー</text>
+<text class="s" x="570" y="226" text-anchor="middle">agent-board-server</text>
+<path class="a" d="M432,195 L476,195"/>
+<text class="s" x="455" y="187" text-anchor="middle">取る</text>
+<path class="a" d="M478,225 L434,225"/>
+<text class="s" x="455" y="243" text-anchor="middle">状態</text>
+<path class="a" d="M170,390 L300,390 L300,254"/>
+<text class="s" x="235" y="382" text-anchor="middle">タスクを積む</text>
+<path class="a" d="M560,250 L560,420 L174,420"/>
+<text class="s" x="367" y="440" text-anchor="middle">完了・人待ち・失敗を知らせる</text>
+<rect class="frame" x="740" y="30" width="240" height="410" rx="8"/>
+<text class="s" x="860" y="52" text-anchor="middle">ワーカーのスレッド</text>
+<rect class="box" x="760" y="65" width="200" height="70" rx="6"/>
+<text class="t" x="860" y="94" text-anchor="middle">T3 Code</text>
+<text class="s" x="860" y="116" text-anchor="middle">helios</text>
+<rect class="box" x="760" y="155" width="200" height="70" rx="6"/>
+<text class="t" x="860" y="184" text-anchor="middle">bb</text>
+<text class="s" x="860" y="206" text-anchor="middle">helios・タスクごとの worktree</text>
+<rect class="box" x="760" y="245" width="200" height="70" rx="6"/>
+<text class="t" x="860" y="274" text-anchor="middle">T3 Code</text>
+<text class="s" x="860" y="296" text-anchor="middle">eos</text>
+<rect class="box" x="760" y="335" width="200" height="70" rx="6"/>
+<text class="t" x="860" y="364" text-anchor="middle">bb</text>
+<text class="s" x="860" y="386" text-anchor="middle">eos・タスクごとの worktree</text>
+<path class="ln" d="M660,210 L705,210"/>
+<path class="ln" d="M705,100 L705,370"/>
+<path class="a" d="M705,100 L756,100"/>
+<path class="a" d="M705,190 L756,190"/>
+<path class="a" d="M705,280 L756,280"/>
+<path class="a" d="M705,370 L756,370"/>
+<text class="s" x="688" y="84" text-anchor="middle">CLIで起こす</text>
+<path class="ag" d="M860,440 L860,470 L620,470 L620,254"/>
+<text class="s" x="740" y="492" text-anchor="middle">ターンの終わりの最後の行 DONE・BLOCKED:・FAILED:</text>
+</svg>

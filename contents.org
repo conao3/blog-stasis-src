@@ -22498,6 +22498,135 @@ Brooksが難しいとした仕様と検査は、エージェントがコード�
 工場に渡す前の仕様と受け取ったあとに確かめる仕組みを私が用意できるかどうかで、結果が変わります。
 次は人待ちになったタスクを知らせる通知と、検査を先に用意してから仕事を切る進め方を試すつもりです。
 
+* Vercel Boardで2台のPCのエージェントを窓口1つから動かす工場を組んだ
+:properties:
+:export_file_name: generated/contents/blog/2026/a80aa6
+:export_date: 2026-11-22 20:58
+:export_tags: ai-agent vercel-board t3-code nix
+:export_draft: t
+:end:
+
+[[https://s.conao3.com/blog/2026/bab1ba][前の記事]]でソフトウェア工場の事例を調べたあと、手元でもVercel Boardを軸に工場を組んでみました。
+私が話しかけるのは1本のスレッドだけで、そのエージェントがBoardに積んだタスクを常時動かしているデスクトップとノートPCの2台のエージェントが1件ずつ片付けます。
+
+自分で書いたのはタスクを取ってエージェントを起こす約500行のPythonの管理サーバーだけで、タスクの列と着手の排他と記録はBoardに任せました。
+管理サーバーの仕事の中心は、エージェントのターンが終わったときに最後のメッセージの最後の1行を読んでタスクを完了・人待ち・失敗のどれかにすることです。
+
+設定とコードは[[https://github.com/conao3/nixos-configuration][nixos-configuration]]に置いてあり、この記事は =@vercel/board= 0.54.0とT3 Code 0.1.9とbb 0.49.0で動かした結果です。
+
+** 全体の形
+[[https://github.com/vercel/board][Vercel Board]]はエージェントと人が共有する掲示板で、スレッドを期限付きで1体だけに貸し出せるタスクにできます。
+私はこれを常時動かしているデスクトップのhelios で =vb serve= として動かし、ノートPCのeosからはTailscaleのネットワーク越しに同じBoardを読み書きしています。
+
+[[./resources/public/img/a80aa6-factory.svg]]
+
+私が話すのは図の左下の指揮役のスレッドで、指揮役は仕事をエージェントの1ターンで終わる大きさに分けてBoardに積みます。
+heliosの管理サーバーが着手できるタスクを取ってワーカーのスレッドを立て、ワーカーのターンが終わると結果をタスクの状態に戻して積んだ指揮役に知らせます。
+
+ワーカーが動くのは[[https://github.com/pingdotgg/t3code][T3 Code]]と[[https://github.com/get-bb/bb][bb]]の2種類です。
+どちらもClaude CodeやCodexのようなエージェントをGUIから動かす道具で、CLIからもスレッドを立てたり続きを送ったりできます。
+
+** タスクを積む
+タスクは仕事の対象のリポジトリごとに =work/<リポジトリ>= のチャンネルに積み、ラベルでどこで何に動かすかを指定します。
+
+#+begin_src bash
+vb tasks create work/rust-sellaite "<依頼>" \
+  --label host=helios --label model=opus \
+  --label notify=t3@eos:<指揮役のスレッドのID>
+#+end_src
+
+=host= は動かすPCで、 =model= はモデルの能力の段階 (opus・sonnet・haiku) です。
+どのPCでも同じサブスクリプションを使えます。
+管理サーバーが段階に合うproviderとモデルを選んで =effort= のラベルがあれば推論の強さも指定します。
+
+=notify= は結果を知らせるスレッドで、指揮役は自分のスレッドのIDをここに書いておきます。
+順番があるタスクは =--needs= でつなぐと、前のタスクが完了するまで着手できない状態で待ちます。
+
+依頼文にはワーカーがそれだけで着手できるように、目的と対象のファイルと完了の条件、読む資料とpushしてよいブランチを書きます。
+ワーカーは会話の経緯を知らない新しいスレッドなので、ここが足りないと作業の質がそのまま落ちます。
+
+** ワーカーを起こす
+管理サーバーはPCとエージェントの種類の4つの組 (heliosとeosのそれぞれのT3 Codeとbb) にループを1本ずつ持ち、それぞれが =vb tasks claim --ready= でラベルの合う着手可のタスクを1件ずつ取ります。
+着手は期限付きなので、管理サーバーは作業中のタスクの期限を5分ごとに延ばしています。
+
+どちらのエージェントで動かすかは管理サーバーが決めて、タスクに =harness= のラベルとして書きます。
+bbのワーカーはタスクごとにリポジトリの新しいgit worktreeで動くので、同じリポジトリのタスクを並べても作業場が重なりません。
+
+ほかのPCのエージェントも、heliosからそれぞれのCLIで動かします。
+bbはheliosのbbのサーバーにeosをmachineとしてつないであるので、 =bb thread spawn --machine conao-nixos-eos= でeosにスレッドを立てられます。
+
+T3 CodeはGUIからつないだ別のPCにスレッドを立てられるので、CLIの =t3 thread= にも同じ指定の =--environment= を[[https://github.com/conao3/nixos-configuration/blob/bb949af/pkgs/t3code-thread-cli-environment.patch][パッチ]]で足しました。
+heliosから =t3 thread start --environment <eosのID>= を実行すると、eosのT3 Codeにスレッドが立ちます。
+
+** ターンの終わりで状態を決める
+ワーカーへの依頼文は管理サーバーが持っていて、最後は次の指示で終わります。
+
+#+begin_example
+End your turn with a final message whose last line is one of these:
+DONE
+BLOCKED: <the question for the owner and the options, with the one you recommend>
+FAILED: <what you tried and why you could not go on>
+#+end_example
+
+管理サーバーはワーカーのターンが終わるのを待ち、最後のメッセージを[[https://github.com/conao3/nixos-configuration/blob/bb949af/pkgs/agent-board-server.py#L384-L390][次の関数]]で読みます。
+
+#+begin_src python
+def outcome(text):
+    lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+    last = lines[-1] if lines else ""
+    for word in OUTCOMES:
+        if last.startswith(word):
+            return word.rstrip(":").lower(), last[len(word):].strip()
+    return "failed", f"The worker ended its turn without DONE, BLOCKED or FAILED. Its last line: {last[:300]}"
+#+end_src
+
+=DONE= なら完了で =BLOCKED:= なら質問を理由にした人待ち、 =FAILED:= なら失敗にして、どれでもなければ最後の行を添えて失敗にします。
+タスクは管理サーバーの名前で着手しているので状態を変えるのも管理サーバーで、ワーカーはスレッドに結果を返信するだけです。
+
+ターンの終わりを合図にしているので、CIの結果を裏で待つ形でターンを終えたワーカーはその時点で失敗になります。
+依頼文にはCIのような長い確認は =gh run watch <id> --exit-status= で前景で待つように書いてあります。
+
+** 返信と知らせ
+タスクのスレッドに私か指揮役が返信すると、管理サーバーが =vb tail work/ --json= で読んで担当したワーカーのスレッドに続きを渡します。
+人待ちのタスクは人待ちを解き、失敗したタスクは着手可に戻して同じスレッドに取り直させます。
+
+heliosのT3 Codeで「redかblueか」を聞いて人待ちになったタスクに「blue」と返信したところ、17秒で同じスレッドが =BLUE= と返信してタスクを完了にしました。
+完了したタスクに返信したときも、同じスレッドのエージェントが返信に答えます。
+
+タスクが完了・人待ち・失敗になると、管理サーバーは =notify= のスレッドに次のメッセージを送ります。
+
+#+begin_example
+[factory] Board task #435, which you created, is now completed. https://<Boardのホスト>/?thread=435
+#+end_example
+
+指揮役のスレッドはこのメッセージで次のターンを始めて、結果を確かめてから次のタスクを積むか、人待ちの質問に自分で答えるか私に聞くかを決めます。
+私が見るのは、指揮役が確かめたあとの報告と、指揮役では決められない質問だけになります。
+
+ノートPCは移動中に眠るので、届かなかった知らせと返信は管理サーバーが1分ごとに送り直します。
+眠っているPCの組はタスクを取らず、起きてからまとめて取ります。
+
+** 再起動しても続く
+管理サーバーは組ごとに、着手しているタスクとスレッドをファイルに書いています。
+NixOSの設定を切り替えて管理サーバーが再起動しても、起動すると同じスレッドのターンの終わりを待ち直すので作業中のワーカーは止まりません。
+
+ワーカーのスレッドはT3 Codeとbbのプロセスで動いているので、管理サーバーが止まっているあいだもワーカーの作業は進みます。
+作業中のタスクがあっても、設定を変えたいときにいつでも =make switch= できます。
+
+** 使ってみて
+この記事を書いた時点で2日弱のあいだに78件のタスクを積み、67件が完了しました。
+
+まとまった例は、自分のEmacsのパッケージ20個を[[https://github.com/conao3/ts-elispore][ts-elispore]]の検査に通す仕事です。
+指揮役が76秒のあいだにパッケージごとの20件を積み、4つの組が並んで取って最初のタスクを積んでから54分ですべて完了しました。
+
+1件ずつの作業時間を足すと105分あったので、4つの組で半分ほどの時間に縮んでいます。
+最も長い1件は36分かかり、その組が後ろの2件を取るのが遅れたので、最後に終わったのもその組でした。
+
+[[https://github.com/conao3/rust-sellaite][rust-sellaite]]の作業では、ワーカーがNixの入力を上げてpushしたあと、2台のPCで設定を切り替えてほしいと人待ちにしました。
+切り替えてから返信すると、同じスレッドが続きの確認を進めてタスクを完了にしました。
+
+使ってみて、仕事の分け方と結果の確かめ方が工場の出来を決めると感じています。
+crates.ioへの公開のような取り消せない操作は、ワーカーが人待ちで止まって承認を待つので私の手元に残る判断はそこに集まります。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
