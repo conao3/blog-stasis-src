@@ -23469,8 +23469,8 @@ I checked that each model means the same thing as the Java code by comparing it 
 Lean 4で書いて証明した関数をGoのパッケージから呼べるようにするleanfranのGo版を作りました。
 Leanのstructureと帰納型は値を作るときにLeanの条件で検査するGoの型になりますし、逆向きにGoで書いた関数をLeanに訳してその性質をLeanで証明することもできます。
 
-リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
-Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.10.0][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.10.0で動かした結果をもとに書いています。
+リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.11.0/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
+Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.11.0][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.11.0で動かした結果をもとに書いています。
 
 leanfranはLeanのコンパイラの中間表現をGoのソースに変換するもので、生成したGoはこのmoduleとGoの標準ライブラリだけで動き、実行するときにLeanもcgoも要りません。
 
@@ -23495,10 +23495,10 @@ Leanのコードを変換するCLIの =leanfran-go= はnixで入れます。
 アプリケーションのmoduleにはGoのパッケージと =go tool= で呼ぶコマンドを入れます。
 
 #+begin_src console
-$ nix profile install github:conao3/lean-leanfran/v0.10.0#go
+$ nix profile install github:conao3/lean-leanfran/v0.11.0#go
 $ go mod init example.com/shop
-$ go get github.com/conao3/leanfran-go@v0.10.0
-$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.10.0
+$ go get github.com/conao3/leanfran-go@v0.11.0
+$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.11.0
 #+end_src
 
 Goは1.26以上を使い、生成と証明の検査にはLean 4.35.0の =lean= と =lake= も =PATH= に要ります。
@@ -23584,7 +23584,7 @@ pricing.go
 #+begin_src console
 $ go tool leanfran sync 2>&1 | sed "s|$PWD/||"
 leanfran: lake build: exit status 1
-✖ [4/6] Building LeanGoEmbed.B6578616d706c652e636f6d2f73686f702f70726963696e67 (518ms)
+✖ [4/6] Building LeanGoEmbed.B6578616d706c652e636f6d2f73686f702f70726963696e67 (813ms)
 pricing/pricing.go:15:3: error: (lean block example.com/shop/pricing, Lean 11:2) omega could not prove the goal:
 a possible counterexample may satisfy the constraints
   b ≥ 0
@@ -23697,45 +23697,34 @@ theorem count_record (xs : Array UInt64) (x : UInt64) :
 `)
 #+end_src
 
-=sync= は =[]uint64= を受け取る =Record= と一緒に、handleを受け取ってhandleを返す =RecordValue= も生成します。
+=sync= は =[]uint64= を受け取る =Record= と一緒に、handleを受け取ってhandleを返す =Handle.Record= も生成します。
+Goの値とhandleの変換は、 =Value.NewArrayUInt64= や =Value.ReadNat= のような =Value= のメソッドになります。
+
 次の =cmd/ledger/main.go= では最初の2件をGoのスライスからhandleにして、そのあとの2件はhandleのまま足しています。
+=record= と =count= は引数の検査もLean側の失敗も持たないので、生成される関数は =error= を返しません。
 
 #+begin_src go
 package main
 
 import (
 	"fmt"
-	"log"
 
 	"example.com/shop/ledger"
 )
 
 func main() {
-	entries, err := ledger.NewArrayUInt64Value([]uint64{1200, 800})
-	if err != nil {
-		log.Fatal(err)
-	}
+	entries := ledger.Value.NewArrayUInt64([]uint64{1200, 800})
 	defer func() { entries.Close() }()
 
 	for _, amount := range []uint64{300, 50} {
-		x, err := ledger.NewUInt64Value(amount)
-		if err != nil {
-			log.Fatal(err)
-		}
-		next, err := ledger.RecordValue(entries.Take(), x.Take())
-		if err != nil {
-			log.Fatal(err)
-		}
-		entries = next
+		x := ledger.Value.NewUInt64(amount)
+		entries = ledger.Handle.Record(entries.Take(), x.Take())
 	}
 
-	n, err := ledger.CountValue(entries.Borrow())
-	if err != nil {
-		log.Fatal(err)
-	}
+	n := ledger.Handle.Count(entries.Borrow())
 	defer n.Close()
-	fmt.Println(ledger.ReadNatValue(n))
-	fmt.Println(ledger.ReadArrayUInt64Value(entries))
+	fmt.Println(ledger.Value.ReadNat(n))
+	fmt.Println(ledger.Value.ReadArrayUInt64(entries))
 }
 #+end_src
 
@@ -23750,23 +23739,28 @@ $ go run ./cmd/ledger
 引数には =entries.Borrow()= か =entries.Take()= を渡します。
 =Borrow= は呼び出しのあとも =entries= を使い続けるとき、 =Take= は参照ごとLeanに渡すときに使います。
 
-=Take= で渡した配列はほかに参照が無いので、Leanの =Array.push= は配列をコピーせずにその場で1件足します。
-=Read...Value= がhandleの中身をGoの値に写す関数で、使い終えたhandleは =Close= で参照を手放します。
+=Take= で渡した配列にはほかに参照が無いので、Leanの =Array.push= は配列をコピーせずにその場で1件足します。
+=Value.ReadNat= と =Value.ReadArrayUInt64= がhandleの中身をGoの値に写すメソッドで、使い終えたhandleは =Close= で参照を手放します。
 
 10件と1,000件と100,000件の配列に1件足す操作を、Linuxのamd64のIntel Core i5-8400とGo 1.27.3で測りました。
-=Record= には同じスライスを毎回渡し、 =RecordValue= にはその件数から始めたhandleを =Take= で渡し続けています。
-値はCPUを1つに固定して5回測った中央値です。
+=Record= には同じスライスを毎回渡し、 =Handle.Record= にはその件数から始めたhandleを =Take= で渡し続けています。
 
-| 配列の件数 | =Record= | =RecordValue= |
+図と表の値は、CPUを1つに固定して11回測った時間の中央値から求めた1秒あたりの回数で、大きいほど速いことを表します。
+
+[[./resources/public/img/ad14a8-record.svg]]
+
+| 配列の件数 | =Record= (回/秒) | =Handle.Record= (回/秒) |
 |---+---+---|
-| 10 | 0.59 µs | 0.63 µs |
-| 1,000 | 35 µs | 0.63 µs |
-| 100,000 | 3,764 µs | 0.70 µs |
+| 10 | 1,620,000 | 2,880,000 |
+| 1,000 | 46,400 | 2,930,000 |
+| 100,000 | 281 | 2,680,000 |
 
-=Record= の時間は配列の件数に比例して増え、 =RecordValue= は件数によらず0.6から0.7 µsです。
+=Record= の回数は配列の件数に反比例して減りますが、 =Handle.Record= は件数によらず毎秒270万回から290万回です。
 
 handleの操作はランタイムがプロセスの中で1つずつ順に実行するので、複数のgoroutineから呼んでもLeanの処理は並列になりません。
-サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
+続けて行う操作を =leanfran.WithValues= の中で =Handle.In(scope)= と =Value.In(scope)= から呼ぶと、その間のロックの取得が1回で済みます。
+
+サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.11.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
 
 ** Goの関数をLeanで証明する
 逆向きの例として、値を範囲に収める =Clamp= をGoで書き、 =//leanfran:model= でLeanの仕様と結びつけます。
@@ -23798,7 +23792,7 @@ func Clamp(x, lo, hi int64) int64 {
 この例では =lo ≤ hi= のときに =Clamp= が =clampSpec= と同じ値を返すことと、戻り値が =lo= 以上 =hi= 以下になることが証明の義務になります。
 
 =go tool leanfran check= はGoの構文木と型を読んで関数をLeanの =do= 記法の関数に訳し、 =Clamp.obligation.refines= のような名前で義務の命題を作ります。
-証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.10.0/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
+証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.11.0/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
 
 #+begin_src lean
 import LeanGoModel.B6578616d706c652e636f6d2f73686f702f63616c63
@@ -23844,7 +23838,7 @@ Goの実装とLeanの仕様は、Leanを使わない乱数のテストでも比�
 
 #+begin_src console
 $ go test ./calc/
-ok  	example.com/shop/calc	0.005s
+ok  	example.com/shop/calc	0.024s
 #+end_src
 
 生成されるテストは、0や整数の上限などの境界の値とシードを固定した乱数で入力を作り、 =requires= を満たす入力を200件集めます。
@@ -23887,7 +23881,7 @@ Goの整数は同じ幅のLeanの整数に訳し、 =int= と =uint= は =Int64=
 ゼロ除算と範囲外の添字と =panic= は、モデルの上では失敗の値になります。
 
 訳せるのはGoの一部で、 =if= と =switch= と =for= 、スライスの添字と =append= 、structは扱えます。
-ポインタ、map、channel、goroutine、メソッド、generics、 =defer= 、入出力を含む関数は対象外で、対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.10.0/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
+ポインタ、map、channel、goroutine、メソッド、generics、 =defer= 、入出力を含む関数は対象外で、対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.11.0/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
 
 生成するGoのほうは、LeanのCバックエンドで動かした結果と比べるテストで確かめています。
 
@@ -23896,10 +23890,10 @@ Goの整数は同じ幅のLeanの整数に訳し、 =int= と =uint= は =Int64=
 差が最も大きい =Float.cos= では、浮動小数点数で表せる最小の刻みの88個分です。
 
 ** おわりに
-この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleと、2つのパッケージでGoのstructを共有するembed-modelsを置いてあります。
+この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.11.0/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleと、2つのパッケージでGoのstructを共有するembed-modelsを置いてあります。
 Leanの =IO= の関数をGoのコマンドとして動かすgreet-cliもあります。
 
-導入の手順は[[https://github.com/conao3/lean-leanfran/blob/master/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.10.0/docs/go-guide.md][Goのガイド]]にあります。
+導入の手順は[[https://github.com/conao3/lean-leanfran/blob/master/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.11.0/docs/go-guide.md][Goのガイド]]にあります。
 
 * COMMENT Local variables
 # Local Variables:
