@@ -23049,12 +23049,12 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 これを =drop= してから =reduce= すると、65505件以上で処理が終わりません。
 
 #+begin_src clojure
-(reduce + (drop 1 (vec (range 65537))))
-;; => 2147516416
 (reduce + (drop 1 (into (vector-of :long) (range 65504))))
 ;; => 2145354256
-(reduce + (drop 1 (into (vector-of :long) (range 65537))))
+(reduce + (drop 1 (into (vector-of :long) (range 65505))))
 ;; => 終わらない
+(reduce + (drop 1 (vec (range 65505))))
+;; => 2145419760
 #+end_src
 
 原因はseqの =reduce= が次の32件の塊の先頭を求める[[https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79][gvec.clj の79行目]]です。
@@ -23064,7 +23064,8 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 #+end_src
 
 =0xffe0= で下位5bitを消して32の倍数にそろえたいのですが、このマスクは16bit目より上も消してしまいます。
-65504の次の塊の先頭は65536になるはずが0に戻るので、先頭から読み直し続けます。
+65505件あると、添字65504から始まる塊ができます。
+この塊を読んだあとの次の塊の先頭は65536になるはずが0に戻るので、先頭から読み直し続けます。
 
 [[./resources/public/img/8bda7e-mask.svg]]
 
