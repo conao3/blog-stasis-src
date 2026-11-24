@@ -5,13 +5,16 @@ Tags: clojure lean formal-verification testing differential-testing
 
 
 Clojureの永続データ構造は1.0のころから多くの人に使われてきたので、不具合はもう残っていないだろうと思っていました。
-小さな関数をLean 4に写して全入力で確かめる手順をまとめた[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)を見かけたので、これをClojure本体のJavaで書かれた層に当ててみました。
+小さな関数をLean 4に写して全入力で確かめる手順が[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)にまとまっているのを見かけたので、Clojure本体のJavaで書かれた層に当ててみました。
 
-整数とビットの計算はLeanに写して反例を探し、コレクションは `java.util` のコレクションとの差分ファズにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
-その結果、ClojureのJIRAとask.clojure.orgで見つからない不具合が `vector-of` の `reduce` やHAMTのハッシュ衝突ノード、型ヒントの無い関数型インターフェースの呼び出しなどに17件ありました。
+整数とビットの計算はLeanに写して反例を探しました。
+コレクションは `java.util` のコレクションとの差分ファズにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
 
-一方でHAMTの本体には225万回の操作のファズでも、vectorの木の本体には境界の前後のファズでも食い違いが出ませんでした。
-不具合は、木の外側にある別の実装や `=` とハッシュの関係のような継ぎ目に残っていました。
+その結果、ClojureのJIRAとask.clojure.orgで見つからない不具合が17件ありました。
+`vector-of` の `reduce` やHAMTのハッシュ衝突ノード、型ヒントの無い関数型インターフェースの呼び出しなどです。
+
+一方でHAMTの本体には225万回の操作のファズでも食い違いが出ず、vectorの木の本体にも境界の前後のファズで食い違いが出ませんでした。
+不具合は木の外側にある別の実装や、 `=` とハッシュの関係のように2つの仕組みが組み合わさるところに残っていました。
 
 調べたのはClojure 1.12.6とJDK 21で、ソースは `clojure/clojure` のmasterの[92ce2a85](https://github.com/clojure/clojure/tree/92ce2a85)です。
 記事で引くコードは1.12.6と同じで、行番号はmasterのものです。
@@ -21,22 +24,28 @@ Clojureの永続データ構造は1.0のころから多くの人に使われて�
 
 # 調べ方
 
-lean-verifyの手順では確かめる関数を1つに絞ってLeanの定義に写し、幅を広げて計算した素朴な仕様と比べる性質を書いて `bv_decide` で反例を探します。
-Javaの `long` と `int` を `BitVec 64` と `BitVec 32` に写すと、足し算と掛け算の折り返しや `/` の0方向への丸め、 `%` の符号がそのまま `BitVec` の演算に対応します。
+lean-verifyの手順では確かめる関数を1つに絞ってLeanの定義に写します。
+幅を広げて計算した素朴な仕様と比べる性質を書いて、 `bv_decide` で反例を探します。
+
+Javaの `long` と `int` を `BitVec 64` と `BitVec 32` に写すと、足し算と掛け算の折り返しがそのまま `BitVec` の演算に対応します。
+`/` の0方向への丸めや `%` の符号もそのまま対応します。
 
 反例が出たら、その値をClojureの入力に直して元のコードで再現し、直したコードをLeanに写して同じ性質を証明します。
 Leanに写せるのは整数とビットの計算に切り出せる小さな関数だけなので、状態の大きい永続データ構造は差分ファズで調べました。
 
 乱数で作った操作の列を `PersistentHashMap` と `java.util.HashMap` の両方に当てて、結果を比べます。
-HAMTでは5bitごとの各段で部分的に衝突するキーとハッシュがまったく同じキーを混ぜて、1500通りの種で1500回ずつ操作しています。
+HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて1500通りの種で1500回ずつ操作しています。
 
-vectorでは木の段が変わる32と1056と32800と1048608の前後で、 `conj` と `pop` と `assoc` とtransientの操作を `ArrayList` と比べました。
-見つけた事象はClojureのJIRAをREST APIで、ask.clojure.orgをウェブ検索とサイト内検索で探して、同じ報告が見つからないことを確かめています。
+vectorでは木の段が変わる32・1056・32800・1048608の前後で操作を当てて、結果を `ArrayList` と比べました。
+当てた操作は `conj` と `pop` と `assoc` と、transientの操作です。
+
+同じ報告が既に無いかは、ClojureのJIRAとask.clojure.orgで探しました。
+JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で探して、どちらにも見つからないことを確かめています。
 
 
 # vector-ofのreduceが終わらない
 
-`vector-of` はプリミティブの値を詰めて持つvectorで、 `PersistentVector` とは別に `gvec.clj` にClojureで書かれています。
+`vector-of` はプリミティブの配列に値を持つvectorで、 `PersistentVector` とは別に `gvec.clj` にClojureで書かれています。
 これを `drop` してから `reduce` すると、65505件以上で処理が終わりません。
 
 ```clojure
@@ -48,7 +57,7 @@ vectorでは木の段が変わる32と1056と32800と1048608の前後で、 `con
 ;; => 終わらない
 ```
 
-原因は、seqの `reduce` が次の32件の塊の先頭を求める[gvec.clj の79行目](https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79)です。
+原因はseqの `reduce` が次の32件の塊の先頭を求める[gvec.clj の79行目](https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79)です。
 
 ```clojure
 (recur result (bit-and 0xffe0 (+ aidx 32)))
@@ -57,8 +66,8 @@ vectorでは木の段が変わる32と1056と32800と1048608の前後で、 `con
 `0xffe0` で下位5bitを消して32の倍数にそろえたいのですが、このマスクは16bit目より上も消してしまいます。
 冒頭の図のように65504の次の塊の先頭は65536になるはずが0に戻るので、先頭から読み直し続けます。
 
-この `0xffe0` のマスクは、 `internal-reduce` を入れた[2010年のコミット](https://github.com/clojure/clojure/commit/5b281880)からそのまま残っています。
-Leanでは、32の倍数の位置 `a` から次の塊の先頭が `a + 32` になる性質を書きました。
+この `0xffe0` のマスクは `internal-reduce` を入れた[2010年のコミット](https://github.com/clojure/clojure/commit/5b281880)からそのまま残っています。
+Leanでは32の倍数の位置 `a` から次の塊の先頭が `a + 32` になる性質を書きました。
 
 ```lean
 import Std.Tactic.BVDecide
@@ -83,16 +92,19 @@ theorem fix_ok (a : BitVec 64) (h32 : a &&& 0x1f = 0) (hlt : a < 0x7fffffe0) :
 Clojureのhash-mapはHAMTで、キーのハッシュを5bitずつ区切って木をたどります。
 32bitのハッシュがまったく同じキーどうしは木の末端の `HashCollisionNode` に並べて持ち、その中では `=` でキーを探します。
 
-キーを1つ除いた新しいノードは[HashCollisionNode.without](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/PersistentHashMap.java#L1000-L1007)が作るのですが、ノードのハッシュに自分のフィールドの `this.hash` を使うべきところで、引数の `hash` を使っています。
+キーを1つ除いた新しいノードは[HashCollisionNode.without](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/PersistentHashMap.java#L1000-L1007)が作ります。
+このときノードのハッシュには自分のフィールドの `this.hash` を使うべきところで、引数の `hash` を使っています。
 
 ```java
 return new HashCollisionNode(null, hash, count - 1, removePair(array, idx/2));
 ```
 
 引数の `hash` は `dissoc` に渡したキーのハッシュです。
-保存されているキーと `=` でもハッシュの違うキーで `dissoc` すると、ノードに違うハッシュが記録されます。
+保存されているキーと `=` になるのにハッシュが違うキーで `dissoc` すると、ノードに違うハッシュが記録されます。
 
-Clojureでは、Javaの `ArrayList` と同じ要素のvectorが `=` になるのにハッシュは違い、この食い違いは[CLJ-1372](https://clojure.atlassian.net/browse/CLJ-1372)で知られています。
+ClojureではJavaの `ArrayList` と同じ要素のvectorは `=` になるのにハッシュが違います。
+この食い違いは[CLJ-1372](https://clojure.atlassian.net/browse/CLJ-1372)で知られています。
+
 次の例の `a` と `b` は、 `ArrayList` のハッシュがどちらも1003になるように選んだキーです。
 
 ```clojure
@@ -111,11 +123,13 @@ Clojureでは、Javaの `ArrayList` と同じ要素のvectorが `=` になるの
 `m3` を表示すると `b` のキーが見えるのに、 `(get m3 b)` は `nil` を返します。
 `dissoc` のあとのノードには `[0 42]` のハッシュの1867155179が記録されるので、続く `assoc` は1003のキーと衝突しないと判断して2つを別の枝に分けます。
 
-`b` を引くときは1003の枝をたどって `a` だけを見つけるので、 `b` に届きません。
-この例では衝突ノードが木の1段目にあるので、 `dissoc` に渡すキーのハッシュは下位5bitが1003と同じである必要があり、1867155179はそうなっています。
+`b` を引くときは1003の枝をたどって `a` だけを見つけるので、 `b` は見つかりません。
+この例では衝突ノードが木の1段目にあるので、 `dissoc` に渡すキーはハッシュの下位5bitが1003と同じである必要があり、1867155179はこの条件を満たしています。
 
 hash-setの `disj` でも同じことが起きて、transientの `dissoc!` を通る経路では起きません。
-1.12.6の `PersistentHashMap.java` の該当行を `this.hash` に変えてコンパイルし、jarより先にclasspathに置いて同じ例を動かすと、 `(get m3 b)` は `:B` を返しました。
+
+1.12.6の `PersistentHashMap.java` の該当行を `this.hash` に変えてコンパイルしました。
+これをjarより先にclasspathに置いて同じ例を動かすと、 `(get m3 b)` は `:B` を返しました。
 
 
 # 型ヒントの有無でremoveIfの結果が変わる
@@ -125,8 +139,8 @@ Clojure 1.12では、Javaのメソッドが関数型インターフェースを�
 
 > In prior alphas, the FI adapter returns inserted Clojure truthy return logic when adapting a Clojure function to an FI with boolean return.
 
-コンパイラが型の分かる呼び出しに作るコードはこのとおり動くのですが、型ヒントが無くてリフレクションを通る呼び出しが使う[Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/Reflector.java#L570-L583)は、 `boolean` の返り値に `RT.booleanCast` を当てたままでした。
-そのため同じ `.removeIf` の呼び出しが、型ヒントの有無で別の結果になります。
+コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/Reflector.java#L570-L583)を使います。
+そこでは `boolean` の返り値に `RT.booleanCast` を当てたままなので、同じ `.removeIf` の呼び出しが型ヒントの有無で別の結果になります。
 
 ```clojure
 (let [l (java.util.ArrayList. [1 2 3])]
@@ -138,13 +152,16 @@ Clojure 1.12では、Javaのメソッドが関数型インターフェースを�
 ```
 
 `identity` を挟むと `l` の型が分からなくなるので、呼び出しはリフレクションを通ります。
-setを関数として渡すと要素そのものを返すので、型の分かる呼び出しは `Long` を `Boolean` にできずに例外を投げ、リフレクションの呼び出しは真として読んで要素を消します。
+
+setを関数として渡すと要素そのものを返すので、型の分かる呼び出しは `Long` を `Boolean` にできずに例外を投げます。
+リフレクションの呼び出しは返り値を真として読んで、要素を消します。
 
 
 # intのあふれとsubvecの負の添字
 
-1.12で `drop` を速くした `IDrop` の実装には、文字列とvectorのseqで今の位置と `n` をintのまま足してから長さと比べるものがあります。
-文字列のseqでは[StringSeq.drop](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/StringSeq.java#L61-L68)がそうなっています。
+1.12には `drop` を速くした `IDrop` の実装があります。
+そのうち文字列とvectorのseqの実装は、今の位置と `n` をintのまま足してから長さと比べています。
+文字列のseqの[StringSeq.drop](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/StringSeq.java#L61-L68)もその1つです。
 
 ```clojure
 (drop Integer/MAX_VALUE (next (seq "abc")))
@@ -167,7 +184,7 @@ Leanに写すと `i = 2147483646` と `n = 2147483647` の反例が出ました�
 ```
 
 subvecの外にある元のvectorの要素が書き換わって、見かけは変わらないsubvecが返ります。
-`nth` の同じ穴は[CLJ-962](https://clojure.atlassian.net/browse/CLJ-962)で直っているのですが、 `assoc` の側が残っていました。
+`nth` の同じ不具合は[CLJ-962](https://clojure.atlassian.net/browse/CLJ-962)で直っているのですが、 `assoc` の側は直っていませんでした。
 
 
 # そのほかの候補
@@ -255,12 +272,16 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 # 見つからなかったところ
 
 `PersistentHashMap` と `PersistentHashSet` は、永続とtransientの操作を混ぜた225万回の操作で `java.util.HashMap` と食い違いませんでした。
-更新する前のmapが変わらないことと、 `ArrayNode` の分割と統合や深さ7までの衝突ノードも見ています。
+更新する前のmapが変わらないことや、 `ArrayNode` の分割と統合、深さ7までの衝突ノードも見ています。
 
-`PersistentTreeMap` も `java.util.TreeMap` と食い違わずに赤黒木の条件を保っていて、vectorの木の境界の前後でも `ArrayList` との食い違いは出ませんでした。
+`PersistentTreeMap` も `java.util.TreeMap` と食い違わずに赤黒木の条件を保っていました。
+vectorの木の境界の前後でも `ArrayList` との食い違いは出ませんでした。
 
 数値の側では、 `Numbers` の足し算と引き算が速い経路を選ぶ判定はオーバーフローの判定と一致することを64bitで証明できました。
-掛け算は `bv_decide` が16bitで時間切れになるので8bitと10bitで確かめていて、 `clojure.core/mod` が床関数の剰余と一致することは32bitまで証明しました。
 
-Leanで証明した性質はどれも記事に書いたモデルの上で成り立つもので、モデルが実際のJavaのコードと同じ意味かは、ソースと再現の結果を突き合わせて確かめています。
+掛け算は `bv_decide` が16bitで時間切れになるので8bitと10bitで確かめています。
+`clojure.core/mod` が床関数の剰余と一致することは32bitまで証明しました。
+
+Leanで証明した性質はどれも記事に書いたモデルの上で成り立つものです。
+モデルが実際のJavaのコードと同じ意味かは、ソースと再現の結果を突き合わせて確かめています。
 
