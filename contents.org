@@ -23019,11 +23019,10 @@ Clojureの永続データ構造も1.0のころから多くの人に使われて�
 その結果、ClojureのJIRAとask.clojure.orgで見つからない不具合が17件ありました。
 =vector-of= の =reduce= やHAMTのハッシュ衝突ノード、型ヒントの無い関数型インターフェースの呼び出しなどです。
 
-一方でHAMTの本体には225万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
+一方でHAMTの本体には300万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
 不具合は木の外側にある別の実装や、 ~=~ とハッシュの関係のように2つの仕組みが組み合わさるところに残っていました。
 
-調べたのはClojure 1.12.6とJDK 21で、ソースは =clojure/clojure= のmasterの[[https://github.com/clojure/clojure/tree/92ce2a85][92ce2a85]]です。
-記事で引くコードは1.12.6と同じで、行番号はmasterのものです。
+調べたのは2026-11-18に出たClojure 1.12.7とJDK 21で、ソースへのリンクは[[https://github.com/clojure/clojure/tree/clojure-1.12.7][clojure-1.12.7]]のタグを指します。
 
 ** 調べ方
 lean-verifyの手順では確かめる関数を1つに絞ってLeanの定義に写します。
@@ -23036,7 +23035,7 @@ Javaの =long= と =int= を =BitVec 64= と =BitVec 32= に写すと、足し�
 Leanに写せるのは整数とビットの計算に切り出せる小さな関数だけなので、状態の大きい永続データ構造は差分テストで調べました。
 
 乱数で作った操作の列を =PersistentHashMap= と =java.util.HashMap= の両方に当てて、結果を比べます。
-HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて1500通りの種で1500回ずつ操作しています。
+HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて2000通りの種で1500回ずつ操作しています。
 
 vectorでは木の段が変わる32・1056・32800・1048608の前後で操作を当てて、結果を =ArrayList= と比べました。
 当てた操作は =conj= と =pop= と =assoc= と、transientの操作です。
@@ -23057,7 +23056,7 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 ;; => 2145419760
 #+end_src
 
-原因はseqの =reduce= が次の32件の塊の先頭を求める[[https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79][gvec.clj の79行目]]です。
+原因はseqの =reduce= が次の32件の塊の先頭を求める[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/clj/clojure/gvec.clj#L79][gvec.clj の79行目]]です。
 
 #+begin_src clojure
 (recur result (bit-and 0xffe0 (+ aidx 32)))
@@ -23093,7 +23092,7 @@ theorem fix_ok (a : BitVec 64) (h32 : a &&& 0x1f = 0) (hlt : a < 0x7fffffe0) :
 Clojureのhash-mapはHAMTで、キーのハッシュを5bitずつ区切って木をたどります。
 32bitのハッシュがまったく同じキーどうしは木の末端の =HashCollisionNode= に並べて持ち、その中では ~=~ でキーを探します。
 
-キーを1つ除いた新しいノードは[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/PersistentHashMap.java#L1000-L1007][HashCollisionNode.without]]が作ります。
+キーを1つ除いた新しいノードは[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/PersistentHashMap.java#L964-L971][HashCollisionNode.without]]が作ります。
 このときノードのハッシュには自分のフィールドの =this.hash= を使うべきところで、引数の =hash= を使っています。
 
 #+begin_src java
@@ -23131,7 +23130,7 @@ ClojureではJavaの =ArrayList= と同じ要素のvectorは ~=~ になるのに
 
 hash-setの =disj= でも同じことが起きて、transientの =dissoc!= を通る経路では起きません。
 
-1.12.6の =PersistentHashMap.java= の該当行を =this.hash= に変えてコンパイルしました。
+1.12.7の =PersistentHashMap.java= の該当行を =this.hash= に変えてコンパイルしました。
 これをjarより先にclasspathに置いて同じ例を動かすと、 =(get m3 b)= は =:B= を返しました。
 
 ** 型ヒントの有無でremoveIfの結果が変わる
@@ -23142,7 +23141,7 @@ Clojure 1.12では、Javaのメソッドが関数型インターフェースを�
 In prior alphas, the FI adapter returns inserted Clojure truthy return logic when adapting a Clojure function to an FI with boolean return.
 #+end_quote
 
-コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/Reflector.java#L570-L583][Reflector.coerceAdapterReturn]]を使います。
+コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/Reflector.java#L579-L591][Reflector.coerceAdapterReturn]]を使います。
 そこでは =boolean= の返り値に =RT.booleanCast= を当てたままなので、同じ =.removeIf= の呼び出しが型ヒントの有無で別の結果になります。
 
 #+begin_src clojure
@@ -23164,7 +23163,7 @@ setを関数として渡すと要素そのものを返すので、型の分か�
 ** intのあふれとsubvecの負の添字
 1.12には =drop= を速くした =IDrop= の実装があります。
 そのうち文字列とvectorのseqの実装は、今の位置と =n= をintのまま足してから長さと比べています。
-文字列のseqの[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/StringSeq.java#L61-L68][StringSeq.drop]]もその1つです。
+文字列のseqの[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/StringSeq.java#L61-L68][StringSeq.drop]]もその1つです。
 
 #+begin_src clojure
 (drop Integer/MAX_VALUE (next (seq "abc")))
@@ -23178,7 +23177,7 @@ Leanに写すと =i = 2147483646= と =n = 2147483647= の反例が出ました�
 
 [[./resources/public/img/8bda7e-drop.svg]]
 
-=subvec= の結果への =assoc= では、[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/APersistentVector.java#L661-L667][SubVector.assocN]]が負の添字を確かめていません。
+=subvec= の結果への =assoc= では、[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/APersistentVector.java#L661-L667][SubVector.assocN]]が負の添字を確かめていません。
 
 #+begin_src clojure
 (assoc [2 3] -1 :x)
@@ -23194,7 +23193,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 [[./resources/public/img/8bda7e-subvec.svg]]
 
 ** そのほかの候補
-残りの12件は影響の小さいもので、どれもClojure 1.12.6で再現しています。
+残りの12件は影響の小さいもので、どれもClojure 1.12.7で再現しています。
 
 | 事象 | 例 |
 |------+----|
@@ -23212,7 +23211,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 | listの =.lastIndexOf= が ~=~ でなく =equals= で比べる | =(.lastIndexOf (list 1 2) (int 2))= が-1 |
 
 ** 見つからなかったところ
-=PersistentHashMap= と =PersistentHashSet= は、永続とtransientの操作を混ぜた225万回の操作で =java.util.HashMap= と食い違いませんでした。
+=PersistentHashMap= と =PersistentHashSet= は、永続とtransientの操作を混ぜた300万回の操作で =java.util.HashMap= と食い違いませんでした。
 更新する前のmapが変わらないことや、 =ArrayNode= の分割と統合、深さ7までの衝突ノードも見ています。
 
 =PersistentTreeMap= も =java.util.TreeMap= と食い違わずに赤黒木の条件を保っていました。
@@ -23249,11 +23248,11 @@ I checked the collections with differential testing against the =java.util= coll
 I found 17 bugs that I could not find in Clojure's JIRA or on ask.clojure.org.
 They include =reduce= on =vector-of=, the hash collision node of the HAMT, and calls to functional interfaces without a type hint.
 
-The HAMT itself showed no mismatch in 2.25 million operations of differential testing, and the vector tree showed none around its boundaries.
+The HAMT itself showed no mismatch in 3 million operations of differential testing, and the vector tree showed none around its boundaries.
 The bugs sat in separate code outside the trees, and in places where two mechanisms meet, such as ~=~ and hashing.
 
-I used Clojure 1.12.6 and JDK 21, and read the source at [[https://github.com/clojure/clojure/tree/92ce2a85][92ce2a85]] on the master branch of =clojure/clojure=.
-The code I quote matches 1.12.6, and the line numbers refer to master.
+I used Clojure 1.12.7, released on 2026-11-18, and JDK 21.
+The links to the source point to the [[https://github.com/clojure/clojure/tree/clojure-1.12.7][clojure-1.12.7]] tag.
 
 ** How I checked
 The lean-verify procedure picks one function and models it as a Lean definition.
@@ -23267,7 +23266,7 @@ I then modeled the fixed code in Lean and proved the same property.
 Lean can only take small functions that reduce to integer and bit arithmetic, so I checked the large persistent data structures with differential testing.
 
 Each test applies the same random sequence of operations to =PersistentHashMap= and to =java.util.HashMap= and compares the results.
-For the HAMT, the keys mix partial collisions at each 5-bit level with fully identical hashes, and I ran 1,500 operations for each of 1,500 seeds.
+For the HAMT, the keys mix partial collisions at each 5-bit level with fully identical hashes, and I ran 1,500 operations for each of 2,000 seeds.
 
 For vectors, I compared against =ArrayList= around 32, 1056, 32800, and 1048608, where the tree gains a level.
 The operations were =conj=, =pop=, =assoc=, and their transient versions.
@@ -23289,7 +23288,7 @@ If you =drop= from one and then =reduce= it, the call never returns once the vec
 ;; => 2145419760
 #+end_src
 
-The cause is [[https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79][line 79 of gvec.clj]], where the seq's =reduce= computes the start of the next 32-element chunk.
+The cause is [[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/clj/clojure/gvec.clj#L79][line 79 of gvec.clj]], where the seq's =reduce= computes the start of the next 32-element chunk.
 
 #+begin_src clojure
 (recur result (bit-and 0xffe0 (+ aidx 32)))
@@ -23325,7 +23324,7 @@ theorem fix_ok (a : BitVec 64) (h32 : a &&& 0x1f = 0) (hlt : a < 0x7fffffe0) :
 Clojure's hash-map is a HAMT: it splits the key's hash into 5-bit pieces and uses them to walk down the tree.
 Keys whose 32-bit hashes are identical share a =HashCollisionNode= at the bottom of the tree, and the node finds a key among them with ~=~.
 
-[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/PersistentHashMap.java#L1000-L1007][HashCollisionNode.without]] builds the new node with one key removed.
+[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/PersistentHashMap.java#L964-L971][HashCollisionNode.without]] builds the new node with one key removed.
 It should give the new node its own hash, =this.hash=, but it passes the parameter =hash= instead.
 
 #+begin_src java
@@ -23364,7 +23363,7 @@ In this example the collision node sits on the first level of the tree, so the k
 
 =disj= on a hash-set has the same bug, while the path through the transient =dissoc!= does not.
 
-I changed that line in the 1.12.6 =PersistentHashMap.java= to =this.hash= and compiled it.
+I changed that line in the 1.12.7 =PersistentHashMap.java= to =this.hash= and compiled it.
 With the patched class ahead of the jar on the classpath, the same example returned =:B= for =(get m3 b)=.
 
 ** removeIf gives different results with and without a type hint
@@ -23376,7 +23375,7 @@ In prior alphas, the FI adapter returns inserted Clojure truthy return logic whe
 #+end_quote
 
 The compiler follows this for calls where it knows the type.
-A call without a type hint goes through reflection and uses [[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/Reflector.java#L570-L583][Reflector.coerceAdapterReturn]].
+A call without a type hint goes through reflection and uses [[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/Reflector.java#L579-L591][Reflector.coerceAdapterReturn]].
 That method still applies =RT.booleanCast= to a =boolean= return value, so the same =.removeIf= call gives a different result depending on the type hint.
 
 #+begin_src clojure
@@ -23399,7 +23398,7 @@ The reflective call reads the return value as true and removes the elements.
 ** int overflow and a negative subvec index
 Clojure 1.12 added =IDrop= implementations that make =drop= faster.
 The ones for string seqs and vector seqs add the current position and =n= as ints and then compare the sum with the length.
-[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/StringSeq.java#L61-L68][StringSeq.drop]] for string seqs is one of them.
+[[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/StringSeq.java#L61-L68][StringSeq.drop]] for string seqs is one of them.
 
 #+begin_src clojure
 (drop Integer/MAX_VALUE (next (seq "abc")))
@@ -23414,7 +23413,7 @@ Under the assumptions =0 <= i < s.length()= and =0 < n=, Lean proved that the fi
 
 [[./resources/public/img/e4f733-drop.svg]]
 
-For =assoc= on the result of =subvec=, [[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/APersistentVector.java#L661-L667][SubVector.assocN]] does not reject a negative index.
+For =assoc= on the result of =subvec=, [[https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/APersistentVector.java#L661-L667][SubVector.assocN]] does not reject a negative index.
 
 #+begin_src clojure
 (assoc [2 3] -1 :x)
@@ -23430,7 +23429,7 @@ The call overwrites an element of the underlying vector outside the subvec, and 
 [[./resources/public/img/e4f733-subvec.svg]]
 
 ** Other findings
-The other 12 bugs have a smaller impact, and I reproduced each of them on Clojure 1.12.6.
+The other 12 bugs have a smaller impact, and I reproduced each of them on Clojure 1.12.7.
 
 | Behavior | Example |
 |------+----|
@@ -23448,7 +23447,7 @@ The other 12 bugs have a smaller impact, and I reproduced each of them on Clojur
 | =.lastIndexOf= on a list compares with =equals= instead of ~=~ | =(.lastIndexOf (list 1 2) (int 2))= is -1 |
 
 ** Where I found nothing
-=PersistentHashMap= and =PersistentHashSet= matched =java.util.HashMap= over 2.25 million operations that mixed persistent and transient updates.
+=PersistentHashMap= and =PersistentHashSet= matched =java.util.HashMap= over 3 million operations that mixed persistent and transient updates.
 The tests also covered maps before an update staying unchanged, =ArrayNode= splits and merges, and collision nodes down to depth 7.
 
 =PersistentTreeMap= matched =java.util.TreeMap= and kept the red-black tree invariants.

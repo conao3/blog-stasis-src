@@ -18,11 +18,10 @@ Clojureの永続データ構造も1.0のころから多くの人に使われて�
 その結果、ClojureのJIRAとask.clojure.orgで見つからない不具合が17件ありました。
 `vector-of` の `reduce` やHAMTのハッシュ衝突ノード、型ヒントの無い関数型インターフェースの呼び出しなどです。
 
-一方でHAMTの本体には225万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
+一方でHAMTの本体には300万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
 不具合は木の外側にある別の実装や、 `=` とハッシュの関係のように2つの仕組みが組み合わさるところに残っていました。
 
-調べたのはClojure 1.12.6とJDK 21で、ソースは `clojure/clojure` のmasterの[92ce2a85](https://github.com/clojure/clojure/tree/92ce2a85)です。
-記事で引くコードは1.12.6と同じで、行番号はmasterのものです。
+調べたのは2026-11-18に出たClojure 1.12.7とJDK 21で、ソースへのリンクは[clojure-1.12.7](https://github.com/clojure/clojure/tree/clojure-1.12.7)のタグを指します。
 
 
 # 調べ方
@@ -37,7 +36,7 @@ Javaの `long` と `int` を `BitVec 64` と `BitVec 32` に写すと、足し�
 Leanに写せるのは整数とビットの計算に切り出せる小さな関数だけなので、状態の大きい永続データ構造は差分テストで調べました。
 
 乱数で作った操作の列を `PersistentHashMap` と `java.util.HashMap` の両方に当てて、結果を比べます。
-HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて1500通りの種で1500回ずつ操作しています。
+HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて2000通りの種で1500回ずつ操作しています。
 
 vectorでは木の段が変わる32・1056・32800・1048608の前後で操作を当てて、結果を `ArrayList` と比べました。
 当てた操作は `conj` と `pop` と `assoc` と、transientの操作です。
@@ -60,7 +59,7 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 ;; => 2145419760
 ```
 
-原因はseqの `reduce` が次の32件の塊の先頭を求める[gvec.clj の79行目](https://github.com/clojure/clojure/blob/92ce2a85/src/clj/clojure/gvec.clj#L79)です。
+原因はseqの `reduce` が次の32件の塊の先頭を求める[gvec.clj の79行目](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/clj/clojure/gvec.clj#L79)です。
 
 ```clojure
 (recur result (bit-and 0xffe0 (+ aidx 32)))
@@ -98,7 +97,7 @@ theorem fix_ok (a : BitVec 64) (h32 : a &&& 0x1f = 0) (hlt : a < 0x7fffffe0) :
 Clojureのhash-mapはHAMTで、キーのハッシュを5bitずつ区切って木をたどります。
 32bitのハッシュがまったく同じキーどうしは木の末端の `HashCollisionNode` に並べて持ち、その中では `=` でキーを探します。
 
-キーを1つ除いた新しいノードは[HashCollisionNode.without](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/PersistentHashMap.java#L1000-L1007)が作ります。
+キーを1つ除いた新しいノードは[HashCollisionNode.without](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/PersistentHashMap.java#L964-L971)が作ります。
 このときノードのハッシュには自分のフィールドの `this.hash` を使うべきところで、引数の `hash` を使っています。
 
 ```java
@@ -136,7 +135,7 @@ ClojureではJavaの `ArrayList` と同じ要素のvectorは `=` になるのに
 
 hash-setの `disj` でも同じことが起きて、transientの `dissoc!` を通る経路では起きません。
 
-1.12.6の `PersistentHashMap.java` の該当行を `this.hash` に変えてコンパイルしました。
+1.12.7の `PersistentHashMap.java` の該当行を `this.hash` に変えてコンパイルしました。
 これをjarより先にclasspathに置いて同じ例を動かすと、 `(get m3 b)` は `:B` を返しました。
 
 
@@ -147,7 +146,7 @@ Clojure 1.12では、Javaのメソッドが関数型インターフェースを�
 
 > In prior alphas, the FI adapter returns inserted Clojure truthy return logic when adapting a Clojure function to an FI with boolean return.
 
-コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/Reflector.java#L570-L583)を使います。
+コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/Reflector.java#L579-L591)を使います。
 そこでは `boolean` の返り値に `RT.booleanCast` を当てたままなので、同じ `.removeIf` の呼び出しが型ヒントの有無で別の結果になります。
 
 ```clojure
@@ -171,7 +170,7 @@ setを関数として渡すと要素そのものを返すので、型の分か�
 
 1.12には `drop` を速くした `IDrop` の実装があります。
 そのうち文字列とvectorのseqの実装は、今の位置と `n` をintのまま足してから長さと比べています。
-文字列のseqの[StringSeq.drop](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/StringSeq.java#L61-L68)もその1つです。
+文字列のseqの[StringSeq.drop](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/StringSeq.java#L61-L68)もその1つです。
 
 ```clojure
 (drop Integer/MAX_VALUE (next (seq "abc")))
@@ -185,7 +184,7 @@ Leanに写すと `i = 2147483646` と `n = 2147483647` の反例が出ました�
 
 ![img](../../../../resources/public/img/8bda7e-drop.svg)
 
-`subvec` の結果への `assoc` では、[SubVector.assocN](https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/APersistentVector.java#L661-L667)が負の添字を確かめていません。
+`subvec` の結果への `assoc` では、[SubVector.assocN](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/APersistentVector.java#L661-L667)が負の添字を確かめていません。
 
 ```clojure
 (assoc [2 3] -1 :x)
@@ -203,7 +202,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 # そのほかの候補
 
-残りの12件は影響の小さいもので、どれもClojure 1.12.6で再現しています。
+残りの12件は影響の小さいもので、どれもClojure 1.12.7で再現しています。
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -285,7 +284,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 # 見つからなかったところ
 
-`PersistentHashMap` と `PersistentHashSet` は、永続とtransientの操作を混ぜた225万回の操作で `java.util.HashMap` と食い違いませんでした。
+`PersistentHashMap` と `PersistentHashSet` は、永続とtransientの操作を混ぜた300万回の操作で `java.util.HashMap` と食い違いませんでした。
 更新する前のmapが変わらないことや、 `ArrayNode` の分割と統合、深さ7までの衝突ノードも見ています。
 
 `PersistentTreeMap` も `java.util.TreeMap` と食い違わずに赤黒木の条件を保っていました。
