@@ -23472,7 +23472,7 @@ Leanのstructureと帰納型は値を作るときにLeanの条件で検査する
 リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
 Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.10.0][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.10.0で動かした結果をもとに書いています。
 
-leanfranはLeanのコンパイラの中間表現をGoのソースに変換するもので、生成したGoは標準ライブラリだけで動き、実行するときにLeanもcgoも要りません。
+leanfranはLeanのコンパイラの中間表現をGoのソースに変換するもので、生成したGoはこのmoduleとGoの標準ライブラリだけで動き、実行するときにLeanもcgoも要りません。
 
 Rust・Python・TypeScript・Clojureの4つは[[https://s.conao3.com/blog/2026/23d62c][leanfranを紹介した記事]]で、PHPは[[https://s.conao3.com/blog/2026/ec8faf][PHP版の記事]]で取り上げていて、Goもそれらと同じリポジトリから同じ版で出しています。
 
@@ -23753,7 +23753,7 @@ $ go run ./cmd/ledger
 =Take= で渡した配列はほかに参照が無いので、Leanの =Array.push= は配列をコピーせずにその場で1件足します。
 =Read...Value= がhandleの中身をGoの値に写す関数で、使い終えたhandleは =Close= で参照を手放します。
 
-1,000件と100,000件の配列に1件足す操作を、Linuxのamd64のIntel Core i5-8400とGo 1.27.3で測りました。
+10件と1,000件と100,000件の配列に1件足す操作を、Linuxのamd64のIntel Core i5-8400とGo 1.27.3で測りました。
 =Record= には同じスライスを毎回渡し、 =RecordValue= にはその件数から始めたhandleを =Take= で渡し続けています。
 値はCPUを1つに固定して5回測った中央値です。
 
@@ -23763,10 +23763,10 @@ $ go run ./cmd/ledger
 | 1,000 | 35 µs | 0.63 µs |
 | 100,000 | 3,764 µs | 0.70 µs |
 
-=Record= の時間は配列の件数に比例して伸び、 =RecordValue= は件数によらず0.6から0.7 µsです。
+=Record= の時間は配列の件数に比例して増え、 =RecordValue= は件数によらず0.6から0.7 µsです。
 
 handleの操作はランタイムがプロセスの中で1つずつ順に実行するので、複数のgoroutineから呼んでもLeanの処理は並列になりません。
-サーバーが状態をhandleで持ち、リクエストごとに =Take= で更新する使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
+サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.10.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
 
 ** Goの関数をLeanで証明する
 逆向きの例として、値を範囲に収める =Clamp= をGoで書き、 =//leanfran:model= でLeanの仕様と結びつけます。
