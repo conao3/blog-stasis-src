@@ -4,8 +4,13 @@ Draft: true
 Tags: clojure lean formal-verification testing differential-testing
 
 
-Clojureの永続データ構造は1.0のころから多くの人に使われてきたので、不具合はもう残っていないだろうと思っていました。
-小さな関数をLean 4に写して全入力で確かめる手順が[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)にまとまっているのを見かけたので、Clojure本体のJavaで書かれた層に当ててみました。
+Koukyosyumeiさんの「[著名なRust製OSSをLean 4で形式検証してみたら、めちゃめちゃバグが見つかった話](https://zenn.dev/koukyosyumei/articles/31c8fcf4da45b7)」を読みました。
+有名なRust製のOSSをLean 4で証明できる形に移植していくと、証明が通らないところに元の実装の不具合が見つかったという話です。
+
+Clojureの永続データ構造も1.0のころから多くの人に使われていて、不具合はもう残っていないだろうと思っていました。
+それでもLeanで調べれば何か見つかるのではないかと思い、試してみたくなりました。
+
+ちょうど小さな関数をLean 4に写して全入力で確かめる手順が[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)にまとまっていたので、これをClojure本体のJavaで書かれた層に当てました。
 
 整数とビットの計算はLeanに写して反例を探しました。
 コレクションは `java.util` のコレクションと結果を比べる差分テストにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
