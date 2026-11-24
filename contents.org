@@ -23002,7 +23002,6 @@ Leanの =IO= の関数をPHPのコマンドとして動かすgreet-cliもあり�
 :export_file_name: generated/contents/blog/2026/8bda7e
 :export_date: 2026-11-24 12:16
 :export_tags: clojure lean formal-verification testing differential-testing
-:export_draft: t
 :end:
 
 Koukyosyumeiさんの「[[https://zenn.dev/koukyosyumei/articles/31c8fcf4da45b7][著名なRust製OSSをLean 4で形式検証してみたら、めちゃめちゃバグが見つかった話]]」を読みました。
@@ -23231,7 +23230,6 @@ Leanで証明した性質はどれも記事に書いたモデルの上で成り�
 :export_date: 2026-11-24 12:16
 :export_lang: en
 :export_tags: clojure lean formal-verification testing differential-testing
-:export_draft: t
 :end:
 
 I read Koukyosyumei's article "[[https://zenn.dev/koukyosyumei/articles/31c8fcf4da45b7][著名なRust製OSSをLean 4で形式検証してみたら、めちゃめちゃバグが見つかった話]]" (in Japanese; the title means "I formally verified well-known Rust OSS with Lean 4 and found a lot of bugs").

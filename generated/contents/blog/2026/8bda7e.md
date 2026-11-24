@@ -1,6 +1,5 @@
 Title: Clojure本体をLeanと差分テストで調べて、HAMTとvector-ofに未報告の不具合を見つけた
 Date: 2026-11-24 12:16
-Draft: true
 Tags: clojure lean formal-verification testing differential-testing
 
 
