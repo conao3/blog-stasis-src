@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" font-family="sans-serif">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a0410d"/></marker></defs>
+<rect x="0" y="0" width="1000" height="430" rx="16" fill="#fff"/>
+<text x="30" y="40" font-size="18" fill="#a0410d" text-anchor="start" font-weight="bold">今のコード: ii = i + n をintで計算して ii &lt; s.length() と比べる</text>
+<line x1="90" y1="130" x2="910" y2="130" stroke="#555" stroke-width="2"/>
+<line x1="90" y1="122" x2="90" y2="138" stroke="#555" stroke-width="2"/>
+<text x="90" y="86" font-size="15" fill="#222" text-anchor="middle">-2147483648</text>
+<text x="90" y="106" font-size="13" fill="#666" text-anchor="middle">Integer/MIN_VALUE</text>
+<line x1="470" y1="122" x2="470" y2="138" stroke="#555" stroke-width="2"/>
+<text x="470" y="160" font-size="15" fill="#222" text-anchor="middle">0</text>
+<line x1="560" y1="122" x2="560" y2="138" stroke="#555" stroke-width="2"/>
+<text x="560" y="160" font-size="15" fill="#222" text-anchor="middle">3</text>
+<text x="560" y="180" font-size="13" fill="#666" text-anchor="middle">s.length()</text>
+<line x1="910" y1="122" x2="910" y2="138" stroke="#555" stroke-width="2"/>
+<text x="910" y="160" font-size="15" fill="#222" text-anchor="middle">2147483647</text>
+<text x="910" y="180" font-size="13" fill="#666" text-anchor="middle">Integer/MAX_VALUE</text>
+<circle cx="500" cy="130" r="6" fill="#0f4c81"/>
+<text x="500" y="112" font-size="15" fill="#0f4c81" text-anchor="middle" font-weight="bold">i = 1</text>
+<path d="M500,100 Q705,50 908,118" fill="none" stroke="#a0410d" stroke-width="2" marker-end="url(#ahr)"/>
+<text x="705" y="60" font-size="15" fill="#a0410d" text-anchor="middle" font-weight="bold">+ n (2147483647)</text>
+<path d="M910,192 Q500,250 94,146" fill="none" stroke="#a0410d" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahr)"/>
+<text x="500" y="242" font-size="15" fill="#a0410d" text-anchor="middle">intの上限を越えて折り返す</text>
+<circle cx="90" cy="130" r="7" fill="#a0410d"/>
+<rect x="30" y="268" width="940" height="44" rx="6" fill="#fde2d2" stroke="#a0410d" stroke-width="1.5"/>
+<text x="50" y="296" font-size="16" fill="#a0410d" text-anchor="start">ii = -2147483648 は 3 より小さいので StringSeq を作り、charAt(-2147483648) で例外になる</text>
+<text x="30" y="352" font-size="18" fill="#0f4c81" text-anchor="start" font-weight="bold">直したコード: n と残りの長さ s.length() - i を比べる</text>
+<rect x="30" y="366" width="940" height="44" rx="6" fill="#dbe6f4" stroke="#0f4c81" stroke-width="1.5"/>
+<text x="50" y="394" font-size="16" fill="#0f4c81" text-anchor="start">n = 2147483647 は s.length() - i = 3 - 1 = 2 以上なので、() を返す</text>
+</svg>

@@ -23127,6 +23127,8 @@ ClojureではJavaの =ArrayList= と同じ要素のvectorは ~=~ になるのに
 =b= を引くときは1003の枝をたどって =a= だけを見つけるので、 =b= は見つかりません。
 この例では衝突ノードが木の1段目にあるので、 =dissoc= に渡すキーはハッシュの下位5bitが1003と同じである必要があり、1867155179はこの条件を満たしています。
 
+[[./resources/public/img/8bda7e-hamt.svg]]
+
 hash-setの =disj= でも同じことが起きて、transientの =dissoc!= を通る経路では起きません。
 
 1.12.6の =PersistentHashMap.java= の該当行を =this.hash= に変えてコンパイルしました。
@@ -23157,6 +23159,8 @@ In prior alphas, the FI adapter returns inserted Clojure truthy return logic whe
 setを関数として渡すと要素そのものを返すので、型の分かる呼び出しは =Long= を =Boolean= にできずに例外を投げます。
 リフレクションの呼び出しは返り値を真として読んで、要素を消します。
 
+[[./resources/public/img/8bda7e-removeif.svg]]
+
 ** intのあふれとsubvecの負の添字
 1.12には =drop= を速くした =IDrop= の実装があります。
 そのうち文字列とvectorのseqの実装は、今の位置と =n= をintのまま足してから長さと比べています。
@@ -23172,6 +23176,8 @@ setを関数として渡すと要素そのものを返すので、型の分か�
 Leanに写すと =i = 2147483646= と =n = 2147483647= の反例が出ました。
 =n= を残りの長さ =s.length() - i= と比べる形に直すと、 =0 <= i < s.length()= と =0 < n= の前提の下で、32bitのすべての入力について素朴な仕様と一致することを証明できました。
 
+[[./resources/public/img/8bda7e-drop.svg]]
+
 =subvec= の結果への =assoc= では、[[https://github.com/clojure/clojure/blob/92ce2a85/src/jvm/clojure/lang/APersistentVector.java#L661-L667][SubVector.assocN]]が負の添字を確かめていません。
 
 #+begin_src clojure
@@ -23184,6 +23190,8 @@ Leanに写すと =i = 2147483646= と =n = 2147483647= の反例が出ました�
 
 subvecの外にある元のvectorの要素が書き換わって、見かけは変わらないsubvecが返ります。
 =nth= の同じ不具合は[[https://clojure.atlassian.net/browse/CLJ-962][CLJ-962]]で直っているのですが、 =assoc= の側は直っていませんでした。
+
+[[./resources/public/img/8bda7e-subvec.svg]]
 
 ** そのほかの候補
 残りの12件は影響の小さいもので、どれもClojure 1.12.6で再現しています。
