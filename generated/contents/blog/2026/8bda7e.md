@@ -1,4 +1,4 @@
-Title: Clojure本体をLeanと差分ファズで調べて、HAMTとvector-ofに未報告の不具合を見つけた
+Title: Clojure本体をLeanと差分テストで調べて、HAMTとvector-ofに未報告の不具合を見つけた
 Date: 2026-11-24 12:16
 Draft: true
 Tags: clojure lean formal-verification testing differential-testing
@@ -8,12 +8,12 @@ Clojureの永続データ構造は1.0のころから多くの人に使われて�
 小さな関数をLean 4に写して全入力で確かめる手順が[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)にまとまっているのを見かけたので、Clojure本体のJavaで書かれた層に当ててみました。
 
 整数とビットの計算はLeanに写して反例を探しました。
-コレクションは `java.util` のコレクションとの差分ファズにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
+コレクションは `java.util` のコレクションと結果を比べる差分テストにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
 
 その結果、ClojureのJIRAとask.clojure.orgで見つからない不具合が17件ありました。
 `vector-of` の `reduce` やHAMTのハッシュ衝突ノード、型ヒントの無い関数型インターフェースの呼び出しなどです。
 
-一方でHAMTの本体には225万回の操作のファズでも食い違いが出ず、vectorの木の本体にも境界の前後のファズで食い違いが出ませんでした。
+一方でHAMTの本体には225万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
 不具合は木の外側にある別の実装や、 `=` とハッシュの関係のように2つの仕組みが組み合わさるところに残っていました。
 
 調べたのはClojure 1.12.6とJDK 21で、ソースは `clojure/clojure` のmasterの[92ce2a85](https://github.com/clojure/clojure/tree/92ce2a85)です。
@@ -31,7 +31,7 @@ Javaの `long` と `int` を `BitVec 64` と `BitVec 32` に写すと、足し�
 `/` の0方向への丸めや `%` の符号もそのまま対応します。
 
 反例が出たら、その値をClojureの入力に直して元のコードで再現し、直したコードをLeanに写して同じ性質を証明します。
-Leanに写せるのは整数とビットの計算に切り出せる小さな関数だけなので、状態の大きい永続データ構造は差分ファズで調べました。
+Leanに写せるのは整数とビットの計算に切り出せる小さな関数だけなので、状態の大きい永続データ構造は差分テストで調べました。
 
 乱数で作った操作の列を `PersistentHashMap` と `java.util.HashMap` の両方に当てて、結果を比べます。
 HAMTでは5bitごとの各段で部分的に衝突するキーと、ハッシュがまったく同じキーを混ぜて1500通りの種で1500回ずつ操作しています。
