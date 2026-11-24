@@ -24,8 +24,6 @@ Clojureの永続データ構造も1.0のころから多くの人に使われて�
 調べたのはClojure 1.12.6とJDK 21で、ソースは `clojure/clojure` のmasterの[92ce2a85](https://github.com/clojure/clojure/tree/92ce2a85)です。
 記事で引くコードは1.12.6と同じで、行番号はmasterのものです。
 
-![img](../../../../resources/public/img/8bda7e-mask.svg)
-
 
 # 調べ方
 
@@ -69,7 +67,9 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 ```
 
 `0xffe0` で下位5bitを消して32の倍数にそろえたいのですが、このマスクは16bit目より上も消してしまいます。
-冒頭の図のように65504の次の塊の先頭は65536になるはずが0に戻るので、先頭から読み直し続けます。
+65504の次の塊の先頭は65536になるはずが0に戻るので、先頭から読み直し続けます。
+
+![img](../../../../resources/public/img/8bda7e-mask.svg)
 
 この `0xffe0` のマスクは `internal-reduce` を入れた[2010年のコミット](https://github.com/clojure/clojure/commit/5b281880)からそのまま残っています。
 Leanでは32の倍数の位置 `a` から次の塊の先頭が `a + 32` になる性質を書きました。
