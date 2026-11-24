@@ -227,12 +227,12 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 <tr>
 <td class="org-left">引数3つ以上の関数型インターフェースで、型の分かる呼び出しのintの返り値が黙って切り詰められる</td>
-<td class="org-left">4294967297を返す関数が1になる</td>
+<td class="org-left"><code>(fn [a b c] 4294967297)</code> が1を返し、 <code>(fn [a b] 4294967297)</code> は <code>ArithmeticException</code></td>
 </tr>
 
 <tr>
 <td class="org-left">文字列やプリミティブ配列のseq、無限の <code>repeat</code> の <code>next</code> がメタデータを引き継ぐ</td>
-<td class="org-left"><code>(meta (rest (with-meta (seq "abc") {:m 1})))</code></td>
+<td class="org-left"><code>(meta (rest (with-meta (seq "abc") {:m 1})))</code> が <code>{:m 1}</code> で、vectorのseqは <code>nil</code></td>
 </tr>
 
 <tr>
@@ -257,7 +257,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 <tr>
 <td class="org-left">boxedとプリミティブのdoubleで、byteなどへの変換の範囲の判定が違う</td>
-<td class="org-left"><code>(byte (identity 127.9))</code> は127</td>
+<td class="org-left"><code>(byte (identity 127.9))</code> が127で、 <code>(byte 127.9)</code> は例外</td>
 </tr>
 
 <tr>

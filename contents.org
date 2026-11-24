@@ -23199,13 +23199,13 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 | 事象 | 例 |
 |------+----|
 | =reduce-kv= が =vector-of= で例外を投げる | =(reduce-kv f [] (vector-of :long 5 6))= |
-| 引数3つ以上の関数型インターフェースで、型の分かる呼び出しのintの返り値が黙って切り詰められる | 4294967297を返す関数が1になる |
-| 文字列やプリミティブ配列のseq、無限の =repeat= の =next= がメタデータを引き継ぐ | =(meta (rest (with-meta (seq "abc") {:m 1})))= |
+| 引数3つ以上の関数型インターフェースで、型の分かる呼び出しのintの返り値が黙って切り詰められる | =(fn [a b c] 4294967297)= が1を返し、 =(fn [a b] 4294967297)= は =ArithmeticException= |
+| 文字列やプリミティブ配列のseq、無限の =repeat= の =next= がメタデータを引き継ぐ | =(meta (rest (with-meta (seq "abc") {:m 1})))= が ={:m 1}= で、vectorのseqは =nil= |
 | =(long ##NaN)= と =(int ##NaN)= が0を返す | =(long ##NaN)= が0で、 =(byte ##NaN)= は例外 |
 | =long= がdoubleの2^63を、 =int= がfloatの2^31を最大値に丸める | =(long (Math/pow 2 63))= が =Long/MAX_VALUE= |
 | =char= がBigIntを2^64で折り返す | =(char 18446744073709551681N)= が =\A= |
 | =float= が =##Inf= を拒んで =##NaN= を通す | =(float ##Inf)= が例外で、 =(float ##NaN)= は =##NaN= |
-| boxedとプリミティブのdoubleで、byteなどへの変換の範囲の判定が違う | =(byte (identity 127.9))= は127 |
+| boxedとプリミティブのdoubleで、byteなどへの変換の範囲の判定が違う | =(byte (identity 127.9))= が127で、 =(byte 127.9)= は例外 |
 | =get= が文字列とJavaの配列で小数の添字を切り詰める | =(get "abc" 1.9)= が =\b= |
 | =byte-array= と =short-array= が初期値を受け付けない | =(byte-array 2 7)= が例外 |
 | プリミティブ配列のseqで =.indexOf= と =.contains= が食い違う | =(.indexOf (seq (byte-array [1 2 3])) 2)= が-1 |
