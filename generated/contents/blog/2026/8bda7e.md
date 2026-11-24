@@ -237,7 +237,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 <tr>
 <td class="org-left"><code>(long ##NaN)</code> と <code>(int ##NaN)</code> が0を返す</td>
-<td class="org-left"><code>char</code> や <code>byte</code> は例外を投げる</td>
+<td class="org-left"><code>(long ##NaN)</code> が0で、 <code>(byte ##NaN)</code> は例外</td>
 </tr>
 
 <tr>
@@ -252,7 +252,7 @@ subvecの外にある元のvectorの要素が書き換わって、見かけは�
 
 <tr>
 <td class="org-left"><code>float</code> が <code>##Inf</code> を拒んで <code>##NaN</code> を通す</td>
-<td class="org-left">floatは無限大を表せる</td>
+<td class="org-left"><code>(float ##Inf)</code> が例外で、 <code>(float ##NaN)</code> は <code>##NaN</code></td>
 </tr>
 
 <tr>
