@@ -23743,7 +23743,7 @@ $ go run ./cmd/ledger
 #+end_src
 
 引数には =entries.Borrow()= か =entries.Take()= を渡します。
-=Borrow= は呼び出しのあとも =entries= を使い続けるとき、 =Take= は参照ごとLeanに渡して、そのhandleをもう使わないときに使います。
+=Borrow= は呼び出しのあとも =entries= を使い続けるとき、 =Take= は参照ごとLeanに渡して、そのhandleを手放すときに使います。
 
 =Take= で渡した配列にはほかに参照が無いので、Leanの =Array.push= は配列をコピーせずにその場で1件足します。
 =Value.ReadNat= と =Value.ReadArrayUInt64= がhandleの中身をGoの値に変換するメソッドです。
