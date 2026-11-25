@@ -365,9 +365,10 @@
 
 
 (defn post-markdown
-  [{:keys [title date url tags]} body]
+  [{:keys [title date updated url tags]} body]
   (str "# " title "\n\n"
        (when date (str "Date: " date "\n"))
+       (when updated (str "Updated: " updated "\n"))
        (when (seq tags) (str "Tags: " (str/join ", " tags) "\n"))
        "URL: " url "\n"
        "Author: conao3 (Naoya Yamashita)\n\n"
@@ -444,17 +445,17 @@
          "  <id>" site-url "/</id>\n"
          "  <link rel=\"alternate\" type=\"text/html\" href=\"" site-url "/\"/>\n"
          "  <link rel=\"self\" type=\"application/atom+xml\" href=\"" site-url "/feed.xml\"/>\n"
-         "  <updated>" (rfc3339 (:datetime (second (first entries)))) "</updated>\n"
+         "  <updated>" (->> entries (map (fn [[_ {:keys [datetime updated-datetime]}]] (rfc3339 (or updated-datetime datetime)))) sort last) "</updated>\n"
          "  <author><name>conao3 (Naoya Yamashita)</name><uri>" site-url (portfolio/urls :en) "</uri></author>\n"
          "  <icon>" site-url "/assets/icon.jpg</icon>\n"
          (->> entries
-              (map (fn [[path {:keys [title url datetime description lang]}]]
+              (map (fn [[path {:keys [title url datetime updated-datetime description lang]}]]
                      (str "  <entry>\n"
                           "    <title>" (xml-escape title) "</title>\n"
                           "    <id>" url "</id>\n"
                           "    <link rel=\"alternate\" type=\"text/html\" href=\"" url "\"/>\n"
                           "    <published>" (rfc3339 datetime) "</published>\n"
-                          "    <updated>" (rfc3339 datetime) "</updated>\n"
+                          "    <updated>" (rfc3339 (or updated-datetime datetime)) "</updated>\n"
                           (when description (str "    <summary xml:lang=\"" (or lang "ja") "\">" (xml-escape description) "</summary>\n"))
                           "  </entry>\n")))
               (apply str))
@@ -491,9 +492,9 @@
        "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n"
        (->> pages
             (sort-by first)
-            (map (fn [[path {:keys [date]}]]
+            (map (fn [[path {:keys [date updated]}]]
                    (str "  <url><loc>" (page-url path) "</loc>"
-                        (when date (str "<lastmod>" date "</lastmod>"))
+                        (when-let [lastmod (or updated date)] (str "<lastmod>" lastmod "</lastmod>"))
                         "</url>\n")))
             (apply str))
        "</urlset>\n"))
@@ -517,7 +518,7 @@
 
 
 (defn json-ld
-  [path {:keys [title description lang datetime post? og-type tags]}]
+  [path {:keys [title description lang datetime updated-datetime post? og-type tags]}]
   (cond
     (= path "/index.html")
     {"@context" "https://schema.org"
@@ -542,6 +543,7 @@
                            "isPartOf" {"@type" "Blog" "name" blog-name "url" (str site-url "/")}
                            "author" author
                            "publisher" author}
+                 updated-datetime (assoc "dateModified" (rfc3339 updated-datetime))
                  (seq tags) (assoc "keywords" tags))
                {"@type" "BreadcrumbList"
                 "itemListElement" [{"@type" "ListItem" "position" 1 "name" blog-name "item" (str site-url "/")}
@@ -575,7 +577,7 @@
 
 
 (defn render-page
-  [path {:keys [title body description lang og-type draft? portfolio-href not-found? preview? markdown? post? datetime alternates] :as page}]
+  [path {:keys [title body description lang og-type draft? portfolio-href not-found? preview? markdown? post? datetime updated-datetime alternates] :as page}]
   (open-external-links-in-new-tab
    (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
@@ -609,6 +611,8 @@
                       [:meta {:property "og:locale" :content (get og-locales (or lang "ja") "ja_JP")}]
                       (when (and post? datetime)
                         (list [:meta {:property "article:published_time" :content (rfc3339 datetime)}]
+                              (when updated-datetime
+                                [:meta {:property "article:modified_time" :content (rfc3339 updated-datetime)}])
                               [:meta {:property "article:author" :content (str site-url (portfolio/urls :en))}]))
                       (when description
                         [:meta {:property "og:description" :content description}])
@@ -685,7 +689,7 @@
 
 
 (defn render-content
-  [{:keys [title body date datetime url post? tags sources]}]
+  [{:keys [title body date datetime updated updated-datetime url post? tags sources]}]
   (hiccup/html
     [:article
      [:header
@@ -693,7 +697,11 @@
       (when post?
         [:div {:class "post-meta"}
          [:div {:class "post-meta-main"}
-          [:time {:datetime datetime} date]
+          (if updated
+            [:span {:class "post-dates"}
+             [:span [:time {:datetime datetime} date] " 公開"]
+             [:span [:time {:datetime updated-datetime} updated] " 更新"]]
+            [:time {:datetime datetime} date])
           [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
            (hiccup/raw x-logo)
            "ポスト"]]
@@ -791,6 +799,8 @@
                                         :post? (not= path "/index.html")
                                         :date (some-> (:date (:metadata p)) (subs 0 10))
                                         :datetime (some-> (:date (:metadata p)) (str/replace " " "T"))
+                                        :updated (some-> (:updated (:metadata p)) (subs 0 10))
+                                        :updated-datetime (some-> (:updated (:metadata p)) (str/replace " " "T"))
                                         :lang (:lang (:metadata p))
                                         :tags (parse-tags (:tags (:metadata p)))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))

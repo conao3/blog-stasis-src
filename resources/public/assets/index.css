@@ -244,6 +244,12 @@ article > header .post-meta {
     gap: var(--spacing-200);
 }
 
+.post-dates {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-100);
+}
+
 .share-x {
     align-items: center;
     background-color: var(--gray-200);
