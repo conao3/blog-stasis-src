@@ -11,14 +11,14 @@
     <text x="205" y="107">10件</text><text x="205" y="197">1,000件</text><text x="205" y="287">100,000件</text>
   </g>
   <g fill="#9aa5b1">
-    <rect x="220" y="72" width="505" height="26"/><rect x="220" y="162" width="320" height="26"/><rect x="220" y="252" width="54" height="26"/>
+    <rect x="220" y="72" width="520" height="26"/><rect x="220" y="162" width="326" height="26"/><rect x="220" y="252" width="63" height="26"/>
   </g>
   <g fill="#007d9c">
-    <rect x="220" y="102" width="535" height="26"/><rect x="220" y="192" width="536" height="26"/><rect x="220" y="282" width="531" height="26"/>
+    <rect x="220" y="102" width="542" height="26"/><rect x="220" y="192" width="541" height="26"/><rect x="220" y="282" width="539" height="26"/>
   </g>
   <g font-size="15" fill="#222">
-    <text x="733" y="91">1,620,000</text><text x="548" y="181">46,400</text><text x="282" y="271">281</text>
-    <text x="763" y="121">2,880,000</text><text x="764" y="211">2,930,000</text><text x="759" y="301">2,680,000</text>
+    <text x="748" y="91">2,170,000</text><text x="554" y="181">52,100</text><text x="291" y="271">335</text>
+    <text x="770" y="121">3,270,000</text><text x="769" y="211">3,230,000</text><text x="767" y="301">3,080,000</text>
   </g>
   <rect x="330" y="364" width="18" height="18" fill="#9aa5b1"/><text x="356" y="379" font-size="16" fill="#222">Record (スライスを渡す)</text>
   <rect x="580" y="364" width="18" height="18" fill="#007d9c"/><text x="606" y="379" font-size="16" fill="#222">Handle.Record (handleを渡す)</text>
