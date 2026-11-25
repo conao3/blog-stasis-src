@@ -657,6 +657,12 @@
                        [:span "© conao3"]]])))
 
 
+(def calendar-icon
+  "<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.75 0a.75.75 0 0 1 .75.75V2h5V.75a.75.75 0 0 1 1.5 0V2h1.25c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 13.25 16H2.75A1.75 1.75 0 0 1 1 14.25V3.75C1 2.784 1.784 2 2.75 2H4V.75A.75.75 0 0 1 4.75 0ZM2.5 7.5v6.75c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25V7.5Zm10.75-4H2.75a.25.25 0 0 0-.25.25V6h11V3.75a.25.25 0 0 0-.25-.25Z\"/></svg>")
+
+(def pencil-icon
+  "<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.249.249 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z\"/></svg>")
+
 (def x-logo
   "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\"/></svg>")
 
@@ -697,11 +703,12 @@
       (when post?
         [:div {:class "post-meta"}
          [:div {:class "post-meta-main"}
-          (if updated
-            [:span {:class "post-dates"}
-             [:span [:time {:datetime datetime} date] " 公開"]
-             [:span [:time {:datetime updated-datetime} updated] " 更新"]]
-            [:time {:datetime datetime} date])
+          [:span {:class "post-dates"}
+           [:span {:class "post-date" :title "公開"}
+            (hiccup/raw calendar-icon) [:span {:class "visually-hidden"} "公開"] [:time {:datetime datetime} date]]
+           (when (and updated (not= updated date))
+             [:span {:class "post-date" :title "更新"}
+              (hiccup/raw pencil-icon) [:span {:class "visually-hidden"} "更新"] [:time {:datetime updated-datetime} updated]])]
           [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
            (hiccup/raw x-logo)
            "ポスト"]]

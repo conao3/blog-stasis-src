@@ -247,7 +247,29 @@ article > header .post-meta {
 .post-dates {
     display: inline-flex;
     flex-wrap: wrap;
-    gap: var(--spacing-100);
+    gap: 0 var(--spacing-200);
+}
+
+.post-date {
+    align-items: center;
+    color: var(--gray-600);
+    display: inline-flex;
+    gap: var(--spacing-75);
+}
+
+.post-date svg {
+    fill: currentColor;
+    height: 13px;
+    width: 13px;
+}
+
+.visually-hidden {
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
 }
 
 .share-x {
