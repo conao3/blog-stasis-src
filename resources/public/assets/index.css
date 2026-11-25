@@ -70,7 +70,8 @@ body > header nav .feed-link svg {
     padding: var(--spacing-100) var(--spacing-200);
 }
 
-.feed-copy button {
+.feed-copy button,
+.source-copy button {
     background-color: var(--gray-200);
     border: var(--border-width-100) solid var(--gray-300);
     border-radius: var(--corner-radius-100);
@@ -83,11 +84,13 @@ body > header nav .feed-link svg {
     white-space: nowrap;
 }
 
-.feed-copy button:hover {
+.feed-copy button:hover,
+.source-copy button:hover {
     background-color: var(--gray-300);
 }
 
-.feed-copy button[hidden] {
+.feed-copy button[hidden],
+.source-copy button[hidden] {
     display: none;
 }
 
@@ -229,6 +232,7 @@ time {
 article > header .post-meta {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-200);
     margin-top: var(--spacing-200);
 }
@@ -256,6 +260,42 @@ article > header .post-meta {
     fill: currentColor;
     height: 14px;
     width: 14px;
+}
+
+.source-badge {
+    align-items: center;
+    border: var(--border-width-100) solid var(--gray-300);
+    border-radius: 9999px;
+    color: var(--gray-800);
+    display: inline-flex;
+    font-family: var(--code-font-family), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: var(--body-size-xs);
+    gap: var(--spacing-75);
+    line-height: 1;
+    padding: var(--spacing-75) var(--spacing-200);
+    text-decoration: none;
+}
+
+.source-badge:hover {
+    background-color: var(--gray-200);
+    color: var(--gray-900);
+}
+
+.source-badge svg {
+    fill: currentColor;
+    height: 14px;
+    width: 14px;
+}
+
+.source-copy {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-100);
+}
+
+pre.source-text {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
 }
 
 .post-tags,

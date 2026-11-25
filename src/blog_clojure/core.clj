@@ -2,6 +2,7 @@
   (:require
     [clojure.data.json :as json]
     [clojure.java.io :as io]
+    [clojure.java.shell :as shell]
     [blog-clojure.portfolio :as portfolio]
     [blog-clojure.sites :as sites]
     [clojure.string :as str]
@@ -259,6 +260,51 @@
 (defn markdown-path
   [path]
   (str/replace path #"\.html$" ".md"))
+
+
+(defn org-path
+  [path]
+  (str/replace path #"\.html$" ".org"))
+
+
+(defn preview-path
+  [source-path]
+  (str "/preview" source-path ".html"))
+
+
+(def repo-url "https://github.com/conao3/blog-stasis-src")
+
+
+(defn git-revision
+  []
+  (let [{:keys [exit out]} (shell/sh "git" "rev-parse" "HEAD")]
+    (if (zero? exit) (str/trim out) "master")))
+
+
+(defn org-subtrees
+  [text]
+  (let [lines (vec (str/split text #"\n" -1))
+        starts (keep-indexed (fn [i line] (when (str/starts-with? line "* ") i)) lines)]
+    (->> (map vector starts (concat (rest starts) [(count lines)]))
+         (keep (fn [[start end]]
+                 (let [end (loop [end end]
+                             (if (and (> end (inc start)) (str/blank? (lines (dec end)))) (recur (dec end)) end))
+                       drawer (take-while #(not (re-matches #"(?i):end:\s*" %)) (subvec lines (inc start) end))
+                       file-name (some #(second (re-matches #"(?i):export_file_name:\s*generated/contents(/\S+?)(?:\.md)?\s*" %)) drawer)]
+                   (when file-name
+                     {:path (str file-name ".html")
+                      :text (str (str/join "\n" (subvec lines start end)) "\n")
+                      :lines [(inc start) end]}))))
+         (group-by :path)
+         (#(update-vals % (fn [[subtree & more]]
+                            (when more
+                              (throw (ex-info (str "Duplicate export_file_name: " (:path subtree)) {:path (:path subtree)})))
+                            subtree))))))
+
+
+(defn source-github-url
+  [revision [start end]]
+  (str repo-url "/blob/" revision "/contents.org?plain=1#L" start "-L" end))
 
 
 (def author
@@ -529,7 +575,7 @@
 
 
 (defn render-page
-  [path {:keys [title body description lang og-type draft? portfolio-href not-found? markdown? post? datetime alternates] :as page}]
+  [path {:keys [title body description lang og-type draft? portfolio-href not-found? preview? markdown? post? datetime alternates] :as page}]
   (open-external-links-in-new-tab
    (hiccup.page/html5 {:lang (or lang "ja")}
                      [:head
@@ -543,18 +589,18 @@
                       [:link {:rel "alternate" :type "application/atom+xml" :title blog-name :href "/feed.xml"}]
                       (for [[hreflang href] alternates]
                         [:link {:rel "alternate" :hreflang hreflang :href (str site-url href)}])
-                      (when-not not-found?
+                      (when-not (or not-found? preview?)
                         [:link {:rel "canonical" :href (page-url path)}])
                       (when markdown?
                         [:link {:rel "alternate" :type "text/markdown" :href (markdown-path path)}])
-                      (when not-found?
+                      (when (or not-found? preview?)
                         [:meta {:name "robots" :content "noindex"}])
                       (when description
                         [:meta {:name "description" :content description}])
                       [:meta {:property "og:title" :content title}]
                       [:meta {:property "og:type" :content (or og-type (if (= path "/index.html") "website" "article"))}]
                       [:meta {:property "og:url" :content (page-url path)}]
-                      (when-not not-found?
+                      (when-not (or not-found? preview?)
                         (list [:meta {:property "og:image" :content (str site-url (og-image-path path))}]
                               [:meta {:property "og:image:width" :content "1200"}]
                               [:meta {:property "og:image:height" :content "630"}]
@@ -578,6 +624,8 @@
                         [:script {:src "/assets/math.js" :defer true}])
                       (when (str/includes? body "class=\"feed-copy\"")
                         [:script {:src "/assets/feed.js" :defer true}])
+                      (when (str/includes? body "class=\"source-copy\"")
+                        [:script {:src "/assets/source.js" :defer true}])
                       (when (str/includes? body "class=\"github-card\"")
                         [:script {:src "/assets/github-card.js" :defer true}])
                       (when (str/includes? body "class=\"youtube-card\"")
@@ -615,8 +663,27 @@
     (str "https://x.com/intent/post?text=" (encode title) "&url=" (encode url))))
 
 
+(def github-mark
+  "<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656\"/></svg>")
+
+
+(defn github-badge
+  [href]
+  [:a {:class "source-badge" :href href :aria-label "GitHub で原稿を開く"}
+   (hiccup/raw github-mark)
+   "GitHub"])
+
+
+(defn source-badges
+  [{:keys [markdown-href org-href github-href]}]
+  (list
+    [:a {:class "source-badge" :href (str markdown-href "?preview=true")} ".md"]
+    [:a {:class "source-badge" :href (str org-href "?preview=true")} ".org"]
+    (github-badge github-href)))
+
+
 (defn render-content
-  [{:keys [title body date datetime url post? tags]}]
+  [{:keys [title body date datetime url post? tags sources]}]
   (hiccup/html
     [:article
      [:header
@@ -626,12 +693,41 @@
          [:time {:datetime datetime} date]
          [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
           (hiccup/raw x-logo)
-          "ポスト"]])
+          "ポスト"]
+         (when sources (source-badges sources))])
       (when (seq tags)
         [:ul {:class "post-tags"}
          (for [tag tags]
            [:li [:a {:href (tag-path tag)} (str "#" tag)]])])]
      [:div {:class "content"} (hiccup/raw body)]]))
+
+
+(defn source-preview-page
+  [source-path {:keys [title lang draft? sources]} text]
+  (let [file-name (last (str/split source-path #"/"))
+        article-path (str/replace source-path #"\.(md|org)$" "")]
+    {:title file-name
+     :description (str "「" title "」の " file-name " の中身。")
+     :lang lang
+     :draft? draft?
+     :preview? true
+     :body (hiccup/html
+             [:article
+              [:header
+               [:h1 file-name]
+               [:div {:class "post-meta"}
+                [:a {:class "source-badge" :href article-path} "記事に戻る"]
+                [:a {:class "source-badge" :href source-path} "そのまま開く"]
+                (github-badge (:github-href sources))]]
+              [:div {:class "content"}
+               [:p "「" [:a {:href article-path} title] "」の " file-name " です。"
+                "URL の " [:code "?preview=true"] " を外すと、ファイルをそのまま返します。"]
+               [:div {:class "feed-copy"}
+                [:input {:type "text" :readonly true :value (str "curl " site-url source-path) :aria-label "取得するコマンド"}]
+                [:button {:type "button" :hidden true} "コピー"]]
+               [:div {:class "source-copy"}
+                [:button {:type "button" :hidden true} "全文をコピー"]]
+               [:pre {:class "source-text"} [:code text]]]])}))
 
 
 (defn post-list-items
@@ -681,6 +777,8 @@
   (let [portfolio-langs (->> (keys portfolio/paths)
                              (filter #(or drafts? (not (get-in portfolio/pages [% :draft?]))))
                              set)
+        orgs (org-subtrees (slurp "contents.org"))
+        revision (git-revision)
         contents (->> (stasis/slurp-directory "generated/contents" #"\.md$")
                       (map (fn [[k v]]
                              (let [p (parse-markdown v)
@@ -696,6 +794,10 @@
                                         :description (:description p)
                                         :markdown? true
                                         :source (second (str/split v #"\n\n" 2))
+                                        :sources (when-let [{:keys [lines]} (get orgs path)]
+                                                   {:markdown-href (markdown-path path)
+                                                    :org-href (org-path path)
+                                                    :github-href (source-github-url revision lines)})
                                         :body (:html p)}]
                                [path (assoc obj :body (render-content obj))])))
                       (into {})
@@ -755,6 +857,22 @@
                            posts)
                      (assoc "/index.md" (index-markdown posts)
                             "/404.md" not-found-markdown))
+       :org (into {}
+                  (map (fn [[path page]]
+                         (if-let [{:keys [text]} (get orgs path)]
+                           [(org-path path) text]
+                           (throw (ex-info (str "No contents.org subtree for " path) {:path path :title (:title page)})))))
+                  posts)
+       :previews (into {}
+                       (mapcat (fn [[path page]]
+                                 (for [[source-path text-fn] [[(markdown-path path) #(post-markdown page (:source page))]
+                                                              [(org-path path) #(:text (get orgs path))]]]
+                                   [(preview-path source-path)
+                                    (fn [_]
+                                      (let [preview (source-preview-page source-path page (text-fn))]
+                                        (render-page (preview-path source-path)
+                                                     (assoc preview :portfolio-href (portfolio-href (:lang page))))))])))
+                       posts)
        :agents {"/sitemap.xml" (sitemap-xml (dissoc contents "/404.html"))
                 "/robots.txt" robots-txt
                 "/llms.txt" (llms-txt posts)
@@ -794,12 +912,32 @@
         res
         (handler req)))))
 
+(defn preview-request?
+  [{:keys [uri query-string]}]
+  (and (re-find #"\.(md|org)$" uri)
+       (some #(= "preview=true" %) (str/split (or query-string "") #"&"))))
+
+
+(defn- wrap-source-preview
+  [handler]
+  (fn [req]
+    (if (preview-request? req)
+      (handler (assoc req :uri (preview-path (:uri req))))
+      (handler req))))
+
+
+(def source-mime-types
+  {"md" "text/markdown; charset=utf-8"
+   "org" "text/plain; charset=utf-8"})
+
+
 (defn start-server
   [& _args]
   (jetty/run-jetty
     (-> (stasis/serve-pages site stasis-config)
         wrap-extensionless
+        wrap-source-preview
         (file/wrap-file "resources/public" {:index-files? false})
-        content-type/wrap-content-type
+        (content-type/wrap-content-type {:mime-types source-mime-types})
         not-modified/wrap-not-modified)
     {:port 8080 :join? false}))

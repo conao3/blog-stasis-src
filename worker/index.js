@@ -1,4 +1,5 @@
 const markdownType = "text/markdown; charset=utf-8";
+const sourceTypes = { md: markdownType, org: "text/plain; charset=utf-8" };
 
 function parseAccept(accept) {
   return accept.split(",").map((part) => {
@@ -52,6 +53,18 @@ export default {
     const mdPath = markdownPath(url.pathname);
     const sitemapLink = `<${url.origin}/sitemap.xml>; rel="sitemap"; type="application/xml"`;
     const llmsLink = `<${url.origin}/llms.txt>; rel="describedby"; type="text/plain"`;
+    const sourceExtension = url.pathname.startsWith("/preview/") ? null : url.pathname.match(/\.(md|org)$/)?.[1];
+
+    if (sourceExtension && url.searchParams.get("preview") === "true") {
+      const previewUrl = new URL(`/preview${url.pathname}`, url);
+      const preview = await env.ASSETS.fetch(new Request(previewUrl, request));
+      if (preview.status === 200) return withHeaders(preview, { "X-Robots-Tag": "noindex" });
+    }
+
+    if (sourceExtension) {
+      const source = await env.ASSETS.fetch(request);
+      return source.status === 200 ? withHeaders(source, { "Content-Type": sourceTypes[sourceExtension] }) : source;
+    }
 
     if (mdPath && prefersMarkdown(request)) {
       const markdown = await env.ASSETS.fetch(new Request(new URL(mdPath, url), request));
