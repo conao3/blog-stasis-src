@@ -23893,6 +23893,156 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 
 導入の手順は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/docs/go-guide.md][Goのガイド]]にあります。
 
+* A Clojure core cheat sheet in math notation
+:properties:
+:export_file_name: generated/contents/blog/2026/315a71
+:export_date: 2026-11-25 01:17
+:export_lang: en
+:export_draft: t
+:export_tags: clojure standard-library
+:end:
+
+I wrote down 110 functions from =clojure.core= that work on sequences, collections and functions, each as a small formula.
+I borrowed the notation from Daniel Keep's [[https://danielkeep.github.io/itercheat_baked.html][Rust Iterator Cheat Sheet]] (CC BY-SA 4.0) and moved it to Clojure syntax, with seqs, vectors, maps and sets written as Clojure literals and function calls written as lists.
+The rows describe Clojure 1.12.7.
+A [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-cheatsheet.clj][script]] keeps every row next to 220 checks that run the function in Clojure, and it builds the tables only when all of the checks pass.
+
+[[./resources/public/img/315a71-predicate.png]]
+
+** Reading the notation
+
+- \((a_0\ a_1\ \ldots)\) is a seq. \(a\) and \(b\) are input seqs, and a subscript picks one element.
+- \([a_0\ a_1\ \ldots]\) is a vector, \(\{k_0\ v_0,\ \ldots\}\) is a map, and \(\#\{a_0\ \ldots\}\) is a set, as in Clojure source.
+- \((f\ a_0)\) calls \(f\) with \(a_0\), as in Clojure source.
+- \(f\) is a function that computes new values, and \(p\) is a predicate. A predicate result counts as \(\mathtt{true}\) when it is anything other than \(\mathtt{nil}\) or \(\mathtt{false}\).
+- \(f : x\ y \to z\) says that \(f\) takes two arguments. \(\mathit{acc}\) is the accumulated value of a reducing function, and \(\mathit{init}\) is its first value.
+- \(i\) and \(j\) are positions, \(n\) and \(m\) are lengths, and \(k\) is a count given as an argument. In the rows about maps, \(k\) is a key and \(v\) is its value.
+- \(x \mapsto (f\ x)\) is a function, the same as =(fn [x] (f x))=.
+- \(\sigma\) is a permutation of the positions, and "wh." reads "where".
+- An underlined element is one that the function never realizes, even when you consume the whole result. =(take-while p a)= has to look at \(a_i\) to know where to stop, so only the elements after \(a_i\) are underlined. I measured this on an unchunked lazy seq. Vectors and =range= give chunked seqs, which realize 32 elements at a time.
+- A check in the Lazy column means the result is a lazy seq.
+- A check in the xf column means the function returns a [[https://clojure.org/reference/transducers][transducer]] when you call it without the collection, as in =(map inc)=.
+- The function name links to its entry in the [[https://clojure.github.io/clojure/clojure.core-api.html][clojure.core API reference]].
+
+** How the functions are grouped
+
+The [[https://clojure.org/api/cheatsheet][official Clojure cheat sheet]] groups its "Seq in, Seq out" functions by what happens to the length of the seq, under headings such as "Get shorter", "Get longer", "Head-items" and "Tail-items".
+Some functions sit under two of those headings, such as =filter=, which appears under "Get shorter" and "'Change'".
+
+I grouped each function by how the elements of its result relate to the elements of its input, so each function appears once.
+- Selecting: every result element is an input element, in the input order.
+- Transforming: the result elements are values that \(f\) computes from the input elements.
+- Growing: the result has every input element, and more.
+- Reordering: the result has the same elements in another order.
+- Splitting: the result is a seq of groups.
+- Reducing: the result is one value.
+- Collecting: the result is a vector, set or map built from the seq.
+
+Rich Hickey described the argument order of =clojure.core= in [[https://groups.google.com/g/clojure/c/iyyNyWs53dc][a mailing list thread]] in 2008:
+
+#+begin_quote
+Sequence functions take their sources last and collection functions take their primary operand (collection) first.
+#+end_quote
+
+The groups above are sequence functions, so the seq comes last and they work with =->>=.
+The functions that update a vector, map or set keep the type of their first argument and work with =->=, and they have their own section after the sequence functions.
+The last section is about functions that take functions and return functions.
+
+** Making a seq
+
+These functions make a seq from nothing, from a value or from a collection.
+
+#+INCLUDE: "generated/include/315a71/making.html" export html
+
+** Selecting by position
+
+These functions keep or drop elements by counting.
+=rest= returns an empty seq when nothing is left, and =next= returns \(\mathtt{nil}\), so =next= has to realize one more element to find out.
+
+#+INCLUDE: "generated/include/315a71/position.html" export html
+
+** Selecting by predicate
+
+These functions keep or drop elements by testing each one, or by comparing it with the elements before it.
+
+#+INCLUDE: "generated/include/315a71/predicate.html" export html
+
+** Transforming
+
+These functions compute new elements from the input elements.
+With more than one input seq, =map= stops at the end of the shortest one.
+
+#+INCLUDE: "generated/include/315a71/transforming.html" export html
+
+** Growing
+
+The result keeps every input element and adds more, from another seq or from a separator.
+
+#+INCLUDE: "generated/include/315a71/growing.html" export html
+
+** Reordering
+
+=sort= and =sort-by= are stable, so equal elements keep their input order.
+
+#+INCLUDE: "generated/include/315a71/reordering.html" export html
+
+** Splitting
+
+Each function here returns the input elements in groups.
+
+#+INCLUDE: "generated/include/315a71/splitting.html" export html
+
+** Reducing to a value
+
+These functions consume a seq and return one value.
+=some=, =every?=, =not-every?= and =not-any?= stop at the first element that decides the answer.
+
+#+INCLUDE: "generated/include/315a71/reducing.html" export html
+
+** Collecting into a collection
+
+The result is a vector, a set or a map that holds the elements of the seq.
+
+#+INCLUDE: "generated/include/315a71/collecting.html" export html
+
+** Collections
+
+These functions take the collection first, and the ones that return a collection keep its type.
+=conj= adds at the end of a vector and at the front of a list.
+
+#+INCLUDE: "generated/include/315a71/collections.html" export html
+
+** Functions
+
+Each function here takes functions or values and returns a new function.
+
+#+INCLUDE: "generated/include/315a71/functions.html" export html
+
+** Related functions without a formula
+
+These functions control when a seq is realized, run side effects, or help you write transducers, so I describe them in words.
+
+| Function            | What it does                                                                          |
+|---------------------+---------------------------------------------------------------------------------------|
+| =doall=             | Realizes a lazy seq and returns it.                                                   |
+| =dorun=             | Realizes a lazy seq for its side effects and returns =nil=.                           |
+| =run!=              | Calls a function on each element for its side effects and returns =nil=.             |
+| =doseq=             | A macro that runs a body for each element, with the bindings of =for=.               |
+| =for=               | A macro for list comprehension that returns a lazy seq.                               |
+| =realized?=         | Tells whether a lazy seq, delay, future or promise already has its value.            |
+| =lazy-seq=          | A macro that makes a lazy seq from a body that returns a seq.                         |
+| =lazy-cat=          | A macro version of =concat= that evaluates each collection expression only when needed. |
+| =iteration=         | Builds a seq from repeated calls to a step function, such as fetching pages of an API. |
+| =tree-seq=          | Walks a tree depth first and returns the nodes as a lazy seq.                        |
+| =eduction=          | Applies transducers to a collection each time you reduce or iterate it.              |
+| =cat=               | A transducer that concatenates the collections it receives.                           |
+| =halt-when=         | A transducer that stops the reduction at the first input that satisfies a predicate. |
+| =completing=        | Adds a completion arity to a reducing function, for use with =transduce=.            |
+| =reduced=           | Wraps a value so that =reduce= stops and returns it.                                  |
+| =bounded-count=     | Counts the elements of a seq, stopping after a given number.                          |
+
+I left out the rest of =clojure.core= (numbers, strings, atoms and refs, namespaces, macros for control flow, Java interop), since those functions take neither a seq nor a collection.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
