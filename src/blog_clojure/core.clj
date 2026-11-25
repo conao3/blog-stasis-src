@@ -674,12 +674,14 @@
    "GitHub"])
 
 
-(defn source-badges
+(defn source-group
   [{:keys [markdown-href org-href github-href]}]
-  (list
-    [:a {:class "source-badge" :href (str markdown-href "?preview=true")} ".md"]
-    [:a {:class "source-badge" :href (str org-href "?preview=true")} ".org"]
-    (github-badge github-href)))
+  [:div {:class "source-group" :role "group" :aria-label "原稿"}
+   [:a {:href (str markdown-href "?preview=true")} ".md"]
+   [:a {:href (str org-href "?preview=true")} ".org"]
+   [:a {:href github-href :aria-label "GitHub で原稿を開く"}
+    (hiccup/raw github-mark)
+    "GitHub"]])
 
 
 (defn render-content
@@ -690,11 +692,12 @@
       [:h1 title]
       (when post?
         [:div {:class "post-meta"}
-         [:time {:datetime datetime} date]
-         [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
-          (hiccup/raw x-logo)
-          "ポスト"]
-         (when sources (source-badges sources))])
+         [:div {:class "post-meta-main"}
+          [:time {:datetime datetime} date]
+          [:a {:class "share-x" :href (x-share-url title url) :target "_blank" :rel "noopener"}
+           (hiccup/raw x-logo)
+           "ポスト"]]
+         (when sources (source-group sources))])
       (when (seq tags)
         [:ul {:class "post-tags"}
          (for [tag tags]
