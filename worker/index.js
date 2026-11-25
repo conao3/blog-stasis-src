@@ -86,11 +86,7 @@ export default {
       return withHeaders(html, { Vary: "Accept", Link: `${sitemapLink}, ${llmsLink}` });
     }
 
-    const asset = permanentRedirect(await env.ASSETS.fetch(request));
-    const response =
-      asset.status === 200 && /^\/(img|og|assets)\//.test(url.pathname)
-        ? withHeaders(asset, { "Cache-Control": "public, max-age=3600, stale-while-revalidate=604800" })
-        : asset;
+    const response = permanentRedirect(await env.ASSETS.fetch(request));
     if (!mdPath) return response;
     const links = [sitemapLink, llmsLink];
     if (response.status === 200 && (url.pathname === "/" || url.pathname.startsWith("/blog/"))) {
