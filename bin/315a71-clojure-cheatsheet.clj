@@ -51,14 +51,19 @@
 (defn first-wh [& cond'] (str "i" (t " is the first index with ") (apply str cond')))
 
 (def A (sq "a_0" "a_1" dots))
-(def An (sq "a_0" dots "a_{n-1}"))
-(def Bm (sq "b_0" dots "b_{m-1}"))
+(def Al (sq "a_0" dots "a_{l-1}"))
+(def Bl (sq "b_0" dots "b_{l'-1}"))
+(defn ls [& xs] (str "\\texttt{'}" (apply sq xs)))
 (def P (str "p : x \\to " (t "bool")))
 (def F "f : x \\to y")
 (def F2 "f : \\mathit{acc}\\ x \\to \\mathit{acc}")
+(def G "g : x \\to y")
 (defn ap [& xs] (apply sq xs))
 (def pa-false (str (ap "p" "a_i") " = " false'))
 (def pa-true (str (ap "p" "a_i") " = " true'))
+(def M (mp (sp "k_0" "v_0") (sp "k_1" "v_1") dots))
+(def init "\\mathit{init}")
+(def xf "\\mathit{xf}")
 
 (def sections
   [{:id "making"
@@ -67,12 +72,19 @@
       :cases [{:args [(vc "a_0" "a_1" dots)] :out A}
               {:args [(vc)] :out nil'}]
       :checks [(= (seq [1 2]) '(1 2)) (nil? (seq [])) (nil? (seq nil))]}
+     {:name "sequence"
+      :cases [{:args [(vc "a_0" "a_1" dots)] :out A}
+              {:args [(vc)] :out (sq)}
+              {:args [xf A] :lazy true :out (str (sq "b_0" "b_1" dots) (wh (t "the ") "b_i" (t " are what ") xf (t " passes on")))}]
+      :checks [(= (sequence [1 2]) [1 2]) (= () (sequence [])) (= (sequence (filter odd?) [1 2 3]) [1 3])
+               (instance? clojure.lang.LazySeq (sequence (map inc) [1]))]}
      {:name "range" :lazy true
       :cases [{:args [] :out (sq "0" "1" "2" dots)}
               {:args ["n"] :out (sq "0" "1" dots "n-1")}
               {:args ["i" "j"] :out (sq "i" "i+1" dots "j-1")}
-              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh (t "every element is ") "< j"))}]
-      :checks [(= (take 3 (range)) [0 1 2]) (= (range 3) [0 1 2]) (= (range 2 5) [2 3 4]) (= (range 0 7 3) [0 3 6])]}
+              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh (t "it stops before reaching ") "j"))}]
+      :checks [(= (take 3 (range)) [0 1 2]) (= (range 3) [0 1 2]) (= (range 2 5) [2 3 4]) (= (range 0 7 3) [0 3 6])
+               (= (range 5 0 -2) [5 3 1])]}
      {:name "repeat" :lazy true
       :cases [{:args ["x"] :out (sq "x" "x" dots)}
               {:args ["n" "x"] :out (sq (ub (sp "x" dots "x") "n"))}]
@@ -85,15 +97,15 @@
       :cases [{:args ["f : x \\to x" "x"] :out (sq "x" (ap "f" "x") (ap "f" (ap "f" "x")) dots)}]
       :checks [(= (take 4 (iterate inc 0)) [0 1 2 3])]}
      {:name "keys"
-      :cases [{:args [(mp (sp "k_0" "v_0") (sp "k_1" "v_1") dots)] :out (sq "k_0" "k_1" dots)}
+      :cases [{:args [M] :out (sq "k_0" "k_1" dots)}
               {:args [(mp)] :out nil'}]
       :checks [(= (keys (array-map :a 1 :b 2)) [:a :b]) (nil? (keys {}))]}
      {:name "vals"
-      :cases [{:args [(mp (sp "k_0" "v_0") (sp "k_1" "v_1") dots)] :out (sq "v_0" "v_1" dots)}
+      :cases [{:args [M] :out (sq "v_0" "v_1" dots)}
               {:args [(mp)] :out nil'}]
       :checks [(= (vals (array-map :a 1 :b 2)) [1 2]) (nil? (vals {}))]}
      {:name "rseq"
-      :cases [{:args [(vc "a_0" dots "a_{n-1}")] :out (sq "a_{n-1}" dots "a_0")}
+      :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out (sq "a_{l-1}" dots "a_0")}
               {:args [(vc)] :out nil'}]
       :checks [(= (rseq [1 2 3]) [3 2 1]) (nil? (rseq []))]}]}
 
@@ -107,25 +119,25 @@
       :cases [{:args ["n" (sq "a_0" dots "a_{n-1}" "a_n" dots)] :out (sq "a_n" dots)}]
       :checks [(= (drop 2 [1 2 3]) [3]) (= (drop 5 [1 2]) [])]}
      {:name "take-last"
-      :cases [{:args ["k" An] :out (sq "a_{n-k}" dots "a_{n-1}")}
-              {:args ["k" (sq)] :out nil'}]
+      :cases [{:args ["n" Al] :out (sq "a_{l-n}" dots "a_{l-1}")}
+              {:args ["n" (sq)] :out nil'}]
       :checks [(= (take-last 2 [1 2 3]) [2 3]) (nil? (take-last 2 []))]}
      {:name "drop-last" :lazy true
-      :cases [{:args [An] :out (sq "a_0" dots "a_{n-2}")}
-              {:args ["k" An] :out (sq "a_0" dots "a_{n-k-1}")}]
+      :cases [{:args [Al] :out (sq "a_0" dots "a_{l-2}")}
+              {:args ["n" Al] :out (sq "a_0" dots "a_{l-n-1}")}]
       :checks [(= (drop-last [1 2 3]) [1 2]) (= (drop-last 2 [1 2 3]) [1])]}
      {:name "butlast"
-      :cases [{:args [An] :out (sq "a_0" dots "a_{n-2}")}
+      :cases [{:args [Al] :out (sq "a_0" dots "a_{l-2}")}
               {:args [(sq "a_0")] :out nil'}]
       :checks [(= (butlast [1 2 3]) [1 2]) (nil? (butlast [1]))]}
      {:name "rest"
-      :cases [{:args [(sq "a_0" (ul "a_1" dots))] :out (sq "a_1" dots)}
+      :cases [{:args [(sq "a_0" "a_1" dots)] :out (sq "a_1" dots)}
               {:args [(sq "a_0")] :out (sq)}
               {:args [nil'] :out (sq)}]
       :checks [(= (rest [1 2]) [2]) (= (rest [1]) ()) (= (rest nil) ())
                (= #{0} (realized-by #(do (rest %) nil)))]}
      {:name "next"
-      :cases [{:args [(sq "a_0" "a_1" (ul dots))] :out (sq "a_1" dots)}
+      :cases [{:args [(sq "a_0" "a_1" dots)] :out (sq "a_1" dots)}
               {:args [(sq "a_0")] :out nil'}
               {:args [nil'] :out nil'}]
       :checks [(= (next [1 2]) [2]) (nil? (next [1])) (nil? (next nil))
@@ -135,15 +147,15 @@
               {:args [(sq "a_0" "a_1")] :out nil'}]
       :checks [(= (nnext [1 2 3]) [3]) (nil? (nnext [1 2]))]}
      {:name "nthrest"
-      :cases [{:args [(sq "a_0" dots "a_{k-1}" "a_k" dots) "k"] :out (sq "a_k" dots)}
-              {:args [An "k \\ge n"] :out (sq)}]
+      :cases [{:args [(sq "a_0" dots "a_{n-1}" "a_n" dots) "n"] :out (sq "a_n" dots)}
+              {:args [Al "n \\ge l"] :out (sq)}]
       :checks [(= (nthrest [1 2 3] 2) [3]) (= (nthrest [1 2] 5) ())]}
      {:name "nthnext"
-      :cases [{:args [(sq "a_0" dots "a_{k-1}" "a_k" dots) "k"] :out (sq "a_k" dots)}
-              {:args [An "k \\ge n"] :out nil'}]
+      :cases [{:args [(sq "a_0" dots "a_{n-1}" "a_n" dots) "n"] :out (sq "a_n" dots)}
+              {:args [Al "n \\ge l"] :out nil'}]
       :checks [(= (nthnext [1 2 3] 2) [3]) (nil? (nthnext [1 2] 5))]}
      {:name "take-nth" :lazy true :xf true
-      :cases [{:args ["k" A] :out (sq "a_0" "a_k" "a_{2k}" dots)}]
+      :cases [{:args ["n" A] :out (sq "a_0" "a_n" "a_{2n}" dots)}]
       :checks [(= (take-nth 2 (range 7)) [0 2 4 6])]}]}
 
    {:id "predicate"
@@ -167,13 +179,13 @@
                :out (str (sq "a_i" dots) (wh (first-wh pa-false)))}]
       :checks [(= (drop-while #(< % 3) (range 5)) [3 4])]}
      {:name "distinct" :lazy true :xf true
-      :cases [{:args [A] :out (str (sq "a_i" dots) (wh "a_i \\ne a_j " (t " for every ") "j < i"))}]
+      :cases [{:args [A] :out (str (sq "a_i" dots) (wh "a_i \\ne a_j" (t " for every ") "j < i"))}]
       :checks [(= (distinct [1 2 1 3 2]) [1 2 3]) (lazy-on-infinite? distinct)]}
      {:name "dedupe" :lazy true :xf true
       :cases [{:args [A] :out (str (sq "a_0" "a_i" dots) (wh "a_i \\ne a_{i-1}"))}]
       :checks [(= (dedupe [1 1 2 2 1]) [1 2 1]) (lazy-on-infinite? dedupe)]}
      {:name "random-sample" :lazy true :xf true
-      :cases [{:args ["q" A] :out (str (sq "a_i" dots) (wh (t "each ") "a_i" (t " is kept with probability ") "q"))}]
+      :cases [{:args ["\\mathit{prob}" A] :out (str (sq "a_i" dots) (wh (t "each ") "a_i" (t " is kept with probability ") "\\mathit{prob}"))}]
       :checks [(= (random-sample 1.0 [1 2]) [1 2]) (= (random-sample 0.0 [1 2]) [])]}]}
 
    {:id "transforming"
@@ -206,22 +218,23 @@
                         (ub (sp "z_0" "z_1" dots) (ap "f" "a_1"))
                         dots)}]
       :checks [(= (mapcat #(repeat % %) [1 2 3]) [1 2 2 3 3 3])]}
-     {:name "replace" :lazy true :xf true
-      :cases [{:args [(mp (sp "k_0" "v_0") dots) A] :out (str (sq "r_0" "r_1" dots) (wh "r_i = " (ap "get" "smap" "a_i" "a_i")))}
-              {:args [(mp (sp "k_0" "v_0") dots) (vc "a_0" "a_1" dots)] :out (vc "r_0" "r_1" dots)}]
-      :checks [(= (replace {1 :one} '(1 2)) [:one 2]) (= (replace {1 :one} [1 2]) [:one 2]) (vector? (replace {1 :one} [1 2]))]}
+     {:name "replace" :xf true
+      :cases [{:args ["m" A] :lazy true :out (str (sq "r_0" "r_1" dots) (wh "r_i = " (ap "get" "m" "a_i" "a_i")))}
+              {:args ["m" (vc "a_0" "a_1" dots)] :lazy false :out (vc "r_0" "r_1" dots)}]
+      :checks [(= (replace {1 :one} '(1 2)) [:one 2]) (instance? clojure.lang.LazySeq (replace {1 :one} '(1 2)))
+               (= (replace {1 :one} [1 2]) [:one 2]) (vector? (replace {1 :one} [1 2]))]}
      {:name "reductions" :lazy true
       :cases [{:args [F2 A] :out (sq "a_0" (ap "f" "a_0" "a_1") (ap "f" (ap "f" "a_0" "a_1") "a_2") dots)}
-              {:args [F2 "\\mathit{init}" A] :out (sq "\\mathit{init}" (ap "f" "\\mathit{init}" "a_0") (ap "f" (ap "f" "\\mathit{init}" "a_0") "a_1") dots)}]
+              {:args [F2 init A] :out (sq init (ap "f" init "a_0") (ap "f" (ap "f" init "a_0") "a_1") dots)}]
       :checks [(= (reductions + [1 2 3]) [1 3 6]) (= (reductions + 10 [1 2]) [10 11 13])]}]}
 
-   {:id "growing"
+   {:id "combining"
     :rows
     [{:name "cons"
       :cases [{:args ["x" A] :out (sq "x" "a_0" "a_1" dots)}]
       :checks [(= (cons 0 [1 2]) [0 1 2]) (= #{} (realized-by #(do (cons :x %) nil)))]}
      {:name "concat" :lazy true
-      :cases [{:args [An Bm dots] :out (sq "a_0" dots "a_{n-1}" "b_0" dots "b_{m-1}" dots)}]
+      :cases [{:args [Al Bl dots] :out (sq "a_0" dots "a_{l-1}" "b_0" dots "b_{l'-1}" dots)}]
       :checks [(= (concat [1 2] [3] [4]) [1 2 3 4])]}
      {:name "interleave" :lazy true
       :cases [{:args [(sq "a_0" dots "a_i" "a_{i+1}" (ul "a_{i+2}" dots)) (sq "b_0" dots "b_i")]
@@ -229,10 +242,10 @@
       :checks [(= (interleave [1 2 3] [:a :b]) [1 :a 2 :b])
                (= #{0 1 2} (realized-by #(doall (interleave % [:a :b]))))]}
      {:name "interpose" :lazy true :xf true
-      :cases [{:args ["s" An] :out (sq "a_0" "s" "a_1" "s" dots "s" "a_{n-1}")}]
+      :cases [{:args ["\\mathit{sep}" Al] :out (sq "a_0" "\\mathit{sep}" "a_1" "\\mathit{sep}" dots "\\mathit{sep}" "a_{l-1}")}]
       :checks [(= (interpose 0 [1 2 3]) [1 0 2 0 3])]}
      {:name "cycle" :lazy true
-      :cases [{:args [An] :out (sq "a_0" dots "a_{n-1}" "a_0" dots "a_{n-1}" dots)}]
+      :cases [{:args [Al] :out (sq "a_0" dots "a_{l-1}" "a_0" dots "a_{l-1}" dots)}]
       :checks [(= (take 5 (cycle [1 2])) [1 2 1 2 1])]}
      {:name "flatten" :lazy true
       :cases [{:args [(sq "a_0" (sq "b_0" (sq "c_0" "c_1")) "d_0")] :out (sq "a_0" "b_0" "c_0" "c_1" "d_0")}]
@@ -241,15 +254,17 @@
    {:id "reordering"
     :rows
     [{:name "reverse"
-      :cases [{:args [An] :out (sq "a_{n-1}" dots "a_0")}]
+      :cases [{:args [Al] :out (sq "a_{l-1}" dots "a_0")}]
       :checks [(= (reverse [1 2 3]) [3 2 1])]}
      {:name "sort"
       :cases [{:args [A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh "a_{\\sigma(0)} \\le a_{\\sigma(1)} \\le \\ldots"))}
-              {:args [(str "c : x\\ x \\to " (t "int")) A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (t "ordered by ") "c"))}]
-      :checks [(= (sort [3 1 2]) [1 2 3]) (= (sort > [3 1 2]) [3 2 1])]}
+              {:args ["c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (t "ordered by ") "c"))}]
+      :checks [(= (sort [3 1 2]) [1 2 3]) (= (sort > [3 1 2]) [3 2 1]) (= (sort compare [2 1]) [1 2])]}
      {:name "sort-by"
-      :cases [{:args ["k : x \\to y" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap "k" "a_{\\sigma(0)}") " \\le " (ap "k" "a_{\\sigma(1)}") " \\le \\ldots"))}]
-      :checks [(= (sort-by count ["bb" "a" "ccc"]) ["a" "bb" "ccc"]) (= (sort-by first [[1 :b] [0 :x] [1 :a]]) [[0 :x] [1 :b] [1 :a]])]}
+      :cases [{:args [G A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap "g" "a_{\\sigma(0)}") " \\le " (ap "g" "a_{\\sigma(1)}") " \\le \\ldots"))}
+              {:args [G "c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap "g" "a_{\\sigma(i)}") (t " ordered by ") "c"))}]
+      :checks [(= (sort-by count ["bb" "a" "ccc"]) ["a" "bb" "ccc"]) (= (sort-by first [[1 :b] [0 :x] [1 :a]]) [[0 :x] [1 :b] [1 :a]])
+               (= (sort-by count > ["a" "ccc" "bb"]) ["ccc" "bb" "a"])]}
      {:name "shuffle"
       :cases [{:args [A] :out (str (vc "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh "\\sigma" (t " is a random permutation")))}]
       :checks [(= (sort (shuffle [3 1 2])) [1 2 3]) (vector? (shuffle [1]))]}]}
@@ -257,31 +272,31 @@
    {:id "splitting"
     :rows
     [{:name "partition" :lazy true
-      :cases [{:args ["k" A] :out (str (sq (sq "a_0" dots "a_{k-1}") (sq "a_k" dots "a_{2k-1}") dots) (wh (t "a short last group is dropped")))}
-              {:args ["k" "s" A] :out (sq (sq "a_0" dots "a_{k-1}") (sq "a_s" dots "a_{s+k-1}") dots)}]
+      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped")))}
+              {:args ["n" "s" A] :out (sq (sq "a_0" dots "a_{n-1}") (sq "a_s" dots "a_{s+n-1}") dots)}]
       :checks [(= (partition 2 [0 1 2 3 4]) [[0 1] [2 3]]) (= (partition 2 1 [0 1 2]) [[0 1] [1 2]])]}
      {:name "partition-all" :lazy true :xf true
-      :cases [{:args ["k" A] :out (str (sq (sq "a_0" dots "a_{k-1}") (sq "a_k" dots "a_{2k-1}") dots) (wh (t "the last group may be short")))}]
+      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short")))}]
       :checks [(= (partition-all 2 [0 1 2 3 4]) [[0 1] [2 3] [4]])]}
      {:name "partition-by" :lazy true :xf true
       :cases [{:args [F (sq "a_0" dots "a_{i-1}" "a_i" dots)]
                :out (str (sq (sq "a_0" dots "a_{i-1}") (sq "a_i" dots) dots) (wh (ap "f" "a_{i-1}") " \\ne " (ap "f" "a_i")))}]
       :checks [(= (partition-by odd? [1 3 2 4 5]) [[1 3] [2 4] [5]])]}
      {:name "split-at"
-      :cases [{:args ["k" (sq "a_0" dots "a_{k-1}" "a_k" dots)] :out (vc (sq "a_0" dots "a_{k-1}") (sq "a_k" dots))}]
+      :cases [{:args ["n" (sq "a_0" dots "a_{n-1}" "a_n" dots)] :out (vc (sq "a_0" dots "a_{n-1}") (sq "a_n" dots))}]
       :checks [(= (split-at 2 [1 2 3]) [[1 2] [3]]) (vector? (split-at 1 [1]))]}
      {:name "split-with"
       :cases [{:args [P (sq "a_0" dots "a_{i-1}" "a_i" dots)]
                :out (str (vc (sq "a_0" dots "a_{i-1}") (sq "a_i" dots)) (wh (first-wh pa-false)))}]
       :checks [(= (split-with odd? [1 3 2 5]) [[1 3] [2 5]])]}
      {:name "partitionv" :lazy true
-      :cases [{:args ["k" A] :out (str (sq (vc "a_0" dots "a_{k-1}") (vc "a_k" dots "a_{2k-1}") dots) (wh (t "a short last group is dropped")))}]
+      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped")))}]
       :checks [(= (partitionv 2 [0 1 2]) [[0 1]]) (vector? (first (partitionv 2 [0 1])))]}
      {:name "partitionv-all" :lazy true :xf true
-      :cases [{:args ["k" A] :out (str (sq (vc "a_0" dots "a_{k-1}") (vc "a_k" dots "a_{2k-1}") dots) (wh (t "the last group may be short")))}]
+      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short")))}]
       :checks [(= (partitionv-all 2 [0 1 2]) [[0 1] [2]]) (vector? (first (partitionv-all 2 [0])))]}
      {:name "splitv-at"
-      :cases [{:args ["k" (sq "a_0" dots "a_{k-1}" "a_k" dots)] :out (vc (vc "a_0" dots "a_{k-1}") (sq "a_k" dots))}]
+      :cases [{:args ["n" (sq "a_0" dots "a_{n-1}" "a_n" dots)] :out (vc (vc "a_0" dots "a_{n-1}") (sq "a_n" dots))}]
       :checks [(= (splitv-at 2 [1 2 3]) [[1 2] [3]]) (vector? (first (splitv-at 1 [1 2])))]}]}
 
    {:id "reducing"
@@ -290,19 +305,20 @@
       :cases [{:args [F2 A] :out (ap "f" (ap "f" (ap "f" "a_0" "a_1") "a_2") dots)}
               {:args [F2 (sq "a_0")] :out "a_0"}
               {:args [F2 (sq)] :out "(f)"}
-              {:args [F2 "\\mathit{init}" A] :out (ap "f" (ap "f" (ap "f" "\\mathit{init}" "a_0") "a_1") dots)}
-              {:args [F2 "\\mathit{init}" (sq)] :out "\\mathit{init}"}]
+              {:args [F2 init A] :out (ap "f" (ap "f" (ap "f" init "a_0") "a_1") dots)}
+              {:args [F2 init (sq)] :out init}]
       :checks [(= (reduce - [10 1 2]) 7) (= (reduce + [5]) 5) (= (reduce + []) 0) (= (reduce - 10 [1 2]) 7) (= (reduce + 3 []) 3)]}
      {:name "reduce-kv"
-      :cases [{:args ["f : \\mathit{acc}\\ k\\ v \\to \\mathit{acc}" "\\mathit{init}" (mp (sp "k_0" "v_0") (sp "k_1" "v_1") dots)]
-               :out (ap "f" (ap "f" "\\mathit{init}" "k_0" "v_0") "k_1" "v_1" dots)}]
+      :cases [{:args ["f : \\mathit{acc}\\ k\\ v \\to \\mathit{acc}" init M]
+               :out (ap "f" (ap "f" init "k_0" "v_0") "k_1" "v_1" dots)}]
       :checks [(= (reduce-kv #(+ %1 %2 %3) 0 {1 10 2 20}) 33)]}
      {:name "transduce"
-      :cases [{:args ["\\mathit{xf}" F2 "\\mathit{init}" A]
-               :out (str (ap "f" (ap "f" (ap "f" "\\mathit{init}" "b_0") "b_1") dots) (wh (sq "b_0" "b_1" dots) " = " (ap "sequence" "\\mathit{xf}" "a")))}]
-      :checks [(= (transduce (map inc) + 0 [1 2]) 5)]}
+      :cases [{:args [xf (str F2 ",\\ \\mathit{acc} \\to \\mathit{acc}") init A]
+               :out (str (ap "f" (ap "f" (ap "f" (ap "f" init "b_0") "b_1") dots)) (wh (sq "b_0" "b_1" dots) " = " (ap "sequence" xf "a")))}]
+      :checks [(= (transduce (map inc) + 0 [1 2]) 5)
+               (= (transduce (map inc) (fn ([a] (* 100 a)) ([a x] (+ a x))) 0 [1 2]) 500)]}
      {:name "count"
-      :cases [{:args [An] :out "n"} {:args [nil'] :out "0"}]
+      :cases [{:args [Al] :out "l"} {:args [nil'] :out "0"}]
       :checks [(= (count [1 2 3]) 3) (= (count nil) 0)]}
      {:name "first"
       :cases [{:args [(sq "a_0" (ul "a_1" dots))] :out "a_0"} {:args [(sq)] :out nil'}]
@@ -311,20 +327,24 @@
       :cases [{:args [(sq "a_0" "a_1" (ul "a_2" dots))] :out "a_1"} {:args [(sq "a_0")] :out nil'}]
       :checks [(= (second [1 2 3]) 2) (nil? (second [1])) (= #{0 1} (realized-by second))]}
      {:name "last"
-      :cases [{:args [An] :out "a_{n-1}"} {:args [(sq)] :out nil'}]
+      :cases [{:args [Al] :out "a_{l-1}"} {:args [(sq)] :out nil'}]
       :checks [(= (last [1 2 3]) 3) (nil? (last []))]}
      {:name "nth"
       :cases [{:args [(sq "a_0" dots "a_i" (ul dots)) "i"] :out "a_i"}
-              {:args [An "i \\ge n"] :out (t "throws")}
-              {:args [An "i \\ge n" "d"] :out "d"}]
+              {:args [Al "i \\ge l"] :out (t "throws")}
+              {:args [Al "i \\ge l" "d"] :out "d"}]
       :checks [(= (nth [1 2 3] 1) 2) (= :d (nth [1] 5 :d))
                (= :thrown (try (nth [1] 5) (catch IndexOutOfBoundsException _ :thrown)))
                (= #{0 1 2} (realized-by #(nth % 2)))]}
      {:name "ffirst"
-      :cases [{:args [(sq (sq "b_0" dots) dots)] :out "b_0"}]
-      :checks [(= (ffirst [[1 2] [3]]) 1)]}
+      :cases [{:args [(sq (sq "b_0" (ul dots)) (ul dots))] :out "b_0"}]
+      :checks [(= (ffirst [[1 2] [3]]) 1)
+               (let [[inner seen] (probe)
+                     outer (lazy-seq (cons inner (lazy-seq (swap! seen conj :outer-rest) nil)))]
+                 (ffirst outer)
+                 (= #{0} @seen))]}
      {:name "rand-nth"
-      :cases [{:args [An] :out (str "a_i" (wh "i" (t " is random")))}]
+      :cases [{:args [Al] :out (str "a_i" (wh "i" (t " is random")))}]
       :checks [(contains? #{1 2} (rand-nth [1 2]))]}
      {:name "some"
       :cases [{:args [F (sq "a_0" dots "a_i" (ul dots))]
@@ -342,32 +362,34 @@
       :cases [{:args [P (sq "a_0" dots "a_i" (ul dots))]
                :out (cases true' (str (t "wh. ") (first-wh pa-false))
                            false' (t "otherwise"))}]
-      :checks [(true? (not-every? odd? [1 2])) (false? (not-every? odd? [1 3]))]}
+      :checks [(true? (not-every? odd? [1 2])) (false? (not-every? odd? [1 3]))
+               (= #{0 1} (realized-by #(not-every? (fn [x] (< x 1)) %)))]}
      {:name "not-any?"
       :cases [{:args [P (sq "a_0" dots "a_i" (ul dots))]
                :out (cases false' (str (t "wh. ") (first-wh pa-true))
                            true' (t "otherwise"))}]
-      :checks [(true? (not-any? even? [1 3])) (false? (not-any? even? [1 2]))]}
+      :checks [(true? (not-any? even? [1 3])) (false? (not-any? even? [1 2]))
+               (= #{0 1} (realized-by #(not-any? (fn [x] (= x 1)) %)))]}
      {:name "empty?"
       :cases [{:args [(sq)] :out true'} {:args [(sq "a_0" (ul dots))] :out false'}]
       :checks [(true? (empty? [])) (false? (empty? [1])) (= #{0} (realized-by empty?))]}
      {:name "not-empty"
-      :cases [{:args [(sq)] :out nil'} {:args ["c"] :out "c"}]
+      :cases [{:args [(sq)] :out nil'} {:args [(sq "a_0" dots)] :out (sq "a_0" dots)}]
       :checks [(nil? (not-empty [])) (= [1] (not-empty [1]))]}
      {:name "max-key"
-      :cases [{:args [(str "k : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "k" "x_i") (t " is the largest (the last one on a tie)")))}]
-      :checks [(= "ccc" (max-key count "a" "ccc" "bb")) (= "cd" (max-key count "ab" "cd"))]}
+      :cases [{:args [(str "g : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "g" "x_i") (t " is the largest (the last one on a tie)")))}]
+      :checks [(= "ccc" (max-key count "a" "ccc" "bb")) (= "cd" (max-key count "ab" "cd")) (= "ef" (max-key count "ab" "cd" "ef"))]}
      {:name "min-key"
-      :cases [{:args [(str "k : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "k" "x_i") (t " is the smallest (the last one on a tie)")))}]
-      :checks [(= "a" (min-key count "a" "ccc" "bb")) (= "cd" (min-key count "ab" "cd"))]}]}
+      :cases [{:args [(str "g : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "g" "x_i") (t " is the smallest (the last one on a tie)")))}]
+      :checks [(= "a" (min-key count "a" "ccc" "bb")) (= "cd" (min-key count "ab" "cd")) (= "ef" (min-key count "ab" "cd" "ef"))]}]}
 
    {:id "collecting"
     :rows
     [{:name "into"
       :cases [{:args [(vc "t_0" dots) A] :out (vc "t_0" dots "a_0" "a_1" dots)}
-              {:args [(sq "t_0" dots) A] :out (sq dots "a_1" "a_0" "t_0" dots)}
+              {:args [(ls "t_0" dots) A] :out (ls dots "a_1" "a_0" "t_0" dots)}
               {:args [(mp (sp "k_0" "v_0") dots) (sq (vc "k" "v") dots)] :out (mp (sp "k_0" "v_0") dots (sp "k" "v") dots)}
-              {:args ["c" "\\mathit{xf}" A] :out (ap "into" "c" (ap "sequence" "\\mathit{xf}" "a"))}]
+              {:args ["\\mathit{to}" xf A] :out (ap "into" "\\mathit{to}" (ap "sequence" xf "a"))}]
       :checks [(= (into [0] [1 2]) [0 1 2]) (= (into '(0) [1 2]) '(2 1 0)) (= (into {:a 1} [[:b 2]]) {:a 1 :b 2})
                (= (into [] (map inc) [1 2]) [2 3])]}
      {:name "vec"
@@ -376,17 +398,12 @@
      {:name "set"
       :cases [{:args [A] :out (st "a_0" "a_1" dots)}]
       :checks [(= (set [1 2 1]) #{1 2})]}
-     {:name "sequence" :lazy true
-      :cases [{:args [A] :out A}
-              {:args [(sq)] :out (sq)}
-              {:args ["\\mathit{xf}" A] :out (str (sq "b_0" "b_1" dots) (wh (t "the ") "b_i" (t " are what ") "\\mathit{xf}" (t " passes on")))}]
-      :checks [(= (sequence [1 2]) [1 2]) (= () (sequence [])) (= (sequence (filter odd?) [1 2 3]) [1 3])]}
      {:name "zipmap"
       :cases [{:args [(sq "k_0" dots "k_i") (sq "v_0" dots "v_i" "v_{i+1}" (ul "v_{i+2}" dots))] :out (mp (sp "k_0" "v_0") dots (sp "k_i" "v_i"))}]
       :checks [(= (zipmap [:a :b] [1 2 3]) {:a 1 :b 2})
                (= #{0 1 2} (realized-by #(zipmap [:a :b] %)))]}
      {:name "frequencies"
-      :cases [{:args [A] :out (str (mp (sp "a_i" "c_i") dots) (wh "c_i" (t " is how many times ") "a_i" (t " occurs")))}]
+      :cases [{:args [A] :out (str (mp (sp "a_i" "n_i") dots) (wh "n_i" (t " is how many times ") "a_i" (t " occurs")))}]
       :checks [(= (frequencies [:a :b :a]) {:a 2 :b 1})]}
      {:name "group-by"
       :cases [{:args [F A] :out (str (mp (sp "y" (vc "a_i" dots)) dots) (wh (ap "f" "a_i") " = y"))}]
@@ -396,16 +413,16 @@
     :rows
     [{:name "conj"
       :cases [{:args [(vc "a_0" dots) "x"] :out (vc "a_0" dots "x")}
-              {:args [(sq "a_0" dots) "x"] :out (sq "x" "a_0" dots)}
+              {:args [(ls "a_0" dots) "x"] :out (ls "x" "a_0" dots)}
               {:args [(st "a_0" dots) "x"] :out (st "a_0" dots "x")}
               {:args [(mp (sp "k_0" "v_0") dots) (vc "k" "v")] :out (mp (sp "k_0" "v_0") dots (sp "k" "v"))}
-              {:args [nil' "x"] :out (sq "x")}]
-      :checks [(= (conj [1] 2) [1 2]) (= (conj '(1) 2) '(2 1)) (= (conj #{1} 2) #{1 2}) (= (conj {:a 1} [:b 2]) {:a 1 :b 2}) (= (conj nil 1) '(1))]}
+              {:args [nil' "x"] :out (ls "x")}]
+      :checks [(= (conj [1] 2) [1 2]) (= (conj '(1) 2) '(2 1)) (= (conj #{1} 2) #{1 2}) (= (conj {:a 1} [:b 2]) {:a 1 :b 2}) (= (conj nil 1) '(1)) (list? (conj nil 1))]}
      {:name "disj"
       :cases [{:args [(st "a_0" dots "x" dots) "x"] :out (st "a_0" dots)}]
       :checks [(= (disj #{1 2} 2) #{1})]}
      {:name "assoc"
-      :cases [{:args [(mp (sp "k_0" "v_0") dots) "k" "v"] :out (str (mp (sp "k_0" "v_0") dots (sp "k" "v")) (wh (t "a previous value of ") "k" (t " is replaced")))}
+      :cases [{:args [M "k" "v"] :out (str (mp (sp "k_0" "v_0") dots (sp "k" "v")) (wh (t "a previous value of ") "k" (t " is replaced")))}
               {:args [(vc "a_0" dots "a_i" dots) "i" "x"] :out (vc "a_0" dots "x" dots)}]
       :checks [(= (assoc {:a 1} :b 2) {:a 1 :b 2}) (= (assoc {:a 1} :a 2) {:a 2}) (= (assoc [1 2] 1 :x) [1 :x]) (= (assoc [1] 1 :x) [1 :x])]}
      {:name "dissoc"
@@ -424,55 +441,59 @@
       :cases [{:args ["m" (vc "k_0" "k_1") "v"] :out (ap "assoc" "m" "k_0" (ap "assoc" (ap "get" "m" "k_0") "k_1" "v"))}]
       :checks [(= (assoc-in {} [:a :b] 1) {:a {:b 1}})]}
      {:name "update"
-      :cases [{:args [(mp dots (sp "k" "v") dots) "k" F] :out (mp dots (sp "k" (ap "f" "v")) dots)}
+      :cases [{:args [(mp dots (sp "k" "v") dots) "k" "f : v \\to w"] :out (mp dots (sp "k" (ap "f" "v")) dots)}
               {:args [(mp dots (sp "k" "v") dots) "k" "f" "x_0" dots] :out (mp dots (sp "k" (ap "f" "v" "x_0" dots)) dots)}]
       :checks [(= (update {:a 1} :a inc) {:a 2}) (= (update {:a 1} :a + 10) {:a 11}) (= (update {} :a (fnil inc 0)) {:a 1})]}
      {:name "update-in"
-      :cases [{:args ["m" (vc "k_0" "k_1") F] :out (ap "assoc-in" "m" (vc "k_0" "k_1") (ap "f" (ap "get-in" "m" (vc "k_0" "k_1"))))}]
+      :cases [{:args ["m" (vc "k_0" "k_1") "f : v \\to w"] :out (ap "assoc-in" "m" (vc "k_0" "k_1") (ap "f" (ap "get-in" "m" (vc "k_0" "k_1"))))}]
       :checks [(= (update-in {:a {:b 1}} [:a :b] inc) {:a {:b 2}})]}
      {:name "update-keys"
-      :cases [{:args [(mp (sp "k_0" "v_0") dots) "f : k \\to k"] :out (mp (sp (ap "f" "k_0") "v_0") dots)}]
+      :cases [{:args [M "f : k \\to k'"] :out (mp (sp (ap "f" "k_0") "v_0") (sp (ap "f" "k_1") "v_1") dots)}]
       :checks [(= (update-keys {:a 1} name) {"a" 1})]}
      {:name "update-vals"
-      :cases [{:args [(mp (sp "k_0" "v_0") dots) "f : v \\to v"] :out (mp (sp "k_0" (ap "f" "v_0")) dots)}]
+      :cases [{:args [M "f : v \\to w"] :out (mp (sp "k_0" (ap "f" "v_0")) (sp "k_1" (ap "f" "v_1")) dots)}]
       :checks [(= (update-vals {:a 1} inc) {:a 2})]}
      {:name "merge"
-      :cases [{:args [(mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "j_0" "u_0") dots) dots]
-               :out (str (mp (sp "k_0" "w_0") dots (sp "j_0" "u_0") dots) (wh (t "the later map wins")))}]
+      :cases [{:args [(mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots) dots]
+               :out (str (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots) (wh (t "the later map wins")))}]
       :checks [(= (merge {:a 1 :b 2} {:a 3 :c 4}) {:a 3 :b 2 :c 4}) (nil? (merge))]}
      {:name "merge-with"
-      :cases [{:args ["f : v\\ v \\to v" (mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "j_0" "u_0") dots)]
-               :out (mp (sp "k_0" (ap "f" "v_0" "w_0")) dots (sp "j_0" "u_0") dots)}]
+      :cases [{:args ["f : v\\ w \\to v" (mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots)]
+               :out (mp (sp "k_0" (ap "f" "v_0" "w_0")) (sp "k_1" "w_1") dots)}]
       :checks [(= (merge-with + {:a 1 :b 2} {:a 3 :c 4}) {:a 4 :b 2 :c 4})]}
      {:name "select-keys"
       :cases [{:args ["m" (vc "k_0" "k_1" dots)] :out (str (mp (sp "k_i" "v_i") dots) (wh "k_i" (t " is a key of ") "m"))}]
       :checks [(= (select-keys {:a 1 :b 2} [:a :z]) {:a 1})]}
      {:name "contains?"
       :cases [{:args ["m" "k"] :out (cases true' (str (t "wh. ") "k" (t " is a key of ") "m") false' (t "otherwise"))}
-              {:args [(vc "a_0" dots "a_{n-1}") "i"] :out (cases true' (str (t "wh. ") "0 \\le i < n") false' (t "otherwise"))}]
+              {:args [(vc "a_0" dots "a_{l-1}") "i"] :out (cases true' (str (t "wh. ") "0 \\le i < l") false' (t "otherwise"))}]
       :checks [(true? (contains? {:a nil} :a)) (false? (contains? {} :a)) (true? (contains? [:x :y] 1)) (false? (contains? [:x :y] :x))]}
      {:name "find"
       :cases [{:args [(mp dots (sp "k" "v") dots) "k"] :out (vc "k" "v")}
               {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of ") "m"))}]
       :checks [(= (find {:a 1} :a) [:a 1]) (map-entry? (find {:a 1} :a)) (nil? (find {} :a))]}
      {:name "peek"
-      :cases [{:args [(vc "a_0" dots "a_{n-1}")] :out "a_{n-1}"}
-              {:args [(sq "a_0" dots)] :out "a_0"}]
-      :checks [(= (peek [1 2 3]) 3) (= (peek '(1 2 3)) 1)]}
+      :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out "a_{l-1}"}
+              {:args [(ls "a_0" dots)] :out "a_0"}
+              {:args [(vc)] :out nil'}]
+      :checks [(= (peek [1 2 3]) 3) (= (peek '(1 2 3)) 1) (nil? (peek []))]}
      {:name "pop"
-      :cases [{:args [(vc "a_0" dots "a_{n-1}")] :out (vc "a_0" dots "a_{n-2}")}
-              {:args [(sq "a_0" "a_1" dots)] :out (sq "a_1" dots)}
-              {:args [(vc)] :out (t "throws")}]
+      :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out (vc "a_0" dots "a_{l-2}")}
+              {:args [(ls "a_0" "a_1" dots)] :out (ls "a_1" dots)}
+              {:args [(vc)] :out (t "throws")}
+              {:args [(ls)] :out (t "throws")}]
       :checks [(= (pop [1 2 3]) [1 2]) (= (pop '(1 2 3)) '(2 3))
-               (= :thrown (try (pop []) (catch IllegalStateException _ :thrown)))]}
+               (= :thrown (try (pop []) (catch IllegalStateException _ :thrown)))
+               (= :thrown (try (pop ()) (catch IllegalStateException _ :thrown)))]}
      {:name "subvec"
-      :cases [{:args [(vc "a_0" dots "a_{n-1}") "i" "j"] :out (vc "a_i" dots "a_{j-1}")}
-              {:args [(vc "a_0" dots "a_{n-1}") "i"] :out (vc "a_i" dots "a_{n-1}")}]
+      :cases [{:args [(vc "a_0" dots "a_{l-1}") "i" "j"] :out (vc "a_i" dots "a_{j-1}")}
+              {:args [(vc "a_0" dots "a_{l-1}") "i"] :out (vc "a_i" dots "a_{l-1}")}]
       :checks [(= (subvec [0 1 2 3] 1 3) [1 2]) (= (subvec [0 1 2] 1) [1 2])]}
      {:name "empty"
       :cases [{:args [(vc "a_0" dots)] :out (vc)}
-              {:args [(mp (sp "k_0" "v_0") dots)] :out (mp)}]
-      :checks [(= (empty [1 2]) []) (vector? (empty [1])) (= (empty {:a 1}) {}) (map? (empty {:a 1}))]}]}
+              {:args [M] :out (mp)}]
+      :checks [(= (empty [1 2]) []) (vector? (empty [1])) (= (empty {:a 1}) {}) (map? (empty {:a 1}))
+               (sorted? (empty (sorted-map :a 1)))]}]}
 
    {:id "functions"
     :rows
@@ -523,18 +544,22 @@
 
 (defn row-html [{:keys [name lazy xf cases]}]
   (let [n (count cases)
-        span (fn [body] (str "<td" (when (> n 1) (str " rowspan=\"" n "\"")) ">" body "</td>"))]
+        span (fn [body] (str "<td" (when (> n 1) (str " rowspan=\"" n "\"")) ">" body "</td>"))
+        per-case-lazy? (some #(contains? % :lazy) cases)
+        mark (fn [b] (if b "✓" ""))]
     (str/join
      "\n"
      (map-indexed
-      (fn [i {:keys [args out]}]
+      (fn [i {:keys [args out] :as c}]
         (str "<tr>"
              (when (zero? i)
                (span (str "<a href=\"" (doc-url name) "\"><code style=\"white-space: nowrap\">" (escape name) "</code></a>")))
              "<td>" (if (seq args) (str/join ", " (map math args)) "") "</td>"
              "<td>" (math out) "</td>"
-             (when (zero? i)
-               (str (span (if lazy "✓" "")) (span (if xf "✓" ""))))
+             (if per-case-lazy?
+               (str "<td>" (mark (:lazy c)) "</td>")
+               (when (zero? i) (span (mark lazy))))
+             (when (zero? i) (span (mark xf)))
              "</tr>"))
       cases))))
 
