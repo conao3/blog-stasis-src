@@ -57,8 +57,13 @@
 (def P (str "p : x \\to " (t "bool")))
 (def F "f : x \\to y")
 (def F2 "f : \\mathit{acc}\\ x \\to \\mathit{acc}")
-(def G "g : x \\to y")
-(defn ap [& xs] (apply sq xs))
+(def kf "\\mathit{keyfn}")
+(def G (str kf " : x \\to y"))
+(defn ap [head & xs]
+  (apply sq (if (re-matches #"[a-z][a-z-]+" head)
+              (str "\\mathtt{" (str/replace head "-" "\\text{-}") "}")
+              head)
+         xs))
 (def pa-false (str (ap "p" "a_i") " = " false'))
 (def pa-true (str (ap "p" "a_i") " = " true'))
 (def M (mp (sp "k_0" "v_0") (sp "k_1" "v_1") dots))
@@ -82,7 +87,7 @@
       :cases [{:args [] :out (sq "0" "1" "2" dots)}
               {:args ["n"] :out (sq "0" "1" dots "n-1")}
               {:args ["i" "j"] :out (sq "i" "i+1" dots "j-1")}
-              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh (t "it stops before reaching ") "j"))}]
+              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh "s \\ne 0" (t ", and it stops before reaching ") "j"))}]
       :checks [(= (take 3 (range)) [0 1 2]) (= (range 3) [0 1 2]) (= (range 2 5) [2 3 4]) (= (range 0 7 3) [0 3 6])
                (= (range 5 0 -2) [5 3 1])]}
      {:name "repeat" :lazy true
@@ -248,7 +253,7 @@
       :cases [{:args [Al] :out (sq "a_0" dots "a_{l-1}" "a_0" dots "a_{l-1}" dots)}]
       :checks [(= (take 5 (cycle [1 2])) [1 2 1 2 1])]}
      {:name "flatten" :lazy true
-      :cases [{:args [(sq "a_0" (sq "b_0" (sq "c_0" "c_1")) "d_0")] :out (sq "a_0" "b_0" "c_0" "c_1" "d_0")}]
+      :cases [{:args [(sq "a_0" (vc "a_1" (sq "a_2" "a_3")) "a_4")] :out (sq "a_0" "a_1" "a_2" "a_3" "a_4")}]
       :checks [(= (flatten [1 [2 [3 4]] 5]) [1 2 3 4 5])]}]}
 
    {:id "reordering"
@@ -261,8 +266,8 @@
               {:args ["c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (t "ordered by ") "c"))}]
       :checks [(= (sort [3 1 2]) [1 2 3]) (= (sort > [3 1 2]) [3 2 1]) (= (sort compare [2 1]) [1 2])]}
      {:name "sort-by"
-      :cases [{:args [G A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap "g" "a_{\\sigma(0)}") " \\le " (ap "g" "a_{\\sigma(1)}") " \\le \\ldots"))}
-              {:args [G "c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap "g" "a_{\\sigma(i)}") (t " ordered by ") "c"))}]
+      :cases [{:args [G A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap kf "a_{\\sigma(0)}") " \\le " (ap kf "a_{\\sigma(1)}") " \\le \\ldots"))}
+              {:args [G "c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap kf "a_{\\sigma(i)}") (t " ordered by ") "c"))}]
       :checks [(= (sort-by count ["bb" "a" "ccc"]) ["a" "bb" "ccc"]) (= (sort-by first [[1 :b] [0 :x] [1 :a]]) [[0 :x] [1 :b] [1 :a]])
                (= (sort-by count > ["a" "ccc" "bb"]) ["ccc" "bb" "a"])]}
      {:name "shuffle"
@@ -377,10 +382,10 @@
       :cases [{:args [(sq)] :out nil'} {:args [(sq "a_0" dots)] :out (sq "a_0" dots)}]
       :checks [(nil? (not-empty [])) (= [1] (not-empty [1]))]}
      {:name "max-key"
-      :cases [{:args [(str "g : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "g" "x_i") (t " is the largest (the last one on a tie)")))}]
+      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the largest (the last one on a tie)")))}]
       :checks [(= "ccc" (max-key count "a" "ccc" "bb")) (= "cd" (max-key count "ab" "cd")) (= "ef" (max-key count "ab" "cd" "ef"))]}
      {:name "min-key"
-      :cases [{:args [(str "g : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap "g" "x_i") (t " is the smallest (the last one on a tie)")))}]
+      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the smallest (the last one on a tie)")))}]
       :checks [(= "a" (min-key count "a" "ccc" "bb")) (= "cd" (min-key count "ab" "cd")) (= "ef" (min-key count "ab" "cd" "ef"))]}]}
 
    {:id "collecting"
@@ -403,7 +408,7 @@
       :checks [(= (zipmap [:a :b] [1 2 3]) {:a 1 :b 2})
                (= #{0 1 2} (realized-by #(zipmap [:a :b] %)))]}
      {:name "frequencies"
-      :cases [{:args [A] :out (str (mp (sp "a_i" "n_i") dots) (wh "n_i" (t " is how many times ") "a_i" (t " occurs")))}]
+      :cases [{:args [A] :out (str (mp (sp "a_i" "\\mathit{cnt}_i") dots) (wh "\\mathit{cnt}_i" (t " is how many times ") "a_i" (t " occurs")))}]
       :checks [(= (frequencies [:a :b :a]) {:a 2 :b 1})]}
      {:name "group-by"
       :cases [{:args [F A] :out (str (mp (sp "y" (vc "a_i" dots)) dots) (wh (ap "f" "a_i") " = y"))}]
@@ -448,7 +453,7 @@
       :cases [{:args ["m" (vc "k_0" "k_1") "f : v \\to w"] :out (ap "assoc-in" "m" (vc "k_0" "k_1") (ap "f" (ap "get-in" "m" (vc "k_0" "k_1"))))}]
       :checks [(= (update-in {:a {:b 1}} [:a :b] inc) {:a {:b 2}})]}
      {:name "update-keys"
-      :cases [{:args [M "f : k \\to k'"] :out (mp (sp (ap "f" "k_0") "v_0") (sp (ap "f" "k_1") "v_1") dots)}]
+      :cases [{:args [M "f : k \\to k"] :out (mp (sp (ap "f" "k_0") "v_0") (sp (ap "f" "k_1") "v_1") dots)}]
       :checks [(= (update-keys {:a 1} name) {"a" 1})]}
      {:name "update-vals"
       :cases [{:args [M "f : v \\to w"] :out (mp (sp "k_0" (ap "f" "v_0")) (sp "k_1" (ap "f" "v_1")) dots)}]

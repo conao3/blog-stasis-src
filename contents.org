@@ -23914,7 +23914,7 @@ A [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-che
 - \((a_0\ a_1\ \ldots)\) is a seq. \(a\) and \(b\) are input seqs, and a subscript picks one element.
 - \(\texttt{'}(a_0\ a_1\ \ldots)\) is a list, \([a_0\ a_1\ \ldots]\) is a vector, \(\{k_0\ v_0,\ \ldots\}\) is a map, and \(\#\{a_0\ \ldots\}\) is a set, as in Clojure source. The list rows of =peek= and =pop= need a real list, and a seq such as the result of =map= throws there.
 - \((f\ a_0)\) calls \(f\) with \(a_0\), as in Clojure source.
-- \(f\) is a function that computes new values, and \(g\) is a key function such as the one =sort-by= takes.
+- \(f\), \(g\) and \(h\) are functions that compute new values, and \(\mathit{keyfn}\) is a key function such as the one =sort-by= takes.
 - \(p\) and \(q\) are predicates. A predicate result counts as \(\mathtt{true}\) when it is anything other than \(\mathtt{nil}\) or \(\mathtt{false}\).
 - \(c\) is a comparator, such as =compare= or =>=.
 - \(f : x\ y \to z\) says that \(f\) takes two arguments, and \(\text{bool}\) and \(\text{number}\) name the kind of value it returns. \(\mathit{acc}\) is the accumulated value of a reducing function, and \(\mathit{init}\) is its first value.
@@ -23922,8 +23922,8 @@ A [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-che
 - \(i\) and \(j\) are positions, \(n\) is a count that you pass in, \(s\) is a step, and \(l\) and \(l'\) are the lengths of the input seqs.
 - \(m\) is a map, \(k\) is a key, \(v\) and \(w\) are values, and \(d\) is a default value.
 - \(x \mapsto (f\ x)\) is a function, the same as =(fn [x] (f x))=. \((x_0\ \ldots) \mapsto \ldots\) takes any number of arguments.
-- \(\sigma\) is a permutation of the positions, and "wh." reads "where". Other letters name values that the row defines after "wh.".
-- An underlined element stays unrealized after you call the function and consume every seq in its result. =(take-while p a)= has to look at \(a_i\) to know where to stop, so only the elements after \(a_i\) are underlined. I measured this on an unchunked lazy seq. Lazy functions over a vector or a finite =range= compute 32 results at a time, because those seqs are chunked.
+- \(\sigma\) is a permutation of the positions, and "wh." reads "where". Other letters name values that appear in the arguments or that the row defines after "wh.".
+- An underlined element stays unrealized after you call the function and consume every seq in its result. =(take-while p a)= has to look at \(a_i\) to know where to stop, so only the elements after \(a_i\) are underlined. I measured this on an unchunked lazy seq. Over a vector or a finite =range=, many lazy functions such as =map= and =filter= compute 32 results at a time, because those seqs are chunked.
 - A check in the Lazy column means the function returns a lazy seq, which computes its elements when you ask for them.
 - A check in the xf column means the function returns a [[https://clojure.org/reference/transducers][transducer]] when you call it without the collection, as in =(map inc)=.
 - The function name links to its entry in the [[https://clojure.github.io/clojure/clojure.core-api.html][clojure.core API reference]].
@@ -23936,7 +23936,7 @@ Some functions sit under two of those headings, such as =filter=, which appears 
 I grouped each function by how the elements of its result relate to the elements of its input, so each function appears once.
 - Selecting: every result element is an input element, in the input order.
 - Transforming: the result elements are values that \(f\) computes from the input elements.
-- Combining: the result joins the elements of several seqs, or of nested seqs, into one seq, or puts new elements between them.
+- Combining: the result adds elements to a seq, or joins several seqs or nested collections into one seq.
 - Reordering: the result has the same elements in another order.
 - Splitting: the result holds the input elements in groups.
 - Reducing: the result is one value.
@@ -23956,7 +23956,7 @@ The last section is about functions that build, call or wrap functions.
 ** Making a seq
 
 These functions make a seq from nothing, from a value or from a collection.
-=sequence= returns a lazy seq only when you give it a transducer.
+Without a transducer, =sequence= only turns its argument into a seq, so a vector gives a chunked seq and a lazy seq comes back as it is.
 
 #+INCLUDE: "generated/include/315a71/making.html" export html
 
@@ -23982,7 +23982,7 @@ With more than one input seq, =map= stops at the end of the shortest one.
 
 ** Combining
 
-=interleave= stops at the end of the shortest seq, and =flatten= replaces each nested seq with its elements.
+=interleave= stops at the end of the shortest seq, and =flatten= replaces each nested sequential collection, such as a vector or a list, with its elements.
 
 #+INCLUDE: "generated/include/315a71/combining.html" export html
 
