@@ -104,15 +104,24 @@
       :cases [{:args ["x_0" dots A] :out (sq "x_0" dots "a_0" "a_1" dots)}]
       :checks [(= (list* 1 2 [3 4]) [1 2 3 4]) (= #{} (realized-by #(do (list* :x %) nil)))]}
      {:name "re-seq" :lazy true
-      :cases [{:args ["\\mathit{re}" "\\mathit{str}"] :out (str (sq "s_0" "s_1" dots) (wh "s_i" (t " is the i-th match of ") "\\mathit{re}"))}]
-      :checks [(= (re-seq #"\d" "a1b2") ["1" "2"]) (nil? (re-seq #"\d" "ab"))]}
+      :cases [{:args ["\\mathit{re}" "\\mathit{str}"] :out (str (sq "s_0" "s_1" dots) (wh "s_i" (t " is the i-th match, as ") "\\mathtt{re\\text{-}find}" (t " returns it")))}
+              {:args ["\\mathit{re}" "\\mathit{str}"] :out (str nil' (wh (t "there is no match")))}]
+      :checks [(= (re-seq #"\d" "a1b2") ["1" "2"]) (nil? (re-seq #"\d" "ab")) (= (re-seq #"(\d)(\w)" "1a") [["1a" "1" "a"]])]}
      {:name "subseq"
-      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k")))}
-              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t " and ") (ap "\\mathit{test}'" "a_i" "k'")))}]
-      :checks [(= (subseq (sorted-set 1 2 3) > 1) [2 3]) (= (subseq (sorted-set 1 2 3 4) > 1 < 4) [2 3]) (= (subseq (sorted-map 1 :a 2 :b) >= 2) [[2 :b]])]}
+      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy false :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "> \\ge"))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "< \\le"))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t " and ") (ap "\\mathit{test}'" "a_i" "k'")))}]
+      :checks [(= (subseq (sorted-set 1 2 3) > 1) [2 3]) (= (subseq (sorted-set 1 2 3 4) > 1 < 4) [2 3]) (= (subseq (sorted-map 1 :a 2 :b) >= 2) [[2 :b]])
+               (not (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2) > 0)))
+               (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2) < 2))
+               (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2 3) > 0 < 3))]}
      {:name "rsubseq"
-      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", in reverse order")))}]
-      :checks [(= (rsubseq (sorted-set 1 2 3) < 3) [2 1])]}
+      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy false :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "< \\le"))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "> \\ge"))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t " and ") (ap "\\mathit{test}'" "a_i" "k'")))}]
+      :checks [(= (rsubseq (sorted-set 1 2 3) < 3) [2 1]) (= (rsubseq (sorted-set 1 2 3 4) > 1 < 4) [3 2])
+               (not (instance? clojure.lang.LazySeq (rsubseq (sorted-set 1 2) < 2)))
+               (instance? clojure.lang.LazySeq (rsubseq (sorted-set 1 2) > 0))]}
      {:name "range" :lazy true
       :cases [{:args [] :out (sq "0" "1" "2" dots)}
               {:args ["n"] :out (sq "0" "1" dots "n-1")}
@@ -522,10 +531,10 @@
               {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of ") "m"))}]
       :checks [(= (find {:a 1} :a) [:a 1]) (map-entry? (find {:a 1} :a)) (nil? (find {} :a))]}
      {:name "key"
-      :cases [{:args [(vc "k" "v")] :out "k"}]
+      :cases [{:args ["e"] :out (str "k" (wh "e = " (vc "k" "v") (t " is a map entry")))}]
       :checks [(= :a (key (first {:a 1})))]}
      {:name "val"
-      :cases [{:args [(vc "k" "v")] :out "v"}]
+      :cases [{:args ["e"] :out (str "v" (wh "e = " (vc "k" "v") (t " is a map entry")))}]
       :checks [(= 1 (val (first {:a 1})))]}
      {:name "peek"
       :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out "a_{l-1}"}
@@ -595,8 +604,9 @@
                [(= (true-for sequential?) #{:list :vector :seq :lazy :entry})])
      (pred-row "associative?" "a map, vector or map entry" nil
                [(= (true-for associative?) #{:map :sorted-map :vector :entry})])
-     (pred-row "counted?" "a collection that counts in constant time (every type here except a lazy seq)" nil
-               [(= (true-for counted?) #{:list :vector :seq :map :set :entry :sorted-map :sorted-set})])
+     (pred-row "counted?" "a list, vector, map, set or map entry, or a seq that knows its length, such as a vector's seq" nil
+               [(= (true-for counted?) #{:list :vector :seq :map :set :entry :sorted-map :sorted-set})
+                (false? (counted? (cons 1 '(2)))) (true? (counted? (range 10)))])
      (pred-row "reversible?" "a vector, map entry, sorted map or sorted set" nil
                [(= (true-for reversible?) #{:vector :entry :sorted-map :sorted-set})])
      (pred-row "sorted?" "a sorted map or sorted set" nil
@@ -653,8 +663,8 @@
       :cases [{:args ["x" "y"] :out (cases true' (str (t "wh. ") "x" (t " and ") "y" (t " are the same object")) false' (t "otherwise"))}]
       :checks [(let [v [1]] (true? (identical? v v))) (false? (identical? [1] [1]))]}
      {:name "compare"
-      :cases [{:args ["x" "y"] :out (cases (t "a negative number") (str (t "wh. ") "x < y") "0" (str (t "wh. ") "x = y") (t "a positive number") (str (t "wh. ") "x > y"))}]
-      :checks [(neg? (compare 1 2)) (zero? (compare [1 2] [1 2])) (pos? (compare "b" "a")) (neg? (compare nil 1))]}
+      :cases [{:args ["x" "y"] :out (cases (t "a negative number") (str (t "wh. ") "x" (t " comes before ") "y") "0" (str (t "wh. ") "x" (t " and ") "y" (t " are in the same place")) (t "a positive number") (str (t "wh. ") "x" (t " comes after ") "y"))}]
+      :checks [(neg? (compare 1 2)) (zero? (compare [1 2] [1 2])) (pos? (compare "b" "a")) (neg? (compare nil 1)) (zero? (compare 1 1.0)) (pos? (compare [1 2] [3]))]}
      {:name "nil?"
       :cases [{:args [nil'] :out true'} {:args ["x"] :out (str false' (wh "x \\ne " nil'))}]
       :checks [(true? (nil? nil)) (false? (nil? false))]}
@@ -711,7 +721,7 @@
       :cases [{:args ["f" "g" dots] :out (lam "x" (ap "or" (ap "f" "x") (ap "g" "x") dots))}]
       :checks [(= ((some-fn :a :b) {:b 2}) 2) (nil? ((some-fn :a :b) {}))]}
      {:name "trampoline"
-      :cases [{:args ["f" "x_0" dots] :out (str "r" (wh "r" (t " is the first non-function value in ") (sq (ap "f" "x_0" dots) (ap (ap "f" "x_0" dots)) dots)))}]
+      :cases [{:args ["f" "x_0" dots] :out (str "r" (wh "r" (t " is the first value for which ") "\\mathtt{fn?}" (t " is false in ") (sq (ap "f" "x_0" dots) (ap (ap "f" "x_0" dots)) dots)))}]
       :checks [(= 5 (trampoline (fn [] (fn [] 5)))) (letfn [(g [x] (if (< x 3) #(g (inc x)) x))] (= 3 (trampoline g 0)))]}
      {:name "memoize"
       :cases [{:args [F] :out (str "f'" (wh (ap "f'" "x") (t " calls ") (ap "f" "x") (t " once per distinct ") "x"))}]
