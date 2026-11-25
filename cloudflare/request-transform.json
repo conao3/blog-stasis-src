@@ -23,18 +23,6 @@
           }
         }
       }
-    },
-    {
-      "description": "preview page for post sources",
-      "expression": "(http.host eq \"s.conao3.com\" and http.request.uri.path.extension in {\"md\" \"org\"} and not starts_with(http.request.uri.path, \"/preview/\") and any(http.request.uri.args[\"preview\"][*] eq \"true\"))",
-      "action": "rewrite",
-      "action_parameters": {
-        "uri": {
-          "path": {
-            "expression": "concat(\"/preview\", http.request.uri.path)"
-          }
-        }
-      }
     }
   ]
 }

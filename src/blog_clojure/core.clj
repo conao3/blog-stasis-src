@@ -687,8 +687,8 @@
 (defn source-group
   [{:keys [markdown-href org-href github-href]}]
   [:div {:class "source-group" :role "group" :aria-label "原稿"}
-   [:a {:href (str markdown-href "?preview=true")} ".md"]
-   [:a {:href (str org-href "?preview=true")} ".org"]
+   [:a {:href (str "/preview" markdown-href)} ".md"]
+   [:a {:href (str "/preview" org-href)} ".org"]
    [:a {:href github-href :aria-label "GitHub で原稿を開く"}
     (hiccup/raw github-mark)
     "GitHub"]])
@@ -739,7 +739,7 @@
                 (github-badge (:github-href sources))]]
               [:div {:class "content"}
                [:p "「" [:a {:href article-path} title] "」の " file-name " です。"
-                "URL の " [:code "?preview=true"] " を外すと、ファイルをそのまま返します。"]
+                "「そのまま開く」はファイルをそのまま返します。"]
                [:div {:class "feed-copy"}
                 [:input {:type "text" :readonly true :value (str "curl " site-url source-path) :aria-label "取得するコマンド"}]
                 [:button {:type "button" :hidden true} "コピー"]]
@@ -933,17 +933,11 @@
         res
         (handler req)))))
 
-(defn preview-request?
-  [{:keys [uri query-string]}]
-  (and (re-find #"\.(md|org)$" uri)
-       (some #(= "preview=true" %) (str/split (or query-string "") #"&"))))
-
-
 (defn- wrap-source-preview
   [handler]
   (fn [req]
-    (if (preview-request? req)
-      (handler (assoc req :uri (preview-path (:uri req))))
+    (if (re-find #"^/preview/.*\.(md|org)$" (:uri req))
+      (handler (update req :uri str ".html"))
       (handler req))))
 
 

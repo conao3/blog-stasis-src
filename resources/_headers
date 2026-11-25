@@ -1,2 +1,37 @@
+/*
+  Vary: Accept
+  Link: <https://s.conao3.com/sitemap.xml>; rel="sitemap"; type="application/xml", <https://s.conao3.com/llms.txt>; rel="describedby"; type="text/plain"
+
+/
+  Link: <https://s.conao3.com/index.md>; rel="alternate"; type="text/markdown"
+
+/blog/:year/:id
+  Link: <https://s.conao3.com/blog/:year/:id.md>; rel="alternate"; type="text/markdown"
+
+/*.md
+  ! Link
+  Content-Type: text/markdown; charset=utf-8
+
+/*.org
+  ! Link
+  Content-Type: text/plain; charset=utf-8
+
+/index.md
+  Link: <https://s.conao3.com/>; rel="canonical"; type="text/html", <https://s.conao3.com/sitemap.xml>; rel="sitemap"; type="application/xml"
+
+/blog/:year/:id.md
+  Link: <https://s.conao3.com/blog/:year/:id>; rel="canonical"; type="text/html", <https://s.conao3.com/sitemap.xml>; rel="sitemap"; type="application/xml"
+
 /preview/*
+  ! Content-Type
+  Content-Type: text/html; charset=utf-8
   X-Robots-Tag: noindex
+
+/img/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
+
+/og/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
+
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
