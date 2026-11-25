@@ -1,6 +1,19 @@
 {
   "rules": [
     {
+      "description": "markdown content type",
+      "expression": "(http.host eq \"s.conao3.com\" and http.request.uri.path.extension eq \"md\" and not starts_with(http.request.uri.path, \"/preview/\"))",
+      "action": "rewrite",
+      "action_parameters": {
+        "headers": {
+          "Content-Type": {
+            "operation": "set",
+            "value": "text/markdown; charset=utf-8"
+          }
+        }
+      }
+    },
+    {
       "description": "org content type",
       "expression": "(http.host eq \"s.conao3.com\" and http.request.uri.path.extension eq \"org\" and not starts_with(http.request.uri.path, \"/preview/\"))",
       "action": "rewrite",
@@ -9,19 +22,6 @@
           "Content-Type": {
             "operation": "set",
             "value": "text/plain; charset=utf-8"
-          }
-        }
-      }
-    },
-    {
-      "description": "noindex for preview pages",
-      "expression": "(http.host eq \"s.conao3.com\" and starts_with(http.request.uri.path, \"/preview/\"))",
-      "action": "rewrite",
-      "action_parameters": {
-        "headers": {
-          "X-Robots-Tag": {
-            "operation": "set",
-            "value": "noindex"
           }
         }
       }
