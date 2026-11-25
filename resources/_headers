@@ -5,9 +5,6 @@
 /
   Link: <https://s.conao3.com/index.md>; rel="alternate"; type="text/markdown"
 
-/blog/:year/:id
-  Link: <https://s.conao3.com/blog/:year/:id.md>; rel="alternate"; type="text/markdown"
-
 /*.md
   ! Link
   Content-Type: text/markdown; charset=utf-8
