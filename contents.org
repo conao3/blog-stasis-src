@@ -23907,9 +23907,11 @@ I borrowed the notation from Daniel Keep's [[https://danielkeep.github.io/iterch
 The rows describe Clojure 1.12.7.
 A [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-cheatsheet.clj][script]] keeps every row next to 235 checks that run the function in Clojure, and it builds the tables only when all of the checks pass.
 
-[[./resources/public/img/315a71-predicate.png]]
-
 ** Reading the notation
+
+The figure reads the =take-while= row, and then follows the same row through =(take-while #(< % 3) (range))=.
+
+[[./resources/public/img/315a71-reading-a-row.svg]]
 
 - \((a_0\ a_1\ \ldots)\) is a seq. \(a\) and \(b\) are input seqs, and a subscript picks one element.
 - \(\texttt{'}(a_0\ a_1\ \ldots)\) is a list, \([a_0\ a_1\ \ldots]\) is a vector, \(\{k_0\ v_0,\ \ldots\}\) is a map, and \(\#\{a_0\ \ldots\}\) is a set, as in Clojure source. The list rows of =peek= and =pop= need a real list, and a seq such as the result of =map= throws there.
