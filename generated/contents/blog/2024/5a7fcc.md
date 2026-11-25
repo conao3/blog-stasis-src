@@ -1,5 +1,6 @@
 Title: Hello Stasis
 Date: 2024-12-21
+Updated: 2024-12-21
 Tags: clojure blog release blog-stasis-src
 
 

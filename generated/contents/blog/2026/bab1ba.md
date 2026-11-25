@@ -1,5 +1,6 @@
 Title: AIの「ソフトウェア工場」はいまどこまで来たのか
 Date: 2026-11-21 14:20
+Updated: 2026-11-21 14:20
 Tags: ai-agent history vercel-board
 
 

@@ -217,8 +217,8 @@
     (goto-char (point-max))
     (when (re-search-backward "^\\* COMMENT Local variables" nil t)
       (beginning-of-line))
-    (insert (format "* %s\n:properties:\n:export_file_name: %s\n:export_date: %s\n:end:\n\n"
-                    title file-name date))))
+    (insert (format "* %s\n:properties:\n:export_file_name: %s\n:export_date: %s\n:export_updated: %s\n:end:\n\n"
+                    title file-name date date))))
 #+end_src
 
 #+RESULTS:
@@ -230,6 +230,7 @@ my/stasis-new
 :properties:
 :export_file_name: generated/contents/index.md
 :export_date: 2024-12-21
+:export_updated: 2024-12-21
 :end:
 
 ** Links
@@ -241,6 +242,7 @@ my/stasis-new
 :properties:
 :export_file_name: generated/contents/blog/2018/07b41c
 :export_date: 2018-12-07
+:export_updated: 2018-12-07
 :export_tags: emacs make dotfiles directory-structure
 :end:
 
@@ -866,6 +868,7 @@ clean:
 :properties:
 :export_file_name: generated/contents/blog/2018/48bb55
 :export_date: 2018-12-08
+:export_updated: 2018-12-08
 :export_tags: emacs emacs-lisp ci testing release cort-el leaf-el
 :end:
 
@@ -1365,6 +1368,7 @@ make test
 :properties:
 :export_file_name: generated/contents/blog/2018/611299
 :export_date: 2018-12-14
+:export_updated: 2018-12-14
 :export_tags: emacs org-mode blog static-site orglyth-el
 :end:
 
@@ -1684,6 +1688,7 @@ AMP対応してGoogleのサーバーにホスティングしてもらうのも�
 :properties:
 :export_file_name: generated/contents/blog/2018/8aa938
 :export_date: 2018-12-21
+:export_updated: 2018-12-21
 :export_tags: emacs emacs-lisp use-package package-management leaf-el feather-el
 :end:
 
@@ -1959,6 +1964,7 @@ leaf.elはhandlerの一つだけの関数で処理を行っており、とても
 :properties:
 :export_file_name: generated/contents/blog/2019/13c1f0
 :export_date: 2019-04-16
+:export_updated: 2019-04-16
 :export_tags: emacs-lisp lisp macro leaf-el
 :end:
 
@@ -2141,6 +2147,7 @@ Elispの場合、C言語で実装されている関数はすべてスペシャ�
 :properties:
 :export_file_name: generated/contents/blog/2019/69b273
 :export_date: 2019-05-31
+:export_updated: 2019-05-31
 :end:
 
 ** leafとは
@@ -2151,6 +2158,7 @@ use-packageはinit.el記述において、素晴らしいブレイクスルー�
 :properties:
 :export_file_name: generated/contents/blog/2019/34401b
 :export_date: 2019-06-01
+:export_updated: 2019-06-01
 :end:
 
 ** 背景
@@ -2235,6 +2243,7 @@ MacやLinuxならホームディレクトリの場所は疑いようがありま
 :properties:
 :export_file_name: generated/contents/blog/2019/73938b
 :export_date: 2019-06-01
+:export_updated: 2019-06-01
 :end:
 
 ** 背景
@@ -2263,6 +2272,7 @@ Emacs初心者の方でもleafを使うことで、「パッケージの設定�
 :properties:
 :export_file_name: generated/contents/blog/2019/2b6cbf
 :export_date: 2019-06-15
+:export_updated: 2019-06-15
 :export_tags: emacs use-package package-management release leaf-el leaf-keywords-el
 :end:
 
@@ -3867,6 +3877,7 @@ MELPAで公開されたので導入のハードルも極めて低くなりまし
 :properties:
 :export_file_name: generated/contents/blog/2019/3f8b40
 :export_date: 2019-06-17
+:export_updated: 2019-06-17
 :end:
 
 ** Emacsとは
@@ -3908,6 +3919,7 @@ Emacsはあなたにも少なからざるものを与えてくれると信じて
 :properties:
 :export_file_name: generated/contents/blog/2019/a95917
 :export_date: 2019-12-01
+:export_updated: 2019-12-01
 :export_tags: github-actions ci emacs release setup-cask
 :end:
 
@@ -4256,6 +4268,7 @@ GitHubのバッジより豊富なスタイル指定ができることが特徴�
 :properties:
 :export_file_name: generated/contents/blog/2019/b9700c
 :export_date: 2019-12-02
+:export_updated: 2019-12-02
 :export_tags: emacs emacs-lisp color-theme solarized oss-contribution
 :end:
 
@@ -4477,6 +4490,7 @@ init.elに下記のleafを書きます。
 :properties:
 :export_file_name: generated/contents/blog/2019/3279ec
 :export_date: 2019-12-02
+:export_updated: 2019-12-02
 :export_tags: emacs package-management release leaf-el leaf-keywords-el
 :end:
 
@@ -4994,6 +5008,7 @@ leafはIssueやPRを放置することなく、後方互換性を保った上で
 :properties:
 :export_file_name: generated/contents/blog/2019/84b8f6
 :export_date: 2019-12-03
+:export_updated: 2019-12-03
 :end:
 
 ** はじめに
@@ -5021,6 +5036,7 @@ dashの関数を既に大量に使っている場合は[[https://github.com/bbat
 :properties:
 :export_file_name: generated/contents/blog/2019/6c5374
 :export_date: 2019-12-03
+:export_updated: 2019-12-03
 :export_tags: emacs emacs-lisp byte-compile macro performance leaf-el
 :end:
 
@@ -5325,6 +5341,7 @@ leaf.elを使っているinit.elをバイトコンパイルする方法を紹介
 :properties:
 :export_file_name: generated/contents/blog/2019/183c16
 :export_date: 2019-12-04
+:export_updated: 2019-12-04
 :export_tags: emacs make dotfiles directory-structure byte-compile leaf-el
 :end:
 
@@ -5694,6 +5711,7 @@ $(SYMS):
 :properties:
 :export_file_name: generated/contents/blog/2019/981fee
 :export_date: 2019-12-25
+:export_updated: 2019-12-25
 :end:
 
 ** はじめに
@@ -5707,12 +5725,14 @@ Elispに限らず、様々な言語
 :properties:
 :export_file_name: generated/contents/blog/2020/c8afa7
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 * COMMENT Emacsにおける.dir-locals.elについて
 :properties:
 :export_file_name: generated/contents/blog/2020/00a837
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ** 背景
@@ -5774,6 +5794,7 @@ See Info node `(elisp)Directory Local Variables' for details.")
 :properties:
 :export_file_name: generated/contents/blog/2020/fe6cf9
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 https://stackoverflow.com/questions/22455366/how-can-i-write-to-standard-output-in-emacs
@@ -5782,6 +5803,7 @@ https://stackoverflow.com/questions/22455366/how-can-i-write-to-standard-output-
 :properties:
 :export_file_name: generated/contents/blog/2020/ab9c6e
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ネタ元はEmacs-jp。
@@ -5847,12 +5869,14 @@ defunした関数は (function hoge) の様にするのみなので、これは�
 :properties:
 :export_file_name: generated/contents/blog/2020/e13065
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 * COMMENT Arch Linuxでいい感じに揃ったスクリーンショットを撮り、管理する方法
 :properties:
 :export_file_name: generated/contents/blog/2020/f0aaa7
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 
@@ -5862,6 +5886,7 @@ defunした関数は (function hoge) の様にするのみなので、これは�
 :properties:
 :export_file_name: generated/contents/blog/2020/fd31b6
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 
@@ -5875,6 +5900,7 @@ nom  12:40
 :properties:
 :export_file_name: generated/contents/blog/2020/761276
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ** 背景
@@ -5890,6 +5916,7 @@ Lispを触ったことのない人に「Lispとは何か」を紹介し、魅力
 :properties:
 :export_file_name: generated/contents/blog/2020/72ce3b
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ** intro
@@ -5898,12 +5925,14 @@ Lispを触ったことのない人に「Lispとは何か」を紹介し、魅力
 :properties:
 :export_file_name: generated/contents/blog/2020/cdbc75
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 * COMMENT base64の画像をEmacsで表示する方法
 :properties:
 :export_file_name: generated/contents/blog/2020/089941
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ネタ元はROCKTAKEYさんのEmacs-jpでの発言。
@@ -5915,6 +5944,7 @@ Lispを触ったことのない人に「Lispとは何か」を紹介し、魅力
 :properties:
 :export_file_name: generated/contents/blog/2020/0bb7dc
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 ** はじめに
@@ -6111,6 +6141,7 @@ https://emacs-jp.slack.com
 :properties:
 :export_file_name: generated/contents/blog/2020/c2b49e
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 http://cocu.hatenablog.com/entry/2016/07/19/225308
@@ -6119,6 +6150,7 @@ http://cocu.hatenablog.com/entry/2016/07/19/225308
 :properties:
 :export_file_name: generated/contents/blog/2020/e6f3b1
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 chuntaro  16:58
@@ -6149,6 +6181,7 @@ add-variable-watcherを使うと、setqだけで処理を進められる邪悪�
 :properties:
 :export_file_name: generated/contents/blog/2020/d415bc
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 
@@ -6174,6 +6207,7 @@ zk-phi  11:15
 :properties:
 :export_file_name: generated/contents/blog/2020/cbcd64
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 roswell  14:36
@@ -6238,6 +6272,7 @@ except that PLACE is only evaluated once (after NEWELT).
 :properties:
 :export_file_name: generated/contents/blog/2020/cc96da
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 shr-render-buffer/shr-render-region
@@ -6246,6 +6281,7 @@ shr-render-buffer/shr-render-region
 :properties:
 :export_file_name: generated/contents/blog/2020/80ae56
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 https://atcoder.jp/contests/abc086/standings/jsonにアクセスするとAC状況が見れる。
@@ -6255,6 +6291,7 @@ https://atcoder.jp/contests/abc086/standings/jsonにアクセスするとAC状�
 :properties:
 :export_file_name: generated/contents/blog/2020/0665b5
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 test test test
@@ -6279,6 +6316,7 @@ $$a \between b$$
 :properties:
 :export_file_name: generated/contents/blog/2020/5afd3d
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 cppは得意ではありませんが、競技プログラミングにおいては最強です。
@@ -6289,6 +6327,7 @@ cppは得意ではありませんが、競技プログラミングにおいて�
 :properties:
 :export_file_name: generated/contents/blog/2020/5c7232
 :export_date: 2020-01-01
+:export_updated: 2020-01-01
 :end:
 
 | Short | Long | Description |
@@ -6299,6 +6338,7 @@ cppは得意ではありませんが、競技プログラミングにおいて�
 :properties:
 :export_file_name: generated/contents/blog/2020/d22aed
 :export_date: 2020-04-16
+:export_updated: 2020-04-16
 :export_tags: emacs tutorial package-management leaf-el leaf-convert-el leaf-tree-el
 :end:
 
@@ -6758,6 +6798,7 @@ use-packageが作られた当時はきちんとautoloadをパッケージ開発�
 :properties:
 :export_file_name: generated/contents/blog/2020/0a23fb
 :export_date: 2020-05-05
+:export_updated: 2020-05-05
 :export_tags: hugo ox-hugo org-mode emacs blog static-site
 :end:
 
@@ -6953,6 +6994,7 @@ Netlify + Hugo + ox-hugoで快適なブログ執筆環境を整えることが�
 :properties:
 :export_file_name: generated/contents/blog/2020/0bc44c
 :export_date: 2020-05-06
+:export_updated: 2020-05-06
 :export_tags: blog permalink
 :end:
 
@@ -7071,6 +7113,7 @@ URLから得られる情報もありますし、後述するランダム値の�
 :properties:
 :export_file_name: generated/contents/blog/2020/e6234e
 :export_date: 2020-05-07
+:export_updated: 2020-05-07
 :export_tags: emacs org-mode ox-hugo hugo blog
 :end:
 
@@ -7167,6 +7210,7 @@ org-captureの設定をすることによってブログ記事を書くハード
 :properties:
 :export_file_name: generated/contents/blog/2020/9383f3
 :export_date: 2020-05-07
+:export_updated: 2020-05-07
 :export_tags: blog permalink
 :end:
 
@@ -7389,6 +7433,7 @@ $2^{32} = (42.9\text{億})$ 個([[https://www.wolframalpha.com/input/?i=2%5E%283
 :properties:
 :export_file_name: generated/contents/blog/2020/91b392
 :export_date: 2020-05-10
+:export_updated: 2020-05-10
 :export_tags: emacs emacs-lisp color-theme solarized release iceberg-theme-el
 :end:
 
@@ -7643,6 +7688,7 @@ yellow orange red magenta violet blue cyan green
 :properties:
 :export_file_name: generated/contents/blog/2020/55bf86
 :export_date: 2020-05-11
+:export_updated: 2020-05-11
 :export_tags: github-actions deployment
 :end:
 
@@ -7825,6 +7871,7 @@ rsyncを使ってサイトをGitHub Actionsからデプロイできるように�
 :properties:
 :export_file_name: generated/contents/blog/2020/33dbfa
 :export_date: 2020-05-23
+:export_updated: 2020-05-23
 :export_tags: emacs emacs-lisp
 :end:
 
@@ -7915,6 +7962,7 @@ Emacs-jpのスレッドで次のような質問があった。
 :properties:
 :export_file_name: generated/contents/blog/2020/5fb67c
 :export_date: 2020-05-23
+:export_updated: 2020-05-23
 :export_tags: emacs emacs-lisp
 :end:
 
@@ -7986,6 +8034,7 @@ Emacsは良いエディタで、Elispは強力ですが、GitをElispで実装�
 :properties:
 :export_file_name: generated/contents/blog/2020/7b1dc7
 :export_date: 2020-05-24
+:export_updated: 2020-05-24
 :export_tags: emacs melpa package-management github-actions deployment release celpa
 :end:
 
@@ -8097,6 +8146,7 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 :properties:
 :export_file_name: generated/contents/blog/2020/5739d9
 :export_date: 2020-05-24
+:export_updated: 2020-05-24
 :export_tags: emacs emacs-lisp competitive-programming release oj-el
 :end:
 
@@ -8164,6 +8214,7 @@ ojをEmacsから使いやすくするラッパーパッケージを書きまし�
 :properties:
 :export_file_name: generated/contents/blog/2020/8e5d61
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs-lisp string
 :end:
 
@@ -8357,6 +8408,7 @@ Nオーダーではあるけどもなかなか高速に動作するので、O(N^
 :properties:
 :export_file_name: generated/contents/blog/2020/8f0b12
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs emacs-lisp macro ppp-el
 :end:
 
@@ -8522,6 +8574,7 @@ ppp, promise, asyncに依存して、次のコード片を実行すれば調べ�
 :properties:
 :export_file_name: generated/contents/blog/2020/40023a
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs keybinding
 :end:
 
@@ -8569,6 +8622,7 @@ CSSの =important!= のような感じ。
 :properties:
 :export_file_name: generated/contents/blog/2020/609573
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs emacs-lisp keybinding leaf-el
 :end:
 
@@ -8631,6 +8685,7 @@ Redetectされると =insert-file= が実行されます。
 :properties:
 :export_file_name: generated/contents/blog/2020/6e67e4
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs-lisp lisp
 :end:
 
@@ -8691,6 +8746,7 @@ Redetectされると =insert-file= が実行されます。
 :properties:
 :export_file_name: generated/contents/blog/2020/cec89c
 :export_date: 2020-05-26
+:export_updated: 2020-05-26
 :export_tags: emacs-lisp
 :end:
 
@@ -8730,6 +8786,7 @@ Emacs-jpで聞いたところ、koshさんに =seq-some= を教えてもらい�
 :properties:
 :export_file_name: generated/contents/blog/2020/cbf3fd
 :export_date: 2020-05-27
+:export_updated: 2020-05-27
 :export_tags: emacs melpa package-management
 :end:
 
@@ -8799,6 +8856,7 @@ Ideas for improvement:
 :properties:
 :export_file_name: generated/contents/blog/2020/67a1dc
 :export_date: 2020-08-01
+:export_updated: 2020-08-01
 :export_tags: emacs emacs-lisp git
 :end:
 
@@ -8882,6 +8940,7 @@ Emacsは後方互換性を重視しているためデフォルト値が変更さ
 :properties:
 :export_file_name: generated/contents/blog/2020/dc06b0
 :export_date: 2020-08-10
+:export_updated: 2020-08-10
 :export_tags: emacs-lisp string
 :end:
 
@@ -8953,6 +9012,7 @@ This function is polyfill for Emacs<24.4."
 :properties:
 :export_file_name: generated/contents/blog/2020/0fb03f
 :export_date: 2020-08-11
+:export_updated: 2020-08-11
 :export_tags: github-actions ci
 :end:
 
@@ -9047,6 +9107,7 @@ jobs:
 :properties:
 :export_file_name: generated/contents/blog/2020/48c25c
 :export_date: 2020-08-17
+:export_updated: 2020-08-17
 :export_tags: emacs-lisp macro
 :end:
 
@@ -9550,6 +9611,7 @@ VARS is used internally for recursive calls."
 :properties:
 :export_file_name: generated/contents/blog/2020/8ecc43
 :export_date: 2020-09-24
+:export_updated: 2020-09-24
 :export_tags: internship
 :end:
 
@@ -9590,6 +9652,7 @@ VARS is used internally for recursive calls."
 :properties:
 :export_file_name: generated/contents/blog/2020/6dae6b
 :export_date: 2020-09-25
+:export_updated: 2020-09-25
 :export_tags: emacs emacs-lisp org-mode blog release ox-zenn-el
 :end:
 
@@ -10048,6 +10111,7 @@ ox-zennを使うことでorgドキュメントからZenn拡張の含まれたマ
 :properties:
 :export_file_name: generated/contents/blog/2020/958847
 :export_date: 2020-12-25
+:export_updated: 2020-12-25
 :end:
 
 
@@ -10306,6 +10370,7 @@ EIEIOのドキュメントは短いので、この章ではそれ(と補足)を�
 :properties:
 :export_file_name: generated/contents/blog/2020/c23057
 :export_date: 2020-12-25
+:export_updated: 2020-12-25
 :end:
 
 [[https://github.com/magit/magit][Magit]]という超便利パッケージがあります。
@@ -10320,6 +10385,7 @@ magitは[[https://github.com/tarsius][tarsius]]さんの代表的なパッケー
 :properties:
 :export_file_name: generated/contents/blog/2020/5fc05c
 :export_date: 2020-12-25
+:export_updated: 2020-12-25
 :export_tags: emacs emacs-lisp leaf-el leaf-keywords-el release advent-calendar
 :end:
 
@@ -10620,6 +10686,7 @@ leaf-defaultsについて紹介しました。2年前から構想はしていた
 :properties:
 :export_file_name: generated/contents/blog/2022/6b4afc
 :export_date: 2022-12-16
+:export_updated: 2022-12-16
 :export_tags: rust macro tutorial advent-calendar
 :end:
 
@@ -10931,6 +10998,7 @@ v1がリリースされたらまたチャレンジしてみようかなと思い
 :properties:
 :export_file_name: generated/contents/blog/2023/b81579
 :export_date: 2023-03-12
+:export_updated: 2023-03-12
 :export_tags: astro react cloudflare blog static-site
 :end:
 
@@ -11188,6 +11256,7 @@ conao3.comをNetlifyのDNSに置いて、そのままNetlifyを向くように�
 :properties:
 :export_file_name: generated/contents/blog/2023/d76e1d
 :export_date: 2023-03-14
+:export_updated: 2023-03-14
 :export_tags: python poetry package-management
 :end:
 
@@ -11456,6 +11525,7 @@ Pythonのインストーラに限らず、自分で制御できる方法でPCを
 :properties:
 :export_file_name: generated/contents/blog/2023/d23672
 :export_date: 2023-03-18
+:export_updated: 2023-03-18
 :end:
 
 ** Intro
@@ -11468,6 +11538,7 @@ Pythonのインストーラに限らず、自分で制御できる方法でPCを
 :properties:
 :export_file_name: generated/contents/blog/2023/7a00d9
 :export_date: 2023-03-19
+:export_updated: 2023-03-19
 :export_tags: python poetry tutorial
 :end:
 
@@ -11641,6 +11712,7 @@ Person(name='John', age=30)
 :properties:
 :export_file_name: generated/contents/blog/2023/38d15e
 :export_date: 2023-03-20
+:export_updated: 2023-03-20
 :export_tags: python pydantic tutorial
 :end:
 
@@ -11792,6 +11864,7 @@ print(user1.json())
 :properties:
 :export_file_name: generated/contents/blog/2023/2bff82
 :export_date: 2023-03-20
+:export_updated: 2023-03-20
 :export_tags: blog
 :end:
 
@@ -11831,6 +11904,7 @@ print(user1.json())
 :properties:
 :export_file_name: generated/contents/blog/2023/916227
 :export_date: 2023-03-22
+:export_updated: 2023-03-22
 :export_tags: pnpm package-management astro
 :end:
 
@@ -11933,6 +12007,7 @@ pnpm run dev
 :properties:
 :export_file_name: generated/contents/blog/2023/bb48a7
 :export_date: 2023-03-24
+:export_updated: 2023-03-24
 :export_tags: astro react blog
 :end:
 
@@ -12004,6 +12079,7 @@ SSRに対応してないのかな？ということで =client:only= を指定�
 :properties:
 :export_file_name: generated/contents/blog/2023/e4b3be
 :export_date: 2023-03-25
+:export_updated: 2023-03-25
 :export_tags: astro ast blog
 :end:
 
@@ -12131,6 +12207,7 @@ rehype-katexが $\KaTeX$ にレンダリングしているので、おそらく�
 :properties:
 :export_file_name: generated/contents/blog/2023/17d2f4
 :export_date: 2023-03-31
+:export_updated: 2023-03-31
 :export_tags: docker postgresql
 :end:
 
@@ -12204,6 +12281,7 @@ postgresもlocaleでソート順が変わるという[[https://www.postgresql.jp
 :properties:
 :export_file_name: generated/contents/blog/2023/145870
 :export_date: 2023-04-01
+:export_updated: 2023-04-01
 :end:
 
 ** はじめに
@@ -12301,6 +12379,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 :properties:
 :export_file_name: generated/contents/blog/2023/9709e5
 :export_date: 2023-04-02
+:export_updated: 2023-04-02
 :end:
 
 ** はじめに
@@ -12341,6 +12420,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 :properties:
 :export_file_name: generated/contents/blog/2023/abe9ab
 :export_date: 2023-04-03
+:export_updated: 2023-04-03
 :end:
 
 ** はじめに
@@ -12356,6 +12436,7 @@ a
 :properties:
 :export_file_name: generated/contents/blog/2023/760239
 :export_date: 2023-06-04
+:export_updated: 2023-06-04
 :export_tags: typescript deno
 :end:
 
@@ -12496,6 +12577,7 @@ console.log('Hello, deno!')
 :properties:
 :export_file_name: generated/contents/blog/2023/085ed2
 :export_date: 2023-06-05
+:export_updated: 2023-06-05
 :export_tags: graphql react typescript pnpm tutorial
 :end:
 
@@ -12784,6 +12866,7 @@ export function LaunchesList() {
 :properties:
 :export_file_name: generated/contents/blog/2023/7c1a85
 :export_date: 2023-11-01
+:export_updated: 2023-11-01
 :export_tags: python poetry package-management clojure release thread-last
 :end:
 
@@ -12948,6 +13031,7 @@ Publishing thread-last (0.1.0) to PyPI
 :properties:
 :export_file_name: generated/contents/blog/2023/32f60d
 :export_date: 2023-12-28
+:export_updated: 2023-12-28
 :export_tags: emacs emacs-lisp macro leaf-el advent-calendar tutorial
 :end:
 
@@ -13305,6 +13389,7 @@ plistのソートは今回はこのように実装しました。 =push= して 
 :properties:
 :export_file_name: generated/contents/blog/2024/3ef28c
 :export_date: 2024-01-07
+:export_updated: 2024-01-07
 :export_tags: rust python package-management pydantic cedar github-actions
 :end:
 
@@ -13927,6 +14012,7 @@ assert authorizer.is_authorized(request, policy_set) == True
 :properties:
 :export_file_name: generated/contents/blog/2024/d27077
 :export_date: 2024-08-04
+:export_updated: 2024-08-04
 :export_tags: emacs clojure leaf-el talk tutorial
 :end:
 
@@ -14471,6 +14557,7 @@ Emacsこわくないよ！
 :properties:
 :export_file_name: generated/contents/blog/2024/ee6a20
 :export_date: 2024-10-18
+:export_updated: 2024-10-18
 :end:
 
 [[https://tokyo-emacs.connpass.com/event/330572/][東京Emacs勉強会 オクトーバーフェスティバル2024]]の登壇資料です。
@@ -14626,6 +14713,7 @@ npx tree-sitter test
 :properties:
 :export_file_name: generated/contents/blog/2024/5d087f
 :export_date: 2024-10-26
+:export_updated: 2024-10-26
 :export_tags: emacs clojure parser emacs-lisp talk
 :end:
 
@@ -15016,6 +15104,7 @@ Clojureの標準モジュールであるclojure.coreを網羅的に解説しま�
 :properties:
 :export_file_name: generated/contents/blog/2024/5a7fcc.md
 :export_date: 2024-12-21
+:export_updated: 2024-12-21
 :export_tags: clojure blog release blog-stasis-src
 :end:
 
@@ -15039,6 +15128,7 @@ descriptionには「Some Clojure functions for creating static websites.」と�
 :properties:
 :export_file_name: generated/contents/blog/2024/4d880f.md
 :export_date: 2024-12-23
+:export_updated: 2024-12-23
 :export_tags: clojure networking
 :end:
 
@@ -15142,6 +15232,7 @@ Escape character is '^]'.
 :properties:
 :export_file_name: generated/contents/blog/2024/fa34f6
 :export_date: 2024-12-27
+:export_updated: 2024-12-27
 :end:
 
 NixでCommonlispプロジェクトを管理する。
@@ -15171,6 +15262,7 @@ test
 :properties:
 :export_file_name: generated/contents/blog/2025/f84aea
 :export_date: 2025-12-02
+:export_updated: 2025-12-02
 :export_tags: emacs org-mode nix advent-calendar tutorial
 :end:
 
@@ -15644,6 +15736,7 @@ Emacsでいきなりコードを書き始めるのではなく、まずは日本
 :properties:
 :export_file_name: generated/contents/blog/2025/68a957
 :export_date: 2025-11-27
+:export_updated: 2025-11-27
 :end:
 
 ClojureはJavaで動作するため、Javaとの相互運用のために便利な仕組みが用意されています。
@@ -15779,6 +15872,7 @@ charsetを渡さない場合は =java.nio.charset.Charset/defaultCharset()= で�
 :properties:
 :export_file_name: generated/contents/blog/2025/1488a7
 :export_date: 2025-12-03
+:export_updated: 2025-12-03
 :end:
 
 ClaudeCode
@@ -15787,6 +15881,7 @@ ClaudeCode
 :properties:
 :export_file_name: generated/contents/blog/2025/b1a436
 :export_date: 2025-12-14
+:export_updated: 2025-12-14
 :export_tags: nix package-management
 :end:
 
@@ -15812,6 +15907,7 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 :properties:
 :export_file_name: generated/contents/blog/2026/26583e
 :export_date: 2026-01-24
+:export_updated: 2026-01-24
 :export_tags: emacs nix tutorial
 :end:
 
@@ -16071,6 +16167,7 @@ emacsclientに興味がありながらも上手く設定できずに悩んでい
 :export_file_name: generated/contents/blog/2025/ba3a31
 :export_draft: t
 :export_date: 2025-12-17
+:export_updated: 2025-12-17
 :export_tags: emacs emacs-lisp tutorial
 :end:
 
@@ -16172,6 +16269,7 @@ posframe自体の装飾は常識的な範囲に滞まっているので、
 :export_file_name: generated/contents/blog/2026/2653f0
 :export_draft: t
 :export_date: 2026-06-14
+:export_updated: 2026-06-14
 :export_tags: typescript aws release bun-bunsai
 :end:
 
@@ -16345,6 +16443,7 @@ Issue / PR大歓迎です。
 :properties:
 :export_file_name: generated/contents/blog/2026/5499a8
 :export_date: 2026-11-03 04:36
+:export_updated: 2026-11-03 04:36
 :export_tags: lean formal-verification cli tax release lean-ritsuryo
 :end:
 
@@ -16647,6 +16746,7 @@ Nixを使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行で
 :properties:
 :export_file_name: generated/contents/blog/2026/1e0718
 :export_date: 2026-11-04 01:59
+:export_updated: 2026-11-04 01:59
 :export_lang: en
 :export_tags: git security ai-agent release minsky-git
 :end:
@@ -16869,6 +16969,7 @@ Each command output in this post comes from a real run, pasted as is.
 :properties:
 :export_file_name: generated/contents/blog/2026/bfc7fe
 :export_date: 2026-11-04 14:43
+:export_updated: 2026-11-04 14:43
 :export_tags: lean paper formal-verification ai-agent lean-ritsuryo
 :end:
 
@@ -16956,6 +17057,7 @@ Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https
 :properties:
 :export_file_name: generated/contents/blog/2026/12e5f6
 :export_date: 2026-11-04 20:32
+:export_updated: 2026-11-04 20:32
 :export_tags: github-actions cloudflare ci deployment security emacs-doc
 :end:
 
@@ -17085,6 +17187,7 @@ Workersの静的アセットで配りたいけれど、Cloudflareのトークン
 :properties:
 :export_file_name: generated/contents/blog/2026/33d2c2
 :export_date: 2026-11-05 02:00
+:export_updated: 2026-11-05 02:00
 :export_tags: rust cargo nix llm cli release rust-plamo-tr-local
 :end:
 
@@ -17299,6 +17402,7 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_MのGGUFを動かし、temperature
 :properties:
 :export_file_name: generated/contents/blog/2026/f681b9
 :export_date: 2026-11-05 18:21
+:export_updated: 2026-11-05 18:21
 :export_tags: rust aws aws-cli cargo performance differential-testing release rust-awscli
 :end:
 
@@ -17471,6 +17575,7 @@ crates.ioの各バージョンのページには、公開したGitHub Actionsの
 :properties:
 :export_file_name: generated/contents/blog/2026/87e5cb
 :export_date: 2026-11-05 18:56
+:export_updated: 2026-11-05 18:56
 :export_lang: en
 :export_tags: rust aws aws-cli cargo performance differential-testing release rust-awscli
 :end:
@@ -17640,6 +17745,7 @@ If your scripts or CI jobs call =aws= many times, replace =aws= with =awsr=.
 :properties:
 :export_file_name: generated/contents/blog/2026/4e5aa2
 :export_date: 2026-11-05 20:05
+:export_updated: 2026-11-05 20:05
 :export_tags: lean clojure formal-verification code-generation property-based-testing release lean-clj
 :end:
 
@@ -17978,6 +18084,7 @@ IssueやPRは大歓迎です。
 :properties:
 :export_file_name: generated/contents/blog/2026/311be4
 :export_date: 2026-11-05 20:05
+:export_updated: 2026-11-05 20:05
 :export_lang: en
 :export_tags: lean clojure formal-verification code-generation property-based-testing release lean-clj
 :end:
@@ -18327,6 +18434,7 @@ I welcome issues and pull requests.
 :properties:
 :export_file_name: generated/contents/blog/2026/7fe084
 :export_date: 2026-11-06 04:27
+:export_updated: 2026-11-06 04:27
 :export_tags: rust aws aws-cli github-actions nix ci differential-testing rust-awscli
 :end:
 
@@ -18429,6 +18537,7 @@ PRのブランチにmasterをmergeし、その上に移植のcommitを積んで�
 :properties:
 :export_file_name: generated/contents/blog/2026/b43a06
 :export_date: 2026-11-09 09:58
+:export_updated: 2026-11-09 09:58
 :export_tags: lean rust formal-verification code-generation property-based-testing cargo release lean-rs
 :end:
 
@@ -18727,6 +18836,7 @@ Issue / PR大歓迎です。
 :properties:
 :export_file_name: generated/contents/blog/2026/c4f11a
 :export_date: 2026-11-09 14:40
+:export_updated: 2026-11-09 14:40
 :export_tags: lean rust formal-verification tax release rust-ritsuryo lean-ritsuryo lean-rs
 :end:
 
@@ -18807,6 +18917,7 @@ Rustのコードを作るときはlean-ritsuryoの証明も含めてLeanのパ�
 :properties:
 :export_file_name: generated/contents/blog/2026/dc65bb
 :export_date: 2026-11-11 13:59
+:export_updated: 2026-11-11 13:59
 :export_tags: lean python formal-verification code-generation property-based-testing pydantic fastapi release lean-py
 :end:
 
@@ -19131,6 +19242,7 @@ LeanでPythonの関数を書けるようにして、Leanの型をpydanticのmode
 :properties:
 :export_file_name: generated/contents/blog/2026/ccc5ed
 :export_date: 2026-11-09 17:30
+:export_updated: 2026-11-09 17:30
 :export_tags: lean rust lsp formal-verification testing release rust-lsp-touchstone
 :end:
 
@@ -19256,6 +19368,7 @@ lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の
 :properties:
 :export_file_name: generated/contents/blog/2026/f4154e
 :export_date: 2026-11-16 10:34
+:export_updated: 2026-11-16 10:34
 :export_tags: python cpython pep macro ast compiler release cpython-pep638
 :end:
 
@@ -19485,6 +19598,7 @@ $ ./python -m test test_macros
 :properties:
 :export_file_name: generated/contents/blog/2025/a56493
 :export_date: 2025-02-26
+:export_updated: 2025-02-26
 :export_draft: t
 :export_tags: clojure standard-library tutorial
 :end:
@@ -19583,6 +19697,7 @@ $ ./python -m test test_macros
 :properties:
 :export_file_name: generated/contents/blog/2025/7d3c20
 :export_date: 2025-02-26
+:export_updated: 2025-02-26
 :export_draft: t
 :export_tags: clojure tutorial
 :end:
@@ -19667,6 +19782,7 @@ user> (ns-publics 'clojure.data.csv)
 :properties:
 :export_file_name: generated/contents/blog/2025/8d05b2
 :export_date: 2025-02-26
+:export_updated: 2025-02-26
 :export_draft: t
 :export_tags: clojure standard-library tutorial
 :end:
@@ -19679,6 +19795,7 @@ user> (ns-publics 'clojure.data.csv)
 :properties:
 :export_file_name: generated/contents/blog/2025/cadb41
 :export_date: 2025-02-26
+:export_updated: 2025-02-26
 :export_draft: t
 :export_tags: clojure standard-library tutorial
 :end:
@@ -19785,6 +19902,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
 :export_date: 2026-11-17 12:43
+:export_updated: 2026-11-17 12:43
 :export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
 :end:
 
@@ -19955,6 +20073,7 @@ leanassayは、実行できる定理しか確かめられません。
 :properties:
 :export_file_name: generated/contents/blog/2026/b62ab3
 :export_date: 2026-11-12 17:01
+:export_updated: 2026-11-12 17:01
 :export_draft: t
 :export_tags: lean typescript formal-verification code-generation release lean-leanfran
 :end:
@@ -20330,6 +20449,7 @@ LeanでTypeScriptの関数を書けるようにし、Leanの型をStandard Schem
 :properties:
 :export_file_name: generated/contents/blog/2026/23d62c
 :export_date: 2026-11-13 12:21
+:export_updated: 2026-11-13 12:21
 :export_tags: lean rust python typescript clojure formal-verification code-generation release lean-leanfran
 :end:
 Lean 4で書いて証明した関数を、Rust、Python、TypeScript、Clojureから呼べるleanfranを作りました。
@@ -20475,6 +20595,7 @@ Leanの型と仕様を、複数の言語で使う共通語にしたいと考え�
 :properties:
 :export_file_name: generated/contents/blog/2026/bd0d48
 :export_date: 2026-11-14 20:15
+:export_updated: 2026-11-14 20:15
 :export_tags: mongodb t3-code ai-agent hackathon claude-code ts-payproof
 :end:
 
@@ -20908,6 +21029,7 @@ PayProof自体も人間の確認と特定の支払いへの承認を扱うアプ
 :properties:
 :export_file_name: generated/contents/blog/2026/2baf8e
 :export_date: 2026-11-14 20:15
+:export_updated: 2026-11-14 20:15
 :export_lang: en
 :export_tags: mongodb t3-code ai-agent hackathon claude-code ts-payproof
 :end:
@@ -21380,6 +21502,7 @@ I did not make it to the finalist pitches, but I had fun.
 :properties:
 :export_file_name: generated/contents/blog/2026/d60a7d
 :export_date: 2026-11-17 07:00
+:export_updated: 2026-11-17 07:00
 :export_tags: lean rust mathlib parser release rust-leanwisp
 :end:
 
@@ -21570,6 +21693,7 @@ Mathlibで確かめたのは31ファイルで、残りのファイルには掛�
 :properties:
 :export_file_name: generated/contents/blog/2026/060bea
 :export_date: 2026-11-17 14:45
+:export_updated: 2026-11-17 14:45
 :export_tags: lean rust lsp mathlib performance formal-verification release rust-leansail lean-leanfran rust-lsp-touchstone
 :end:
 
@@ -21719,6 +21843,7 @@ FileWorkerの管理をRustに移す案も考えたのですが、3つのファ�
 :properties:
 :export_file_name: generated/contents/blog/2026/360ae9
 :export_date: 2026-11-17 02:18
+:export_updated: 2026-11-17 02:18
 :export_tags: hasura graphql postgresql performance
 :end:
 
@@ -21903,6 +22028,7 @@ HasuraにHTTPでクエリを送って15回測った時間の中央値は、次�
 :properties:
 :export_file_name: generated/contents/blog/2026/2a0865
 :export_date: 2026-11-17 16:37
+:export_updated: 2026-11-17 16:37
 :export_tags: rust lean japanese-law linter formal-verification release rust-ritsulint lean-leanfran
 :end:
 
@@ -22096,6 +22222,7 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 :properties:
 :export_file_name: generated/contents/blog/2026/d8ac45
 :export_date: 2026-11-18 18:08
+:export_updated: 2026-11-18 18:08
 :export_tags: lean rust performance profiler formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
 :end:
 
@@ -22289,6 +22416,7 @@ Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanpr
 :properties:
 :export_file_name: generated/contents/blog/2026/bab1ba
 :export_date: 2026-11-21 14:20
+:export_updated: 2026-11-21 14:20
 :export_tags: ai-agent history vercel-board
 :end:
 
@@ -22502,6 +22630,7 @@ Symphonyがタスクごとに用意する作業場や冒頭のポストの図に
 :properties:
 :export_file_name: generated/contents/blog/2026/a80aa6
 :export_date: 2026-11-22 20:58
+:export_updated: 2026-11-22 20:58
 :export_tags: ai-agent vercel-board t3-code nix
 :end:
 
@@ -22661,6 +22790,7 @@ crates.ioへの公開のように取り消せない操作ではワーカーが�
 :properties:
 :export_file_name: generated/contents/blog/2026/ec8faf
 :export_date: 2026-11-23 01:00
+:export_updated: 2026-11-23 01:00
 :export_tags: lean php formal-verification code-generation release lean-leanfran
 :end:
 Lean 4で書いて証明した関数をPHPのクラスから呼べるようにするleanfranのPHP版を作りました。
@@ -23002,6 +23132,7 @@ Leanの =IO= の関数をPHPのコマンドとして動かすgreet-cliもあり�
 :properties:
 :export_file_name: generated/contents/blog/2026/8bda7e
 :export_date: 2026-11-24 12:16
+:export_updated: 2026-11-24 12:16
 :export_tags: clojure lean formal-verification testing differential-testing
 :end:
 
@@ -23229,6 +23360,7 @@ Leanで証明した性質はどれも記事に書いたモデルの上で成り�
 :properties:
 :export_file_name: generated/contents/blog/2026/e4f733
 :export_date: 2026-11-24 12:16
+:export_updated: 2026-11-24 12:16
 :export_lang: en
 :export_tags: clojure lean formal-verification testing differential-testing
 :end:
@@ -23464,6 +23596,7 @@ I checked that each model means the same thing as the Java code by comparing it 
 :properties:
 :export_file_name: generated/contents/blog/2026/ad14a8
 :export_date: 2026-11-25 05:00
+:export_updated: 2026-11-25 05:00
 :export_tags: lean go formal-verification code-generation release lean-leanfran
 :end:
 Lean 4で書いて証明した関数をGoのパッケージから呼べるようにするleanfranのGo版を作りました。
@@ -23901,6 +24034,7 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 :properties:
 :export_file_name: generated/contents/blog/2026/315a71
 :export_date: 2026-11-25 01:17
+:export_updated: 2026-11-25 01:17
 :export_lang: en
 :export_tags: clojure standard-library
 :end:

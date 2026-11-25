@@ -1,5 +1,6 @@
 Title: org-modeドキュメントからZenn Flavored Markdownを生成するox-zennの使い方
 Date: 2020-09-25
+Updated: 2020-09-25
 Tags: emacs emacs-lisp org-mode blog release ox-zenn-el
 
 

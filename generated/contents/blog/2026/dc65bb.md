@@ -1,5 +1,6 @@
 Title: Lean 4で証明した関数をPythonから呼べるlean-pyを作った
 Date: 2026-11-11 13:59
+Updated: 2026-11-11 13:59
 Tags: lean python formal-verification code-generation property-based-testing pydantic fastapi release lean-py
 
 

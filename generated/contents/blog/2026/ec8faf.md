@@ -1,5 +1,6 @@
 Title: Lean 4で証明した関数をPHPから呼べて、PHPの関数をLeanで証明できるleanfranのPHP版を作った
 Date: 2026-11-23 01:00
+Updated: 2026-11-23 01:00
 Tags: lean php formal-verification code-generation release lean-leanfran
 
 

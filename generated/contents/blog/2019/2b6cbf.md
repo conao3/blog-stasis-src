@@ -1,5 +1,6 @@
 Title: [正式リリース]leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする
 Date: 2019-06-15
+Updated: 2019-06-15
 Tags: emacs use-package package-management release leaf-el leaf-keywords-el
 
 

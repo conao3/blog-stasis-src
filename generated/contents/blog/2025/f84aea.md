@@ -1,5 +1,6 @@
 Title: 日本語レポートから始めるorg-modeとEmacs
 Date: 2025-12-02
+Updated: 2025-12-02
 Tags: emacs org-mode nix advent-calendar tutorial
 
 

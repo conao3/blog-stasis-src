@@ -1,5 +1,6 @@
 Title: Leanの論文をaiXivに投稿した
 Date: 2026-11-04 14:43
+Updated: 2026-11-04 14:43
 Tags: lean paper formal-verification ai-agent lean-ritsuryo
 
 
