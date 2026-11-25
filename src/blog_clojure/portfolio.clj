@@ -28,7 +28,7 @@
   {:en
    {:title "Naoya Yamashita"
     :draft? false
-    :role "Software Engineer (Backend / Full-Stack) · conao3"
+    :role "Software Engineer (Backend / Full-Stack), conao3"
     :description "Backend-focused software engineer with 6+ years building and operating production services in TypeScript, Python, and Clojure on PostgreSQL and AWS."
     :summary " Owns features end to end: API design through implementation and operation, data modeling, the React frontend, CI/CD, and on-call. Writes Rust and Emacs Lisp in open source and runs an AI-native workflow with coding agents."
     :links [["GitHub" "https://github.com/conao3"]
@@ -97,7 +97,7 @@
    :ja
    {:title "山下 直哉"
     :draft? false
-    :role "ソフトウェアエンジニア (バックエンド / フルスタック) · conao3"
+    :role "ソフトウェアエンジニア (バックエンド / フルスタック)、conao3"
     :description "バックエンドサービスとフルスタック Web アプリケーションの開発で 6 年以上の実務経験を持つソフトウェアエンジニア。"
     :summary "TypeScript (Node.js)、Python、Clojure、Rust を使い、AWS 上で REST / GraphQL API の設計から実装と運用、PostgreSQL のデータモデリング、React のフロントエンドまで、機能を一貫して担当できます。新しい技術スタックの習得が速く、Clojure に移って半年でチームの相談役になりました。OSS では Rust と Emacs Lisp を書いています。また、Claude Code、Codex、Devin を使った AI ネイティブな開発フローを実践しています。"
     :links [["GitHub" "https://github.com/conao3"]
@@ -244,7 +244,7 @@
           [:h2 (:experience headings)]
           (for [{:keys [heading period items]} experience]
             (list
-              [:h3 (first heading) " · " (second heading)]
+              [:h3 (if (= lang :ja) (str (first heading) "の" (second heading)) (str (first heading) " at " (second heading)))]
               [:p {:class "portfolio-period"} period]
               [:ul (for [item items] [:li item])]))
           [:h2 (:skills headings)]
