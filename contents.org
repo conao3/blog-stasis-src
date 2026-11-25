@@ -23898,7 +23898,6 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 :export_file_name: generated/contents/blog/2026/315a71
 :export_date: 2026-11-25 01:17
 :export_lang: en
-:export_draft: t
 :export_tags: clojure standard-library
 :end:
 
