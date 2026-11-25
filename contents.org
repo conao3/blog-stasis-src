@@ -23470,8 +23470,8 @@ Lean 4で書いて証明した関数をGoのパッケージから呼べるよう
 
 Leanのstructureは値を作るときにフィールドの条件を検査するGoのstructになり、列挙や場合分けを表す帰納型もGoの型になります。
 
-リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
-Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.12.0][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.12.0で動かした結果をもとに書いています。
+リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.13.1/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
+Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.13.1][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.13.1で動かした結果をもとに書いています。
 
 leanfranはLeanのコンパイラの中間表現をGoに変換するものです。
 生成したGoはこのmoduleとGoの標準ライブラリだけで動き、実行するときにLeanもcgoも要りません。
@@ -23497,10 +23497,10 @@ leanfranをGoから使う方法は4つあります。
 Leanを変換するCLIの =leanfran-go= はnixで入れ、アプリケーションのmoduleにはleanfran-goのパッケージと =go tool= で呼ぶコマンドを足します。
 
 #+begin_src console
-$ nix profile install github:conao3/lean-leanfran/v0.12.0#go
+$ nix profile install github:conao3/lean-leanfran/v0.13.1#go
 $ go mod init example.com/shop
-$ go get github.com/conao3/leanfran-go@v0.12.0
-$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.12.0
+$ go get github.com/conao3/leanfran-go@v0.13.1
+$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.13.1
 #+end_src
 
 Goは1.26以上が要ります。
@@ -23744,17 +23744,17 @@ GoのGCはこの参照を手放さないので、 =Take= で渡さなかったha
 
 | 配列の件数 | =Record= (回/秒) | =Handle.Record= (回/秒) |
 |---+---+---|
-| 10 | 2,400,000 | 6,730,000 |
-| 1,000 | 55,300 | 6,660,000 |
-| 100,000 | 353 | 6,850,000 |
+| 10 | 2,530,000 | 6,840,000 |
+| 1,000 | 64,200 | 7,100,000 |
+| 100,000 | 603 | 6,700,000 |
 
-=Record= は配列の件数が増えるほど回数が減りますが、 =Handle.Record= は件数によらず毎秒666万回から685万回です。
+=Record= は配列の件数が増えるほど回数が減りますが、 =Handle.Record= は件数によらず毎秒670万回から710万回です。
 
 handleはどれも1つの領域に属し、leanfran-goのランタイムは同じ領域のhandleの操作を1つずつ順に実行します。
 ここまでの例のhandleは、プロセスに1つある既定の領域に属します。
 =leanfran.NewRegion()= で領域を作り、その領域の =WithValues= の中でhandleを作ると、別々の領域のhandleを複数のgoroutineから同時に操作できます。
 
-サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
+サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.13.1/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
 
 ** Goの関数をLeanで証明する
 逆向きの例として、値を範囲に収める =Clamp= をGoで書き、 =//leanfran:model= でLeanの仕様と結びつけます。
@@ -23786,7 +23786,7 @@ func Clamp(x, lo, hi int64) int64 {
 この例では =lo ≤ hi= のときに =Clamp= が =clampSpec= と同じ値を返すことと、戻り値が =lo= 以上 =hi= 以下になることが証明の義務です。
 
 =go tool leanfran check= はGoの構文木と型を読んで関数をLeanの関数に訳し、 =Clamp.obligation.refines= のような名前で義務の命題を作ります。
-証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
+証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.13.1/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
 
 #+begin_src lean
 import LeanGoModel.B6578616d706c652e636f6d2f73686f702f63616c63
@@ -23888,221 +23888,13 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 訳せるのはGoの一部で、 =if= ・ =switch= ・ =for= 、スライスの添字と =append= 、structを扱えます。
 
 ポインタ・map・channel・goroutine・メソッド・generics・ =defer= ・入出力を含む関数は対象外です。
-対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
+対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.13.1/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
 
 ** おわりに
-この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleを置いてあります。
+この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.13.1/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleを置いてあります。
 2つのパッケージでGoのstructを共有するembed-modelsや、Leanの =IO= の関数をGoのコマンドとして動かすgreet-cliもあります。
 
-導入の手順は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/docs/go-guide.md][Goのガイド]]にあります。
-
-* A Clojure core cheat sheet in math notation
-:properties:
-:export_file_name: generated/contents/blog/2026/315a71
-:export_date: 2026-11-25 01:17
-:export_lang: en
-:export_tags: clojure standard-library
-:end:
-
-I wrote down 163 functions from =clojure.core= that work on sequences, collections and functions, each as a small formula.
-I borrowed the notation from Daniel Keep's [[https://danielkeep.github.io/itercheat_baked.html][Rust Iterator Cheat Sheet]] (CC BY-SA 4.0) and moved it to Clojure syntax, with seqs, vectors, maps and sets written as Clojure literals and function calls written as lists.
-The rows describe Clojure 1.12.7.
-A [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-cheatsheet.clj][script]] keeps every row next to 333 checks that run the function in Clojure, and it builds the tables only when all of the checks pass.
-
-** Reading the notation
-
-The figure reads the =take-while= row, and then follows the same row through =(take-while #(< % 3) (range))=.
-
-[[./resources/public/img/315a71-reading-a-row.svg]]
-
-- \((a_0\ a_1\ \ldots)\) is a seq. \(a\) and \(b\) are input seqs, and a subscript picks one element.
-- \(\texttt{'}(a_0\ a_1\ \ldots)\) is a list, \([a_0\ a_1\ \ldots]\) is a vector, \(\{k_0\ v_0,\ \ldots\}\) is a map, and \(\#\{a_0\ \ldots\}\) is a set, as in Clojure source. The list rows of =peek= and =pop= need a real list, and a seq such as the result of =map= throws there.
-- \((f\ a_0)\) calls \(f\) with \(a_0\), as in Clojure source.
-- \(f\), \(g\) and \(h\) are functions that compute new values, and \(\mathit{keyfn}\) is a key function such as the one =sort-by= takes.
-- \(p\) and \(q\) are predicates. A predicate result counts as \(\mathtt{true}\) when it is anything other than \(\mathtt{nil}\) or \(\mathtt{false}\).
-- \(c\) is a comparator, such as =compare= or =>=.
-- \(f : x\ y \to z\) says that \(f\) takes two arguments, and \(\text{bool}\) and \(\text{number}\) name the kind of value it returns. \(\mathit{acc}\) is the accumulated value of a reducing function, and \(\mathit{init}\) is its first value.
-- \(\mathit{xf}\) is a transducer, such as =(map inc)=.
-- \(i\) and \(j\) are positions, except in =range=, where they are the start and end values. \(n\) is a count that you pass in, \(s\) is a step, and \(l\) and \(l'\) are the lengths of the input seqs.
-- \(m\) is a map, \(k\) is a key, \(v\) and \(w\) are values, and \(d\) is a default value.
-- \(x \mapsto (f\ x)\) is a function, the same as =(fn [x] (f x))=. \((x_0\ \ldots) \mapsto \ldots\) takes any number of arguments.
-- A superscript ! marks a transient, as in \([a_0\ \ldots]^{!}\).
-- \(\sigma\) is a permutation of the positions, and "wh." reads "where". Other letters name values that appear in the arguments or that the row defines after "wh.".
-- An underlined element stays unrealized after you call the function and consume every seq in its result. =(take-while p a)= has to look at \(a_i\) to know where to stop, so I underline only the elements after \(a_i\). I measured this on an unchunked lazy seq. Over a vector or a finite =range=, many lazy functions such as =map= and =filter= compute 32 results at a time, because vectors and finite ranges give chunked seqs.
-- A check in the Lazy column means the function returns a lazy seq, which computes its elements when you ask for them.
-- A check in the xf column means the function returns a [[https://clojure.org/reference/transducers][transducer]] when you call it without the collection, as in =(map inc)=.
-- The function name links to its entry in the [[https://clojure.github.io/clojure/clojure.core-api.html][clojure.core API reference]].
-
-** How I grouped the functions
-
-The [[https://clojure.org/api/cheatsheet][official Clojure cheat sheet]] groups its "Seq in, Seq out" functions under headings such as "Get shorter", "Get longer", "Head-items", "Tail-items" and "'Change'".
-Some functions sit under two of those headings, such as =filter=, which appears under "Get shorter" and "'Change'".
-
-I grouped each function by how the elements of its result relate to the elements of its input, so each function appears once.
-- Selecting: every result element is an input element, in the input order.
-- Transforming: the result elements are values that \(f\) computes from the input elements.
-- Combining: the result adds elements to a seq, or joins several seqs or nested collections into one seq.
-- Reordering: the result has the same elements in another order.
-- Splitting: the result holds the input elements in groups.
-- Reducing: the result is one value.
-- Collecting: the result is a vector, a set, a map, or the collection you pass to =into=.
-
-Rich Hickey described the argument order of =clojure.core= in [[https://groups.google.com/g/clojure/c/iyyNyWs53dc][a mailing list thread]] in 2008:
-
-#+begin_quote
-Sequence functions take their sources last and collection functions take their primary operand (collection) first.
-#+end_quote
-
-Most functions in the groups above are sequence functions, so the seq comes last and they work with =->>=.
-=nth=, =nthrest= and =nthnext= take the seq first, and =max-key= and =min-key= take values instead of a seq.
-The functions that read or update a vector, map or set take it first and work with =->=.
-After them come the functions that build collections, test what kind of collection a value is, work on transients, and compare values.
-
-** Making a seq
-
-These functions make a seq from nothing, from a value or from a collection.
-Without a transducer, =sequence= only turns its argument into a seq, so a vector gives a chunked seq and a lazy seq comes back as it is.
-
-#+INCLUDE: "generated/include/315a71/making.html" export html
-
-** Selecting by position
-
-These functions keep or drop elements by counting.
-=rest= returns an empty seq when nothing is left, and =next= returns \(\mathtt{nil}\), so =next= has to realize one more element to find out.
-
-#+INCLUDE: "generated/include/315a71/position.html" export html
-
-** Selecting by predicate
-
-These functions keep or drop elements by testing each one, or by comparing it with the elements before it.
-
-#+INCLUDE: "generated/include/315a71/predicate.html" export html
-
-** Transforming
-
-These functions compute new elements from the input elements.
-With more than one input seq, =map= stops at the end of the shortest one.
-
-#+INCLUDE: "generated/include/315a71/transforming.html" export html
-
-** Combining
-
-=interleave= stops at the end of the shortest seq, and =flatten= replaces each nested sequential collection, such as a vector or a list, with its elements.
-
-#+INCLUDE: "generated/include/315a71/combining.html" export html
-
-** Reordering
-
-=sort= and =sort-by= are stable, so equal elements keep their input order.
-
-#+INCLUDE: "generated/include/315a71/reordering.html" export html
-
-** Splitting
-
-=partition= and its relatives return a seq of groups, and =split-at=, =split-with= and =splitv-at= return a vector of two parts.
-
-#+INCLUDE: "generated/include/315a71/splitting.html" export html
-
-** Reducing to a value
-
-These functions consume a seq and return one value.
-=some=, =every?=, =not-every?= and =not-any?= stop at the first element that decides the answer.
-=transduce= calls \(f\) with one argument at the end, and =completing= adds that arity to a two-argument function.
-
-#+INCLUDE: "generated/include/315a71/reducing.html" export html
-
-** Collecting into a collection
-
-The result is a vector, a set or a map that holds the elements of the seq, or the collection you pass to =into= with the elements added.
-
-#+INCLUDE: "generated/include/315a71/collecting.html" export html
-
-** Collections
-
-These functions take the collection first.
-=conj= adds at the end of a vector and at the front of a list.
-=assoc=, =dissoc=, =conj=, =merge= and =empty= keep the type of their first argument, such as a sorted map, and =select-keys=, =update-keys= and =update-vals= return a plain map.
-
-#+INCLUDE: "generated/include/315a71/collections.html" export html
-
-** Constructing collections
-
-These functions build a collection from the values you pass.
-=array-map= keeps the keys in the given order until you =assoc= more keys onto a map that has more than 8 entries, which turns it into a hash map.
-The sorted variants keep their keys ordered by =compare= or by the comparator you pass.
-
-#+INCLUDE: "generated/include/315a71/constructing.html" export html
-
-** Predicates on collections
-
-Each predicate tells you what kind of collection a value is.
-A Clojure map entry is a vector of a key and a value, so =vector?=, =sequential?= and =indexed?= return true for it.
-
-#+INCLUDE: "generated/include/315a71/predicates.html" export html
-
-** Transients
-
-A [[https://clojure.org/reference/transients][transient]] is a version of a vector, hash map or hash set that you make in constant time, change with the functions that end in =!=, and turn back into a persistent collection.
-Each of those functions returns the updated transient, and you keep using that return value.
-Sorted collections and lists have no transient version.
-
-#+INCLUDE: "generated/include/315a71/transients.html" export html
-
-** Comparing and testing values
-
-~=~ compares values, so a vector and a list with the same elements are equal, and =identical?= compares objects.
-~(= 1 1.0)~ is false, because integers and floating-point numbers are never ~=~ to each other; ~(== 1 1.0)~ compares them as numbers.
-=compare= is the default order of =sort= and the sorted collections.
-It orders numbers by value across types, so =(compare 1 1.0)= is 0, and it orders vectors by length first and then element by element.
-Lists, sets and maps do not implement =Comparable=, and =compare= throws on them.
-
-#+INCLUDE: "generated/include/315a71/values.html" export html
-
-** Functions
-
-Each function here builds, calls or wraps functions.
-
-#+INCLUDE: "generated/include/315a71/functions.html" export html
-
-** Related functions without a formula
-
-These functions control when Clojure realizes a seq, run side effects, or help you write transducers, so I describe them in words.
-
-| Function        | What it does                                                                                       |
-|-----------------+----------------------------------------------------------------------------------------------------|
-| =doall=         | Realizes a lazy seq and returns it.                                                                |
-| =dorun=         | Realizes a lazy seq for its side effects and returns =nil=.                                        |
-| =run!=          | Calls a function on each element for its side effects and returns =nil=.                          |
-| =doseq=         | A macro that runs a body for each element, with the bindings of =for=.                            |
-| =for=           | A macro for list comprehension that returns a lazy seq.                                            |
-| =realized?=     | Tells whether a lazy seq, delay, future or promise already has its value.                         |
-| =lazy-seq=      | A macro that makes a lazy seq from a body that returns a seq.                                      |
-| =lazy-cat=      | A macro version of =concat= that evaluates each collection expression only when needed.           |
-| =iteration=     | Makes a seqable and reducible value from repeated calls to a step function, such as fetching pages of an API. |
-| =tree-seq=      | Walks a tree depth first and returns the nodes as a lazy seq.                                     |
-| =eduction=      | Applies transducers to a collection each time you reduce or iterate it.                           |
-| =cat=           | A transducer that concatenates the collections it receives.                                        |
-| =halt-when=     | Returns a transducer that stops the reduction at the first input that satisfies a predicate.      |
-| =completing=    | Adds a completion arity to a reducing function, for use with =transduce=.                         |
-| =reduced=       | Wraps a value so that =reduce= stops and returns it.                                               |
-| =bounded-count= | Counts the elements of a seq, stopping after a given number.                                       |
-| =reduced?=      | Tells whether a value is wrapped by =reduced=.                                                     |
-| =unreduced=     | Takes the value out of a =reduced= wrapper, and returns other values as they are.                  |
-| =ensure-reduced= | Wraps a value with =reduced= unless it is wrapped already.                                        |
-| =seque=         | Makes a queued seq that realizes another seq in the background, up to n items ahead of the consumer. |
-| =iterator-seq=  | Makes a seq from a =java.util.Iterator=.                                                           |
-| =enumeration-seq= | Makes a seq from a =java.util.Enumeration=.                                                      |
-| =line-seq=      | Makes a lazy seq of the lines read from a =java.io.BufferedReader=.                               |
-| =file-seq=      | Walks a directory tree and returns its =java.io.File= objects as a lazy seq.                      |
-| =xml-seq=       | Walks a tree parsed by =clojure.xml/parse= and returns its elements and text nodes as a lazy seq. |
-| =resultset-seq= | Makes a lazy seq of maps from the rows of a =java.sql.ResultSet=.                                  |
-| =to-array=      | Copies a collection into a Java =Object[]=.                                                        |
-| =to-array-2d=   | Copies a collection of collections into a Java =Object[][]=.                                       |
-| =into-array=    | Copies a seq into a Java array of a given element type, or of the first element's type.           |
-| =deref=         | Reads the value of a reference such as an atom, a delay, a future or a promise; =@x= is short for it. |
-| =bean=          | Makes a read-only map view of a Java object from its JavaBean properties.                         |
-
-I left out the rest of =clojure.core=, which includes numbers, strings, concurrency, namespaces, macros for control flow and the other parts of Java interop.
+導入の手順は[[https://github.com/conao3/lean-leanfran/blob/v0.13.1/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.13.1/docs/go-guide.md][Goのガイド]]にあります。
 
 * COMMENT Local variables
 # Local Variables:
