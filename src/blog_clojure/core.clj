@@ -734,9 +734,10 @@
               [:header
                [:h1 file-name]
                [:div {:class "post-meta"}
-                [:a {:class "source-badge" :href article-path} "記事に戻る"]
-                [:a {:class "source-badge" :href source-path} "そのまま開く"]
-                (github-badge (:github-href sources))]]
+                [:div {:class "post-meta-main"}
+                 [:a {:class "source-badge" :href article-path} "記事に戻る"]
+                 [:a {:class "source-badge" :href source-path} "そのまま開く"]
+                 (github-badge (:github-href sources))]]]
               [:div {:class "content"}
                [:p "「" [:a {:href article-path} title] "」の " file-name " です。"
                 "「そのまま開く」はファイルをそのまま返します。"]

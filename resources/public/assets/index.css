@@ -241,6 +241,7 @@ article > header .post-meta {
 .post-meta-main {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-200);
 }
 
