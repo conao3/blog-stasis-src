@@ -23470,8 +23470,8 @@ Lean 4で書いて証明した関数をGoのパッケージから呼べるよう
 
 Leanのstructureは値を作るときにフィールドの条件を検査するGoのstructになり、列挙や場合分けを表す帰納型もGoの型になります。
 
-リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.11.1/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
-Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.11.1][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.11.1で動かした結果をもとに書いています。
+リポジトリは[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go][conao3/lean-leanfranのlangs/Go/]]で、ライセンスはApache-2.0です。
+Goのmoduleは[[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.12.0][github.com/conao3/leanfran-go]]の名前で公開していて、この記事は0.12.0で動かした結果をもとに書いています。
 
 leanfranはLeanのコンパイラの中間表現をGoに変換するものです。
 生成したGoはこのmoduleとGoの標準ライブラリだけで動き、実行するときにLeanもcgoも要りません。
@@ -23497,10 +23497,10 @@ leanfranをGoから使う方法は4つあります。
 Leanを変換するCLIの =leanfran-go= はnixで入れ、アプリケーションのmoduleにはleanfran-goのパッケージと =go tool= で呼ぶコマンドを足します。
 
 #+begin_src console
-$ nix profile install github:conao3/lean-leanfran/v0.11.1#go
+$ nix profile install github:conao3/lean-leanfran/v0.12.0#go
 $ go mod init example.com/shop
-$ go get github.com/conao3/leanfran-go@v0.11.1
-$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.11.1
+$ go get github.com/conao3/leanfran-go@v0.12.0
+$ go get -tool github.com/conao3/leanfran-go/cmd/leanfran@v0.12.0
 #+end_src
 
 Goは1.26以上が要ります。
@@ -23733,6 +23733,7 @@ $ go run ./cmd/ledger
 
 =Value.ReadNat= と =Value.ReadArrayUInt64= がhandleの中身をGoの値に変換するメソッドです。
 使い終えたhandleは =Close= を呼んで参照を手放します。
+GoのGCはこの参照を手放さないので、 =Take= で渡さなかったhandleには =Close= を呼びます。
 
 10件と1,000件と100,000件の配列に1件足す操作を、Linux・amd64のIntel Core i5-8400とGo 1.27.3で測りました。
 =Record= には同じスライスを毎回渡し、 =Handle.Record= には同じ件数の配列で作ったhandleを =Take= で渡し続けています。
@@ -23743,15 +23744,17 @@ $ go run ./cmd/ledger
 
 | 配列の件数 | =Record= (回/秒) | =Handle.Record= (回/秒) |
 |---+---+---|
-| 10 | 2,170,000 | 3,270,000 |
-| 1,000 | 52,100 | 3,230,000 |
-| 100,000 | 335 | 3,080,000 |
+| 10 | 2,400,000 | 6,730,000 |
+| 1,000 | 55,300 | 6,660,000 |
+| 100,000 | 353 | 6,850,000 |
 
-=Record= は配列の件数が増えるほど回数が減りますが、 =Handle.Record= は件数によらず毎秒308万回から327万回です。
+=Record= は配列の件数が増えるほど回数が減りますが、 =Handle.Record= は件数によらず毎秒666万回から685万回です。
 
-handleの操作はleanfran-goのランタイムがプロセスの中で1つずつ順に実行するので、複数のgoroutineから呼んでもLeanの処理は並列になりません。
+handleはどれも1つの領域に属し、leanfran-goのランタイムは同じ領域のhandleの操作を1つずつ順に実行します。
+ここまでの例のhandleは、プロセスに1つある既定の領域に属します。
+=leanfran.NewRegion()= で領域を作り、その領域の =WithValues= の中でhandleを作ると、別々の領域のhandleを複数のgoroutineから同時に操作できます。
 
-サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.11.1/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
+サーバーが状態をhandleで持ち、リクエストごとに次の状態のhandleへ置き換える使い方は[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go/samples/value-server][value-serverのサンプル]]にあります。
 
 ** Goの関数をLeanで証明する
 逆向きの例として、値を範囲に収める =Clamp= をGoで書き、 =//leanfran:model= でLeanの仕様と結びつけます。
@@ -23783,7 +23786,7 @@ func Clamp(x, lo, hi int64) int64 {
 この例では =lo ≤ hi= のときに =Clamp= が =clampSpec= と同じ値を返すことと、戻り値が =lo= 以上 =hi= 以下になることが証明の義務です。
 
 =go tool leanfran check= はGoの構文木と型を読んで関数をLeanの関数に訳し、 =Clamp.obligation.refines= のような名前で義務の命題を作ります。
-証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
+証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
 
 #+begin_src lean
 import LeanGoModel.B6578616d706c652e636f6d2f73686f702f63616c63
@@ -23885,13 +23888,13 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 訳せるのはGoの一部で、 =if= ・ =switch= ・ =for= 、スライスの添字と =append= 、structを扱えます。
 
 ポインタ・map・channel・goroutine・メソッド・generics・ =defer= ・入出力を含む関数は対象外です。
-対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
+対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
 
 ** おわりに
-この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.11.1/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleを置いてあります。
+この記事の例のほかにも、[[https://github.com/conao3/lean-leanfran/tree/v0.12.0/langs/Go/samples][Goのサンプル]]にはビットマスクと剰余が等しいことを証明するverified-nibbleを置いてあります。
 2つのパッケージでGoのstructを共有するembed-modelsや、Leanの =IO= の関数をGoのコマンドとして動かすgreet-cliもあります。
 
-導入の手順は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/docs/go-guide.md][Goのガイド]]にあります。
+導入の手順は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/langs/Go/README.md][GoのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.12.0/docs/go-guide.md][Goのガイド]]にあります。
 
 * A Clojure core cheat sheet in math notation
 :properties:
