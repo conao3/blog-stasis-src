@@ -23743,9 +23743,10 @@ $ go run ./cmd/ledger
 #+end_src
 
 引数には =entries.Borrow()= か =entries.Take()= を渡します。
-=Borrow= は呼び出しのあとも =entries= を使い続けるとき、 =Take= は参照ごとLeanに渡して、そのhandleを手放すときに使います。
+=Borrow= は呼び出しのあとも =entries= を使い続けるとき、 =Take= は参照ごとLeanに渡して、そのhandleを使い終えるときに使います。
 
 =Take= で渡した配列にはほかに参照が無いので、Leanの =Array.push= は配列をコピーせずにその場で1件足します。
+
 =Value.ReadNat= と =Value.ReadArrayUInt64= がhandleの中身をGoの値に変換するメソッドです。
 使い終えたhandleは =Close= を呼んで参照を手放します。
 
@@ -23799,8 +23800,7 @@ func Clamp(x, lo, hi int64) int64 {
 この例では =lo ≤ hi= のときに =Clamp= が =clampSpec= と同じ値を返すことと、戻り値が =lo= 以上 =hi= 以下になることが証明の義務です。
 
 =go tool leanfran check= はGoの構文木と型を読んで関数をLeanの関数に訳し、 =Clamp.obligation.refines= のような名前で義務の命題を作ります。
-証明は =go.mod= の隣の =lean/Proofs/= に書きます。
-ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
+証明は =go.mod= の隣の =lean/Proofs/= に書き、ここでは[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/langs/Go/samples/verified-clamp/lean/Proofs/Clamp.lean][verified-clampのサンプルの証明]]のモジュール名だけをこのパッケージに合わせています。
 
 #+begin_src lean
 import LeanGoModel.B6578616d706c652e636f6d2f73686f702f63616c63
@@ -23869,7 +23869,7 @@ example.com/shop/calc.Clamp [in_range]: failed
 example.com/shop/calc.Clamp [refines]: failed
 #+end_src
 
-このテストも、3つの引数がすべて0の入力で反例を見つけます。
+=go test= で動かす乱数のテストも、3つの引数がすべて0の入力で反例を見つけます。
 
 #+begin_src console
 $ go test ./calc/
@@ -23888,7 +23888,8 @@ Leanの定理はLeanで書いた関数とGoから訳したLeanのモデルの性
 翻訳器は手で書いたGoを実行した結果と、訳したモデルをLeanの標準のCバックエンドでコンパイルして動かした結果を比べるテストで確かめています。
 演算のモデルはモデルから生成したコードとGoの演算を境界の値で比べ、モデルの失敗とGoの =panic= が対応することも見ています。
 
-LeanをGoに変換する生成器とランタイムも、生成したGoの結果をLeanのCバックエンドの結果と比べています。
+LeanをGoに変換する生成器とランタイムは、生成したGoの結果をLeanのCバックエンドの結果と比べるテストで確かめています。
+
 この記事を書いた時点で、Linux・amd64では境界の値と乱数で作った1,769,817件の数値の演算を試しました。
 そのうち1,764,071件の結果がCバックエンドの結果とバイト単位で一致しています。
 
@@ -23898,8 +23899,8 @@ LeanをGoに変換する生成器とランタイムも、生成したGoの結果
 GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にして、 =int= と =uint= は =Int64= と =UInt64= にします。
 ゼロ除算と範囲外の添字と =panic= は、モデルの上では失敗を表す値になります。
 
-訳せるのはGoの一部です。
-=if= ・ =switch= ・ =for= 、スライスの添字と =append= 、structを訳せます。
+訳せるのはGoの一部で、 =if= ・ =switch= ・ =for= 、スライスの添字と =append= 、structを扱えます。
+
 ポインタ・map・channel・goroutine・メソッド・generics・ =defer= ・入出力を含む関数は対象外です。
 対応する構文の一覧は[[https://github.com/conao3/lean-leanfran/blob/v0.11.1/docs/go-guide.md#go-subset-and-proof-scope][Goのガイド]]にあります。
 
