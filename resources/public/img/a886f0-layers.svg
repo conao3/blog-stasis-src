@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" font-family="sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="430" rx="16" fill="#fff"/>
+  <text x="30" y="44" font-size="20" font-weight="bold" fill="#222">leangageの層</text>
+
+  <rect x="30" y="70" width="270" height="250" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="165" y="104" font-size="20" font-weight="bold" text-anchor="middle" fill="#0f4c81">Lean 4</text>
+  <text x="165" y="140" font-size="16" text-anchor="middle" fill="#222">kernel (transition)</text>
+  <text x="165" y="170" font-size="16" text-anchor="middle" fill="#222">認可のguard</text>
+  <text x="165" y="200" font-size="16" text-anchor="middle" fill="#222">SQLのコンパイラ</text>
+  <text x="165" y="230" font-size="16" text-anchor="middle" fill="#222">tokenの形式</text>
+  <text x="165" y="260" font-size="16" text-anchor="middle" fill="#222">JSONのwriter</text>
+  <text x="165" y="296" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f4c81">と、それぞれの定理</text>
+
+  <line x1="305" y1="195" x2="395" y2="195" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="350" y="182" font-size="16" text-anchor="middle" fill="#222">leanfran</text>
+
+  <rect x="400" y="70" width="270" height="250" rx="12" fill="#f3f3f3" stroke="#555" stroke-width="2"/>
+  <text x="535" y="104" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">殻 (手で書く)</text>
+  <text x="535" y="134" font-size="16" text-anchor="middle" fill="#222">HTTP・HMAC・engine</text>
+  <rect x="425" y="152" width="220" height="146" rx="10" fill="#fff4e0" stroke="#b36b00" stroke-width="2"/>
+  <text x="535" y="182" font-size="18" font-weight="bold" text-anchor="middle" fill="#b36b00">生成したコード</text>
+  <text x="535" y="216" font-size="16" text-anchor="middle" fill="#222">Rust (axum)</text>
+  <text x="535" y="246" font-size="16" text-anchor="middle" fill="#222">Python (http.server)</text>
+  <text x="535" y="276" font-size="16" text-anchor="middle" fill="#222">Go (net/http)</text>
+
+  <line x1="675" y1="195" x2="765" y2="195" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="720" y="182" font-size="16" text-anchor="middle" fill="#222">SQL</text>
+
+  <rect x="770" y="70" width="200" height="250" rx="12" fill="#e6f1ea" stroke="#2f6f4f" stroke-width="2"/>
+  <text x="870" y="104" font-size="20" font-weight="bold" text-anchor="middle" fill="#2f6f4f">保存先</text>
+  <text x="870" y="180" font-size="16" text-anchor="middle" fill="#222">メモリ</text>
+  <text x="870" y="216" font-size="16" text-anchor="middle" fill="#222">PostgreSQL</text>
+
+  <rect x="30" y="346" width="270" height="54" rx="10" fill="#0f4c81"/>
+  <text x="165" y="379" font-size="16" font-weight="bold" text-anchor="middle" fill="#fff">Leanで証明する</text>
+  <rect x="425" y="346" width="220" height="54" rx="10" fill="#b36b00"/>
+  <text x="535" y="379" font-size="16" font-weight="bold" text-anchor="middle" fill="#fff">Leanと出力を比べる</text>
+  <rect x="770" y="346" width="200" height="54" rx="10" fill="#555"/>
+  <text x="870" y="379" font-size="16" font-weight="bold" text-anchor="middle" fill="#fff">殻と保存先は信頼する</text>
+</svg>
