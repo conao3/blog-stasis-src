@@ -695,7 +695,7 @@
 
 
 (def lang-labels
-  [["en" "English"] ["ja" "日本語"]])
+  [["ja" "Japanese"] ["en" "English"]])
 
 
 (defn lang-switch
@@ -705,7 +705,7 @@
          :when (contains? translations code)]
      (if (= code lang)
        [:span {:aria-current "page"} label]
-       [:a {:href (translations code) :hreflang code :lang code} label]))])
+       [:a {:href (translations code) :hreflang code} label]))])
 
 
 (defn render-content

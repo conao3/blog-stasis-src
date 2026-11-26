@@ -217,11 +217,11 @@
         [:article {:class "portfolio"}
          (when (< 1 (count langs))
            [:nav {:class "portfolio-lang"}
-            (for [[code label] [[:en "English"] [:ja "日本語"]]
+            (for [[code label] [[:ja "Japanese"] [:en "English"]]
                   :when (contains? langs code)]
               (if (= code lang)
                 [:span {:aria-current "page"} label]
-                [:a {:href (urls code) :hreflang (name code) :lang (name code)} label]))])
+                [:a {:href (urls code) :hreflang (name code)} label]))])
          [:header
           [:img {:class "portfolio-icon" :src "/assets/icon.jpg" :alt "" :width 96 :height 96}]
           [:div
