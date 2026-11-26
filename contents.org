@@ -24239,7 +24239,7 @@ These functions control when Clojure realizes a seq, run side effects, or help y
 
 I left out the rest of =clojure.core=, which includes numbers, strings, concurrency, namespaces, macros for control flow and the other parts of Java interop.
 
-* Lean 4で証明したkernelをRust・Python・GoのHTTPサーバーにするleangageを作った
+* Lean 4で証明したkernelをRustとPythonとGoのHTTPサーバーにするleangageを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/a886f0
 :export_date: 2026-11-26 13:10
@@ -24247,7 +24247,7 @@ I left out the rest of =clojure.core=, which includes numbers, strings, concurre
 :export_tags: lean rust python go formal-verification code-generation postgresql performance release lean-leangage lean-leanfran
 :export_draft: t
 :end:
-Lean 4で書いて証明した関数を、Rust・Python・GoのHTTPサーバーとして動かすwebフレームワークのleangageを作りました。
+Lean 4で書いて証明した関数を、RustとPythonとGoのHTTPサーバーとして動かすwebフレームワークのleangageを作りました。
 サービスのロジックを1つの関数にまとめてLeanで証明すると、認可やテナントの分離のような性質を定理として持ったまま、3つの言語で同じサーバーを動かせます。
 
 リポジトリは[[https://github.com/conao3/lean-leangage][conao3/lean-leangage]]で、ライセンスはApache-2.0です。
@@ -24267,8 +24267,8 @@ kernelは呼び出した利用者とテナントの状態と命令の3つを受�
 
 [[./resources/public/img/a886f0-layers.svg]]
 
-Leanにはkernelのほかに、どのサービスでも使う部品として認可のguard・SQLのコンパイラ・tokenの形式・JSONのwriterが書いてあります。
-これらを[[https://s.conao3.com/blog/2026/23d62c][leanfran]]の0.13.2でRust・Python・Goのコードに変換しています。
+Leanにはkernelのほかに、どのサービスでも使う部品として認可のguardとSQLのコンパイラ、tokenの形式とJSONのwriterが書いてあります。
+これらを[[https://s.conao3.com/blog/2026/23d62c][leanfran]]の0.13.2でRustとPythonとGoのコードに変換しています。
 
 変換したコードを動かすサーバーは、言語ごとに手で書いています。
 
@@ -24291,7 +24291,7 @@ def transition (actor : Principal) (snap : Snapshot) (cmd : Command) :
   | .get => .ok (none, .value (memoryOf snap.memories actor.user))
 #+end_src
 
-命令は =set= ・ =apply= ・ =get= の3つです。
+命令は =set= と =apply= と =get= の3つです。
 =set= は数を覚え、 =apply= は覚えている数に演算をして結果を覚え直し、 =get= は覚えている数を返します。
 
 返り値の =Option Memory= は状態に書き込む行で、 =get= のように何も書き込まない命令では =none= になります。
@@ -24416,7 +24416,7 @@ SQLの文はLeanで書いたコンパイラがこの定義から作ります。
 同じテナントへの命令が続くときは前の命令のあとの状態を覚えておき、ほかのサーバーから書き込まれていなければ行を読み直しません。
 
 コンパイラについての定理は、Leanで書いたPostgreSQLのモデルに対して証明しています。
-モデルは =CREATE TABLE= ・ =INSERT= ・ =DELETE= ・ =SELECT= が表の行をどう変えるかをLeanの関数として書いたものです。
+モデルは =CREATE TABLE= と =INSERT= と =DELETE= と =SELECT= が表の行をどう変えるかをLeanの関数として書いたものです。
 
 | 定理 | 内容 |
 |---|---|
@@ -24428,7 +24428,7 @@ SQLの文はLeanで書いたコンパイラがこの定義から作ります。
 この定理は =stored_transition= という名前で、電卓とノートのそれぞれにあります。
 
 ** 証明していないところ
-定理はLeanで書いた関数に対して証明していますが、実際に動くのはそこから変換したRust・Python・Goのコードです。
+定理はLeanで書いた関数に対して証明していますが、実際に動くのはそこから変換したRustとPythonとGoのコードです。
 変換したコードがLeanと同じ結果を返すことは、テストで確かめています。
 
 テストでは、同じ命令の列をLeanが直接コンパイルしたkernelと3つの言語のkernelに流して出力を比べます。
