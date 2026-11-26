@@ -9,7 +9,7 @@
   <text x="165" y="104" font-size="20" font-weight="bold" text-anchor="middle" fill="#0f4c81">Lean 4</text>
   <text x="165" y="136" font-size="16" text-anchor="middle" fill="#222">kernel (transition)</text>
   <text x="165" y="162" font-size="16" text-anchor="middle" fill="#222">認可のguard</text>
-  <text x="165" y="188" font-size="16" text-anchor="middle" fill="#222">要求の読み取り</text>
+  <text x="165" y="188" font-size="16" text-anchor="middle" fill="#222">命令への変換</text>
   <text x="165" y="214" font-size="16" text-anchor="middle" fill="#222">返信の組み立て</text>
   <text x="165" y="240" font-size="16" text-anchor="middle" fill="#222">SQLのコンパイラ</text>
   <text x="165" y="266" font-size="16" text-anchor="middle" fill="#222">tokenの形式</text>
@@ -20,7 +20,7 @@
 
   <rect x="400" y="70" width="270" height="250" rx="12" fill="#f3f3f3" stroke="#555" stroke-width="2"/>
   <text x="535" y="104" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">サーバー (手で書く)</text>
-  <text x="535" y="134" font-size="16" text-anchor="middle" fill="#222">HTTP、署名の計算、状態の保存</text>
+  <text x="535" y="134" font-size="16" text-anchor="middle" fill="#222">HTTP、JSON、署名、保存</text>
   <rect x="425" y="152" width="220" height="146" rx="10" fill="#fff4e0" stroke="#b36b00" stroke-width="2"/>
   <text x="535" y="182" font-size="18" font-weight="bold" text-anchor="middle" fill="#b36b00">変換したコード</text>
   <text x="535" y="216" font-size="16" text-anchor="middle" fill="#222">Rust</text>
