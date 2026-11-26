@@ -694,11 +694,26 @@
     "GitHub"]])
 
 
+(def lang-labels
+  [["en" "English"] ["ja" "日本語"]])
+
+
+(defn lang-switch
+  [lang translations]
+  [:nav {:class "lang-switch" :aria-label "Language"}
+   (for [[code label] lang-labels
+         :when (contains? translations code)]
+     (if (= code lang)
+       [:span {:aria-current "page"} label]
+       [:a {:href (translations code) :hreflang code :lang code} label]))])
+
+
 (defn render-content
-  [{:keys [title body date datetime updated updated-datetime url post? tags sources]}]
+  [{:keys [title body date datetime updated updated-datetime url post? tags sources lang translations]}]
   (hiccup/html
     [:article
      [:header
+      (when (seq translations) (lang-switch (or lang "ja") translations))
       [:h1 title]
       (when post?
         [:div {:class "post-meta"}
@@ -749,13 +764,25 @@
                [:pre {:class "source-text"} [:code text]]]])}))
 
 
+(defn listed-posts
+  [posts]
+  (let [paths (set (map first posts))]
+    (remove (fn [[_ page]] (contains? paths (:original page))) posts)))
+
+
 (defn post-list-items
   [posts]
   [:ul
-   (->> posts
+   (->> (listed-posts posts)
         (sort-by (fn [[k v]] [(:datetime v) k]))
         reverse
-        (map (fn [[k v]] [:li [:time {:datetime (:datetime v)} (:date v)] [:a {:href k} (:title v)] (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))])
+        (map (fn [[k v]]
+               [:li
+                [:time {:datetime (:datetime v)} (:date v)]
+                [:a {:href k} (:title v)]
+                (for [[code other] (sort (dissoc (:translations v) (or (:lang v) "ja")))]
+                  [:a {:class "post-lang" :href other :hreflang code :lang code} (str/upper-case code)])
+                (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))])
 
 
 (defn tag-pages
@@ -774,8 +801,9 @@
                       [:article
                        [:header [:h1 "タグ"]]
                        [:ul {:class "tag-list"}
-                        (for [[tag tagged] (sort-by (fn [[tag tagged]] [(- (count tagged)) tag]) by-tag)]
-                          [:li [:a (cond-> {:href (tag-path tag)} (= 1 (count tagged)) (assoc :class "tag-single")) (str "#" tag) [:span {:class "tag-count"} (count tagged)]]])]])}}
+                        (for [[tag tagged] (sort-by (fn [[tag tagged]] [(- (count (listed-posts tagged))) tag]) by-tag)
+                              :let [n (count (listed-posts tagged))]]
+                          [:li [:a (cond-> {:href (tag-path tag)} (= 1 n) (assoc :class "tag-single")) (str "#" tag) [:span {:class "tag-count"} n]]])]])}}
             (map (fn [[tag tagged]]
                    [(tag-path tag)
                     {:title (str "#" tag)
@@ -788,6 +816,40 @@
                                (post-list-items tagged)]
                               [:p [:a {:href "/tags/"} "タグの一覧へ"]]])}]))
             by-tag))))
+
+
+(defn check-originals
+  [pages]
+  (doseq [[path {:keys [original lang title]}] pages
+          :when original]
+    (let [target (get pages original)]
+      (when-not target
+        (throw (ex-info (str "Original not found: " original) {:path path :title title})))
+      (when (= (or lang "ja") (or (:lang target) "ja"))
+        (throw (ex-info (str "Original has the same language: " original) {:path path :title title})))))
+  pages)
+
+
+(defn translation-alternates
+  [{:keys [original path translations]}]
+  (let [href #(subs (page-url %) (count site-url))]
+    (concat (map (fn [[code p]] [code (href p)]) (sort translations))
+            [["x-default" (href (or original path))]])))
+
+
+(defn link-translations
+  [pages]
+  (let [groups (->> pages
+                    (keep (fn [[path {:keys [original lang]}]]
+                            (when-let [target (get pages original)]
+                              {original {(or (:lang target) "ja") original
+                                         (or lang "ja") path}})))
+                    (apply merge-with merge))]
+    (update-vals pages
+                 (fn [page]
+                   (if-let [translations (get groups (or (:original page) (:path page)))]
+                     (assoc page :translations translations)
+                     page)))))
 
 
 (defn site
@@ -803,6 +865,7 @@
                              (let [p (parse-markdown v)
                                    path (str (subs k 0 (- (count k) 3)) ".html")
                                    obj {:title (:title (:metadata p))
+                                        :path path
                                         :url (page-url path)
                                         :post? (not= path "/index.html")
                                         :date (some-> (:date (:metadata p)) (subs 0 10))
@@ -810,6 +873,7 @@
                                         :updated (some-> (:updated (:metadata p)) (subs 0 10))
                                         :updated-datetime (some-> (:updated (:metadata p)) (str/replace " " "T"))
                                         :lang (:lang (:metadata p))
+                                        :original (some-> (:original (:metadata p)) str/trim not-empty (str ".html"))
                                         :tags (parse-tags (:tags (:metadata p)))
                                         :draft? (= "true" (some-> (:draft (:metadata p)) str/lower-case))
                                         :description (:description p)
@@ -820,7 +884,7 @@
                                                     :org-href (org-path path)
                                                     :github-href (source-github-url revision lines)})
                                         :body (:html p)}]
-                               [path (assoc obj :body (render-content obj))])))
+                               [path obj])))
                       (into {})
                       (merge (into {}
                                    (map (fn [[lang path]]
@@ -832,8 +896,11 @@
                                                  :portfolio? true
                                                  :body (portfolio/body lang portfolio-langs)}]))
                                    (select-keys portfolio/paths portfolio-langs)))
+                      check-originals
                       (remove (fn [[_ page]] (and (:draft? page) (not drafts?))))
-                      (into {}))
+                      (into {})
+                      link-translations
+                      (#(update-vals % (fn [page] (cond-> page (:markdown? page) (assoc :body (render-content page)))))))
         portfolio-href (fn [lang]
                          (let [lang (if (= lang "en") :en :ja)]
                            (when (contains? contents (portfolio/paths lang))
@@ -870,7 +937,9 @@
                              :date (:date (second (first posts))))
                      (assoc "/feed/index.html" (feed-page feed-xml (:date (second (first posts))))
                             sites/path (sites/page))
-                     (update-vals #(cond-> % (:portfolio? %) (assoc :alternates portfolio-alternates))))]
+                     (update-vals #(cond-> %
+                                     (:portfolio? %) (assoc :alternates portfolio-alternates)
+                                     (:translations %) (assoc :alternates (translation-alternates %)))))]
     (stasis/merge-page-sources
       {:contents (into {} (map (fn [[path page]] [path (render-page path (assoc page :portfolio-href (portfolio-href (:lang page))))])) contents)
        :markdown (-> (into {}

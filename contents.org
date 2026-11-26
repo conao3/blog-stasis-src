@@ -3,7 +3,7 @@
 * org
 #+begin_src elisp
 (org-export-define-derived-backend 'stasis-md 'md
-  :options-alist '((:draft "DRAFT" nil nil t) (:lang "LANG" nil nil t) (:tags "TAGS" nil nil split) (:updated "UPDATED" nil nil t))
+  :options-alist '((:draft "DRAFT" nil nil t) (:lang "LANG" nil nil t) (:original "ORIGINAL" nil nil t) (:tags "TAGS" nil nil split) (:updated "UPDATED" nil nil t))
   :translate-alist
   '((template . stasis-md-template)
     (link . stasis-md-link)
@@ -29,6 +29,7 @@
    (if (plist-get info :updated) (format "Updated: %s\n" (plist-get info :updated)) "")
    (if (plist-get info :draft) "Draft: true\n" "")
    (if (plist-get info :lang) (format "Lang: %s\n" (plist-get info :lang)) "")
+   (if (plist-get info :original) (format "Original: %s\n" (plist-get info :original)) "")
    (if (plist-get info :tags) (format "Tags: %s\n" (string-join (plist-get info :tags) " ")) "")
    "\n\n"
    contents))
@@ -17574,6 +17575,7 @@ crates.ioの各バージョンのページには、公開したGitHub Actionsの
 * awsr: the AWS CLI v2 in Rust, with the same output and up to 550 times the speed
 :properties:
 :export_file_name: generated/contents/blog/2026/87e5cb
+:export_original: /blog/2026/f681b9
 :export_date: 2026-11-05 18:56
 :export_updated: 2026-11-05 18:56
 :export_lang: en
@@ -18083,6 +18085,7 @@ IssueやPRは大歓迎です。
 * lean-clj: call Lean 4 functions from Clojure, and prove Clojure functions in Lean
 :properties:
 :export_file_name: generated/contents/blog/2026/311be4
+:export_original: /blog/2026/4e5aa2
 :export_date: 2026-11-05 20:05
 :export_updated: 2026-11-05 20:05
 :export_lang: en
@@ -21028,6 +21031,7 @@ PayProof自体も人間の確認と特定の支払いへの承認を扱うアプ
 * A day at a MongoDB hackathon with 20 AI threads
 :properties:
 :export_file_name: generated/contents/blog/2026/2baf8e
+:export_original: /blog/2026/bd0d48
 :export_date: 2026-11-14 20:15
 :export_updated: 2026-11-14 20:15
 :export_lang: en
@@ -23359,6 +23363,7 @@ Leanで証明した性質はどれも記事に書いたモデルの上で成り�
 * I checked Clojure's core with Lean and differential testing and found unreported bugs in HAMT and vector-of
 :properties:
 :export_file_name: generated/contents/blog/2026/e4f733
+:export_original: /blog/2026/8bda7e
 :export_date: 2026-11-24 12:16
 :export_updated: 2026-11-24 12:16
 :export_lang: en
