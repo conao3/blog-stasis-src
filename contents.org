@@ -24251,7 +24251,7 @@ Lean 4で書いて証明した関数を、Rust・Python・GoのHTTPサーバー�
 サービスのロジックを1つの関数にまとめてLeanで証明すると、認可やテナントの分離のような性質を定理として持ったまま、3つの言語で同じサーバーを動かせます。
 
 リポジトリは[[https://github.com/conao3/lean-leangage][conao3/lean-leangage]]で、ライセンスはApache-2.0です。
-パッケージの登録先には出していないので、この記事はリポジトリのcommit [[https://github.com/conao3/lean-leangage/tree/9039711][9039711]]をもとに書いています。
+パッケージの登録先には出していないので、この記事はリポジトリのcommit [[https://github.com/conao3/lean-leangage/tree/26f5779][26f5779]]をもとに書いています。
 
 設計は[[https://github.com/h5i-dev/h5i/blob/main/crates/h5i-app/README.md][h5i-app]]に沿っています。
 h5i-appはRustで書いたロジックを[[https://github.com/AeneasVerif/aeneas][Aeneas]]でLeanに訳して証明するフレームワークで、leangageは向きを逆にして、Leanで書いたロジックを各言語に変換します。
@@ -24276,7 +24276,7 @@ Leanにはkernelのほかに、どのサービスでも使う部品として認�
 状態の置き場所はメモリとPostgreSQLから選べます。
 
 ** 電卓のkernelを書く
-最初の例は利用者ごとに数を1つ覚えておく電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Calculator/Kernel.lean][lean/Calculator/Kernel.lean]]の =transition= という関数です。
+最初の例は利用者ごとに数を1つ覚えておく電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/26f5779/lean/Calculator/Kernel.lean][lean/Calculator/Kernel.lean]]の =transition= という関数です。
 =actor= が呼び出した利用者で、 =snap= がテナントの状態です。
 
 #+begin_src lean
@@ -24298,7 +24298,7 @@ def transition (actor : Principal) (snap : Snapshot) (cmd : Command) :
 結果が64bitに収まらない演算と0での割り算は =Error= を返して、何も書き込みません。
 
 ** kernelの性質を証明する
-この関数の性質は[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Calculator/Proofs.lean][lean/Calculator/Proofs.lean]]で証明しています。
+この関数の性質は[[https://github.com/conao3/lean-leangage/blob/26f5779/lean/Calculator/Proofs.lean][lean/Calculator/Proofs.lean]]で証明しています。
 たとえば次の =others_unchanged= は、ある利用者の命令がほかの利用者の数を変えないという定理です。
 
 #+begin_src lean
@@ -24348,7 +24348,7 @@ $ cd go && LEANGAGE_LISTEN=127.0.0.1:8082 go run ./calculator/cmd/leangage-calcu
 2つ目の例は、組織のメンバーがノートを書くサービスです。
 共有したノートは組織の全員が読めて、共有していないノートは持ち主と管理者だけが読めます。
 
-このkernelは[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]にあって、命令の処理と認可を分けて書いています。
+このkernelは[[https://github.com/conao3/lean-leangage/blob/26f5779/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]にあって、命令の処理と認可を分けて書いています。
 命令の処理は =handle= という関数に書き、誰が何を読み書きしてよいかは方針として別の関数に書きます。
 
 方針の関数では、 =permits= が書き込みを許すかを返し、 =visible= が行を見せてよいかを返します。
@@ -24363,7 +24363,7 @@ def transition (a : Principal) (s : Snapshot) (c : Command) :
 guardは =handle= が返した書き込みと、返信に含まれる行を1件ずつ方針に照らします。
 1件でも方針が許さなければ、命令の全体を =denied= で拒否して何も書き込みません。
 
-guardについての定理は[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Leangage/AuthzProofs.lean][lean/Leangage/AuthzProofs.lean]]にあります。
+guardについての定理は[[https://github.com/conao3/lean-leangage/blob/26f5779/lean/Leangage/AuthzProofs.lean][lean/Leangage/AuthzProofs.lean]]にあります。
 kernelと方針を引数に取る形で証明してあるので、自分のkernelをguardに通せば同じ定理が使えます。
 
 | 定理 | 内容 |
@@ -24445,7 +24445,7 @@ tokenの署名をHMAC-SHA256で検査するところと、命令のJSONを読み
 PostgreSQLがLeanで書いたモデルのとおりに動くことも前提にしています。
 サーバーとPostgreSQLの組み合わせは、COMMITの応答を落とすproxyを挟むテストや、処理の途中で接続を切るテストで確かめています。
 
-何を証明して何を前提にしているかの一覧は[[https://github.com/conao3/lean-leangage/tree/9039711#what-is-proved-and-what-is-trusted][READMEの「What is proved, and what is trusted」]]にあります。
+何を証明して何を前提にしているかの一覧は[[https://github.com/conao3/lean-leangage/tree/26f5779#what-is-proved-and-what-is-trusted][READMEの「What is proved, and what is trusted」]]にあります。
 
 ** 速さ
 kernelを挟むとどれだけ遅くなるかを、kernelのないサーバーと比べて測りました。
@@ -24486,7 +24486,7 @@ kernelを速く呼ぶため、サーバーはテナントの状態をLeanの値�
 利用者が1,000人のテナントで、Rustに変換したkernelを直接呼んで測りました。
 
 状態も毎回変換する形では毎秒8,660件の命令しか処理できませんが、Leanの値のまま渡す形では同じテナントで毎秒524万件を処理できます。
-PostgreSQLに保存する場合の値と計測の手順は[[https://github.com/conao3/lean-leangage/tree/9039711#speed][READMEの「Speed」]]に載せています。
+PostgreSQLに保存する場合の値と計測の手順は[[https://github.com/conao3/lean-leangage/tree/26f5779#speed][READMEの「Speed」]]に載せています。
 
 ** おわりに
 ロジックを1つの関数にまとめると、証明する対象が小さくなって、同じ関数を3つの言語のサーバーで動かせます。
