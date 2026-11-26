@@ -24253,7 +24253,7 @@ Lean 4で書いて証明した関数を、Rust・Python・GoのHTTPサーバー�
 リポジトリは[[https://github.com/conao3/lean-leangage][conao3/lean-leangage]]で、ライセンスはApache-2.0です。
 パッケージの登録先には出していないので、この記事はリポジトリのcommit [[https://github.com/conao3/lean-leangage/tree/26f5779][26f5779]]をもとに書いています。
 
-設計は[[https://github.com/h5i-dev/h5i/blob/main/crates/h5i-app/README.md][h5i-app]]に沿っています。
+設計は[[https://github.com/h5i-dev/h5i/blob/main/crates/h5i-app/README.md][h5i-app]]を参考にしています。
 h5i-appはRustで書いたロジックを[[https://github.com/AeneasVerif/aeneas][Aeneas]]でLeanに訳して証明するフレームワークで、leangageは向きを逆にして、Leanで書いたロジックを各言語に変換します。
 
 [[github:conao3/lean-leangage::Rust][Web services whose core is a kernel proved in Lean 4, generated to Rust, Python and Go with leanfran]]
