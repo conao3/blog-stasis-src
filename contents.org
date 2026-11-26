@@ -24239,7 +24239,7 @@ These functions control when Clojure realizes a seq, run side effects, or help y
 
 I left out the rest of =clojure.core=, which includes numbers, strings, concurrency, namespaces, macros for control flow and the other parts of Java interop.
 
-* 認可とテナント分離をLean 4で証明し、axumの92〜97%の速さで返すwebフレームワークleangageを作った
+* Lean 4で証明したkernelをRust・Python・GoのHTTPサーバーにするleangageを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/a886f0
 :export_date: 2026-11-26 13:10
@@ -24247,38 +24247,37 @@ I left out the rest of =clojure.core=, which includes numbers, strings, concurre
 :export_tags: lean rust python go formal-verification code-generation postgresql performance release lean-leangage lean-leanfran
 :export_draft: t
 :end:
-Webサービスのロジックを1つの関数としてLean 4で書いて証明し、Rust・Python・GoのHTTPサーバーとして動かすwebフレームワークのleangageを作りました。
-認可の判定とテナントの分離と保存に使うSQLをLeanの定理で持っていて、Rustのサーバーはkernelを持たないaxumのサーバーの92〜97%の件数を返します。
-
-この値は4 vCPUのVMで =POST /rpc= に1接続と64接続で要求を送ったときのもので、比べたaxumのサーバーはJSONを読んでJSONを返すだけのものです。
-同じセルを2回測ると値が最大10%開くので、3〜8%の差は計測の揺れと同じ大きさです。
-
-engineはテナントの状態をLeanの値のまま持ち続けて、要求ごとに変換するものを呼び出し元と命令と返信だけにしています。
-生成したkernelを直接呼んで比べると、利用者が1,000人のテナントで、状態を毎回Rustの値から変換する形は毎秒8,660件、Leanの値のまま渡す形は毎秒524万件の命令を処理します。
+Lean 4で書いて証明した関数を、Rust・Python・GoのHTTPサーバーとして動かすwebフレームワークのleangageを作りました。
+サービスのロジックを1つの関数にまとめてLeanで証明すると、認可やテナントの分離のような性質を定理として持ったまま、3つの言語で同じサーバーを動かせます。
 
 リポジトリは[[https://github.com/conao3/lean-leangage][conao3/lean-leangage]]で、ライセンスはApache-2.0です。
-この記事はcommit [[https://github.com/conao3/lean-leangage/tree/9039711][9039711]]を[[https://s.conao3.com/blog/2026/23d62c][leanfran]] 0.13.2で動かした結果をもとに書いていて、パッケージの登録先には出していません。
-
-leangageはkernelと呼ぶ1つの純粋な関数の形を決めています。
-kernelは呼び出した人とテナントの状態と命令を受けて、書き込みと返信を返すか命令を拒否します。
+パッケージの登録先には出していないので、この記事はリポジトリのcommit [[https://github.com/conao3/lean-leangage/tree/9039711][9039711]]をもとに書いています。
 
 設計は[[https://github.com/h5i-dev/h5i/blob/main/crates/h5i-app/README.md][h5i-app]]に沿っています。
-h5i-appはRustで書いたロジックを[[https://github.com/AeneasVerif/aeneas][Aeneas]]でLeanに訳して証明するフレームワークで、leangageは向きを逆にしてLeanを元にしています。
+h5i-appはRustで書いたロジックを[[https://github.com/AeneasVerif/aeneas][Aeneas]]でLeanに訳して証明するフレームワークで、leangageは向きを逆にして、Leanで書いたロジックを各言語に変換します。
 
 [[github:conao3/lean-leangage::Rust][Web services whose core is a kernel proved in Lean 4, generated to Rust, Python and Go with leanfran]]
 
-** 全体の構成
-Leanにはサービスごとのkernelと、どのkernelでも使う認可のguard・SQLのコンパイラ・tokenの形式・JSONのwriterを書きます。
+** kernelと殻
+leangageでは、サービスのロジックを書いた関数をkernelと呼びます。
+テナントはサービスを使う組織ごとの区画のことで、kernelは1つのテナントの状態だけを見ます。
+
+kernelは呼び出した利用者とテナントの状態と命令の3つを受け取ります。
+命令を受け付けるなら状態への書き込みと返信を返し、受け付けないならエラーを返します。
 
 [[./resources/public/img/a886f0-layers.svg]]
 
-これらの定義と定理をLeanに置くと、leanfranが定義をRust・Python・Goのコードにします。
-生成したコードを動かす殻は言語ごとに手で書いてあって、HTTPの受け付け・HMACでのtokenの検査・テナントの状態を持つengineが入っています。
+Leanにはkernelのほかに、どのサービスでも使う部品として認可のguard・SQLのコンパイラ・tokenの形式・JSONのwriterが書いてあります。
+これらを[[https://s.conao3.com/blog/2026/23d62c][leanfran]]の0.13.2でRust・Python・Goのコードに変換しています。
 
-engineはメモリに状態を持つものとPostgreSQLに保存するものの2つがあり、kernelの表に送るSQLの文も生成したコンパイラが作ります。
+変換したコードを動かす部分を殻と呼んでいて、こちらは言語ごとに手で書いています。
 
-** 電卓のkernelをLeanで書く
-最初の例は利用者ごとに数を1つ持つ電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Calculator/Kernel.lean][lean/Calculator/Kernel.lean]]の =transition= です。
+殻はHTTPの要求を受け付けてtokenの署名を確かめ、テナントの状態を取り出してkernelを呼びます。
+状態の置き場所はメモリとPostgreSQLから選べます。
+
+** 電卓のkernelを書く
+最初の例は利用者ごとに数を1つ覚えておく電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Calculator/Kernel.lean][lean/Calculator/Kernel.lean]]の =transition= という関数です。
+=actor= が呼び出した利用者で、 =snap= がテナントの状態です。
 
 #+begin_src lean
 def transition (actor : Principal) (snap : Snapshot) (cmd : Command) :
@@ -24292,11 +24291,15 @@ def transition (actor : Principal) (snap : Snapshot) (cmd : Command) :
   | .get => .ok (none, .value (memoryOf snap.memories actor.user))
 #+end_src
 
-=actor= はtokenから読んだ呼び出し元で、 =snap= はそのテナントの状態です。
-返り値は =Option Memory= が状態に書く行で =Reply= がクライアントに返す値になっていて、64bitに収まらない計算と0での割り算は =Error= になります。
+命令は =set= ・ =apply= ・ =get= の3つです。
+=set= は数を覚え、 =apply= は覚えている数に演算をして結果を覚え直し、 =get= は覚えている数を返します。
 
+返り値の =Option Memory= は状態に書き込む行で、 =get= のように何も書き込まない命令では =none= になります。
+結果が64bitに収まらない演算と0での割り算は =Error= を返して、何も書き込みません。
+
+** kernelの性質を証明する
 この関数の性質は[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Calculator/Proofs.lean][lean/Calculator/Proofs.lean]]で証明しています。
-たとえば =others_unchanged= は、受理された命令がほかの利用者の数を変えないという定理です。
+たとえば次の =others_unchanged= は、ある利用者の命令がほかの利用者の数を変えないという定理です。
 
 #+begin_src lean
 theorem others_unchanged (a : Principal) (s : Snapshot) (c : Command) (w : Option Memory)
@@ -24304,10 +24307,19 @@ theorem others_unchanged (a : Principal) (s : Snapshot) (c : Command) (w : Optio
     memoryOf (apply s w).memories u = memoryOf s.memories u
 #+end_src
 
-ほかに、返信が上限のない自然数の四則演算と一致し、拒否するのは結果が64bitに収まらないときと0で割るときだけだという =transition_spec= があります。
-=get= が何も書き込まないという =read_only_sound= も証明していて、PostgreSQLのengineはこの定理を頼りに、idempotency keyのない =get= を読み取り専用のtransactionで動かします。
+仮定の =ht= は命令が受け付けられたことを表し、 =hu= は =u= が呼び出した利用者とは別の利用者であることを表します。
+結論は、書き込みを反映したあとの =u= の数が反映する前と同じだという等式です。
 
-Rustのサーバーは、生成したkernelをaxumのrouterの後ろに置いたものです。
+ほかの定理には次のものがあります。
+
+| 定理 | 内容 |
+|---|---|
+| =transition_spec= | 返信は、桁の上限がない自然数で同じ計算をした結果と一致し、命令を拒否するのは結果が64bitに収まらないときと0で割るときだけである |
+| =get_after= | 受け付けられた命令のあとで同じ利用者が =get= を呼ぶと、その命令の返信と同じ数が返る |
+| =read_only_sound= | =get= は何も書き込まない |
+
+** サーバーを動かす
+Rustのサーバーは変換したkernelをaxumのrouterの後ろに置いたものです。
 
 #+begin_src console
 $ export LEANGAGE_SECRET=dev-secret
@@ -24321,9 +24333,11 @@ $ curl -s -H "Authorization: Bearer $TOKEN" -d '{"cmd":"apply","op":"div","arg":
 {"error":"division_by_zero"}
 #+end_src
 
-=LEANGAGE_ISSUE=1:7= はテナント1の利用者7のtokenを発行する指定で、サーバーはtokenの署名と期限を確かめてからkernelを呼びます。
+=LEANGAGE_SECRET= は署名の鍵で、 =LEANGAGE_ISSUE=1:7= を付けて起動するとテナント1の利用者7のtokenを出力して終わります。
+サーバーは要求のたびにtokenの署名と期限を確かめて、tokenに書かれた利用者としてkernelを呼びます。
 
-PythonとGoのサーバーも同じLeanのmoduleから生成したkernelを動かしていて、1つのサーバーが発行したtokenをほかの2つも受け付けます。
+PythonとGoのサーバーも同じLeanのファイルから変換したkernelを動かします。
+3つのサーバーは同じ命令に同じ返信をして、1つのサーバーが出したtokenはほかの2つでも使えます。
 
 #+begin_src console
 $ cd python && LEANGAGE_LISTEN=127.0.0.1:8081 uv run leangage-calculator &
@@ -24331,11 +24345,14 @@ $ cd go && LEANGAGE_LISTEN=127.0.0.1:8082 go run ./calculator/cmd/leangage-calcu
 #+end_src
 
 ** 認可をguardに任せる
-2つ目の例は、組織のメンバーがノートを持つサービスです。
-共有したノートは全員が読めて、共有していないノートは持ち主と管理者だけが読めます。
+2つ目の例は、組織のメンバーがノートを書くサービスです。
+共有したノートは組織の全員が読めて、共有していないノートは持ち主と管理者だけが読めます。
 
-kernelの[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]は、命令が何をするかを決める =handle= と、誰が何を読み書きしてよいかを決める方針を分けて書いています。
-方針は =permits= ・ =visible= ・ =stored= のBoolの関数と、呼び出し元が見てよい行を返す =view= で、engineが動かす =transition= は =handle= をguardに通したものです。
+このkernelは[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]にあって、命令の処理と認可を分けて書いています。
+命令の処理は =handle= という関数に書き、誰が何を読み書きしてよいかは方針として別の関数に書きます。
+
+方針の関数では、 =permits= が書き込みを許すかを返し、 =visible= が行を見せてよいかを返します。
+殻が呼ぶ =transition= は =handle= をleangageのguardに通したものです。
 
 #+begin_src lean
 def transition (a : Principal) (s : Snapshot) (c : Command) :
@@ -24343,19 +24360,21 @@ def transition (a : Principal) (s : Snapshot) (c : Command) :
   guardViewed handle apply ⟨permits, visible, stored⟩ disclosed readOnly view a s c
 #+end_src
 
-guardは書き込みを1件ずつ方針に照らし、返信が見せる行も1件ずつ照らして、1つでも許されなければ命令の全体を =denied= で拒否します。
-読み取りだけの命令は、呼び出し元が見てよい行だけを残した状態の上で動かします。
+guardは =handle= が返した書き込みと、返信に含まれる行を1件ずつ方針に照らします。
+1件でも方針が許さなければ、命令の全体を =denied= で拒否して何も書き込みません。
 
-guardの定理は[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Leangage/AuthzProofs.lean][lean/Leangage/AuthzProofs.lean]]にあり、どのkernelとどの方針についても成り立つ形で証明しています。
+guardについての定理は[[https://github.com/conao3/lean-leangage/blob/9039711/lean/Leangage/AuthzProofs.lean][lean/Leangage/AuthzProofs.lean]]にあります。
+kernelと方針を引数に取る形で証明してあるので、自分のkernelをguardに通せば同じ定理が使えます。
 
 | 定理 | 内容 |
 |---|---|
-| =guard_authorized= | guardが受理した命令では、どの書き込みも方針が許していて、返信が見せるどの行も保存されていて見てよい行である |
-| =guard_complete= | その条件を満たす命令をguardは拒否しない |
-| =guard_viewed_noninterference= | 見てよい行が同じ2つの状態は、読み取りだけの命令に同じ結果を返す |
+| =guard_authorized= | guardが受け付けた命令では、どの書き込みも方針が許していて、返信に含まれるどの行も呼び出した利用者に見せてよい行である |
+| =guard_complete= | 書き込みと行がすべて方針に合う命令を、guardは拒否しない |
+| =guard_viewed_noninterference= | 見てよい行が同じである2つの状態は、読み取りだけの命令に同じ結果を返す |
 
-=guard_viewed_noninterference= があるので、読み取りだけの命令の返信からは見てはいけない行の有無が漏れません。
-ノートのサーバーで試すと、利用者2は共有していないノートを読めず、他人のノートの書き換えは拒否されます。
+=guard_viewed_noninterference= は、読み取りだけの命令の結果が見てはいけない行に左右されないことを言っています。
+
+ノートのサーバーで、利用者1が共有していないノートを書き、利用者2がそれを読もうとしてみます。
 
 #+begin_src console
 $ A=$(LEANGAGE_ISSUE=1:1 cargo run --release -q --bin leangage-notes)
@@ -24371,12 +24390,14 @@ $ curl -s -H "Authorization: Bearer $B" -d '{"cmd":"put_note","id":7,"body":"min
 {"error":"denied"}
 #+end_src
 
-ノートのHTTPサーバーがあるのはRustだけです。
-PythonとGoのノートのkernelは差分テストの中で動かしています。
+利用者2にはノートが無いときと同じ =not_found= が返り、利用者2がそのノートを書き換えようとするとguardが =denied= で拒否します。
+ノートのHTTPサーバーはRustにだけあって、PythonとGoでは変換したノートのkernelをテストの中で動かしています。
 
-** PostgreSQLに保存してテナントを分ける
-環境変数の =LEANGAGE_DATABASE_URL= を渡すと、電卓の3つのサーバーとノートのRustのサーバーは状態をPostgreSQLに保存します。
-kernelの側は、行と値を相互に変換する関数と表の定義をLeanで書きます。
+** PostgreSQLに保存する
+環境変数の =LEANGAGE_DATABASE_URL= にPostgreSQLの接続先を渡すと、サーバーは状態をメモリの代わりにPostgreSQLに保存します。
+電卓の3つのサーバーとノートのRustのサーバーがこれに対応しています。
+
+kernelの側では、表の定義と、状態の行を表の行に変換する関数をLeanで書きます。
 
 #+begin_src lean
 def tables : List Tab := [⟨"memories", [⟨"user", .int, false⟩, ⟨"value", .int, false⟩], 1⟩]
@@ -24388,49 +24409,50 @@ def fromRow : List Val → Option Memory
   | _ => none
 #+end_src
 
-SQLのコンパイラはどの表にも =tenant_id= の列を足し、 =SELECT= と =DELETE= にはテナントの条件を付けて、 =INSERT= ではテナントを先頭の値にします。
+SQLの文はLeanで書いたコンパイラがこの定義から作ります。
+コンパイラはどの表にも =tenant_id= の列を足し、 =SELECT= と =DELETE= にはテナントを絞る条件を付けます。
 
-engineは1回の試行を =SERIALIZABLE= のtransaction 1つで動かします。
-テナントの版の行を読み、その版の状態を覚えていなければテナントの行を読んで、kernelを呼んだあとにコンパイラが作った文を値をパラメータにして送ります。
+殻は =SERIALIZABLE= のtransactionの中でテナントの行を読んで状態を作り、kernelを呼んで、コンパイラが作った文を送ります。
+同じテナントへの命令が続くときは前の命令のあとの状態を覚えておき、ほかのサーバーから書き込まれていなければ行を読み直しません。
 
-コンパイラの定理はLeanで書いたPostgreSQLのモデルに対して述べています。
-モデルは表と行と、 =CREATE TABLE= ・ =INSERT= ・ =DELETE= ・ =SELECT= が表に何をするかを定めたものです。
+コンパイラについての定理は、Leanで書いたPostgreSQLのモデルに対して証明しています。
+モデルは =CREATE TABLE= ・ =INSERT= ・ =DELETE= ・ =SELECT= が表の行をどう変えるかをLeanの関数として書いたものです。
 
 | 定理 | 内容 |
 |---|---|
-| =compile_sound= | コンパイルした文は実行でき、そのテナントの行だけが書き込みのとおりに変わる |
-| =select_sound= | コンパイルした =SELECT= は、そのテナントの条件に合う行を1回ずつ返す |
-| =tenant_isolation= | あるテナントの文はほかのテナントの行を変えず、 =SELECT= の結果はそのテナントの行だけで決まる |
+| =compile_sound= | コンパイラが作った文は実行でき、そのテナントの行だけが書き込みのとおりに変わる |
+| =select_sound= | コンパイラが作った =SELECT= は、そのテナントの行のうち条件に合うものを1回ずつ返す |
+| =tenant_isolation= | あるテナントのために作った文はほかのテナントの行を変えず、 =SELECT= が返す行はそのテナントの行だけで決まる |
 
-保存した行を読み戻した状態がengineの持っている状態と同じ返信をすることも、電卓とノートのそれぞれで証明していて、これが =stored_transition= です。
-ノートでは、読み戻した状態で受理された命令が認可を満たすという =stored_authorized= も加えています。
+保存した行から読み戻した状態が、保存する前の状態と同じ返信をすることも証明しています。
+この定理は =stored_transition= という名前で、電卓とノートのそれぞれにあります。
 
-** 証明している範囲と信頼している範囲
-定理はLeanの定義について述べていて、動いているのはそこから生成したコードです。
-この間は、同じ命令の列をLeanが直接コンパイルしたkernelと生成したRust・Python・Goに流して出力を比べる差分テストで確かめています。
+** 証明していないところ
+定理はLeanで書いた関数に対して証明していますが、実際に動くのはそこから変換したRust・Python・Goのコードです。
+変換したコードがLeanと同じ結果を返すことは、証明ではなくテストで確かめています。
 
-電卓は5,000件、ノートは3,000件の命令で3つの言語の出力がLeanの出力と一致していて、SQLはschemaと文を合わせて3,024行、tokenは3,000行、JSONは3,000件の入力で同じように比べています。
+テストでは、同じ命令の列をLeanが直接コンパイルしたkernelと3つの言語のkernelに流して出力を比べます。
+電卓は5,000件、ノートは3,000件の命令で、どの言語の出力もLeanの出力と一致します。
 
-定理がkernelの書き換えを退けられるかは[[https://s.conao3.com/blog/2026/51d6b7][leanassay]]で確かめています。
-電卓のkernelを167通りに書き換えたところ、132通りは定理が退け、30通りはコンパイルできず、残る5通りは試したどの入力でも出力が変わりませんでした。
+定理がkernelの書き換えを見逃さないかは[[https://s.conao3.com/blog/2026/51d6b7][leanassay]]で調べています。
+leanassayは関数を少しずつ書き換えて、書き換えたあとも定理が成り立ってしまうものを探す道具です。
 
-証明の外にあって信頼しているものは次のとおりです。
+電卓のkernelで167通りの書き換えを試したところ、定理を満たしたまま出力が変わるものは見つかりませんでした。
 
-- leanfranの変換と各言語のruntime、rustc・CPython・Goのコンパイラ
-- 手で書いた殻: HTTP、HMAC-SHA256と期限の検査、命令のJSONの読み取り、engine
-- PostgreSQLが、モデルが定めたとおりに文を実行すること
-- Leanで書いた仕様と方針が、作りたいサービスを表していること
+手で書いた殻には定理がなく、HTTPの処理やPostgreSQLとのやり取りはここに入ります。
+tokenの署名をHMAC-SHA256で検査するところと、命令のJSONを読み取るところも殻にあります。
 
-PostgreSQLのengineには8項目の契約があります。
-COMMITを落とすproxyや途中で接続を切るテストで項目ごとに確かめています。
+PostgreSQLがLeanで書いたモデルのとおりに動くことも前提にしています。
+殻とPostgreSQLの組み合わせは、COMMITの応答を落とすproxyを挟むテストや、処理の途中で接続を切るテストで確かめています。
 
-どの定理も =propext= ・ =Classical.choice= ・ =Quot.sound= のほかに公理を使っていないことは、 =make check= が検査します。
+何を証明して何を前提にしているかの一覧は[[https://github.com/conao3/lean-leangage/tree/9039711#what-is-proved-and-what-is-trusted][READMEの「What is proved, and what is trusted」]]にあります。
 
 ** 速さ
-計測は4 vCPUのXeon 2.10GHzとメモリ16GBのVMで行いました。
-=oha= で =POST /rpc= に8秒間要求を送って毎秒の返信の件数を数えていて、値が大きいほど速いです。
+kernelを挟むとどれだけ遅くなるかを、kernelのないサーバーと比べて測りました。
+比べる相手は、JSONを読んでJSONを返すだけのaxumのサーバーです。
 
-HTTPの表はどのセルも2回の平均で、どの要求も同じtokenを送るので、サーバーは最初の要求のあとは受理済みのtokenと照合して期限だけを確かめます。
+計測には4 vCPUのXeon 2.10GHzとメモリ16GBのVMを使い、 =oha= で =POST /rpc= に8秒間要求を送って毎秒の返信の件数を数えました。
+表の値はどれも2回の平均で、大きいほど速いことを表します。
 
 [[./resources/public/img/a886f0-speed-http-rust.svg]]
 
@@ -24440,11 +24462,14 @@ HTTPの表はどのセルも2回の平均で、どの要求も同じtokenを送�
 | axum、kernelなし | 18,000 | 17,800 | 134,500 | 128,300 |
 | actix-web、kernelなし | 17,800 | 17,700 | 185,700 | 183,300 |
 
-「kernelなし」の行はJSONの本文を読んでJSONを返すだけのサーバーで、tokenの検査も状態もありません。
-leangageの行との差がtokenの検査とengineと生成したkernelにかかる分です。
+Rustのサーバーは1接続でも64接続でもkernelのないaxumの92〜97%の件数を返します。
+同じ条件で2回測った値が最大10%違うので、この差は計測のばらつきと同じくらいの大きさです。
+
+計測の要求はどれも同じtokenを送っています。
+殻は一度確かめたtokenを覚えているので、2回目からの要求では署名を計算し直さずに期限だけを確かめます。
 
 Goのサーバーは =net/http= の上で動きます。
-kernelのない =net/http= に対して1接続で88〜90%、64接続で71〜75%の件数を返します。
+kernelのない =net/http= に対して、1接続で88〜90%、64接続で71〜75%の件数を返します。
 
 [[./resources/public/img/a886f0-speed-http-go.svg]]
 
@@ -24454,17 +24479,18 @@ kernelのない =net/http= に対して1接続で88〜90%、64接続で71〜75%�
 | net/http、kernelなし | 11,600 | 11,700 | 86,500 | 84,900 |
 | gin、kernelなし | 11,400 | 11,200 | 72,600 | 69,700 |
 
-Pythonのサーバーは =http.server= の1プロセスで、1接続ではFastAPIに対して =get= で103%と =apply= で86%の件数を返します。
-64接続ではPythonのサーバーが返す件数は、4プロセスで動くFastAPIの1割ほどになります。
+Pythonのサーバーは =http.server= を1プロセスで動かしています。
+1接続ではFastAPIの86〜103%の件数を返し、64接続では4プロセスで動くFastAPIの1割ほどになります。
 
-HTTPを通さずにengineだけを測ると、3回の中央値で、利用者が1,000人のテナントでRustは毎秒441万件、Goは74万件、Pythonは3万件の命令を処理します。
-PostgreSQLに保存するRustのサーバーは、同じ表を直接読み書きするaxumとtokio-postgresのサーバーに対して、 =get= で96〜106%、 =apply= で56〜63%です。
+kernelを速く呼ぶため、殻はテナントの状態をLeanの値のまま持ち続けて、呼び出した利用者と命令と返信だけを要求のたびに変換します。
+利用者が1,000人のテナントで、Rustに変換したkernelを直接呼んで測りました。
 
-計測の手順とすべての値は[[https://github.com/conao3/lean-leangage/tree/9039711#speed][READMEのSpeed]]に載せています。
+状態も毎回変換する形では毎秒8,660件の命令しか処理できませんが、Leanの値のまま渡す形では同じテナントで毎秒524万件を処理できます。
+PostgreSQLに保存する場合の値と計測の手順は[[https://github.com/conao3/lean-leangage/tree/9039711#speed][READMEの「Speed」]]に載せています。
 
 ** おわりに
-kernelを1つの純粋な関数にすると、証明する対象が小さくなり、同じ関数を3つの言語のサーバーで動かせます。
-HTTPと認証と保存の層は手で書いた殻に残っているので、定理が述べている範囲と信頼している範囲は[[https://github.com/conao3/lean-leangage/tree/9039711#what-is-proved-and-what-is-trusted][READMEの一覧]]で分けて書いています。
+ロジックを1つの関数にまとめると、証明する対象が小さくなって、同じ関数を3つの言語のサーバーで動かせます。
+殻の中でも、tokenの形式とJSONのwriterにはLeanで書いて証明した部品を使っています。
 
 * COMMENT Local variables
 # Local Variables:
