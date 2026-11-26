@@ -626,6 +626,8 @@
                       [:script {:type "speculationrules"} (hiccup/raw speculation-rules)]
                       (when (str/includes? body "data-tex")
                         [:script {:src "/assets/math.js" :defer true}])
+                      (when (str/includes? body "lang-filter")
+                        [:script {:src "/assets/post-list.js" :defer true}])
                       (when (str/includes? body "class=\"feed-copy\"")
                         [:script {:src "/assets/feed.js" :defer true}])
                       (when (str/includes? body "class=\"source-copy\"")
@@ -770,19 +772,36 @@
     (remove (fn [[_ page]] (contains? paths (:original page))) posts)))
 
 
+(def lang-filters
+  [["" "All"] ["ja" "Japanese"] ["en" "English"]])
+
+
 (defn post-list-items
   [posts]
-  [:ul
-   (->> (listed-posts posts)
-        (sort-by (fn [[k v]] [(:datetime v) k]))
-        reverse
-        (map (fn [[k v]]
-               [:li
-                [:time {:datetime (:datetime v)} (:date v)]
-                [:a {:href k} (:title v)]
-                (for [[code other] (sort (dissoc (:translations v) (or (:lang v) "ja")))]
-                  [:a {:class "post-lang" :href other :hreflang code :lang code} (str/upper-case code)])
-                (when (:draft? v) [:span {:class "draft-label"} "下書き"])])))])
+  (let [rows (->> (listed-posts posts)
+                  (sort-by (fn [[k v]] [(:datetime v) k]))
+                  reverse
+                  (map (fn [[k v]]
+                         (let [lang (or (:lang v) "ja")
+                               translations (or (:translations v) {lang k})
+                               versions (or (:versions v) {lang (select-keys v [:title :date :datetime])})
+                               codes (cons lang (sort (keys (dissoc translations lang))))]
+                           {:langs (set codes)
+                            :html [:li {:data-langs (str/join " " codes)}
+                                   (for [code codes
+                                         :let [{:keys [title date datetime]} (versions code)]]
+                                     [:span {:class "post-version" :data-lang code}
+                                      [:time {:datetime datetime} date]
+                                      [:a {:href (translations code) :hreflang code} title]])
+                                   (for [code (rest codes)]
+                                     [:a {:class "post-lang" :href (translations code) :hreflang code} (str/upper-case code)])
+                                   (when (:draft? v) [:span {:class "draft-label"} "下書き"])]}))))]
+    (list
+      (when (< 1 (count (reduce into #{} (map :langs rows))))
+        [:div {:class "lang-switch lang-filter" :role "group" :aria-label "Language" :hidden true}
+         (for [[code label] lang-filters]
+           [:button {:type "button" :data-filter code :aria-pressed (str (= code ""))} label])])
+      [:ul (map :html rows)])))
 
 
 (defn tag-pages
@@ -848,7 +867,11 @@
     (update-vals pages
                  (fn [page]
                    (if-let [translations (get groups (or (:original page) (:path page)))]
-                     (assoc page :translations translations)
+                     (assoc page
+                            :translations translations
+                            :versions (into {}
+                                            (map (fn [[code p]] [code (select-keys (get pages p) [:title :date :datetime])]))
+                                            translations))
                      page)))))
 
 
