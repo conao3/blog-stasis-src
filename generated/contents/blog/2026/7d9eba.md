@@ -1,16 +1,18 @@
 Title: Emacs LispでJavaScriptと同じasync/awaitを書けるvowを作った
 Date: 2026-11-27 14:47
-Updated: 2026-11-27 14:47
+Updated: 2026-11-27 18:05
 Tags: emacs emacs-lisp async macro release vow-el
 
 
-Emacs Lisp向けに、JavaScriptのPromiseとasync/awaitにならったvowというライブラリを作りました。
-プロセスやタイマーを待つ処理を、コールバックを入れ子にせずasync/awaitで上から順に書けます。
+chuntaroさんの [promise.el](https://github.com/chuntaro/emacs-promise) を書き直して、vowというライブラリを作りました。
+Emacs Lispのasync/awaitで書いた関数を、Edebugでステップ実行できます。
+
+JavaScriptのPromiseとasync/awaitにならった作りで、プロセスやタイマーを待つ処理をコールバックの入れ子にせず、上から順に書けます。
 
 `vow-await` で待っている間もEmacsは操作できます。
 待っていた処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
 
-async/awaitで書いた関数は普段の関数と同じようにEdebugでステップ実行できます。
+`vow-await` で止まって再開したあとも、Edebugのステップ実行は止まった位置から続きます。
 
 リポジトリは [conao3/vow.el](https://github.com/conao3/vow.el) で、ライセンスは [GPL-3.0](https://github.com/conao3/vow.el/blob/afb6269/LICENSE) です。
 Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github.com/conao3/vow.el/commit/afb6269) とEmacs 31.1を使いました。
@@ -20,13 +22,13 @@ Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github
 
 # vowでできること
 
+-   async/awaitで書いた関数をEdebugでステップ実行する。
 -   [Promises/A+](https://promisesaplus.com) に従うPromiseをvowとして作り、 `vow-then` でつなぐ。
 -   `vow-defun` で定義した関数の中で `vow-await` を使い、vowが決まるのを待つ。
 -   `vow-all` や `vow-race` で複数のvowをまとめて待つ。
 -   `vow-process` で外部のコマンドを動かし、その出力をvowで受け取る。
 -   `vow-async-start` で関数を別のEmacsに動かさせ、重い計算の間もEmacsを止めない。
 -   `vow-using` でバッファやプロセスを束縛し、本体が終わったら後始末をする。
--   async/awaitで書いた関数をEdebugでステップ実行する。
 
 
 # Emacs Lispでasync/awaitを書く
@@ -101,6 +103,20 @@ failed: exit 1
                          (funcall resolve (buffer-substring (point) (point-max))))
                        (kill-buffer)))))))
 ```
+
+
+# Edebugでステップ実行する
+
+同じchuntaroさんの [async-await.el](https://github.com/chuntaro/emacs-async-await) の `async-defun` には `debug` の宣言が無いので、 `C-u C-M-x` を押しても本体は計装されません。
+`vow-defun` は `debug` の宣言を持っていて、Edebugが計装した本体をEmacsに同梱のgenerator.elに渡します。
+
+`vow-defun` の定義にカーソルを置いて `C-u C-M-x` を押すと、普段の関数と同じようにEdebugで計装できて、ステップ実行が `vow-await` に来るとEdebugから一度抜け、待っていたvowが決まると止まった位置からステップ実行が続きます。
+
+Edebugの実行モードは再開した後も引き継がれるので、 `g` や `c` で動かせば `vow-await` をまたいで次のブレークポイントまで進みます。
+Edebugは `condition-case` で処理していないエラーを起こした式で止まります。
+
+generator.elが本体のローカル変数の名前を書き換えるので、Edebugの `e` で読めるローカル変数は最初の `vow-await` より前のものだけです。
+再開した後の変数の値は、ステップ実行中にEdebugが表示する式の値で確かめます。
 
 
 # vow-awaitで止まって再開する仕組み
@@ -214,17 +230,6 @@ vowは待ち方を整えるだけなので、計算を速くするには `vow-as
 外部のコマンドを動かすだけなら、子のEmacsを起動しない `vow-process` を使えば、失敗したときの標準エラー出力も受け取れます。
 
 
-# Edebugでステップ実行する
-
-`vow-defun` の定義にカーソルを置いて `C-u C-M-x` を押すと、普段の関数と同じようにEdebugで計装できて、ステップ実行が `vow-await` に来るとEdebugから一度抜け、待っていたvowが決まると止まった位置からステップ実行が続きます。
-
-Edebugの実行モードは再開した後も引き継がれるので、 `g` や `c` で動かせば `vow-await` をまたいで次のブレークポイントまで進みます。
-Edebugは `condition-case` で処理していないエラーを起こした式で止まります。
-
-generator.elが本体のローカル変数の名前を書き換えるので、Edebugの `e` で読めるローカル変数は最初の `vow-await` より前のものだけです。
-再開した後の変数の値は、ステップ実行中にEdebugが表示する式の値で確かめます。
-
-
 # JavaScriptとの対応
 
 vowはECMAScript 2027までのPromiseとasync関数の機能と、stage 3のAwait Dictionaryの提案を写しています。
@@ -310,5 +315,5 @@ vowはECMAScript 2027までのPromiseとasync関数の機能と、stage 3のAwai
 # おわりに
 
 `vow-await` で待つ処理は本体の中で上から順に読めて、エラーも `condition-case` で受けられます。
-プロセスやタイマーを待つときに、vowを使ってみてください。
+さらにEdebugでステップ実行もできるので、プロセスやタイマーを待つときにvowを使ってみてください。
 
