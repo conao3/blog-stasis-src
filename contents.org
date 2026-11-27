@@ -24838,6 +24838,175 @@ CのプロジェクトでLeanの関数を使いたいときはコメントに定
 
 導入手順は [[https://github.com/conao3/lean-leanfran/blob/95f3161cfd5cf8c1d0f0d2812c6e7bd1a48173d9/docs/c-guide.md#set-up-the-compiler][Cガイド]] に、動かせる例は [[https://github.com/conao3/lean-leanfran/tree/95f3161cfd5cf8c1d0f0d2812c6e7bd1a48173d9/langs/C/samples][langs/C/samples]] に置いています。
 
+* Emacs LispでJavaScriptと同じasync/awaitを書けるvowを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/7d9eba
+:export_date: 2026-11-27 14:47
+:export_updated: 2026-11-27 14:47
+:export_tags: emacs emacs-lisp async macro release vow-el
+:export_draft: t
+:end:
+JavaScriptのPromiseとasync/awaitをEmacs Lispに写したvowを作りました。
+Emacs Lispの非同期処理をコールバックの入れ子にせず上から下へ書けて、 =vow-await= で待つ間もEmacsは止まりません。
+
+待った処理の失敗は =condition-case= でそのまま捕まえられます。
+
+Emacsに同梱されているgenerator.elの上に作ったvowは、関数を =vow-await= の位置で止め、待っているvowが決まったらタイマーから続きを動かします。
+async/awaitで書いた関数はEdebugでステップ実行でき、待つたびに止まった位置から実行が続きます。
+
+リポジトリは [[https://github.com/conao3/vow.el][conao3/vow.el]] で、ライセンスは [[https://github.com/conao3/vow.el/blob/ba78fdd/LICENSE][GPL-3.0]] です。
+Emacs 31.1以降で動き、この記事ではmasterの [[https://github.com/conao3/vow.el/commit/ba78fdd][ba78fdd]] とEmacs 31.1を使いました。
+
+[[github:conao3/vow.el::Emacs Lisp][Promises/A+ and async/await for Emacs Lisp]]
+
+** vowでできること
+
+- [[https://promisesaplus.com][Promises/A+]] に従うPromiseをvowとして作り、 =vow-then= でつなぐ。
+- =vow-defun= で定義した関数の中で =vow-await= を使い、vowが決まるのを待つ。
+- =vow-all= や =vow-race= で複数のvowをまとめて待つ。
+- =vow-using= でバッファやプロセスを束縛し、本体が終わったら後始末をする。
+- async/awaitで書いた関数をEdebugでステップ実行する。
+
+** Emacs Lispでasync/awaitを書く
+
+vowは =package-vc-install= でGitHubから入れます。
+
+#+begin_src emacs-lisp
+(package-vc-install "https://github.com/conao3/vow.el")
+#+end_src
+
+外部のコマンドの出力を待つ例を書いてみます。
+=my-command-output= は =vow-new= でvowを作り、プロセスが終わったら出力で満たして、失敗したらエラーで棄却します。
+
+#+begin_src emacs-lisp
+;;; vow-example.el --- vow example  -*- lexical-binding: t; -*-
+(require 'vow)
+
+(defun my-command-output (program &rest args)
+  "Return a vow for the output of PROGRAM run with ARGS."
+  (vow-new
+   (lambda (resolve reject)
+     (let ((buffer (generate-new-buffer " *my-command*")))
+       (make-process
+        :name program
+        :buffer buffer
+        :command (cons program args)
+        :sentinel
+        (lambda (process _event)
+          (unless (process-live-p process)
+            (let ((output (with-current-buffer buffer
+                            (string-trim (buffer-string))))
+                  (code (process-exit-status process)))
+              (kill-buffer buffer)
+              (if (zerop code)
+                  (funcall resolve output)
+                (funcall reject
+                         (list 'error (format "%s exited with %d"
+                                              program code))))))))))))
+
+(vow-defun my-versions ()
+  (let ((git (vow-await (my-command-output "git" "--version")))
+        (emacs (vow-await (my-command-output "emacs" "--version"))))
+    (format "%s / %s" git (car (split-string emacs "\n")))))
+
+(vow-defun my-status ()
+  (condition-case err
+      (vow-await (my-command-output "git" "no-such-command"))
+    (error (format "failed: %S" err))))
+
+(message "%s" (vow-wait (my-versions)))
+(message "%s" (vow-wait (my-status)))
+#+end_src
+
+=my-versions= はgitとemacsのバージョンを順に待って、1つの文字列にします。
+=my-status= は失敗するコマンドを待つので、vowが棄却されたときのエラーが =vow-await= の位置で起き、 =condition-case= がそれを捕まえます。
+
+=vow-defun= で定義した関数は呼ぶとすぐにvowを返すので、バッチで動かすときは =vow-wait= でvowが決まるまで待って値を受け取ります。
+
+#+begin_src sh
+$ emacs --batch -Q -L vow.el -l vow-example.el
+git version 2.56.0 / GNU Emacs 31.1
+failed: (error "git exited with 1")
+#+end_src
+
+2つのコマンドを同時に動かすときは =vow-all= で待ちます。
+
+#+begin_src emacs-lisp
+(vow-defun my-versions-at-once ()
+  (pcase-let ((`(,git ,emacs)
+               (vow-await (vow-all (list (my-command-output "git" "--version")
+                                         (my-command-output "emacs" "--version"))))))
+    (format "%s / %s" git (car (split-string emacs "\n")))))
+#+end_src
+
+** vow-awaitで止まって再開する仕組み
+
+[[./resources/public/img/7d9eba-await.svg]]
+
+=vow-defun= は本体をgeneratorの関数 =iter-lambda= に変え、 =vow-await= を =iter-yield= に変えます。
+generator.elは本体を継続渡しの形に書き換えるので、本体は =iter-yield= の位置で止まり、あとからその位置から続けられます。
+
+=my-versions= を呼ぶと、本体は1つ目の =vow-await= まで動いて止まり、呼び出し側には本体の結果を表すvowが返ります。
+
+gitのプロセスが終わって待っていたvowが満たされると、続きを動かすジョブがジョブキューに入ります。
+ジョブキューは =run-at-time= のタイマーから動いて、本体を次の =vow-await= まで進めます。
+
+続きを動かすときは待っていたvowの値を返す関数を本体に渡し、本体はその関数を呼んだ値を =vow-await= の値にします。
+vowが棄却されていれば同じ位置でエラーが起きるので、 =condition-case= と =unwind-protect= が普段どおりに働きます。
+
+generator.elは入れ子のlambdaの中までは書き換えないので、 =mapcar= に渡す関数の中では =vow-await= を使えません。
+この位置の =vow-await= はマクロを展開するときにエラーになるので、ループの中で待つときは =dolist= や =cl-loop= を使います。
+
+** 待つ間のバッファと後始末
+
+本体は止まったときのカレントバッファで再開します。
+=with-current-buffer= と =save-excursion= も =vow-await= をまたいで使えて、待っている間にそのバッファが削除されると =vow-await= が =vow-buffer-killed= のエラーを起こします。
+
+=vow-using= はJavaScriptの =await using= に当たり、束縛したバッファやプロセスを本体が終わったときに逆順で後始末します。
+本体がエラーで終わったときも後始末をして、後始末でもエラーが起きたら2つのエラーを =vow-suppressed= にまとめます。
+=my-open= と =my-close= は接続を開閉する関数です。
+
+#+begin_src emacs-lisp
+(vow-defun my-download (url)
+  (vow-using ((buffer (generate-new-buffer " *download*"))
+              (conn (my-open url) #'my-close))
+    (vow-await (my-read conn buffer))
+    (with-current-buffer buffer (buffer-string))))
+#+end_src
+
+** Edebugでステップ実行する
+
+=vow-defun= の定義にカーソルを置いて =C-u C-M-x= を押すと、普段の関数と同じようにEdebugで計装できて、ステップ実行が =vow-await= に来るとEdebugから一度抜け、待っていたvowが決まると止まった位置からステップ実行が続きます。
+
+Edebugの実行モードは再開した後も引き継がれるので、 =g= や =c= で動かせば =vow-await= をまたいで次のブレークポイントまで進みます。
+捕まえていないエラーでは、それを起こした式でEdebugが止まります。
+
+generator.elが本体のローカル変数の名前を書き換えるので、Edebugの =e= で読めるローカル変数は最初の =vow-await= より前のものだけです。
+再開した後の変数の値は、ステップ実行中にEdebugが表示する式の値で確かめます。
+
+** JavaScriptとの対応
+
+vowはECMAScript 2027までのPromiseとasync関数の機能と、stage 3のAwait Dictionaryの提案を写しています。
+おもな対応は次のとおりです。
+
+| ECMAScript                    | Edition | vow                       |
+|-------------------------------+---------+---------------------------|
+| =new Promise(executor)=       |    2015 | =vow-new=                 |
+| =async function=, =await=     |    2017 | =vow-defun=, =vow-await=  |
+| =Promise.allSettled=          |    2020 | =vow-all-settled=         |
+| =Promise.any=                 |    2021 | =vow-any=                 |
+| =Promise.withResolvers=       |    2024 | =vow-with-resolvers=      |
+| =Promise.try=                 |    2025 | =vow-try=                 |
+| =Array.fromAsync=             |    2026 | =vow-from-async=          |
+| =await using=                 |    2027 | =vow-using=               |
+| =Promise.allKeyed=            | stage 3 | =vow-all-keyed=           |
+
+すべての対応は [[https://github.com/conao3/vow.el/blob/ba78fdd/README.org#ecmascript-correspondence][READMEの「ECMAScript correspondence」]] に載せています。
+
+** おわりに
+
+=vow-await= で待つ処理は本体の中で上から順に読めて、エラーも =condition-case= で受けられます。
+プロセスやタイマーを待つときに、vowを使ってみてください。
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
