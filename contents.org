@@ -8163,7 +8163,9 @@ GitHub Actionsで30分ごとにビルドが走るようにします。
 
 オンラインジャッジによって実装されている機能に制限はありますが、サンプルケースのダウンロード、テスト、提出、ランダムインプットの生成などの機能があります。
 
-[[https://user-images.githubusercontent.com/2203128/34708715-568b13c0-f557-11e7-97ef-9f6b646e4776.gif]]
+[[./resources/public/img/5739d9-34708715-568b13c0-f557-11e7-97ef-9f6b646e4776.gif]]
+
+上の画像は [[https://github.com/online-judge-tools/oj#screencast][ojのREADMEのScreencast]] から引用しました。
 
 さらに[[https://github.com/online-judge-tools/template-generator][oj-template]]は入出力サンプルからそれっぽいcppとpythonファイルを生成してくれます。
 
