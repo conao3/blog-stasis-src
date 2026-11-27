@@ -17956,6 +17956,224 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_MのGGUFを動かし、temperature
 ** おわりに
 文章をPCの外に出さずに訳したいときに使ってください。
 
+* plamo-tr-local: a CLI that runs PLaMo 3 Translate on your machine and translates text in a shell pipe
+:properties:
+:export_file_name: generated/contents/blog/2026/c5f673
+:export_date: 2026-11-28 08:30
+:export_updated: 2026-11-28 08:30
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/33d2c2
+:export_tags: rust cargo nix llm cli release rust-plamo-tr-local
+:end:
+
+Preferred Networks released the weights of PLaMo 3 Translate, its LLM for translation, on 2026-11-05, so I wrote =plamo-tr-local=, a CLI that runs the model locally on my PC and translates text in a shell pipe.
+The repository is [[https://github.com/conao3/rust-plamo-tr-local][conao3/rust-plamo-tr-local]], under the Apache-2.0 license.
+
+PLaMo 3 Translate produced every translation example in this post.
+
+[[./resources/public/img/33d2c2-flow.svg]]
+
+[[github:conao3/rust-plamo-tr-local::Rust][Translate text from the command line with PLaMo 3 Translate running on your machine]]
+
+** Why I wrote it
+The [[https://www.preferred.jp/ja/blog/tech/plamo-3-translate-weight-release][Preferred Networks tech blog]] says PLaMo 3 Translate comes in four sizes, 0.8B, 2B, 8B, and 31B, with GGUF files for llama.cpp and quantized versions for MLX.
+The weights alone don't translate anything, though, and even for a short passage you have to build a prompt in the PFML3 format and run the model with llama.cpp or a similar runtime.
+
+I started on it after I saw a [[https://x.com/kat0h/status/2118173128207851727][post]] by kat0h.
+kat0h didn't like the way Claude phrases Japanese, so they wrote a script that passes Claude's replies through PLaMo on their own machine before showing them.
+
+With a local translation model as one stage of a pipe, you can try setups like that right away.
+
+** Usage
+With Nix, you can run it without installing it.
+
+#+begin_src console
+$ nix run github:conao3/rust-plamo-tr-local -- text translate-text --text 今日はいい天気ですね。
+#+end_src
+
+You can also install it with Cargo.
+The build compiles llama.cpp, so you need CMake, a C++ compiler, and libclang.
+
+#+begin_src console
+$ cargo install --git https://github.com/conao3/rust-plamo-tr-local
+#+end_src
+
+On the first run, =plamo-tr-local= downloads the Q4_K_M GGUF from =pfnet/plamo-3-translate-<size>-GGUF= on Hugging Face into its cache (=~/.cache/plamo-tr-local= on Linux).
+Q4_K_M quantizes each weight to about 4 bits, and the 2b model takes 1.81 GB.
+You need no account or API key, and your text stays on your PC.
+
+Without a target language, =plamo-tr-local= translates Japanese text into English and text in any other language into Japanese, and it prints JSON by default.
+
+#+begin_src console
+$ plamo-tr-local text translate-text --text 今日はいい天気ですね。
+{
+  "TranslatedText": "The weather is nice today, isn't it?",
+  "SourceLanguageCode": null,
+  "TargetLanguageCode": "en"
+}
+#+end_src
+
+To read standard input, leave out =--text=, and to get only the translation, pipe the JSON to =jq=.
+
+#+begin_src console
+$ echo "Since it's raining today, I think I'll relax at home and read a book." \
+    | plamo-tr-local text translate-text | jq -r .TranslatedText
+今日は雨だから、家でゆっくり本を読んでいようと思う。
+#+end_src
+
+=--glossary= sets the translation of a term, and =--writing-style= picks the Japanese style: =plain= for the plain form or =polite= for the polite form.
+
+#+begin_src console
+$ plamo-tr-local text translate-text --text "Filter tasks by owner." \
+    --glossary Source=owner,Target=担当者 --writing-style polite | jq -r .TranslatedText
+担当者でタスクを絞り込みます。
+#+end_src
+
+Two more options exist: =--context= describes the surrounding paragraphs or the kind of page, and =--model-size= picks the model size.
+=--model-size= accepts =0.8b=, =2b=, =8b=, and =31b= (the default is =2b=). Smaller models run faster, and larger models translate more naturally.
+
+** A command structure like the AWS CLI
+The commands follow the layout of the AWS CLI: =<command> <subcommand>= followed by named arguments.
+
+** Building the PFML3 prompt
+PLaMo 3 Translate takes its prompt in the PFML3 format, a series of sections that each start with =<|plamo:tag|>= and give the dataset type, the reference context, the glossary, the source text, and the target language and style, in that order.
+=plamo-tr-local= builds this prompt from its arguments in the same way as the [[https://huggingface.co/pfnet/plamo-3-translate-2b-GGUF/blob/main/chat_template.jinja][chat_template.jinja]] in the GGUF repository.
+
+Below is the prompt for translating "Filter by owner." into polite Japanese, with "A task list" as the reference context and owner → 担当者 in the glossary.
+The real prompt is a single-line string, and I put each section on its own line here to make it easier to read.
+
+#+begin_example
+<|plamo:tag|>dataset<|plamo:msg|>translation
+<|plamo:tag|>context<|plamo:msg|>A task list
+<|plamo:tag|>glossary<|plamo:index|>owner<|plamo:item|>担当者
+<|plamo:tag|>input<|plamo:msg|>Filter by owner.
+<|plamo:tag|>output<|plamo:key|>lang<|plamo:val|>ja<|plamo:key|>form<|plamo:val|>polite<|plamo:msg|>
+#+end_example
+
+If you leave out =lang= for the source language in the =input= section, the model detects the language.
+The model generates the translation after the last =<|plamo:msg|>=, and =plamo-tr-local= stops generating when a delimiter token such as =<|plamo:tag|>= comes out. It picks each token greedily, taking the most probable candidate every time.
+If the source text contains a string with =<|plamo:=, the program can't tell it apart from the prompt delimiters, so =plamo-tr-local= exits with code 254.
+
+** Translating long text paragraph by paragraph
+The [[https://huggingface.co/pfnet/plamo-3-translate-2b][model card]] says the model handles up to 32,768 tokens of input and output combined, so =plamo-tr-local= splits long text into paragraphs at blank lines, groups them into chunks of 4,096 tokens or fewer, and translates one chunk at a time.
+It splits a paragraph longer than 4,096 tokens by line, and it joins the translations back with the same blank lines and line breaks as the source.
+
+** Problems I ran into
+*** Pinning the llama-cpp-2 revision
+I call llama.cpp from Rust through the =llama-cpp-2= crate of [[https://github.com/utilityai/llama-cpp-rs][llama-cpp-rs]], but with the llama.cpp bundled in 0.1.161 on crates.io, loading the model failed with =unknown tokenizer: 'plamo3'=.
+I pinned the dependency to the git revision of llama-cpp-rs that brings in llama.cpp v0.8.0.
+
+#+begin_src toml
+[dependencies.llama-cpp-2]
+git = "https://github.com/utilityai/llama-cpp-rs"
+rev = "0364f5da1c6a6ee37f507031f116ce4a09b28594"
+version = "0.1.162"
+#+end_src
+
+For the Nix build, I write the hash in =cargoLock.outputHashes= in =flake.nix= to fix the contents of the dependency that comes from git.
+
+#+begin_src nix
+cargoLock = {
+  lockFile = ./Cargo.lock;
+  outputHashes."llama-cpp-2-0.1.162" = "sha256-7jI4+6tJ6s69ojMeqUbDHbbUfmlMbnecpvWrTM7iLEM=";
+};
+#+end_src
+
+*** Building with AVX2
+llama-cpp-sys-2, the binding under =llama-cpp-2=, picks the CPU instruction set for llama.cpp from the Rust target features.
+The Rust default for x86_64 stops at SSE2, so a build with the defaults left llama.cpp without AVX2, and that build ran 3 to 4 times slower than one with AVX2.
+
+To fix it, =.cargo/config.toml= sets the target CPU for x86_64 Linux to =x86-64-v3=.
+=x86-64-v3= is the level that includes AVX2, and it covers Intel CPUs from Haswell on and AMD CPUs from Excavator on.
+
+#+begin_src toml
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "target-cpu=x86-64-v3"]
+#+end_src
+
+*** The default thread count
+My Intel Core Ultra 5 225U has 14 logical CPUs that mix performance P-cores with efficient E-cores, so I measured how long the 2b model took to translate the MIT License text into Japanese at different thread counts.
+In the table, "To first token" is the time from the end of model loading until the model has read the prompt and produced the first token. I measured 4 threads once and took the median of three or more runs for the others.
+
+| Threads | To first token | Output (214 tokens) | Total  |
+|---------+----------------+---------------------+--------|
+|       4 | 4.6 s          | 13.0 s              | 21.2 s |
+|       7 | 3.2 s          | 10.0 s              | 17.0 s |
+|      10 | 2.9 s          | 9.3 s               | 15.9 s |
+|      14 | 2.7 s          | 10.4 s              | 16.8 s |
+
+[[./resources/public/img/33d2c2-threads.svg]]
+
+14 threads processed the prompt fastest, but 10 threads generated the output fastest, and 8, 9, 11, and 12 threads all came out slower than 10.
+With 14 threads, output generation was even slower than with 7.
+I set the default thread count to 3/4 of the logical CPUs (10 on my CPU), and the =PLAMO_TR_LOCAL_THREADS= environment variable changes it.
+
+** Speed
+I compared how long each model size took to translate the same MIT License text into Japanese.
+The source was 169 English words and the prompt 252 tokens. I used only the CPU of the Intel Core Ultra 5 225U with the default 10 threads, and each value is the median of three or more runs.
+The time of each step comes from the values that =--debug= prints.
+
+#+begin_src console
+$ plamo-tr-local text translate-text --text file://LICENSE | jq -r .TranslatedText
+#+end_src
+
+| Model | Load  | To first token | Output speed | Total  |
+|-------+-------+----------------+--------------+--------|
+| 0.8b  | 2.8 s | 0.7 s          | 71 tokens/s  | 6.9 s  |
+| 2b    | 3.4 s | 2.9 s          | 23 tokens/s  | 15.9 s |
+
+[[./resources/public/img/33d2c2-speed.svg]]
+
+The 読み込みなど (loading and other) part of the chart is the total minus the time to the first token and the output generation time, and it includes loading the model.
+The 0.8b translation was 229 tokens and the 2b translation 214 tokens. The 2b translation reads:
+
+#+begin_quote
+MITライセンス
+
+Copyright (c) \lt{}year\gt{} \lt{}copyright holders\gt{}
+
+本ソフトウェアおよび関連ドキュメントファイル（以下「本ソフトウェア」）の複製を取得したすべての者に対し、以下の条件に従い、本ソフトウェアを制限なく取り扱う（本ソフトウェアの使用、複製、改変、結合、公開、頒布、サブライセンス、および／または販売を行う権利、ならびに本ソフトウェアを提供された者が同様の行為を行うことを許可する権利を含むが、これらに限定されない）ことを、無償で許諾する。
+
+上記の著作権表示および本許諾表示は、本ソフトウェアのすべての複製物または実質的な部分に含まれなければならない。
+
+本ソフトウェアは「現状のまま」提供され、明示的か黙示的かを問わず、商品性、特定目的への適合性、および非侵害性に関する保証を含むがこれらに限定されない、いかなる種類の保証も伴わない。いかなる場合においても、著作者または著作権者は、契約上の行為、不法行為、またはその他の事由を問わず、本ソフトウェアに起因し、または本ソフトウェアの使用もしくはその他の取り扱いに関連して生じたいかなる請求、損害、またはその他の責任についても、一切の責任を負わないものとする。
+#+end_quote
+
+The command loads the model on every run, and for 0.8b the load takes 40% of the total, so if you pipe Claude's replies in one paragraph at a time, you pay the load time once per paragraph.
+To translate several texts in a row, use [[https://github.com/conao3/rust-plamo-tr-local#text-batch-translate-text][text batch-translate-text]], which loads the model once and translates one line at a time.
+
+** Trying other writing styles
+The =form= setting of PLaMo 3 Translate accepts two values, =plain= for the plain form and =polite= for the polite form, and I tried to get translations in ojousama speech (the refined speech of a well-bred young lady in Japanese fiction) and in the Kansai dialect.
+I ran the 2B and 8B Q4_K_M GGUF files with =llama-server= from llama.cpp, set the temperature to 0, and tried these settings:
+
+- With =お嬢様言葉=, =関西弁=, or =Japanese (Kansai dialect)= as the target =lang=, the model returned the Japanese source unchanged.
+- With =お嬢様言葉=, =ojousama=, or =kansai= in =form=, the model translated in the plain form.
+- With 「お嬢様言葉で訳す」 (translate in ojousama speech) in the =context= reference context, the model translated in a neutral tone.
+- With two pairs of ojousama-speech translation examples placed before the source as history, the model translated in a neutral tone.
+
+In the end, neither 2B nor 8B produced ojousama speech or the Kansai dialect.
+
+Translating Japanese into Japanese with ~form=polite~, on the other hand, the 2B model rewrote plain-form sentences in the polite form.
+=plamo-tr-local= stops when the source and target languages are the same, so I tried this rewrite with =llama-server=.
+
+#+begin_example
+今日は雨だから家で本読むわ。
+→ 今日は雨だから家で本を読みます。
+#+end_example
+
+** License
+=plamo-tr-local= is under the Apache-2.0 license, but the models it downloads come under the [[https://huggingface.co/pfnet/plamo-3-translate-8b/raw/main/LICENSE/ja][PLaMo Community License]] from Preferred Networks. The main points are:
+
+- Personal and non-commercial use is free.
+- Commercial use is free after you register through the PLaMo commercial use registration form, as long as your revenue for the most recent fiscal year is 1 billion yen or less.
+- Article 5 of the license lets you publish the output of a model that only transforms text, such as translation, without saying so. It asks you to state that you used PLaMo for translation only when you publish the output as all or a substantial part of an independent long text such as a book or a paper.
+- Anyone who provides the model or a derived model to a third party displays "Built with PLaMo".
+
+The =plamo-tr-local= README carries this notice too, and you should read the full license text before you use it.
+
+** Closing
+Use it when you want to translate text without sending it off your PC.
 * AWS CLI v2と出力が同じで最大550倍速いawsrをRustで作った
 :properties:
 :export_file_name: generated/contents/blog/2026/f681b9
@@ -19093,6 +19311,115 @@ PRのブランチにmasterをmergeし、その上に移植のcommitを積んで�
 
 手元では、 =unshare -rnm= で作ったuser namespaceの中に =169.254.169.254= で400か200を返すサーバーを立て、 =/etc/lsb-release= をUbuntuのものに差し替えた環境を使いました。
 400と200のどちらを返しても、本家と =awsr= の出力は同じになります。
+* Keeping awsr in sync with new AWS CLI v2 releases through a daily GitHub Actions workflow
+:properties:
+:export_file_name: generated/contents/blog/2026/0fe13b
+:export_date: 2026-11-28 08:26
+:export_updated: 2026-11-28 08:26
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/7fe084
+:export_tags: rust aws aws-cli github-actions nix ci differential-testing rust-awscli
+:end:
+
+=awsr=, the Rust CLI from [[https://s.conao3.com/blog/2026/87e5cb][my previous post]], returns output byte for byte identical to the AWS CLI v2, so to keep returning the same output, =awsr= has to move to each new AWS CLI version as it comes out.
+
+The AWS CLI [[https://github.com/aws/aws-cli/tags][released 20 times]] in the 36 days from 2026-09-30 to 2026-11-05, with a new version almost every weekday, so I set up GitHub Actions to run this update every day.
+For each new version, the workflow makes the change that bumps the version, compares =awsr= with the AWS CLI, and opens a PR with the results.
+
+[[github:conao3/rust-awscli::Rust][A fast, output-compatible Rust reimplementation of the AWS CLI v2]]
+
+The image below shows the [[https://github.com/conao3/rust-awscli/pull/6][PR that the workflow created]] when 2.39.5 came out, with a table of the comparison results before I ported anything.
+
+[[./resources/public/img/7fe084-pr.png]]
+
+** What changes when you bump the version
+=awsr= follows one fixed AWS CLI version.
+I write that version number in =models/VERSION=, and =flake.nix= pulls in the AWS CLI source and the official Linux installer of the same version with Nix.
+Bumping the AWS CLI version therefore changes three things:
+
+- botocore models: the service and operation definitions that =awsr= embeds in its binary.
+- Expected test values: the command table, the hashes of the argument tables, the help documents, and the waiter descriptions, which I generate from the AWS CLI models and source.
+- AWS CLI code changes: changes to commands with their own logic and to authentication. In the AWS CLI [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]], these are the entries other than =api-change=, such as =enhancement= and =bugfix=.
+
+A script can regenerate the models and expected values from the AWS CLI, but I have to port code changes to Rust.
+
+** The version bump script
+[[https://github.com/conao3/rust-awscli/blob/master/scripts/update-reference.sh][=scripts/update-reference.sh=]] regenerates the models and expected values.
+
+#+begin_src console
+$ scripts/update-reference.sh 2.39.5
+#+end_src
+
+The script runs these steps in order:
+
+1. Fetch the hashes of the AWS CLI source and installer with =nix-prefetch-url=, and update the version and hashes in =flake.nix=.
+2. Enter the devShell of the new version, re-import the models with =scripts/vendor-models.sh=, and set the three data crates that hold the models to the AWS CLI version.
+3. Regenerate the command table, the hashes of the argument tables, the help documents, and the waiter descriptions from the AWS CLI source.
+4. Format the code with =nix fmt=.
+
+Before I relied on the scripts that generate the expected values, I ran them on the 2.39.3 source from before the update and checked that they reproduced the committed expected values.
+
+** The daily workflow
+The [[https://github.com/conao3/rust-awscli/blob/master/.github/workflows/reference.yml][=Reference= workflow]] looks up the latest AWS CLI tag every day at 12:00 UTC.
+If it finds a version newer than =models/VERSION=, it bumps the version with the script above and runs these four checks:
+
+- =make check=: runs fmt, clippy, and the tests.
+- [[https://github.com/conao3/rust-awscli/tree/master/difftest][Differential tests]]: run every operation of the services whose models changed in both =awsr= and the AWS CLI, and compare the output and the requests.
+- Help comparison: on the help pages of the services whose models changed, replace the name =awsr= with =aws= and compare byte for byte. On pages where the longer name moved the line wrapping, compare with the wrapping removed.
+- Scenario and authentication comparison: compare hand-written scenarios, scenarios for the =s3= commands, and authentication commands such as =configure= and =sso login=.
+
+After the checks, the workflow pushes the =reference/<version>= branch and opens a PR with the results table.
+The PR body also lists the AWS CLI changelog entries other than =api-change=.
+If any check fails, or if =scripts/classify-reference-changes.sh= finds files to port in the diff of the AWS CLI source, the workflow marks the PR as a draft.
+If nothing needs porting and all checks pass, the workflow merges the PR and starts the =Release= workflow as well.
+
+[[./resources/public/img/7fe084-flow.svg]]
+
+** Comparing only the services that changed
+A differential test run over all services compares more than 230,000 combinations against the AWS CLI, and without a cache of AWS CLI results it took about 100 minutes on my 14-core PC.
+The =ubuntu-latest= runner that GitHub Actions gives public repositories has [[https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories][4 cores]], so I can't run the full set every day.
+
+The daily comparison covers only the services whose models changed.
+From 2.39.3 to 2.39.5, the models of 34 services changed, and their operations came to 48,504 combinations.
+
+The [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] that bumped =awsr= to 2.39.5 took about 71 minutes in total: about 44 minutes for the differential tests including the release build, and about 18 minutes for comparing 4,189 help pages.
+
+** What I ported in 2.39.5
+The PR from 2.39.3 to 2.39.5 is [[https://github.com/conao3/rust-awscli/pull/6][conao3/rust-awscli#6]], and the [[https://github.com/aws/aws-cli/blob/2.39.5/CHANGELOG.rst][changelog]] of 2.39.4 and 2.39.5 had nine entries other than =api-change=.
+I ported these four of them to =awsr=:
+
+- Stop sending Bearer authentication tokens to endpoints other than HTTPS.
+- Accept =--tags= on =s3 cp=, =s3 mv=, and =s3 sync= for transfers from local files to S3.
+- Count a transfer that fails with =PreconditionFailed= as a skipped existing file only if the transfer has =--no-overwrite=.
+- Set the permissions of the config file that =deploy install= writes to 600.
+
+The AWS CLI =s3= commands have two transfer implementations, classic in Python and crt on the AWS Common Runtime (CRT), and you pick one with [[https://docs.aws.amazon.com/cli/latest/topic/s3-config.html#preferred-transfer-client][the preferred_transfer_client setting]].
+The other five entries cover the CRT transfer client and =aws update= on Windows.
+=awsr= implements only the classic transfer client and has no =update= command yet, so those five need no porting.
+
+The differential tests for =account-access-runtime=, a service added in 2.39.5, caught the Bearer authentication change.
+24 cases for this service didn't match: the AWS CLI stopped with =Bearer authorization requires an HTTPS endpoint.=, while =awsr= sent the request.
+
+If I merged this change into master first, a different service that uses Bearer authentication would stop matching the 2.39.3 AWS CLI, so I port changes that depend on the AWS CLI version inside the version bump PR.
+I merged master into the PR branch, added the porting commits on top, and merged the PR after all comparisons passed on my machine.
+
+The existing scenarios can't compare =--tags=, so I added six =s3= scenarios.
+If I take out the tagging code in =awsr= for a moment, the four upload scenarios among the six fail, so the scenarios do compare the tags.
+
+** A difference that showed up only on the runner
+In the [[https://github.com/conao3/rust-awscli/actions/runs/42182624705][run]] that created the 2.39.5 PR, three =deploy install= and =deploy uninstall= scenarios failed, while the same scenarios matched on my PC.
+
+=deploy install= refuses to run on EC2 instances, and it asks the metadata service at =169.254.169.254= to find out whether it runs on EC2.
+[[https://docs.github.com/en/actions/concepts/runners/github-hosted-runners#cloud-hosts-used-by-github-hosted-runners][GitHub Actions runners]] run on Azure or AWS, and the [[https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service#security-and-authentication][Azure metadata service]] uses the same address, but it rejects requests without the =Metadata: true= header.
+
+The AWS CLI [[https://github.com/aws/aws-cli/blob/2.39.5/awscli/customizations/codedeploy/utils.py#L105-L121][sends an HTTP GET with Python's urlopen]] and concludes it isn't on EC2 when it gets an error response.
+=awsr= only checked whether a TCP connection succeeded, so on a runner where something answered at this address, it concluded it was on EC2.
+
+I changed =awsr= to [[https://github.com/conao3/rust-awscli/commit/3b5e3b9][send an HTTP GET]] too and to treat the host as EC2 only when the response status is below 400.
+
+To test this on my machine, I started a server that returns 400 or 200 at =169.254.169.254= inside a user namespace made with =unshare -rnm=, and replaced =/etc/lsb-release= with Ubuntu's.
+With either status, the AWS CLI and =awsr= print the same output.
 * Lean 4で証明した関数をRustから呼べるlean-rsを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/b43a06
