@@ -1,7 +1,6 @@
 Title: Emacs LispでJavaScriptと同じasync/awaitを書けるvowを作った
 Date: 2026-11-27 14:47
 Updated: 2026-11-27 14:47
-Draft: true
 Tags: emacs emacs-lisp async macro release vow-el
 
 
