@@ -8,7 +8,7 @@ Tags: emacs emacs-lisp async macro release vow-el
 JavaScriptのPromiseとasync/awaitをEmacs Lispに写したvowを作りました。
 Emacs Lispの非同期処理をコールバックの入れ子にせず上から下へ書けて、 `vow-await` で待つ間もEmacsは止まりません。
 
-待った処理の失敗は `condition-case` でそのまま捕まえられます。
+待った処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
 
 Emacsに同梱されているgenerator.elの上に作ったvowは、関数を `vow-await` の位置で止め、待っているvowが決まったらタイマーから続きを動かします。
 async/awaitで書いた関数はEdebugでステップ実行でき、待つたびに止まった位置から実行が続きます。
@@ -64,7 +64,7 @@ vowは `package-vc-install` でGitHubから入れます。
 `my-versions` はgitとemacsのバージョンを順に待って、1つの文字列にします。
 
 `my-status` は失敗するコマンドを待つので、棄却されたvowのエラーが `vow-await` の位置で起きます。
-`condition-case` がそのエラーを捕まえて終了コードを取り出します。
+`condition-case` でそのエラーを処理して、終了コードを取り出します。
 
 `vow-defun` で定義した関数は呼ぶとすぐにvowを返すので、バッチで動かすときは `vow-wait` でvowが決まるまで待って値を受け取ります。
 
@@ -202,7 +202,7 @@ $ emacs --batch -Q -L vow.el -L async -l vow-child-example.el
 `vow-defun` の定義にカーソルを置いて `C-u C-M-x` を押すと、普段の関数と同じようにEdebugで計装できて、ステップ実行が `vow-await` に来るとEdebugから一度抜け、待っていたvowが決まると止まった位置からステップ実行が続きます。
 
 Edebugの実行モードは再開した後も引き継がれるので、 `g` や `c` で動かせば `vow-await` をまたいで次のブレークポイントまで進みます。
-捕まえていないエラーでは、それを起こした式でEdebugが止まります。
+`condition-case` で処理していないエラーが起きると、Edebugはそのエラーを起こした式で止まります。
 
 generator.elが本体のローカル変数の名前を書き換えるので、Edebugの `e` で読めるローカル変数は最初の `vow-await` より前のものだけです。
 再開した後の変数の値は、ステップ実行中にEdebugが表示する式の値で確かめます。
