@@ -24264,7 +24264,7 @@ h5i-appはRustで書いたロジックを[[https://github.com/AeneasVerif/aeneas
 [[github:conao3/lean-leangage::Rust][Web services whose core is a kernel proved in Lean 4, generated to Rust, Python and Go with leanfran]]
 
 ** kernelとサーバー
-leangageでは、サービスのロジックを書いた関数をkernelと呼びます。
+leangageではサービスのロジックを書いた関数をkernelと呼びます。
 テナントはサービスを使う組織ごとの区画のことで、kernelは1つのテナントの状態だけを見ます。
 
 kernelは呼び出した利用者とテナントの状態と命令の3つを受け取ります。
@@ -24273,19 +24273,15 @@ kernelは呼び出した利用者とテナントの状態と命令の3つを受�
 [[./resources/public/img/a886f0-layers.svg]]
 
 Leanにはkernelのほかに、どのサービスでも使う部品が書いてあります。
-認可のguardとSQLのコンパイラとtokenの形式に加えて、JSONを書く関数がその部品です。
+認可のguardとSQLのコンパイラとbearer tokenの形式に加えて、JSONのトークンを扱う関数とJSONを書く関数がその部品です。
 
-要求を命令に直す関数と、kernelの結果を返信に直す関数も、サービスごとにLeanで書きます。
+サービスごとにLeanで書くものには、kernelと、要求を命令に直す関数と、kernelの結果を返信に直す関数があります。
 
-これらを[[https://s.conao3.com/blog/2026/23d62c][leanfran]]の0.13.2でRustとPythonとGoのコードに変換しています。
-読んだ要求をどの命令として扱い、どんな返信を返すかは、この変換したコードが決めます。
-
-HTTPの受け付けと署名の計算と状態の保存の3つは、言語ごとに手で書いています。
-本文のJSONは、それぞれの言語のライブラリで読みます。
-状態の置き場所はメモリとPostgreSQLから選べます。
+これらを[[https://s.conao3.com/blog/2026/23d62c][leanfran]]でRustとPythonとGoのコードに変換して、手で書いたサーバーから呼びます。
+サーバーが受け持つのはHTTPの受け付けとJSONの読み取りと署名の計算と状態の保存で、状態の置き場所はメモリとPostgreSQLから選べます。
 
 ** 電卓のkernelを書く
-最初の例は利用者ごとに数を1つ覚えておく電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Calculator/Kernel.lean][lean/Calculator/Kernel.lean]]の =transition= という関数です。
+最初の例は利用者ごとに数を1つ覚えておく電卓で、kernelは[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Calculator/Kernel.lean#L90-L98][lean/Calculator/Kernel.lean]]の =transition= という関数です。
 =actor= が呼び出した利用者で、 =snap= がテナントの状態です。
 
 #+begin_src lean
@@ -24319,7 +24315,7 @@ theorem others_unchanged (a : Principal) (s : Snapshot) (c : Command) (w : Optio
 仮定の =ht= は命令が受け付けられたことを表し、 =hu= は =u= が呼び出した利用者とは別の利用者であることを表します。
 結論は、書き込みを反映したあとの =u= の数が反映する前と同じだという等式です。
 
-ほかの定理には次のものがあります。
+どの定理もすべての利用者と状態と命令について述べていて、ほかには次の定理があります。
 
 | 定理 | 内容 |
 |---|---|
@@ -24327,8 +24323,36 @@ theorem others_unchanged (a : Principal) (s : Snapshot) (c : Command) (w : Optio
 | =get_after= | 受け付けられた命令のあとで同じ利用者が =get= を呼ぶと、その命令の返信と同じ数が返る |
 | =read_only_sound= | =get= は何も書き込まない |
 
+** leanfranでRustとPythonとGoに変換する
+Leanの関数は、leanfranのコマンドで言語ごとのコードに変換します。
+電卓のkernelでは次の3つを実行していて、[[https://github.com/conao3/lean-leangage/blob/7156538/Makefile#L51-L80][Makefile]]の =generate= がまとめて呼びます。
+
+#+begin_src sh
+leanfran project generate --lake-dir lean \
+  --output-dir rust/calculator/src/generated --modules Calculator.Kernel
+leanfran-python module generate --module-name Calculator.Kernel \
+  --search-path lean/.lake/build/lib/lean \
+  --output-file python/src/leangage_calculator/kernel.py
+leanfran-go module generate --module-name Calculator.Kernel \
+  --search-path lean/.lake/build/lib/lean --output-dir go/calculator/kernel
+#+end_src
+
+leanfranは0.13.2を使っています。
+Rustでは、Leanの =transition= が[[https://github.com/conao3/lean-leangage/blob/7156538/rust/calculator/src/generated/calculator_kernel.rs#L4225][次の型の関数]]になります。
+
+#+begin_src rust
+pub fn transition(actor: Principal, snap: Snapshot, cmd: Command)
+    -> Result<(Option<Memory>, Reply), Error>
+#+end_src
+
+Leanの =Except= はRustの =Result= になり、 =Principal= や =Command= は同じ名前のRustの型になります。
+変換したコードはリポジトリにcommitしてあって、 =make check= は変換をやり直してcommitしたファイルと差があれば失敗します。
+
+変換したコードがLeanの関数と同じ結果を返すことは、テストで確かめています。
+電卓の5,000件の命令を3つの言語の変換したkernelに渡すと、どの言語の出力もLeanが直接コンパイルしたkernelの出力と一致します。
+
 ** サーバーを動かす
-Rustのサーバーは変換したkernelをaxumのrouterの後ろに置いたものです。
+Rustのサーバーは変換した関数をaxumのrouterの後ろに置いたものです。
 
 #+begin_src console
 $ export LEANGAGE_SECRET=dev-secret
@@ -24342,57 +24366,77 @@ $ curl -s -H "Authorization: Bearer $TOKEN" -d '{"cmd":"apply","op":"div","arg":
 {"error":"division_by_zero"}
 #+end_src
 
-=LEANGAGE_SECRET= は署名の鍵で、 =LEANGAGE_ISSUE=1:7= を付けて起動するとテナント1の利用者7のtokenを出力して終わります。
+=LEANGAGE_SECRET= は署名の鍵で、 =LEANGAGE_ISSUE=1:7= を付けて起動するとテナント1の利用者7のbearer tokenを出力して終わります。
 
-要求が届くと、サーバーは変換した関数を順に呼びます。
-最初の関数は =Authorization= ヘッダーからtokenを取り出して、署名を計算する範囲のbytesを返します。
-
-サーバーはこのbytesの署名をHMAC-SHA256で確かめます。
-
-本文のJSONは、それぞれの言語のJSONのライブラリで読みます。
-Rustではserde_json、Pythonでは標準の =json= 、Goでは =encoding/json/jsontext= です。
-
-サーバーはライブラリが読んだ内容から、かっこと名前と値が本文と同じ順に並ぶトークンの列を作ります。
-サーバーはこのトークンの列を1つの文字列にまとめて、次の関数に渡します。
-
-文字列の先頭にはトークンの種類を1文字ずつ並べ、改行のあとに数と文字列と名前の中身を並べ、最後の1つを除いて文字数を前に付けます。
-
-次の関数はtokenの期限を調べて、この文字列を命令に直します。
-その結果は、文字列をトークンの列に読み戻してから命令に直した結果と同じです。
-kernelが命令を処理すると、最後の関数がその結果から状態コードと本文を決めます。
-
-手で書いたコードは、ヘッダーとこの文字列を変換した関数に渡して、関数が返した状態コードと本文をそのまま送ります。
-JSONのライブラリを呼ぶコードは、言語ごとに1つのファイルにまとめてあります。
-
-このファイルはトークンの列を1つの文字列にまとめます。
-どの名前があるかも、値が命令に合うかも判断しません。
-
-要求を処理する経路にある10個のファイルがJSONのライブラリを呼んでいないことを、 =make check= が検査しています。
-状態コードを自分で決めていないことも検査しています。
-
-文字列をトークンの列に読み戻す関数と、トークンの列を命令に直す関数にも定理があります。
-=unpack_pack= はトークンの列をまとめた文字列を読み戻すと元のトークンの列になるという定理です。
-
-トークンの列をまとめた形になっていない文字列は400の =body is not JSON= で拒否され、これは =decode_malformed= が述べています。
-
-=decode_ok_iff= は、どのトークンの列がどの命令として読まれるかを述べる定理です。
-トークンの列がその命令のフィールドだけを持つJSONのオブジェクトであれば命令として読まれ、そうでなければ読まれません。
-フィールドの順序は問いません。
-
-PythonとGoのサーバーも同じLeanのファイルから変換したkernelを動かします。
-3つのサーバーは同じ命令に同じ返信をして、1つのサーバーが出したtokenはほかの2つでも使えます。
+PythonとGoのサーバーも同じLeanのファイルから変換した関数を呼びます。
+3つのサーバーは同じ命令に同じ状態コードと本文を返し、1つのサーバーが出したbearer tokenはほかの2つでも使えます。
 
 #+begin_src console
 $ cd python && LEANGAGE_LISTEN=127.0.0.1:8081 uv run leangage-calculator &
 $ cd go && LEANGAGE_LISTEN=127.0.0.1:8082 go run ./calculator/cmd/leangage-calculator &
 #+end_src
 
+** 1つの要求が通る順
+要求が届くと、サーバーは変換した関数を3つ順に呼びます。
+最初の =authenticate= は =Authorization= ヘッダーからbearer tokenを取り出して、書かれているテナントと利用者と期限を返します。
+
+署名を計算する範囲のbytesも返すので、サーバーはこのbytesのHMAC-SHA256を計算してbearer tokenの署名と比べます。
+
+本文のJSONは、それぞれの言語のライブラリが読みます。
+Rustではserde_json、Goでは =encoding/json/jsontext= 、Pythonでは標準の =json= です。
+
+ライブラリを呼ぶコードは手で書いていて、言語ごとに1つのファイルにまとめています。
+このファイルはライブラリが読んだ内容から、かっこと名前と値が本文と同じ順に並ぶトークンの列を作って、1つの文字列に詰めます。
+
+トークンをそのまま返すライブラリは =encoding/json/jsontext= だけです。
+RustとPythonでは、ライブラリが読んだ値からサーバーがトークンの列を作ります。
+
+Rustではserde_jsonが値を読みながら呼ぶ関数の中で作り、Pythonでは =json= が読み終えた値をたどって作ります。
+
+文字列の先頭にはトークンの種類を1文字ずつ並べ、改行のあとに数と文字列と名前の中身を並べます。
+それぞれの中身の前には文字数とコロンを付けますが、最後の1つには文字数を付けません。
+
+=apply= の本文を詰めると、次の2行の文字列になります。
+
+#+begin_src text
+{ksksk#}
+3:cmd5:apply2:op3:mul3:arg7
+#+end_src
+
+元の本文は ={"cmd":"apply","op":"mul","arg":7}= で、 =k= が名前を、 =s= が文字列を、 =#= が数を表します。
+
+2つ目の =request= はbearer tokenの期限を調べてから、この文字列を命令に直します。
+どの名前があるか、値が命令に合うかは =request= が判断します。
+
+サーバーは命令をkernelに渡して、書き込みを状態に反映します。
+3つ目の =respond= がkernelの結果から状態コードと本文を決め、サーバーはそれをそのまま送ります。
+
+=make check= が呼ぶ[[https://github.com/conao3/lean-leangage/blob/7156538/tools/check-handlers.py][tools/check-handlers.py]]は、要求を処理する経路の10個のファイルが変換した関数を呼んでいることを検査しています。
+10個のファイルがJSONのライブラリを呼んでいたり、状態コードを自分で書いていたりすると、この検査は失敗します。
+
+文字列を読む関数と命令に直す関数にも定理があって、[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Leangage/Json/Lexemes/Proofs.lean][lean/Leangage/Json/Lexemes/Proofs.lean]]と[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Calculator/Wire/Proofs.lean][lean/Calculator/Wire/Proofs.lean]]で証明しています。
+表の =unpack= は詰めた文字列をトークンの列に読み戻す関数で、 =decode= は詰めた文字列を命令に直す関数です。
+
+| 定理 | 内容 |
+|---|---|
+| =unpack_pack= | トークンの列を詰めた文字列を =unpack= に渡すと、元のトークンの列が返る |
+| =unpack_iff= | =unpack= がトークンの列を返す文字列は、そのトークンの列を詰めた文字列だけである |
+| =numberOf_iff= | 数のトークンが64bitの数 =n= として読まれるのは、中身が =n= の10進の表記で、符号も小数も指数も先頭の0もないときだけである |
+| =decode_ok_iff= | =decode= が文字列を命令として読むのは、読み戻したトークンの列がその命令のフィールドだけを持つJSONのオブジェクトのときだけで、フィールドの順序は問わない |
+| =decode_malformed= | どのトークンの列を詰めた形でもない文字列を、 =decode= はJSONではないものとして拒否する |
+| =respond_ok= 、 =respond_error= | 受け付けた命令には200と ={"value": v}= を返し、拒否した命令には422と ={"error": name}= を返す |
+
+=decode= がJSONではないものとして拒否した文字列に、 =request= は400の =body is not JSON= を返します。
+
+定理が述べるのは、詰めた文字列を受け取ってからあとのことです。
+詰めた文字列が本文のトークンの列と合っていることは、ライブラリと手で書いたファイルに任せています。
+
 ** 認可をguardに任せる
 2つ目の例は、組織のメンバーがノートを書くサービスです。
 共有したノートは組織の全員が読めて、共有していないノートは持ち主と管理者だけが読めます。
 
-このkernelは[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]にあって、命令の処理と認可を分けて書いています。
-命令の処理は =handle= という関数に書き、誰が何を読み書きしてよいかは方針として別の関数に書きます。
+このkernelは[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Notes/Kernel.lean][lean/Notes/Kernel.lean]]にあって、命令の実行と認可を分けて書いています。
+命令の実行は =handle= という関数に書き、誰が何を読み書きしてよいかは方針として別の関数に書きます。
 
 方針の関数では、 =permits= が書き込みを許すかを返し、 =visible= が行を見せてよいかを返します。
 サーバーが呼ぶ =transition= は =handle= をleangageのguardに通したものです。
@@ -24440,7 +24484,7 @@ $ curl -s -H "Authorization: Bearer $B" -d '{"cmd":"put_note","id":7,"body":"min
 環境変数の =LEANGAGE_DATABASE_URL= にPostgreSQLの接続先を渡すと、サーバーは状態をメモリの代わりにPostgreSQLに保存します。
 電卓の3つのサーバーとノートのRustのサーバーがこれに対応しています。
 
-kernelの側では、表の定義と、状態の行を表の行に変換する関数をLeanで書きます。
+kernelの側では表の定義と、状態の行を表の行に変換する関数を[[https://github.com/conao3/lean-leangage/blob/7156538/lean/Calculator/Store.lean#L19-L25][lean/Calculator/Store.lean]]のようにLeanで書きます。
 
 #+begin_src lean
 def tables : List Tab := [⟨"memories", [⟨"user", .int, false⟩, ⟨"value", .int, false⟩], 1⟩]
@@ -24456,9 +24500,9 @@ SQLの文はLeanで書いたコンパイラがこの定義から作ります。
 コンパイラはどの表にも =tenant_id= の列を足し、 =SELECT= と =DELETE= にはテナントを絞る条件を付けます。
 
 サーバーは =SERIALIZABLE= のtransactionの中でテナントの行を読んで状態を作り、kernelを呼んで、コンパイラが作った文を送ります。
-同じテナントへの命令が続くときは前の命令のあとの状態を覚えておき、ほかのサーバーから書き込まれていなければ行を読み直しません。
+同じテナントへの命令が続くときは前の命令のあとの状態を保持しておき、ほかのサーバーから書き込まれていなければ行を読み直しません。
 
-コンパイラについての定理は、Leanで書いたPostgreSQLのモデルに対して証明しています。
+コンパイラについての定理はLeanで書いたPostgreSQLのモデルに対して証明しています。
 モデルは =CREATE TABLE= と =INSERT= と =DELETE= と =SELECT= が表の行をどう変えるかをLeanの関数として書いたものです。
 
 | 定理 | 内容 |
@@ -24467,49 +24511,51 @@ SQLの文はLeanで書いたコンパイラがこの定義から作ります。
 | =select_sound= | コンパイラが作った =SELECT= は、そのテナントの行のうち条件に合うものを1回ずつ返す |
 | =tenant_isolation= | あるテナントのために作った文はほかのテナントの行を変えず、 =SELECT= が返す行はそのテナントの行だけで決まる |
 
-保存した行から読み戻した状態が、保存する前の状態と同じ返信をすることも証明しています。
+保存した行から読み戻した状態が、サーバーが保持している状態と同じ返信をすることも証明しています。
 この定理は =stored_transition= という名前で、電卓とノートのそれぞれにあります。
 
-** 証明していないところ
-定理はLeanで書いた関数に対して証明しています。
-サーバーはその関数をleanfranで変換したコードを動かします。
-leangageはleanfranを信頼していて、変換したコードがLeanの関数と同じ結果を返すことを前提にしています。
+** 証明の外にあるもの
+定理はLeanで書いた関数に対して証明していて、サーバーが動かすのはその関数をleanfranで変換したコードです。
 
-この前提を確かめるテストも置いていて、同じ入力をLeanが直接コンパイルした関数と3つの言語の関数に渡して出力を比べます。
-電卓では5,000件の命令と3,000行の要求で、どの言語の出力もLeanの出力と一致します。
+leanfranと各言語のコンパイラは信頼しています。
+変換したコードがLeanの関数と同じ結果を返すことは、出力を比べるテストで確かめています。
 
 定理が関数の書き換えを見逃さないかは[[https://s.conao3.com/blog/2026/51d6b7][leanassay]]で調べています。
 leanassayは関数を少しずつ書き換えて、書き換えたあとも定理が成り立ってしまうものを探す道具です。
 
-手で書いた部分と各言語のライブラリは証明の外にあって、大きく分けると4つです。
+電卓のkernelでは167通りの書き換えを試していて、出力を変えながらすべての定理を満たす書き換えは見つかっていません。
+
+サーバーと各言語のライブラリは証明の外にあります。
+HTTPの受け付けはaxumと =http.server= と =net/http= に任せていて、署名の計算ではHMAC-SHA256と鍵の保管と時計を信頼しています。
+
+状態の保存ではメモリの上の排他制御とPostgreSQLとのやり取りを手で書いています。
 HTTPと状態の保存を証明の外に置くところは、h5i-appと同じです。
 
-1つ目はHTTPの受け付けで、axumと =http.server= と =net/http= に任せています。
-2つ目は署名の計算で、HMAC-SHA256と鍵の保管と時計がここに入ります。
-3つ目は状態の保存で、メモリの上の排他制御とPostgreSQLとのやり取りが入ります。
-4つ目はJSONの読み取りで、serde_jsonと =json= と =encoding/json/jsontext= に任せています。
-
-変換した関数の間をつなぐ処理も手で書いています。
-ライブラリが読んだトークンの列を1つの文字列にまとめる処理と、保存の失敗を返信の種類に対応づける処理がこれに当たります。
-
 PostgreSQLがLeanで書いたモデルのとおりに動くことも前提にしています。
-サーバーとPostgreSQLの組み合わせは、COMMITの応答を落とすproxyを挟むテストや、処理の途中で接続を切るテストで確かめています。
+サーバーとPostgreSQLの組み合わせは、COMMITの応答を落とすproxyを挟むテストや、実行の途中で接続を切るテストで確かめています。
 
-JSONの読み取りをライブラリに任せているので、3つの言語のサーバーが違う答えを返す本文があります。
-テストで見つけた違いは3つです。
-
-対になっていないサロゲートのエスケープ ( ="\ud800"= ) を、serde_jsonとPythonのサーバーは拒否し、 =encoding/json/jsontext= はU+FFFDに置き換えて読みます。
-配列の入れ子は、serde_jsonが深さ127まで読みます。
-=encoding/json/jsontext= は深さ10,000まで読み、Pythonは深さ2,000の本文も読みます。
-=1e400= のように倍精度の範囲を超える数は、serde_jsonだけが拒否します。
-
-この3つを除いて作った3,000行の要求の一覧では、3つの言語の返信が一致します。
+定理の文がサービスのあるべき動作を表しているかも、Leanは確かめません。
+電卓なら、自然数での計算を書いた仕様の関数が電卓のするべき計算になっているかは、人が読んで判断します。
 
 何を証明して何を前提にしているかの一覧は[[https://github.com/conao3/lean-leangage/tree/7156538#what-is-proved-and-what-is-trusted][READMEの「What is proved, and what is trusted」]]にあります。
 
+** JSONのライブラリで答えが違う本文
+JSONの読み取りをライブラリに任せているので、3つの言語のサーバーが違う答えを返す本文があります。
+言語ごとのテストに書いてある違いは次の3つです。
+
+対になっていないサロゲートのエスケープ ="\ud800"= を、RustとPythonのサーバーは拒否し、GoのサーバーはU+FFFDに置き換えて読みます。
+
+配列の入れ子は、Rustのサーバーが深さ127まで読んで128から拒否し、Goのサーバーが深さ10,000まで読んで10,001から拒否します。
+Pythonのサーバーは深さ2,000の本文を読み、深さ200,000の本文を拒否します。
+
+=1e400= のように倍精度の範囲を超える数は、Rustのサーバーだけが拒否し、GoとPythonのサーバーは64bitに収まらない数として読みます。
+
+3つのライブラリの読み方がそろう本文から、3,000行の要求の一覧を作りました。
+この一覧では、3つの言語の返信がLeanの関数の返信と一致します。
+
 ** 速さ
-kernelを挟むとどれだけ遅くなるかを、kernelのないサーバーと比べて測りました。
-比べる相手は、JSONを読んでJSONを返すだけの各言語のサーバーです。
+kernelを挟むとどれだけ遅くなるかを測りました。
+比べる相手はJSONを読んでJSONを返すだけのkernelのない各言語のサーバーです。
 
 計測には4 vCPUのXeon 2.10GHzとメモリ16GBのVMを使い、 =oha= で =POST /rpc= に8秒間要求を送って毎秒の返信の件数を数えました。
 表の値はどれも2回の平均で、大きいほど速いことを表します。
@@ -24518,47 +24564,50 @@ kernelを挟むとどれだけ遅くなるかを、kernelのないサーバー�
 
 | 毎秒の返信の件数、Rust | get、1接続 | apply、1接続 | get、64接続 | apply、64接続 |
 |---|---:|---:|---:|---:|
-| leangage (axum) | 18,800 | 19,000 | 141,700 | 140,500 |
+| leangage、axum | 18,800 | 19,000 | 141,700 | 140,500 |
 | axum、kernelなし | 19,800 | 19,600 | 151,000 | 149,800 |
 | actix-web、kernelなし | 19,500 | 19,200 | 199,100 | 202,100 |
 
-Rustのサーバーは、kernelのないaxumに対して1接続で95〜97%、64接続で94%の件数を返します。
-この記事の表のどのセルでも、2回の値の差は14%以内です。
+Rustのサーバーはkernelのないaxumに対して1接続で95〜97%、64接続で94%の件数を返します。
+この節の3つの表のどのセルでも、2回の値の差は14%以内です。
 
-leangageの値はどれも、本文をライブラリで読んで1つの文字列にまとめ、命令への変換と返信の組み立てをLeanから変換した関数が行うサーバーで測りました。
-
-計測の要求はどれも同じtokenを送っています。
-サーバーは一度確かめたtokenを覚えているので、同じtokenの要求では署名を計算し直さずに期限だけを確かめます。
-
-本文を読んで命令に直すまでの時間を、別の6コアの機械で測りました。
-本文1件にRustで約0.4マイクロ秒、Goで約1.4マイクロ秒、Pythonで約46マイクロ秒かかり、本文に空白があってもなくても同じです。
-
-このうちライブラリが本文を読んでサーバーが1つの文字列にまとめるまでは、Rustで0.24マイクロ秒、Goで0.57マイクロ秒、Pythonで6マイクロ秒です。
-変換した関数はRustで0.12マイクロ秒、Goで0.72マイクロ秒、Pythonで31マイクロ秒かかります。
+計測の要求はどれも同じbearer tokenを送っています。
+サーバーは一度確かめたbearer tokenを保持しているので、同じbearer tokenの要求では署名を計算し直さずに期限だけを確かめます。
 
 Goのサーバーは =net/http= の上で動きます。
-kernelのない =net/http= に対して、1接続で91%、64接続で73〜74%の件数を返します。
+kernelのない =net/http= に対して1接続で91%、64接続で73〜74%の件数を返します。
 
 [[./resources/public/img/a886f0-speed-http-go.svg]]
 
 | 毎秒の返信の件数、Go | get、1接続 | apply、1接続 | get、64接続 | apply、64接続 |
 |---|---:|---:|---:|---:|
-| leangage (net/http) | 11,700 | 11,700 | 71,700 | 67,800 |
+| leangage、net/http | 11,700 | 11,700 | 71,700 | 67,800 |
 | net/http、kernelなし | 12,800 | 12,800 | 96,400 | 92,400 |
 | gin、kernelなし | 13,100 | 13,000 | 80,600 | 77,100 |
 
-Pythonのサーバーは =http.server= を1プロセスで動かしています。
-1接続ではFastAPIの71〜79%の件数を返し、64接続では4プロセスで動くFastAPIの1割ほどになります。
+Pythonのサーバーは =http.server= を1プロセスで動かしていて、kernelの呼び出しを1つのlockで囲んでいます。
+1接続ではFastAPIの71〜79%の件数を返し、64接続では1接続のときより減ります。
+
+[[./resources/public/img/a886f0-speed-http-python.svg]]
+
+| 毎秒の返信の件数、Python | get、1接続 | apply、1接続 | get、64接続 | apply、64接続 |
+|---|---:|---:|---:|---:|
+| leangage、http.server | 5,130 | 4,450 | 2,610 | 2,370 |
+| FastAPI、uvicornの4プロセス、kernelなし | 6,460 | 6,240 | 25,700 | 26,900 |
+| Flask、gunicornの4プロセス、kernelなし | 3,340 | 2,980 | 7,600 | 7,520 |
+
+本文を読んで命令に直すまでの速さは、別の6コアの機械で測りました。
+=apply= の本文を1秒あたりRustで約250万回、Goで約73万回、Pythonで約21,600回読めて、本文に空白があってもなくても同じです。
 
 kernelを速く呼ぶため、サーバーはテナントの状態をLeanの値のまま持ち続けて、呼び出した利用者と命令と返信だけを要求のたびに変換します。
 利用者が1,000人のテナントで、Rustに変換したkernelを直接呼んで測りました。
 
-状態も毎回変換する形では毎秒9,660件の命令しか処理できませんが、Leanの値のまま渡す形では同じテナントで毎秒549万件を処理できます。
+状態も毎回変換する形では毎秒9,660件の命令しか実行できませんが、Leanの値のまま渡す形では同じテナントで毎秒549万件を実行できます。
 PostgreSQLに保存する場合の値と計測の手順は[[https://github.com/conao3/lean-leangage/tree/7156538#speed][READMEの「Speed」]]に載せています。
 
 ** おわりに
 ロジックを1つの関数にまとめると、証明する対象が小さくなって、同じ関数を3つの言語のサーバーで動かせます。
-読んだ本文を命令に直すところから返信の組み立てまでLeanで書いてあるので、返信の状態コードと本文は、証明した関数を変換したコードが決めます。
+詰めた文字列を命令に直すところから返信の組み立てまでLeanで書いてあるので、状態コードと本文は、証明した関数を変換したコードが決めます。
 
 * Lean 4で証明した関数をCから呼べて、Cの関数をLeanに訳して証明できるleanfranのC版を作った
 :properties:
