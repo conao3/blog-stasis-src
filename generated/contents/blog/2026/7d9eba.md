@@ -1,4 +1,4 @@
-Title: Emacs LispでJavaScriptと同じasync/awaitを書けるvowを作った
+Title: async/awaitで書いた関数をEdebugでステップ実行できるEmacs Lispのvowを作った
 Date: 2026-11-27 14:47
 Updated: 2026-11-27 18:05
 Tags: emacs emacs-lisp async macro release vow-el

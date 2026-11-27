@@ -1,4 +1,4 @@
-Title: vow: JavaScript-style async/await for Emacs Lisp
+Title: vow: async/await for Emacs Lisp that you can step through in Edebug
 Date: 2026-11-27 17:24
 Updated: 2026-11-27 18:05
 Lang: en

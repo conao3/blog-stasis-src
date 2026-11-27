@@ -24840,7 +24840,7 @@ CのプロジェクトでLeanの関数を使いたいときはコメントに定
 
 導入手順は [[https://github.com/conao3/lean-leanfran/blob/95f3161cfd5cf8c1d0f0d2812c6e7bd1a48173d9/docs/c-guide.md#set-up-the-compiler][Cガイド]] に、動かせる例は [[https://github.com/conao3/lean-leanfran/tree/95f3161cfd5cf8c1d0f0d2812c6e7bd1a48173d9/langs/C/samples][langs/C/samples]] に置いています。
 
-* Emacs LispでJavaScriptと同じasync/awaitを書けるvowを作った
+* async/awaitで書いた関数をEdebugでステップ実行できるEmacs Lispのvowを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/7d9eba
 :export_date: 2026-11-27 14:47
@@ -25089,7 +25089,7 @@ vowはECMAScript 2027までのPromiseとasync関数の機能と、stage 3のAwai
 
 =vow-await= で待つ処理は本体の中で上から順に読めて、エラーも =condition-case= で受けられます。
 さらにEdebugでステップ実行もできるので、プロセスやタイマーを待つときにvowを使ってみてください。
-* vow: JavaScript-style async/await for Emacs Lisp
+* vow: async/await for Emacs Lisp that you can step through in Edebug
 :properties:
 :export_file_name: generated/contents/blog/2026/aeda19
 :export_original: /blog/2026/7d9eba
