@@ -151,11 +151,10 @@ Emacs Lispで書いた重い計算はvowで包んでも同じEmacsで動くの�
 
 vowは `vow-async-start` を呼んだときだけGNU ELPAのasyncパッケージを読み込むので、ほかの関数には要りません。
 
-違いを見るために、300000より小さい素数を数える `my-count-primes` を、今のEmacsと子のEmacsでそれぞれ動かしてみました。
+違いを見るために、今のEmacsと子のEmacs、さらに同時に動かす2つの子のEmacsで、300000より小さい素数を数える `my-count-primes` を動かしてみました。
 asyncパッケージは2.0を使いました。
 
-`my-measure` は計算を待つ間に0.1秒ごとのタイマーが何回動いたかを数えます。
-タイマーが動いた回数でEmacsが止まっていたかどうかが分かります。
+`my-measure` は計算を待つ間に0.1秒ごとのタイマーを動かし、タイマーが一度も動かなければEmacsが止まっていたと表示します。
 
 ```emacs-lisp
 ;;; vow-child-example.el --- vow example  -*- lexical-binding: t; -*-
@@ -178,29 +177,35 @@ asyncパッケージは2.0を使いました。
     (vow-async-start (lambda () (funcall count-primes n)))))
 
 (defun my-measure (label function)
-  "Call FUNCTION and show how many times a 0.1-second timer ran meanwhile."
+  "Call FUNCTION and show whether Emacs kept running meanwhile."
   (let* ((start (float-time))
          (ticks 0)
-         (timer (run-at-time 0.1 0.1 (lambda () (setq ticks (1+ ticks)))))
-         (value (funcall function)))
+         (timer (run-at-time 0.1 0.1 (lambda () (setq ticks (1+ ticks))))))
+    (funcall function)
     (cancel-timer timer)
-    (message "%s: %S in %.1f seconds, the timer ran %d times"
-             label value (- (float-time) start) ticks)))
+    (message "%s: %.0f seconds, %s" label (- (float-time) start)
+             (if (zerop ticks) "Emacs was blocked" "Emacs kept running"))))
 
-(my-measure "this Emacs" (lambda () (my-count-primes 300000)))
-(my-measure "child Emacs" (lambda () (vow-wait (my-count-primes-in-child 300000))))
+(my-measure "this Emacs"
+            (lambda () (my-count-primes 300000)))
+(my-measure "child Emacs"
+            (lambda () (vow-wait (my-count-primes-in-child 300000))))
+(my-measure "two child Emacs"
+            (lambda () (vow-wait (vow-all (list (my-count-primes-in-child 300000)
+                                                (my-count-primes-in-child 300000))))))
 ```
 
 子のEmacsには親で定義した関数が無いので、 `my-count-primes-in-child` は関数の定義を `symbol-function` で取り出し、クロージャーに閉じ込めて渡しています。
 
 ```sh
 $ emacs --batch -Q -L vow.el -L async -l vow-child-example.el
-this Emacs: 25997 in 3.0 seconds, the timer ran 0 times
-child Emacs: 25997 in 3.2 seconds, the timer ran 32 times
+this Emacs: 4 seconds, Emacs was blocked
+child Emacs: 4 seconds, Emacs kept running
+two child Emacs: 4 seconds, Emacs kept running
 ```
 
-タイマーは今のEmacsで数えた3.0秒のあいだ1回も動かず、子のEmacsに任せると3.2秒のあいだに32回動きました。
-計算にかかる時間はほぼ同じで、子のEmacsが計算している間も親のEmacsは止まらずに動いています。
+今のEmacsで数えると終わるまでの4秒間Emacsが止まりますが、子のEmacsに任せると同じ4秒の間もEmacsは動き続けます。
+2つの子のEmacsに同時に任せても4秒で終わるので、2つの計算は並列に進んでいます。
 
 関数とその値は2つのEmacsの間を文字列で行き来するので、印字して読み戻せる値だけを渡せます。
 クロージャーが閉じ込めた変数は値の写しとして子に渡るので、子で変数を書き換えても親には届きません。
