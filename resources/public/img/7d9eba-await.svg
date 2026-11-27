@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="380" viewBox="0 0 1000 380" font-family="sans-serif" role="img" aria-labelledby="title desc">
   <title id="title">vow-defunの本体がvow-awaitで止まって再開する流れ</title>
-  <desc id="desc">呼び出し側がmy-versionsを呼ぶと、本体は最初のvow-awaitまで動いてvowを返します。gitとemacsのプロセスが終わるたびに、ジョブキューのタイマーが本体を次のvow-awaitまで進め、本体が終わると返したvowが満たされて呼び出し側のハンドラが動きます。</desc>
+  <desc id="desc">呼び出し側がmy-versionsを呼ぶと、本体は最初のvow-awaitまで動いてvowを返します。git --versionとemacs --versionのプロセスが終わるたびに、ジョブキューのタイマーが本体を次のvow-awaitまで進め、本体が終わると返したvowが満たされて呼び出し側のハンドラが動きます。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
   </defs>
@@ -39,7 +39,7 @@
     <text x="215" y="136">呼ぶ</text>
     <text x="420" y="136">vowを返す</text>
     <text x="850" y="136" text-anchor="end">vowが満たされる</text>
-    <text x="460" y="340" text-anchor="middle">gitが終わる</text>
-    <text x="720" y="340" text-anchor="middle">emacsが終わる</text>
+    <text x="460" y="340" text-anchor="middle">git --versionが終わる</text>
+    <text x="720" y="340" text-anchor="middle">emacs --versionが終わる</text>
   </g>
 </svg>
