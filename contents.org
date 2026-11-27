@@ -20511,6 +20511,334 @@ Leanの組み込みの関数は、LeanのCのruntimeの[[https://github.com/lean
 LeanでPythonの関数を書けるようにして、Leanの型をpydanticのmodelにし、Pythonの関数をLeanで証明できるようにしました。
 使い方を1つずつ試せるサンプルは[[https://github.com/conao3/lean-py/tree/master/samples][samples]]にあります。
 
+* lean-py: call Lean 4 functions from Python, and prove Python functions in Lean
+:properties:
+:export_file_name: generated/contents/blog/2026/f29ae0
+:export_date: 2026-11-28 08:50
+:export_updated: 2026-11-28 08:50
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/dc65bb
+:export_tags: lean python formal-verification code-generation property-based-testing pydantic fastapi release lean-py
+:end:
+
+I wrote lean-py, which lets you call functions written and proved in Lean 4 from Python.
+Lean structures and inductive types become pydantic models, so you can use them as FastAPI request types, and in the other direction, you can translate Python functions into Lean and prove their properties in Lean.
+
+The repository is [[https://github.com/conao3/lean-py][conao3/lean-py]], under Apache-2.0.
+The package is on PyPI as =lean-python=, and this post shows results from version 0.2.0.
+lean-py is now the Python backend of [[https://s.conao3.com/blog/2026/23d62c][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Python][langs/Python/ of conao3/lean-leanfran]], with the package name =leanfran=.
+
+lean-py compiles the intermediate representation of the Lean compiler to Python source, and the generated Python runs on the =lean-python= package and pydantic alone, so you don't need Lean at run time.
+[[https://s.conao3.com/blog/2026/311be4][lean-clj]] and [[https://s.conao3.com/blog/2026/1ff994][lean-rs]] call Lean functions from Clojure and Rust, and lean-py brings the same mechanism to Python.
+
+[[github:conao3/lean-py::Python][Run Lean 4 as Python: a backend from Lean's IR, Lean blocks in Python files, pydantic models for Lean types, and Python functions verified in Lean]]
+
+** Three ways to use it
+lean-py supports three uses.
+
+[[./resources/public/img/dc65bb-uses.svg]]
+
+1. Write functions and theorems in Lean inside a Python file, and call them from Python. This use takes =lean(...)= and =lean-py sync=.
+2. Pass Lean structures and inductive types around as pydantic models. You can also use pydantic models you wrote yourself from Lean.
+3. Translate a Python function into Lean, and prove its properties in Lean. This use takes =@model= and =lean-py check=.
+
+The first two go from Lean to Python, and the third goes from Python to Lean.
+
+** Write Lean in a Python file
+First, install the Python package and =lean-python=, the CLI that converts Lean code.
+You can install the CLI with nix.
+
+#+begin_src console
+$ uv add lean-python
+$ nix profile install github:conao3/lean-py
+#+end_src
+
+To check proofs, you also need =lake=, the Lean build tool, from Lean 4.35.0 on your =PATH=.
+
+You write the Lean source as a string in =lean(...)=, and call it in a module of your package.
+
+#+begin_src python
+# demo/arith.py
+from lean_python import lean
+
+arith = lean("arith", r"""
+def double (n : Nat) : Nat := n + n
+
+theorem double_eq (n : Nat) : double n = 2 * n := by
+  unfold double; omega
+
+structure Range where
+  lo : Nat
+  hi : Nat
+  ok : lo ≤ hi
+
+def Range.width (r : Range) : Nat := r.hi - r.lo
+""")
+#+end_src
+
+=double_eq= unfolds the definition of =double= and proves the equation with [[https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#omega][omega]], a tactic that solves linear arithmetic over natural numbers and integers.
+=lean-py sync= imports the modules of the package and collects the =lean(...)= blocks, checks the proofs with =lake build=, and if the check passes, converts the Lean code in the blocks to Python and writes it to =demo/_lean/=.
+
+#+begin_src console
+$ lean-py sync --package demo
+lean-py: 1 blocks of demo checked and generated
+#+end_src
+
+=lean(...)= returns the generated module, so you call the functions in the block as Python functions.
+
+#+begin_src python
+from demo.arith import arith
+
+print(arith.double(21))
+print(arith.double(2**70))
+r = arith.Range(lo=3, hi=10)
+print(arith.Range.width(r))
+print(r.model_dump_json())
+#+end_src
+
+#+begin_src text
+42
+2361183241434822606848
+7
+{"lo":3,"hi":10}
+#+end_src
+
+Lean's =Nat= becomes a Python =int=, so you can pass a large number such as =2**70= as it is.
+The structure =Range= becomes a pydantic model.
+
+A failing proof makes =lean-py sync= fail, so if you change the right-hand side of the theorem to =3 * n=, you get this error.
+
+#+begin_src text
+lean-py: /path/to/demo/arith.py:7: error: (lean block arith, Lean 5:17) omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  a ≥ 1
+where
+ a := ↑n
+lean-py: lake build failed
+#+end_src
+
+=arith.py:7= is the line with =omega=, because lean-py maps the line that Lean reports to the line in the Python file.
+
+=lean-py sync= needs =lake= and the =lean-python= CLI, but the generated =_lean/= holds plain Python files, so if you commit =_lean/= to the repository, the package runs on machines without Lean.
+In return, =lean(...)= compares the hash of the block source with =_lean/blocks.json= at run time, so if you change a block and forget to run =lean-py sync=, the import stops with this error.
+
+#+begin_src text
+lean_python.embed.LeanBlockStale: the Lean block 'arith' of demo.arith has changed since `lean-py sync` generated it; run `lean-py sync` (or set LEAN_PYTHON_AUTO_SYNC=1)
+#+end_src
+
+** Lean types become pydantic models
+Lean types map to Python types as follows.
+
+| Lean                                               | Python                                               |
+|----------------------------------------------------+------------------------------------------------------|
+| =Nat=                                              | =Annotated[int, Ge(0)]=                              |
+| =Int=                                              | =int=                                                |
+| =String=                                           | =str=                                                |
+| =List α=, =Array α=                                | =list[T]=                                            |
+| =Option α=                                         | =T= or =None=                                        |
+| structure                                          | frozen, strict pydantic model                        |
+| inductive with only constructors without arguments | =enum.StrEnum=                                       |
+| other inductive types                              | a model for each constructor, and their parent class |
+| =IO α=                                             | returns =T=, and raises =IO.Error= as =OSError=      |
+
+The structure =Range= has a field =ok= that holds a proof of =lo ≤ hi=.
+A proof doesn't become a Python value, but lean-py builds a Lean function that decides this proposition, converts it to Python, and uses it as a validator of the model, so if you try to create a value that breaks the proposition, pydantic raises =ValidationError=.
+
+#+begin_src text
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Range
+  Value error, ok: lo ≤ hi does not hold [type=value_error, input_value={'lo': 10, 'hi': 3}, input_type=dict]
+#+end_src
+
+Every value passed to a Lean function goes through this check, and lean-py checks a value built with =model_construct=, which skips the check, once more before it passes the value to Lean, so a Lean proof that assumes =ok= holds for values from Python as well.
+A comparison with a constant such as =p ≤ 100= also becomes pydantic's =Le(100)=, and appears as =maximum= in the JSON Schema.
+
+The JSON of a model has the same shape as Lean's =deriving ToJson, FromJson=, so for an inductive type, a constructor without arguments is ="dot"=, and a constructor with arguments is ={"rect": {"width": 1, "height": 2}}=.
+I check in tests that this JSON matches the output of Lean's =toJson=.
+
+You can also use a pydantic model you wrote as a Lean structure, and when you write ~lean(..., models=[LineItem])~, lean-py builds a Lean structure from the model for the block to use.
+
+#+begin_src python
+class LineItem(BaseModel):
+    sku: str = Field(min_length=1)
+    qty: int = Field(ge=1)
+    unitPrice: int = Field(ge=0)
+#+end_src
+
+This model becomes the following Lean structure.
+
+#+begin_src lean
+structure LeanPythonModels.pricing.models.LineItem where
+  sku : String
+  sku_min_length : 1 ≤ sku.length
+  qty : Nat
+  qty_ge : 1 ≤ qty
+  unitPrice : Nat
+#+end_src
+
+The =Field= constraints become fields that hold proofs, so a Lean proof can use =1 ≤ qty= as a premise.
+An =int= with a lower bound of 0 or more becomes Lean's =Nat=.
+
+The next example uses =LineItem= and the Lean inductive type =Discount= as FastAPI request types, and comes from the sample [[https://github.com/conao3/lean-py/tree/master/samples/pricing-api][pricing-api]].
+
+#+begin_src python
+pricing = lean("pricing", r"""
+inductive Discount where
+  | none
+  | percent (p : Nat) (h : p ≤ 100)
+  | fixed (amount : Nat)
+
+def subtotal (items : List LineItem) : Nat :=
+  items.foldl (fun acc i => acc + i.qty * i.unitPrice) 0
+
+def total (items : List LineItem) (d : Discount) : Nat :=
+  match d with
+  | .none => subtotal items
+  | .percent p _ => subtotal items - subtotal items * p / 100
+  | .fixed a => subtotal items - a
+
+theorem total_le (items : List LineItem) (d : Discount) : total items d ≤ subtotal items := by
+  unfold total; split <;> omega
+""", models=[LineItem])
+
+app = FastAPI()
+
+@app.post("/total")
+def post_total(items: list[LineItem], discount: pricing.Discount) -> int:
+    return pricing.total(items, discount)
+#+end_src
+
+=total_le= states that for any discount, the total is at most the subtotal.
+Here are the results of sending an order of 3 apples at a unit price of 120 and 1 pear at 200, with different discounts.
+
+#+begin_src text
+"none" 200 560
+{"percent": {"p": 25}} 200 420
+{"fixed": {"amount": 1000}} 200 0
+{"percent": {"p": 150}} 422 Input should be less than or equal to 100
+qty 0 422
+#+end_src
+
+FastAPI returns 422 for the discount with =p= over 100 and for the order with a =qty= of 0, and the OpenAPI schema shows the three constructors of =Discount= and the upper bound of =p=.
+
+** Prove Python functions in Lean
+The third use writes the implementation in Python and proves its properties in Lean.
+You write the spec in a Lean block, and connect it to the Python function with =@model=.
+
+#+begin_src python
+from lean_python import lean
+from lean_python.verify import model
+
+spec = lean("spec", r"""
+def clampSpec (x lo hi : Int) : Int := max lo (min hi x)
+def ordered (_x lo hi : Int) : Bool := lo ≤ hi
+def inRange (_x lo hi : Int) (r : Int) : Bool := lo ≤ r && r ≤ hi
+""")
+
+@model(refines=spec.clampSpec, requires=spec.ordered, ensures={"in_range": spec.inRange})
+def clamp(x: int, lo: int, hi: int) -> int:
+    if x < lo:
+        return lo
+    if x > hi:
+        return hi
+    return x
+#+end_src
+
+=refines= claims that =clamp= returns the same value as =clampSpec= for every input, =requires= is the precondition, and =ensures= is a condition on the result.
+=@model= returns the function unchanged, so =clamp= runs as a plain Python function.
+The proofs are about the Lean function that lean-py translates from the Python function, and whether that Lean function computes the same thing as running the Python depends on the lean-py translation being correct.
+The proofs cover the value that the function returns, and don't show that a =while= loop terminates.
+
+=lean-py check= translates the function into Lean's =do= notation and builds a proposition to prove for each claim, and Lean's =do= notation has reassignment of variables, =for=, =while=, and early =return=, so Python statements map almost one to one.
+
+#+begin_src lean
+def LeanPythonModel.«calc».«calc».clamp (x : Int) (lo : Int) (hi : Int) : Int := Id.run do
+  if ((decide (x < lo))) then
+    return lo
+  if ((decide (x > hi))) then
+    return hi
+  return x
+#+end_src
+
+With the first part of the names left out, the proposition built from =refines= is this.
+
+#+begin_src lean
+abbrev clamp.obligation.refines : Prop :=
+  ∀ (x : Int) (lo : Int) (hi : Int), ordered x lo hi = true → clamp x lo hi = clampSpec x lo hi
+#+end_src
+
+Python's =int= becomes Lean's =Int=, and a function with operations that raise exceptions, such as indexing, =//=, and =%=, becomes a Lean function that returns =Except=.
+=//= rounds toward negative infinity as in Python, and negative indexes work too.
+
+You write the proofs in Lean in =lean/Proofs/=, next to =pyproject.toml=.
+
+#+begin_src lean
+import LeanPythonModel.calc.calc
+
+open LeanPythonEmbed.calc.spec.spec
+
+namespace LeanPythonModel.«calc».«calc»
+
+theorem clamp.proof.refines : clamp.obligation.refines := by
+  intro x lo hi h
+  simp only [ordered, decide_eq_true_eq] at h
+  simp only [clamp, clampSpec]
+  split <;> (try split) <;> simp_all <;> omega
+#+end_src
+
+When you run =lean-py check=, it shows the state of the proof for each claim.
+The package =calc= that the repository tests use has =clamp=, =first_or=, which returns the head of a list, and =sum_abs=, which returns the sum of absolute values.
+
+#+begin_src console
+$ lean-py check --package calc
+lean-py: 1 blocks of calc checked and generated
+proved     calc.calc:clamp refines
+proved     calc.calc:clamp in_range
+proved     calc.calc:first_or refines
+proved     calc.calc:sum_abs nonneg
+sorry      calc.calc:sum_to refines
+missing    calc.calc:sum_to returns_nat
+#+end_src
+
+=proved= means the proof passed, =sorry= means the proof still contains =sorry=, and =missing= means there is no proof, and the state is =mismatch= when the statement of the theorem doesn't match the proposition, and =failed= when the proof file doesn't build.
+With =--require proved=, the command fails unless every claim is =proved=, so you can use it in CI.
+
+=sum_abs= is a function with a =for= loop, and its proof rewrites the loop as a =foldl= over the list and proceeds by induction on the list.
+
+lean-py records the results in =lean-python.lock= with the hashes of the function sources, and =lean-py status= reads this file without Lean and marks a function whose source changed after the proof as =stale=.
+
+You can also test against the same spec before you write proofs.
+=check_model= generates values with Hypothesis from the type annotations of the arguments, and checks =refines= and =ensures= on inputs that satisfy =requires=.
+
+The spec =clampSpec= is also a Python function converted from Lean, so the tests use the same calculation as the one you prove in Lean, and they find a counterexample for an implementation that forgets to cap the value at =hi=.
+
+#+begin_src python
+@model(refines=spec.clampSpec, requires=spec.ordered)
+def bad_clamp(x: int, lo: int, hi: int) -> int:
+    return max(lo, x)
+
+check_model(bad_clamp)
+#+end_src
+
+#+begin_src text
+lean_python.verify.PropertyFailure: bad_clamp(1, 0, 0) = 1, the spec gives 0
+#+end_src
+
+** How it works
+lean-py reads the last intermediate representation that the Lean compiler produces, and writes a Python function for each function.
+This intermediate representation includes increments and decrements of reference counts, and instructions to reuse an object that has only one reference.
+
+I gave the Python runtime library reference counts too, so appending to and updating an array happen in place when the array has one reference, and a loop that appends elements to an =Array= runs in time proportional to the number of elements, as it does when compiled to C.
+
+I wrote the Lean built-in functions in Python to behave the same as in [[https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h][lean.h]] of the Lean C runtime.
+A test runs the same Lean program compiled to C and converted to Python, and the standard output and standard error of the two match to the character.
+
+It runs from several times to a hundred times slower than the C build, and the measurements are in [[https://github.com/conao3/lean-py/tree/v0.2.0#performance][Performance in the README]].
+
+** Wrapping up
+I made it possible to write Python functions in Lean, to turn Lean types into pydantic models, and to prove Python functions in Lean.
+[[https://github.com/conao3/lean-py/tree/master/samples][samples]] has samples that let you try the uses one at a time.
+
 * Leanで仕様に厳格なLSPのクライアントとサーバーを作り、既存のOSSに仕様違反を見つけた
 :properties:
 :export_file_name: generated/contents/blog/2026/ccc5ed
@@ -20637,6 +20965,138 @@ proxyを起動するコマンドを言語サーバーのコマンドとしてエ
 
 =--server-command-args= のあとには本来の言語サーバーのコマンドを書き、 =--web-ui-port= を付けると、通信をその場で表示するweb UIのURLを標準エラーに出します。
 lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の詳細は[[https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/editors.md][docs/editors.md]]にあります。
+
+* lsp-touchstone: a strict LSP client and server, with parts proved in Lean 4, that finds spec violations in editors and rust-analyzer
+:properties:
+:export_file_name: generated/contents/blog/2026/45f8b5
+:export_date: 2026-11-28 08:50
+:export_updated: 2026-11-28 08:50
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/ccc5ed
+:export_tags: lean rust lsp formal-verification testing release rust-lsp-touchstone
+:end:
+
+Editors and language servers talk to each other over the Language Server Protocol, or LSP for short.
+I use many editors and language servers, and each of them seemed to miss small details of the spec, but LSP has no official conformance test, and I found tools that check parts of a server but none that check a client.
+
+So I built a client and a server that follow the spec strictly, and they judge whether the messages they exchange follow the spec.
+I wrote the three parts of the checks where a calculation is easy to get wrong in Lean 4, proved their properties, and turned them into Rust with [[https://s.conao3.com/blog/2026/1ff994][lean-rs]].
+When I connected it to five editors and rust-analyzer, lsp-mode, Neovim, VS Code, and rust-analyzer did things the spec forbids, and eglot and Helix did things that people read the spec differently on.
+
+The tool is lsp-touchstone, the repository is [[https://github.com/conao3/rust-lsp-touchstone][conao3/rust-lsp-touchstone]], and the license is Apache-2.0.
+The results in this post come from version 0.1.0.
+
+[[github:conao3/rust-lsp-touchstone::Rust][A strict LSP client, server and checking proxy for testing Language Server Protocol implementations]]
+
+** What I built
+lsp-touchstone runs in three modes.
+
+[[./resources/public/img/ccc5ed-modes.svg]]
+
+- client starts a language server from a web UI in the browser, and you send requests and notifications by hand.
+- proxy sits between the editor and the language server, and checks every message as it relays it.
+- server runs as the editor's language server, and sends the requests and notifications that the spec gives a server, one after another.
+
+All three modes use the same checks.
+A capability is a feature that the client or the server declares at initialization as one it can handle.
+lsp-touchstone reads the types for the checks, and the capability that each method belongs to, from [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#metaModel][metaModel.json]], the meta model of the LSP 3.18 spec.
+There are 80 kinds of findings, listed in [[https://github.com/conao3/rust-lsp-touchstone/blob/89ca481/docs/rules.md][docs/rules.md]], and a finding is an error when the spec forbids the behavior, and a warning when the spec allows it but implementations read it differently.
+
+** The parts proved in Lean
+If the checker is wrong, you can't trust its findings either, so I wrote the three parts where a calculation is easy to get wrong in Lean and proved their properties.
+
+- LSP gives a position as a line and a character offset, and the two sides agree at initialization on whether to count characters in UTF-8, UTF-16, or UTF-32 units. =😀= counts as 1 in UTF-32, 2 in UTF-16, and 4 in UTF-8. For the conversions between units, I proved that a round trip gives back the original position, and that the conversion can tell when a position points into the middle of a character.
+- The calculation that applies a change from =didChange= to the local copy of the document by replacing a range. I proved that the text before and after the range stays, that the new string goes in at that position, and that the length comes out as expected.
+- The transitions of the progress state. The server sends progress as =begin=, some number of =report=, and =end=, in that order.
+
+Here is the progress part, without the definitions of the types =TokenState= and =ProgressKind= and the other theorems.
+When you build, Lean checks the proofs of the code in =lean!=, and lean-rs turns the code into Rust functions.
+
+#+begin_src rust
+lean_rust::lean! {
+    pub mod proved;
+    r#"
+    def step : TokenState → ProgressKind → Option TokenState
+      | .created, .begin => some .begun
+      | .begun, .report => some .begun
+      | .begun, .finish => some .ended
+      | _, _ => none
+
+    theorem ended_accepts_nothing (k : ProgressKind) : step .ended k = none := by
+      cases k <;> rfl
+    "#
+}
+#+end_src
+
+=ended_accepts_nothing= states that the state after =end= accepts no kind of progress.
+The proxy calls this =step= on every progress notification, and reports a violation when it returns =none=.
+
+** Spec violations I found
+=make check-editors= drives eglot, lsp-mode, Neovim, Helix, and VS Code with no human input.
+It connects each editor to the lsp-touchstone server, and separately to rust-analyzer through the proxy, then runs hover, completion, go to definition, typing one line, an edit from a code action, save, and exit, in that order.
+The editors and rust-analyzer come from nixpkgs, at these versions.
+
+- Emacs 31.1, eglot 1.24.31, lsp-mode 20261020.1728
+- Neovim 0.12.6
+- Helix 25.07.1
+- =vscode-languageclient= 11.0.0, the client library of VS Code. I ran it in VSCodium 1.143.17183, which builds VS Code from source and distributes it.
+- rust-analyzer 2026-11-02
+
+*** Shutdown
+In LSP, the client sends =shutdown=, waits for the response, and then sends =exit=.
+The [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#shutdown][spec]] says that once the client has sent =shutdown=, it must not send any request or notification other than =exit=.
+
+#+begin_quote
+Clients must not send any requests or notifications other than =exit= to a server to which they have sent a shutdown request. Clients should also wait with sending the =exit= notification until they have received a response from the =shutdown= request.
+#+end_quote
+
+The six implementations each step out of this sequence in a different way, and the findings for eglot and Helix are warnings, while those for the other four are errors.
+"In some runs" marks behavior that showed up in only some of several runs.
+
+- eglot sends =exit= with ="params": {}=. The [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#exit][exit notification in the spec]] has no params, so lsp-touchstone reports a warning.
+- lsp-mode ends the server process without sending =exit=, and in some runs sends =exit= with ="params": null=. [[https://www.jsonrpc.org/specification#parameter_structures][JSON-RPC 2.0]] says "If present, parameters for the rpc call MUST be provided as a Structured value. Either by-position through an Array or by-name through an Object.", and =null= doesn't meet that rule.
+- Neovim, connected to rust-analyzer, sends a =textDocument/semanticTokens= request after =shutdown= in some runs.
+- The VS Code client sends =$/cancelRequest= after =shutdown= in some runs.
+- Helix ends the server process before =exit= arrives in some runs.
+- rust-analyzer answers =shutdown= and exits while requests from the client are still unanswered.
+
+*** Undeclared capabilities
+In LSP, the client and the server declare the features they can handle as capabilities in =initialize=, so if you send a request for a feature the other side hasn't declared, the other side may not handle it.
+
+If you start rust-analyzer from the client web UI, initialize it, and open one file, you get this finding.
+
+[[./resources/public/img/ccc5ed-finding.png]]
+
+rust-analyzer sends a =workspace/diagnostic/refresh= request, but the [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#diagnostic_refresh][spec]] ties this request to the client capability =workspace.diagnostics.refreshSupport=, and the lsp-touchstone client doesn't declare it.
+
+rust-analyzer sent this request with each of the five editors, and none of the five declare =refreshSupport=, yet eglot, lsp-mode, Neovim, and VS Code answered with success, ="result": null=.
+Helix answered with a "method not found" error, and rust-analyzer kept running.
+
+*** Other behavior
+- rust-analyzer can start sending progress on a token before it receives the response to [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#window_workDoneProgress_create][window/workDoneProgress/create]]. The spec forbids progress on that token when the response is an error, so a server that sends without waiting breaks the spec whenever an error comes back.
+- When Emacs renames the file to the backup =main.rs~= on the first save, lsp-mode sends =workspace/willRenameFiles= to the server.
+- The server picks the unit for counting positions from the ones the client offers, preferring =utf-32=, then =utf-8=, then =utf-16=. With eglot, lsp-mode, Neovim, and Helix it picks =utf-32=, and the VS Code client offers only =utf-16=.
+
+*** What worked
+The server sends an edit to the editor with =workspace/applyEdit= from a code action, rebuilds the document from the =didChange= notifications that the editor sends back, and checks that the result matches the document with the edit applied.
+All five editors applied this edit right.
+
+When a feature shows its result on screen, like applying an edit, users notice at once if it goes wrong, but every violation I found happened while the editor was closing, or in exchanges that show nothing on screen.
+Real editors and language servers keep going when they receive a message that breaks the spec, so the side that broke it gets no signal back, and I think finding those violations takes a peer that reports each one.
+
+** How to use it
+You give the editor the command that starts the proxy as its language server command, so with eglot you write this.
+
+#+begin_src elisp
+(add-to-list 'eglot-server-programs
+             '(rust-ts-mode . ("lsp-touchstone" "proxy" "run-proxy"
+                               "--web-ui-port" "4318"
+                               "--server-command-args" "rust-analyzer")))
+#+end_src
+
+After =--server-command-args=, write the command of the real language server, and with =--web-ui-port=, lsp-touchstone prints to standard error the URL of a web UI that shows the traffic as it happens.
+[[https://github.com/conao3/rust-lsp-touchstone/blob/master/docs/editors.md][docs/editors.md]] has the settings for lsp-mode, Neovim, Helix, and VS Code, and the detailed results for each editor.
 * CPython 3.15.2にPEP 638の構文マクロを実装した
 :properties:
 :export_file_name: generated/contents/blog/2026/f4154e
