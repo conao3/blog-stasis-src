@@ -32,10 +32,11 @@ Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github
 
 # Emacs Lispでasync/awaitを書く
 
-vowは `package-vc-install` でGitHubから入れます。
+leafの `:vc` を使うと、GitHubにあるvowを入れられます。
 
 ```emacs-lisp
-(package-vc-install "https://github.com/conao3/vow.el")
+(leaf vow
+  :vc (:url "https://github.com/conao3/vow.el"))
 ```
 
 外部のコマンドの出力を待つ例を書いてみます。
