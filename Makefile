@@ -33,3 +33,7 @@ oss-map:
 .PHONY: rhythm
 rhythm:
 	node scripts/rhythm.mjs $(ID)
+
+.PHONY: check-images
+check-images:
+	node scripts/check-images.mjs
