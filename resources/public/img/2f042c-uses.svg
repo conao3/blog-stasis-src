@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="450" viewBox="0 0 1000 450" font-family="sans-serif" role="img" aria-labelledby="title desc">
+  <title id="title">Lean 4とCの間でleanfranを使う</title>
+  <desc id="desc">Lean 4からCへ関数と型を生成し、CからLean 4へ構造体と関数を翻訳します。翻訳した関数の性質はLean 4で証明します。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect width="1000" height="450" rx="16" fill="#fff"/>
+  <rect x="30" y="40" width="170" height="370" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <rect x="800" y="40" width="170" height="370" rx="12" fill="#e3f4f8" stroke="#007d9c" stroke-width="2"/>
+  <rect x="415" y="40" width="170" height="44" rx="9" fill="#f2f4f7" stroke="#687585" stroke-width="2"/>
+  <g font-size="26" font-weight="bold" text-anchor="middle">
+    <text x="115" y="233" fill="#0f4c81">Lean 4</text>
+    <text x="885" y="233" fill="#007d9c">C</text>
+    <text x="500" y="71" fill="#333">leanfran</text>
+  </g>
+  <g stroke="#333" stroke-width="2.5" marker-end="url(#arrow)">
+    <line x1="205" y1="139" x2="795" y2="139"/>
+    <line x1="205" y1="216" x2="795" y2="216"/>
+    <line x1="795" y1="293" x2="205" y2="293"/>
+    <line x1="795" y1="370" x2="205" y2="370"/>
+  </g>
+  <g font-size="19" text-anchor="middle" fill="#222">
+    <text x="500" y="125">証明したLeanの関数をCから呼べる形にする</text>
+    <text x="500" y="202">Leanの型からCの構造体やenumを生成する</text>
+    <text x="500" y="279">LF_STRUCTを付けたCの構造体をLeanの型にする</text>
+    <text x="500" y="356">LF_MODELを付けたCの関数をLeanに訳して証明する</text>
+  </g>
+</svg>
