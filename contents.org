@@ -19719,6 +19719,308 @@ Leanの証明が保証するのはLeanの定義までで、生成したRustが�
 
 Issue / PR大歓迎です。
 
+* lean-rs: call Lean 4 functions from Rust, and prove Rust functions in Lean
+:properties:
+:export_file_name: generated/contents/blog/2026/1ff994
+:export_date: 2026-11-28 08:40
+:export_updated: 2026-11-28 08:40
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/b43a06
+:export_tags: lean rust formal-verification code-generation property-based-testing cargo release lean-rs
+:end:
+
+I wrote lean-rs, a library that lets you call functions written and proved in Lean 4 from Rust.
+It also works in the other direction, so you can prove properties of Rust functions in Lean.
+
+The repository is [[https://github.com/conao3/lean-rs][conao3/lean-rs]], under Apache-2.0.
+The crate is on crates.io as =lean-rust=, and this post shows results from version 0.2.1.
+lean-rs is now the Rust backend of [[https://s.conao3.com/blog/2026/23d62c][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Rust][langs/Rust/ of conao3/lean-leanfran]], with the crate name =leanfran=.
+
+lean-rs compiles the intermediate representation of the Lean compiler to Rust source, so cargo alone builds the generated Rust, with no Lean toolchain and no Lean C runtime.
+[[https://s.conao3.com/blog/2026/311be4][lean-clj]], which I introduced earlier, calls Lean functions from Clojure, and lean-rs brings the same mechanism to Rust.
+
+[[github:conao3/lean-rs::Rust][Lean 4 to Rust: run Lean functions from Rust, embed Lean in Rust with lean!, and verify Rust functions in Lean on top of Aeneas]]
+
+** Three ways to use it
+lean-rs supports three uses.
+
+[[./resources/public/img/b43a06-uses.svg]]
+
+1. Write functions and theorems in Lean inside a Rust file with the =lean!= macro, and call them from Rust.
+2. Compile an existing project of lake, the Lean build tool, to a set of Rust modules with the CLI.
+3. Translate a Rust function into Lean with =#[lean_rust::model]= and =cargo lean-rust=, and prove its properties.
+
+The first two go from Lean to Rust, and the third goes from Rust to Lean.
+
+** Write Rust functions in Lean
+First, add two crates to =Cargo.toml=, and call =lean-rust-build= from =build.rs=.
+
+#+begin_src toml
+[dependencies]
+lean-rust = "0.2.1"
+
+[build-dependencies]
+lean-rust-build = "0.2.1"
+#+end_src
+
+#+begin_src rust
+// build.rs
+fn main() {
+    lean_rust_build::Builder::new().compile().unwrap();
+}
+#+end_src
+
+The first build needs =lake= from Lean 4.35.0 and the =lean-rust= CLI on your =PATH=.
+You install =lake= with elan, the Lean toolchain installer, and the CLI with nix.
+
+#+begin_src console
+$ nix profile install github:conao3/lean-leanfran/v0.2.1#lean-rust
+#+end_src
+
+Inside a =lean!= block, you write the Lean source as a string.
+
+#+begin_src rust
+lean_rust::lean! {
+    pub mod arith;
+    r#"
+    def double (n : Nat) : Nat := n + n
+
+    theorem double_eq (n : Nat) : double n = 2 * n := by
+      unfold double; omega
+
+    structure Account where
+      owner : String
+      balance : Nat
+    deriving DecidableEq
+
+    def deposit (a : Account) (n : Nat) : Account :=
+      { a with balance := a.balance + n }
+    "#
+}
+
+fn main() {
+    println!("{}", arith::double(21u64.into()));
+    let a = arith::Account { owner: "ann".to_string(), balance: 10u64.into() };
+    println!("{:?}", arith::deposit(a, 5u64.into()));
+}
+#+end_src
+
+=double_eq= unfolds the definition of =double= and proves the equation with [[https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#omega][omega]], a tactic that solves linear arithmetic over natural numbers and integers.
+
+When you run =cargo build=, the build script writes the block out as Lean source and runs =lake build= to check the proof of the theorem, and if the check passes, the functions in the block become Rust functions in the module =arith=.
+Lean's =Nat= becomes the arbitrary-precision =lean_rust::Nat=, and the structure =Account= becomes a Rust struct.
+
+#+begin_src console
+$ cargo run -q
+42
+Account { owner: "ann", balance: 15 }
+#+end_src
+
+A failing proof stops the build, so if you change the right-hand side of the theorem to =3 * n= and build, you get this error.
+
+#+begin_src text
+warning: demo@0.1.0: src/main.rs:7:22: error: omega could not prove the goal:
+warning: demo@0.1.0:   a possible counterexample may satisfy the constraints
+warning: demo@0.1.0:     a ≥ 1
+warning: demo@0.1.0:   where
+warning: demo@0.1.0:    a := ↑n
+error: failed to run custom build command for `demo v0.1.0 (/path/to/demo)`
+#+end_src
+
+=src/main.rs:7:22= is where =omega= appears, because lean-rs maps the line and column that Lean reports to a position in the Rust file.
+
+lean-rs saves the generated Rust code in =.lean-rust/cache/=, and as long as the block stays the same, later builds use it without calling Lean.
+If you commit this cache, the crate builds in CI without Lean, and on the machines of users who fetch it from crates.io.
+
+The =lean!= macro only includes the generated file with =include!=, so Lean doesn't run when rust-analyzer expands the macro.
+
+Lean types map to Rust types as follows.
+
+| Lean                                   | Rust                                                   |
+|----------------------------------------+--------------------------------------------------------|
+| =Nat=, =Int=                           | arbitrary-precision =lean_rust::Nat=, =lean_rust::Int= |
+| =UInt8= to =UInt64=, =Int8= to =Int64= | =u8= to =u64=, =i8= to =i64=                           |
+| =String=                               | =String=                                               |
+| =List α=, =Array α=                    | =Vec<T>=                                               |
+| =Option α=, =Except ε α=               | =Option<T>=, =Result<T, E>=                            |
+| structure, inductive                   | generated =struct=, =enum=                             |
+| =IO α=                                 | =std::io::Result<T>=                                   |
+
+For a function with type parameters, you list the types in the block, as in =rust_instances largest [Nat, String]=, and it becomes a generic Rust function, but Rust can call it only at the types you listed.
+
+** Compile a lake project to Rust modules
+The CLI compiles Lean code written as a lake project to Rust modules.
+The [[https://github.com/conao3/lean-leanfran/tree/v0.2.1/samples/roman-numerals][roman-numerals]] sample writes functions in Lean that convert between integers and Roman numerals, and also proves in Lean that turning any number from 1 to 999 into a Roman numeral and back gives the original number.
+
+#+begin_src lean
+def toRoman (n : Nat) : String := toRomanAux (n + 13) numerals n
+
+def fromRoman (s : String) : Option Nat :=
+  if s.isEmpty then none else fromRomanAux s.toList
+
+theorem roundtrip : ∀ n, n < 1000 → fromRoman (toRoman n) = if n = 0 then none else some n := by
+  decide +kernel
+#+end_src
+
+[[https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#decide][decide]] is a tactic that checks a proposition by computing whether it holds.
+Here the Lean kernel computes each of the 1,000 cases of =n= from 0 to 999, so the theorem says nothing about numbers of 1,000 or more.
+
+=project generate= checks the proofs with =lake build=, then writes a Rust file for each module.
+
+#+begin_src console
+$ lean-rust project generate --lake-dir lean --output-dir src/generated
+#+end_src
+
+Each public Lean function becomes a Rust function with its name in snake_case.
+
+#+begin_src rust
+mod generated;
+use generated::roman;
+
+fn main() {
+    assert_eq!(roman::to_roman(1994u64.into()), "MCMXCIV");
+    assert_eq!(roman::from_roman("MMXXVI"), Some(2026u64.into()));
+    assert_eq!(roman::from_roman("hello"), None);
+}
+#+end_src
+
+The files in =src/generated/= are plain Rust source, so if you commit them, the users of your crate don't need Lean.
+
+** Prove Rust functions in Lean
+The third use writes the implementation in Rust and proves its properties in Lean.
+The translation from Rust to Lean uses [[https://github.com/AeneasVerif/charon][Charon]] and [[https://github.com/AeneasVerif/aeneas][Aeneas]], where Charon extracts the intermediate representation of a function from rustc and Aeneas translates it into a Lean function.
+
+This post calls the Lean function from this translation the model.
+The proofs are about the model, and whether the model computes the same thing as the Rust function depends on Charon and Aeneas translating correctly.
+
+As an example, take =max_u32=, which returns the larger of two =u32= values, and prove that it equals =max= from the spec and that the result is at least as large as both arguments.
+
+You write the specification to prove as Lean functions in a =lean!= block, and this post calls them the spec.
+The spec uses the types of the Aeneas model, so the type for =u32= is =Std.U32=.
+
+#+begin_src rust
+lean_rust::lean! {
+    #[lean(imports = ["Aeneas"])]
+    pub mod bits;
+    r#"
+    open Aeneas Aeneas.Std
+
+    def max (a b : Std.U32) : Std.U32 := if a.val ≤ b.val then b else a
+
+    def max_bound (a b r : Std.U32) : Bool := decide (a.val ≤ r.val ∧ b.val ≤ r.val)
+    "#
+}
+
+#[lean_rust::model(refines = bits::max, ensures(bound = bits::max_bound))]
+pub fn max_u32(a: u32, b: u32) -> u32 {
+    if a <= b { b } else { a }
+}
+#+end_src
+
+=refines = bits::max= claims that =max_u32= returns the same value as =bits::max= for every input, and =ensures(bound = bits::max_bound)= claims that the result satisfies =max_bound=.
+The attribute arguments refer to the spec by its Rust path, so a wrong name or argument type is a compile error.
+
+=cargo lean-rust extract= builds the model with Charon and Aeneas and writes out, for each claim, the Lean proposition to prove, which lean-rs calls an obligation.
+You write the proofs of the obligations in Lean, in =lean/Proofs/= of the crate.
+
+#+begin_src lean
+theorem max_u32.proof.refines : max_u32.obligation.refines := by
+  intro a b
+  unfold max_u32 _root_.bits.max
+  by_cases h : a.val ≤ b.val <;> simp [UScalar.le_equiv, h]
+#+end_src
+
+=cargo lean-rust check= checks the proofs and records the state of each obligation in =lean-rust.lock=, and =cargo lean-rust status= lists those states.
+The [[https://github.com/conao3/lean-leanfran/tree/v0.2.1/samples/verified-rust][verified-rust]] sample proves every obligation, including a loop that counts bits and an insertion sort.
+
+#+begin_src console
+$ cargo lean-rust status
+crate::bits::popcount_fast
+  refines  proved    axioms: Classical.choice, Quot.sound, propext
+crate::bits::max_u32
+  refines  proved    axioms: Quot.sound, propext
+  bound    proved    axioms: Classical.choice, Quot.sound, propext
+crate::sort::insert_sorted
+  sorted  proved    axioms: Classical.choice, Quot.sound, propext
+  perm    proved    axioms: Classical.choice, Quot.sound, propext
+#+end_src
+
+After =axioms:= come the axioms that the proof uses, and the three standard axioms of Lean are Classical.choice, Quot.sound, and propext.
+An obligation whose proof you skip with =sorry= shows =sorry= in place of =proved=, and one that uses an axiom outside the standard three shows =axioms=.
+
+*** Everyday builds need neither Lean nor nightly Rust
+Charon runs on a fixed version of nightly Rust, but only =cargo lean-rust extract= calls Charon, so the everyday =cargo build= runs on stable Rust.
+During that build, the build script compares =lean-rust.lock= with the current source to check whether a function has changed since =cargo lean-rust extract= built the model, so if you change =<== to =<= in =max_u32= and build, you get a warning that the proofs are stale.
+
+#+begin_src text
+warning: verified-rust@0.1.0: lean-rust: crate::bits::max_u32: 2 obligations are stale (crate::bits::max_u32 changed since `cargo lean-rust extract`)
+#+end_src
+
+If you write =require = "proved"= under =[package.metadata.lean-rust]= in =Cargo.toml=, the build fails while any obligation is unproved.
+The environment variable =LEAN_RUST_REQUIRE=proved= does the same, so use it when you want to require proofs only in CI.
+
+*** Find mistakes with tests before writing proofs
+=#[lean_rust::model]= generates a test that calls the Rust function and the spec on inputs from proptest and compares the results.
+The spec is the Lean function compiled to Rust, so the tests and the proofs use the same definition.
+
+For example, if you change =max_u32= to return the smaller value and run =cargo test=, it fails like this.
+
+#+begin_src text
+Test failed: the function returned 0, and the spec bits::max returned 1 at samples/verified-rust/src/bits.rs:17.
+minimal failing input: __args = (
+    0,
+    1,
+)
+#+end_src
+
+The message shows the value that the function returned, the value that the spec returned, and the smallest input where they differ.
+
+*** Call the proved Rust implementation from Lean
+In Lean, if you put =@[csimp]= on a theorem that two functions are equal, the compiler can replace calls to one with calls to the other.
+So I made =cargo lean-rust check= write out this =@[csimp]= lemma once the proof of =refines= passes, except for functions with =requires=, which states preconditions on the arguments.
+
+lean-rs uses this lemma to replace =bits::max= from the spec with the Rust =max_u32=, so when Lean code calls =max=, the Rust function runs.
+You can write a readable spec in Lean and a fast implementation in Rust, prove that they are equal, and then swap one for the other.
+
+** How it works
+The Rust that lean-rs generates is a direct transcription of the C code from the Lean C backend, and the runtime crate =lean-rust-runtime= implements the object layout and reference counting in Rust in the same form as [[https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h][lean.h]].
+The generated code updates a value whose reference count is 1 in place instead of copying it, so operations such as =Array= updates perform as they do in the C backend.
+
+The generated code for =deposit= also has a branch that checks with [[https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h#L759][lean_is_exclusive]] whether the reference count of =Account= is 1, and if it is, updates the same object.
+
+#+begin_src rust
+x_3 = rt::lean_ctor_get(x_1, 0);
+x_4 = rt::lean_ctor_get(x_1, 1);
+x_12 = (!rt::lean_is_exclusive(x_1)) as u8;
+#+end_src
+
+The C backend writes the points where branches meet and self tail calls in a function with =goto=, and Rust has no =goto=, so lean-rs puts the body of the function in a =match= inside a =loop=.
+It sets the number of the target basic block and runs =continue= in place of each =goto=.
+
+Another way to call Lean functions from Rust is to link the output of the C backend with the Lean runtime and call it through FFI.
+[[https://crates.io/crates/lean-sys][lean-sys]] and similar crates take this way and need the Lean toolchain both to build and to run, while lean-rs reimplements the runtime in Rust, so it links no C library and runs on Rust crates alone.
+
+The internal functions of the generated code are =unsafe=, and the public functions are safe functions that take and return Rust values.
+
+=IO= covers the same ground as the C runtime, including files, directories, environment variables, and child processes, and an OS error becomes an =IO.Error= with the same message as in the C runtime.
+
+Tests check that the Rust from lean-rs prints the same output as the program that the Lean C backend builds.
+I wrote Lean code that uses integers, floating-point numbers, strings, lists, arrays, closures, and =IO= on files and child processes, and CI runs it through both lean-rs and the C backend and checks that standard output and standard error match to the character.
+The Lean proofs cover the Lean definitions only, and whether the generated Rust computes the same thing depends on the lean-rs translation and runtime being correct.
+
+** What lean-rs does not do
+- Reference counting isn't atomic.
+- =Task= doesn't start a separate thread, and runs synchronously where you create it.
+- The runtime builds only on Linux and macOS.
+- =#[lean_rust::model]= verifies only Rust that Aeneas can handle. It can't verify functions with =unsafe=, interior mutability, or concurrency.
+- When two modules use the same Lean type, you get two separate Rust types. To share a type, connect the blocks with =uses=.
+
+** Wrapping up
+[[https://github.com/conao3/lean-leanfran/tree/v0.2.1/samples/steps][samples/steps]] has a 17-step sample that lets you try the features one at a time, from a first =lean!= block to verifying a generic function.
+
+I welcome issues and pull requests.
+
 * Leanで証明した日付と税計算を、RustのcrateとWebページにした
 :properties:
 :export_file_name: generated/contents/blog/2026/c4f11a
@@ -19799,6 +20101,90 @@ lean-rsのruntimeはWebAssemblyでも動き、ファイル操作のようにIO�
 
 Rustのコードを作るときはlean-ritsuryoの証明も含めてLeanのパッケージをビルドするので、証明が通らない計算はRustのコードになりません。
 ただ、証明が保証してくれるのはLeanの定義までで、Rustのコードが同じ計算をすることはlean-rsの変換が正しいことに頼っています。
+
+* rust-ritsuryo: Japanese date and tax calculations proved in Lean 4, as a Rust crate and a web page
+:properties:
+:export_file_name: generated/contents/blog/2026/c37a82
+:export_date: 2026-11-28 08:40
+:export_updated: 2026-11-28 08:40
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/c4f11a
+:export_tags: lean rust formal-verification tax release rust-ritsuryo lean-ritsuryo lean-rs
+:end:
+
+[[https://s.conao3.com/blog/2026/232531][lean-ritsuryo]] is a library that computes the periods and tax amounts set by Japanese law in Lean 4, with proofs that the calculations match a specification transcribed from the statutes.
+I compiled it to Rust with [[https://s.conao3.com/blog/2026/1ff994][lean-rs]] and turned it into a Rust crate and a web page that does the calculations in the browser alone.
+
+The repository is [[https://github.com/conao3/rust-ritsuryo][conao3/rust-ritsuryo]], under Apache-2.0, and the crate is on [[https://crates.io/crates/ritsuryo][crates.io]] as =ritsuryo=.
+
+[[github:conao3/rust-ritsuryo::Rust][Japanese statutory periods and taxes for Rust and the browser, compiled from proved Lean 4 code with lean-rs]]
+
+** Calculate in the browser
+The web page is at this URL.
+
+https://conao3.github.io/rust-ritsuryo/
+
+[[./resources/public/img/c4f11a-page.png]]
+
+The form offers the same calculations as the lean-ritsuryo CLI, such as the end date of a period, public holidays, income tax, inheritance tax, and consumption tax.
+
+The image above shows the income tax for 2025 on a total taxable income of 5,000,000 yen, and the amount to pay comes to 584,500 yen.
+That amount is the income tax of 572,500 yen plus 12,022 yen of [[https://laws.e-gov.go.jp/law/423AC0000000117#Mp-Ch_4-Se_2-At_13][special income tax for reconstruction]] (2.1% of the income tax), which makes 584,522 yen, [[https://laws.e-gov.go.jp/law/423AC0000000117#Mp-Ch_4-Se_2-At_24-Pr_2][with the part under 100 yen cut off]].
+The calculation runs inside the browser, so the page sends your input nowhere.
+
+** Call it from Rust
+Add =ritsuryo= to =Cargo.toml=, and you can call the same calculations from Rust.
+
+#+begin_src toml
+[dependencies]
+ritsuryo = "0.1.0"
+serde_json = "1"
+#+end_src
+
+#+begin_src rust
+use serde_json::json;
+
+fn main() {
+    let out = ritsuryo::invoke(
+        "income-tax",
+        "compute-tax",
+        &json!({"TaxYear": 2025, "TaxableIncome": 5_000_000}),
+    )
+    .unwrap();
+    println!("{}", out["Result"]);
+
+    for h in ritsuryo::holiday::holidays(2027).iter().take(3) {
+        println!("{}/{} {}", h.month, h.day, h.name);
+    }
+}
+#+end_src
+
+#+begin_src console
+$ cargo run -q
+{"DefenseTax":0,"IncomeTax":572500,"Payable":584500,"ReconstructionTax":12022,"Total":584522}
+1/1 元日
+1/11 成人の日
+2/11 建国記念の日
+#+end_src
+
+=invoke= takes a CLI subcommand and its parameters as they are, and returns the same JSON that the CLI prints.
+For common calculations such as holidays and income tax, I also added functions that take and return Rust types.
+
+The crate builds with cargo alone, without Lean installed.
+
+** How it works
+[[./resources/public/img/c4f11a-pipeline.svg]]
+
+The input to the translation is a single Lean module that holds only the functions to expose to Rust, and lean-rs turns this module into Rust code together with the lean-ritsuryo functions it calls.
+
+The lean-ritsuryo CLI keeps the parts that handle IO, such as files and standard output, apart from the calculations, and the calculations are functions without IO, so Rust and the browser can call them as they are.
+
+The web page compiles this crate to WebAssembly and calls it from a static page on GitHub Pages.
+The lean-rs runtime also runs on WebAssembly, where operations that use IO, such as file access, return an error, but the lean-ritsuryo calculations use no IO and run unchanged.
+
+Generating the Rust code builds the Lean package, including the lean-ritsuryo proofs, so only calculations whose proofs pass become Rust code.
+The proofs cover the Lean definitions only, though, and whether the Rust code computes the same thing depends on the lean-rs translation being correct.
 
 * Lean 4で証明した関数をPythonから呼べるlean-pyを作った
 :properties:
