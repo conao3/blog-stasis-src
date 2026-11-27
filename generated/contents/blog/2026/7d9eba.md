@@ -13,8 +13,8 @@ Emacs Lispの非同期処理をコールバックの入れ子にせず上から�
 Emacsに同梱されているgenerator.elの上に作ったvowは、関数を `vow-await` の位置で止め、待っているvowが決まったらタイマーから続きを動かします。
 async/awaitで書いた関数はEdebugでステップ実行でき、待つたびに止まった位置から実行が続きます。
 
-リポジトリは [conao3/vow.el](https://github.com/conao3/vow.el) で、ライセンスは [GPL-3.0](https://github.com/conao3/vow.el/blob/ba78fdd/LICENSE) です。
-Emacs 31.1以降で動き、この記事ではmasterの [ba78fdd](https://github.com/conao3/vow.el/commit/ba78fdd) とEmacs 31.1を使いました。
+リポジトリは [conao3/vow.el](https://github.com/conao3/vow.el) で、ライセンスは [GPL-3.0](https://github.com/conao3/vow.el/blob/afb6269/LICENSE) です。
+Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github.com/conao3/vow.el/commit/afb6269) とEmacs 31.1を使いました。
 
 <div class="github-card" data-repo="conao3/vow.el"><a href="https://github.com/conao3/vow.el"><span class="github-card-name"><svg class="github-card-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>conao3/<strong>vow.el</strong></span></span><span class="github-card-description">Promises/A+ and async/await for Emacs Lisp</span><span class="github-card-footer"><span class="github-card-language"><span class="github-card-language-color" style="background-color: #c065db"></span>Emacs Lisp</span><span class="github-card-star"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>Star</span><span class="github-card-star-count" hidden></span></span></span></a></div>
 
@@ -24,6 +24,8 @@ Emacs 31.1以降で動き、この記事ではmasterの [ba78fdd](https://github
 -   [Promises/A+](https://promisesaplus.com) に従うPromiseをvowとして作り、 `vow-then` でつなぐ。
 -   `vow-defun` で定義した関数の中で `vow-await` を使い、vowが決まるのを待つ。
 -   `vow-all` や `vow-race` で複数のvowをまとめて待つ。
+-   `vow-process` で外部のコマンドを動かし、その出力をvowで受け取る。
+-   `vow-async-start` で関数を別のEmacsに動かさせ、重い計算の間もEmacsを止めない。
 -   `vow-using` でバッファやプロセスを束縛し、本体が終わったら後始末をする。
 -   async/awaitで書いた関数をEdebugでステップ実行する。
 
@@ -37,57 +39,39 @@ vowは `package-vc-install` でGitHubから入れます。
 ```
 
 外部のコマンドの出力を待つ例を書いてみます。
-`my-command-output` は `vow-new` でvowを作り、プロセスが終わったら出力で満たして、失敗したらエラーで棄却します。
+
+`vow-process` はコマンドを非同期に動かし、終了コードが0なら標準出力でvowを満たします。
+それ以外のときは `vow-process-failed` のエラーでvowを棄却します。
 
 ```emacs-lisp
 ;;; vow-example.el --- vow example  -*- lexical-binding: t; -*-
 (require 'vow)
 
-(defun my-command-output (program &rest args)
-  "Return a vow for the output of PROGRAM run with ARGS."
-  (vow-new
-   (lambda (resolve reject)
-     (let ((buffer (generate-new-buffer " *my-command*")))
-       (make-process
-        :name program
-        :buffer buffer
-        :command (cons program args)
-        :sentinel
-        (lambda (process _event)
-          (unless (process-live-p process)
-            (let ((output (with-current-buffer buffer
-                            (string-trim (buffer-string))))
-                  (code (process-exit-status process)))
-              (kill-buffer buffer)
-              (if (zerop code)
-                  (funcall resolve output)
-                (funcall reject
-                         (list 'error (format "%s exited with %d"
-                                              program code))))))))))))
-
 (vow-defun my-versions ()
-  (let ((git (vow-await (my-command-output "git" "--version")))
-        (emacs (vow-await (my-command-output "emacs" "--version"))))
-    (format "%s / %s" git (car (split-string emacs "\n")))))
+  (let ((git (vow-await (vow-process "git" "--version")))
+        (emacs (vow-await (vow-process "emacs" "--version"))))
+    (format "%s / %s" (string-trim git) (car (split-string emacs "\n")))))
 
 (vow-defun my-status ()
   (condition-case err
-      (vow-await (my-command-output "git" "no-such-command"))
-    (error (format "failed: %S" err))))
+      (vow-await (vow-process "git" "no-such-command"))
+    (vow-process-failed (format "failed: exit %d" (nth 3 err)))))
 
 (message "%s" (vow-wait (my-versions)))
 (message "%s" (vow-wait (my-status)))
 ```
 
 `my-versions` はgitとemacsのバージョンを順に待って、1つの文字列にします。
-`my-status` は失敗するコマンドを待つので、vowが棄却されたときのエラーが `vow-await` の位置で起き、 `condition-case` がそれを捕まえます。
+
+`my-status` は失敗するコマンドを待つので、棄却されたvowのエラーが `vow-await` の位置で起きます。
+`condition-case` がそのエラーを捕まえて終了コードを取り出します。
 
 `vow-defun` で定義した関数は呼ぶとすぐにvowを返すので、バッチで動かすときは `vow-wait` でvowが決まるまで待って値を受け取ります。
 
 ```sh
 $ emacs --batch -Q -L vow.el -l vow-example.el
 git version 2.56.0 / GNU Emacs 31.1
-failed: (error "git exited with 1")
+failed: exit 1
 ```
 
 2つのコマンドを同時に動かすときは `vow-all` で待ちます。
@@ -95,9 +79,27 @@ failed: (error "git exited with 1")
 ```emacs-lisp
 (vow-defun my-versions-at-once ()
   (pcase-let ((`(,git ,emacs)
-               (vow-await (vow-all (list (my-command-output "git" "--version")
-                                         (my-command-output "emacs" "--version"))))))
-    (format "%s / %s" git (car (split-string emacs "\n")))))
+               (vow-await (vow-all (list (vow-process "git" "--version")
+                                         (vow-process "emacs" "--version"))))))
+    (format "%s / %s" (string-trim git) (car (split-string emacs "\n")))))
+```
+
+コールバックを受け取る関数も `vow-new` で包むとvowを返せます。
+次の `my-fetch` は `url-retrieve` で取ったページの本文でvowを満たします。
+
+```emacs-lisp
+(defun my-fetch (url)
+  "Return a vow for the body of URL."
+  (vow-new
+   (lambda (resolve reject)
+     (url-retrieve url
+                   (lambda (status)
+                     (let ((error (plist-get status :error)))
+                       (if error
+                           (funcall reject error)
+                         (goto-char url-http-end-of-headers)
+                         (funcall resolve (buffer-substring (point) (point-max))))
+                       (kill-buffer)))))))
 ```
 
 
@@ -136,6 +138,63 @@ generator.elは入れ子のlambdaの中までは書き換えないので、 `map
     (vow-await (my-read conn buffer))
     (with-current-buffer buffer (buffer-string))))
 ```
+
+
+# 重い計算を別のEmacsで動かす
+
+待つ相手がプロセスやタイマーなら `vow-await` で待つ間にEmacsが空きます。
+Emacs Lispで書いた重い計算は、vowで包んでも同じEmacsで動くので、その間はEmacsが止まります。
+
+`vow-async-start` は [async](https://github.com/jwiegley/emacs-async) パッケージの `async-start` で別のEmacsを起動して関数を動かします。
+関数が終わるとその値でvowを満たします。
+
+vowは `vow-async-start` を呼んだときだけGNU ELPAのasyncパッケージを読み込むので、ほかの関数には要りません。
+
+300000より小さい素数を2つの子のEmacsで同時に数え、待っている間に親のEmacsのタイマーが何回動くかを調べてみました。
+asyncパッケージは2.0を使い、14コアのマシンで動かしています。
+
+```emacs-lisp
+;;; vow-child-example.el --- vow example  -*- lexical-binding: t; -*-
+(require 'vow)
+
+(defun my-count-primes (n)
+  "Return a vow for the number of primes below N, counted in a child Emacs."
+  (vow-async-start
+   (lambda ()
+     (let ((count 0))
+       (dotimes (i n)
+         (let ((d 2) (prime (> i 1)))
+           (while (and prime (<= (* d d) i))
+             (when (zerop (% i d)) (setq prime nil))
+             (setq d (1+ d)))
+           (when prime (setq count (1+ count)))))
+       count))))
+
+(vow-defun my-primes ()
+  (vow-await (vow-all (list (my-count-primes 300000)
+                            (my-count-primes 300000)))))
+
+(let* ((start (float-time))
+       (ticks 0)
+       (timer (run-at-time 0.1 0.1 (lambda () (setq ticks (1+ ticks))))))
+  (message "%S" (vow-wait (my-primes)))
+  (cancel-timer timer)
+  (message "%.1f seconds, the timer ran %d times" (- (float-time) start) ticks))
+```
+
+```sh
+$ emacs --batch -Q -L vow.el -L async -l vow-child-example.el
+(25997 25997)
+3.4 seconds, the timer ran 33 times
+```
+
+子のEmacsを1つだけ動かしたときも3.4秒だったので、2つの子のEmacsは並列に動いています。
+待っている間も親のタイマーは0.1秒ごとに動いています。
+
+関数とその値は2つのEmacsの間を文字列で行き来するので、印字して読み戻せる値だけを渡せます。
+クロージャーが閉じ込めた変数は値の写しとして子に渡るので、子で変数を書き換えても親には届きません。
+
+外部のコマンドを動かすだけなら、子のEmacsを起動しない `vow-process` を使えば、失敗したときの標準エラー出力も受け取れます。
 
 
 # Edebugでステップ実行する
@@ -228,7 +287,7 @@ vowはECMAScript 2027までのPromiseとasync関数の機能と、stage 3のAwai
 </tbody>
 </table>
 
-すべての対応は [READMEの「ECMAScript correspondence」](https://github.com/conao3/vow.el/blob/ba78fdd/README.org#ecmascript-correspondence) に載せています。
+すべての対応は [READMEの「ECMAScript correspondence」](https://github.com/conao3/vow.el/blob/afb6269/README.org#ecmascript-correspondence) に載せています。
 
 
 # おわりに
