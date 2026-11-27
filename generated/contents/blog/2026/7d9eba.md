@@ -5,13 +5,11 @@ Draft: true
 Tags: emacs emacs-lisp async macro release vow-el
 
 
-JavaScriptのPromiseとasync/awaitをEmacs Lispに写したvowを作りました。
-Emacs Lispの非同期処理をコールバックの入れ子にせず上から下へ書けて、 `vow-await` で待つ間もEmacsは止まりません。
+Emacs Lispの非同期処理をasync/awaitで書けるvowというライブラリを作りました。
+JavaScriptのPromiseとasync/awaitにならった作りで、プロセスやタイマーを待つ処理をコールバックの入れ子にせず、上から順に書けます。
 
-待った処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
-
-Emacsに同梱されているgenerator.elの上に作ったvowは、関数を `vow-await` の位置で止め、待っているvowが決まったらタイマーから続きを動かします。
-async/awaitで書いた関数はEdebugでステップ実行でき、待つたびに止まった位置から実行が続きます。
+`vow-await` で待っている間もEmacsは操作でき、待っていた処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
+async/awaitで書いた関数は、普段の関数と同じようにEdebugでステップ実行できます。
 
 リポジトリは [conao3/vow.el](https://github.com/conao3/vow.el) で、ライセンスは [GPL-3.0](https://github.com/conao3/vow.el/blob/afb6269/LICENSE) です。
 Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github.com/conao3/vow.el/commit/afb6269) とEmacs 31.1を使いました。
