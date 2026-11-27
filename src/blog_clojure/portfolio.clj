@@ -46,6 +46,10 @@
                    "Rust CLI that shares Chrome DevTools Protocol (CDP) sessions across coding agents." nil]
                   ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
                    "Lean 4 library and CLI for Japanese statutory period and tax computations, each proved equal to a specification that follows the statute." nil]
+                  ["leanfran" "https://github.com/conao3/lean-leanfran"
+                   "Write functions and proofs in Lean 4 and generate Rust, Python, TypeScript, Go, and more from them." "51"]
+                  ["leanassay" "https://github.com/conao3/lean-leanassay"
+                   "Checks whether Lean theorems pin down an implementation by running broken implementations against them." "5"]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "Parallel Emacs package manager with async installs." "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
@@ -115,6 +119,10 @@
                    "複数のコーディングエージェントで Chrome DevTools Protocol (CDP) のセッションを共有する Rust 製の CLI。" nil]
                   ["lean-ritsuryo" "https://github.com/conao3/lean-ritsuryo"
                    "日本法の期間計算と税額計算を、条文に沿った仕様と一致する証明を付けて実装した Lean 4 のライブラリと CLI。" nil]
+                  ["leanfran" "https://github.com/conao3/lean-leanfran"
+                   "Lean 4 で書いて証明した関数から、Rust・Python・TypeScript・Go などのコードを生成するツール。" "51"]
+                  ["leanassay" "https://github.com/conao3/lean-leanassay"
+                   "壊した実装を定理にかけて、Lean の定理が実装を決め切っているかを確かめるツール。" "5"]
                   ["feather.el" "https://github.com/conao3/feather.el"
                    "パッケージを並列に非同期でインストールする Emacs のパッケージマネージャ。" "94"]
                   ["seml-mode.el" "https://github.com/conao3/seml-mode.el"
