@@ -24981,54 +24981,64 @@ generator.elは入れ子のlambdaの中までは書き換えないので、 =map
 
 ** 重い計算を別のEmacsで動かす
 
-待つ相手がプロセスやタイマーなら =vow-await= で待つ間にEmacsが空きます。
-Emacs Lispで書いた重い計算は、vowで包んでも同じEmacsで動くので、その間はEmacsが止まります。
+待つ相手がプロセスやタイマーなら、 =vow-await= で待つ間もEmacsは入力を受け付けます。
+Emacs Lispで書いた重い計算はvowで包んでも同じEmacsで動くので、計算が終わるまでEmacsは入力もタイマーも受け付けません。
 
-=vow-async-start= は [[https://github.com/jwiegley/emacs-async][async]] パッケージの =async-start= で別のEmacsを起動して関数を動かします。
-関数が終わるとその値でvowを満たします。
+=vow-async-start= は [[https://github.com/jwiegley/emacs-async][async]] パッケージの =async-start= で子のEmacsを起動します。
+そこで関数を動かして、その値でvowを満たします。
 
 vowは =vow-async-start= を呼んだときだけGNU ELPAのasyncパッケージを読み込むので、ほかの関数には要りません。
 
-300000より小さい素数を2つの子のEmacsで同時に数え、待っている間に親のEmacsのタイマーが何回動くかを調べてみました。
-asyncパッケージは2.0を使い、14コアのマシンで動かしています。
+違いを見るために、300000より小さい素数を数える =my-count-primes= を、今のEmacsと子のEmacsでそれぞれ動かしてみました。
+asyncパッケージは2.0を使いました。
+
+=my-measure= は計算を待つ間に0.1秒ごとのタイマーが何回動いたかを数えます。
+タイマーが動いた回数でEmacsが止まっていたかどうかが分かります。
 
 #+begin_src emacs-lisp
 ;;; vow-child-example.el --- vow example  -*- lexical-binding: t; -*-
 (require 'vow)
 
 (defun my-count-primes (n)
+  "Return the number of primes below N."
+  (let ((count 0))
+    (dotimes (i n)
+      (let ((d 2) (prime (> i 1)))
+        (while (and prime (<= (* d d) i))
+          (when (zerop (% i d)) (setq prime nil))
+          (setq d (1+ d)))
+        (when prime (setq count (1+ count)))))
+    count))
+
+(defun my-count-primes-in-child (n)
   "Return a vow for the number of primes below N, counted in a child Emacs."
-  (vow-async-start
-   (lambda ()
-     (let ((count 0))
-       (dotimes (i n)
-         (let ((d 2) (prime (> i 1)))
-           (while (and prime (<= (* d d) i))
-             (when (zerop (% i d)) (setq prime nil))
-             (setq d (1+ d)))
-           (when prime (setq count (1+ count)))))
-       count))))
+  (let ((count-primes (symbol-function 'my-count-primes)))
+    (vow-async-start (lambda () (funcall count-primes n)))))
 
-(vow-defun my-primes ()
-  (vow-await (vow-all (list (my-count-primes 300000)
-                            (my-count-primes 300000)))))
+(defun my-measure (label function)
+  "Call FUNCTION and show how many times a 0.1-second timer ran meanwhile."
+  (let* ((start (float-time))
+         (ticks 0)
+         (timer (run-at-time 0.1 0.1 (lambda () (setq ticks (1+ ticks)))))
+         (value (funcall function)))
+    (cancel-timer timer)
+    (message "%s: %S in %.1f seconds, the timer ran %d times"
+             label value (- (float-time) start) ticks)))
 
-(let* ((start (float-time))
-       (ticks 0)
-       (timer (run-at-time 0.1 0.1 (lambda () (setq ticks (1+ ticks))))))
-  (message "%S" (vow-wait (my-primes)))
-  (cancel-timer timer)
-  (message "%.1f seconds, the timer ran %d times" (- (float-time) start) ticks))
+(my-measure "this Emacs" (lambda () (my-count-primes 300000)))
+(my-measure "child Emacs" (lambda () (vow-wait (my-count-primes-in-child 300000))))
 #+end_src
+
+子のEmacsには親で定義した関数が無いので、 =my-count-primes-in-child= は関数の定義を =symbol-function= で取り出し、クロージャーに閉じ込めて渡しています。
 
 #+begin_src sh
 $ emacs --batch -Q -L vow.el -L async -l vow-child-example.el
-(25997 25997)
-3.4 seconds, the timer ran 33 times
+this Emacs: 25997 in 3.0 seconds, the timer ran 0 times
+child Emacs: 25997 in 3.2 seconds, the timer ran 32 times
 #+end_src
 
-子のEmacsを1つだけ動かしたときも3.4秒だったので、2つの子のEmacsは並列に動いています。
-待っている間も親のタイマーは0.1秒ごとに動いています。
+タイマーは今のEmacsで数えた3.0秒のあいだ1回も動かず、子のEmacsに任せると3.2秒のあいだに32回動きました。
+計算にかかる時間はほぼ同じで、子のEmacsが計算している間も親のEmacsは止まらずに動いています。
 
 関数とその値は2つのEmacsの間を文字列で行き来するので、印字して読み戻せる値だけを渡せます。
 クロージャーが閉じ込めた変数は値の写しとして子に渡るので、子で変数を書き換えても親には届きません。
