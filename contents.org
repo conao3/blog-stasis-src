@@ -20282,7 +20282,7 @@ structureの =Range= のほうは、pydanticのmodelになっています。
 証明が通らなければ =lean-py sync= が失敗するので、たとえば定理の右辺を =3 * n= に書き換えると次のエラーになります。
 
 #+begin_src text
-lean-py: /path/to/demo/arith.py:7: error: (lean block arith, Lean 5:17) omega could not prove the goal:
+lean-py: /path/to/demo/arith.py:8: error: (lean block arith, Lean 5:17) omega could not prove the goal:
 a possible counterexample may satisfy the constraints
   a ≥ 1
 where
@@ -20290,7 +20290,7 @@ where
 lean-py: lake build failed
 #+end_src
 
-=arith.py:7= は =omega= を書いた行で、lean-pyはLeanが報告した行を、Pythonのファイルの中の行に直して表示しています。
+=arith.py:8= は =omega= を書いた行で、lean-pyはLeanが報告した行を、Pythonのファイルの中の行に直して表示しています。
 
 =lean-py sync= には =lake= と =lean-python= のCLIが要りますが、書き出した =_lean/= はただのPythonのファイルなので、 =_lean/= をリポジトリにcommitしておけば、Leanの入っていない環境でもパッケージは動きます。
 そのかわり実行するときに =lean(...)= がブロックのソースのハッシュを =_lean/blocks.json= と比べるので、ブロックを書き換えたまま =lean-py sync= を忘れるとimportの時点で止まります。
@@ -20610,7 +20610,7 @@ The structure =Range= becomes a pydantic model.
 A failing proof makes =lean-py sync= fail, so if you change the right-hand side of the theorem to =3 * n=, you get this error.
 
 #+begin_src text
-lean-py: /path/to/demo/arith.py:7: error: (lean block arith, Lean 5:17) omega could not prove the goal:
+lean-py: /path/to/demo/arith.py:8: error: (lean block arith, Lean 5:17) omega could not prove the goal:
 a possible counterexample may satisfy the constraints
   a ≥ 1
 where
@@ -20618,7 +20618,7 @@ where
 lean-py: lake build failed
 #+end_src
 
-=arith.py:7= is the line with =omega=, because lean-py maps the line that Lean reports to the line in the Python file.
+=arith.py:8= is the line with =omega=, because lean-py maps the line that Lean reports to the line in the Python file.
 
 =lean-py sync= needs =lake= and the =lean-python= CLI, but the generated =_lean/= holds plain Python files, so if you commit =_lean/= to the repository, the package runs on machines without Lean.
 In return, =lean(...)= compares the hash of the block source with =_lean/blocks.json= at run time, so if you change a block and forget to run =lean-py sync=, the import stops with this error.

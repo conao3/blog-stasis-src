@@ -96,7 +96,7 @@ structureの `Range` のほうは、pydanticのmodelになっています。
 証明が通らなければ `lean-py sync` が失敗するので、たとえば定理の右辺を `3 * n` に書き換えると次のエラーになります。
 
 ```text
-lean-py: /path/to/demo/arith.py:7: error: (lean block arith, Lean 5:17) omega could not prove the goal:
+lean-py: /path/to/demo/arith.py:8: error: (lean block arith, Lean 5:17) omega could not prove the goal:
 a possible counterexample may satisfy the constraints
   a ≥ 1
 where
@@ -104,7 +104,7 @@ where
 lean-py: lake build failed
 ```
 
-`arith.py:7` は `omega` を書いた行で、lean-pyはLeanが報告した行を、Pythonのファイルの中の行に直して表示しています。
+`arith.py:8` は `omega` を書いた行で、lean-pyはLeanが報告した行を、Pythonのファイルの中の行に直して表示しています。
 
 `lean-py sync` には `lake` と `lean-python` のCLIが要りますが、書き出した `_lean/` はただのPythonのファイルなので、 `_lean/` をリポジトリにcommitしておけば、Leanの入っていない環境でもパッケージは動きます。
 そのかわり実行するときに `lean(...)` がブロックのソースのハッシュを `_lean/blocks.json` と比べるので、ブロックを書き換えたまま `lean-py sync` を忘れるとimportの時点で止まります。
