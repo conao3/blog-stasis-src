@@ -24329,12 +24329,14 @@ Leanの関数は、leanfranのコマンドで言語ごとのコードに変換�
 
 #+begin_src sh
 leanfran project generate --lake-dir lean \
-  --output-dir rust/calculator/src/generated --modules Calculator.Kernel
+  --output-dir rust/calculator/src/generated --modules Calculator.Kernel \
+  --output text
 leanfran-python module generate --module-name Calculator.Kernel \
   --search-path lean/.lake/build/lib/lean \
-  --output-file python/src/leangage_calculator/kernel.py
+  --output-file python/src/leangage_calculator/kernel.py --output text
 leanfran-go module generate --module-name Calculator.Kernel \
-  --search-path lean/.lake/build/lib/lean --output-dir go/calculator/kernel
+  --search-path lean/.lake/build/lib/lean --output-dir go/calculator/kernel \
+  --output text
 #+end_src
 
 leanfranは0.13.2を使っています。
@@ -24554,7 +24556,7 @@ Pythonのサーバーは深さ2,000の本文を読み、深さ200,000の本文�
 この一覧では、3つの言語の返信がLeanの関数の返信と一致します。
 
 ** 速さ
-kernelを挟むとどれだけ遅くなるかを測りました。
+kernelを挟んだサーバーが毎秒いくつの返信を返せるかを測りました。
 比べる相手はJSONを読んでJSONを返すだけのkernelのない各言語のサーバーです。
 
 計測には4 vCPUのXeon 2.10GHzとメモリ16GBのVMを使い、 =oha= で =POST /rpc= に8秒間要求を送って毎秒の返信の件数を数えました。
