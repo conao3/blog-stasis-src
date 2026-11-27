@@ -5,11 +5,13 @@ Draft: true
 Tags: emacs emacs-lisp async macro release vow-el
 
 
-Emacs Lispの非同期処理をasync/awaitで書けるvowというライブラリを作りました。
-JavaScriptのPromiseとasync/awaitにならった作りで、プロセスやタイマーを待つ処理をコールバックの入れ子にせず、上から順に書けます。
+Emacs Lisp向けに、JavaScriptのPromiseとasync/awaitにならったvowというライブラリを作りました。
+プロセスやタイマーを待つ処理を、コールバックを入れ子にせずasync/awaitで上から順に書けます。
 
-`vow-await` で待っている間もEmacsは操作でき、待っていた処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
-async/awaitで書いた関数は、普段の関数と同じようにEdebugでステップ実行できます。
+`vow-await` で待っている間もEmacsは操作できます。
+待っていた処理が失敗したときは、同期のコードと同じように `condition-case` でエラーを処理できます。
+
+async/awaitで書いた関数は普段の関数と同じようにEdebugでステップ実行できます。
 
 リポジトリは [conao3/vow.el](https://github.com/conao3/vow.el) で、ライセンスは [GPL-3.0](https://github.com/conao3/vow.el/blob/afb6269/LICENSE) です。
 Emacs 31.1以降で動き、この記事ではmasterの [afb6269](https://github.com/conao3/vow.el/commit/afb6269) とEmacs 31.1を使いました。
@@ -62,7 +64,7 @@ vowは `package-vc-install` でGitHubから入れます。
 `my-versions` はgitとemacsのバージョンを順に待って、1つの文字列にします。
 
 `my-status` は失敗するコマンドを待つので、棄却されたvowのエラーが `vow-await` の位置で起きます。
-`condition-case` でそのエラーを処理して、終了コードを取り出します。
+そのエラーを `condition-case` で処理して、終了コードを取り出しています。
 
 `vow-defun` で定義した関数は呼ぶとすぐにvowを返すので、バッチで動かすときは `vow-wait` でvowが決まるまで待って値を受け取ります。
 
@@ -200,7 +202,7 @@ $ emacs --batch -Q -L vow.el -L async -l vow-child-example.el
 `vow-defun` の定義にカーソルを置いて `C-u C-M-x` を押すと、普段の関数と同じようにEdebugで計装できて、ステップ実行が `vow-await` に来るとEdebugから一度抜け、待っていたvowが決まると止まった位置からステップ実行が続きます。
 
 Edebugの実行モードは再開した後も引き継がれるので、 `g` や `c` で動かせば `vow-await` をまたいで次のブレークポイントまで進みます。
-`condition-case` で処理していないエラーが起きると、Edebugはそのエラーを起こした式で止まります。
+Edebugは `condition-case` で処理していないエラーを起こした式で止まります。
 
 generator.elが本体のローカル変数の名前を書き換えるので、Edebugの `e` で読めるローカル変数は最初の `vow-await` より前のものだけです。
 再開した後の変数の値は、ステップ実行中にEdebugが表示する式の値で確かめます。
