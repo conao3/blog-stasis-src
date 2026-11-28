@@ -31961,6 +31961,126 @@ leancloveの関数はリストを返すので =iterate= は無限の列を作れ
 Clojure本体をLeanと差分テストで調べた記事ではClojureのJavaで書かれた層の小さな関数をLeanに写しました。
 leancloveはClojureの実装のモデルではなく、clojure.coreの名前と考え方をLeanの関数として書き直したライブラリです。
 
+* leanclove: use 46 clojure.core functions in Lean 4, with theorems you can reuse in your proofs
+:properties:
+:export_file_name: generated/contents/blog/2026/1a5d3f
+:export_original: /blog/2026/c55cad
+:export_date: 2026-11-27 23:02
+:export_updated: 2026-11-27 23:02
+:export_lang: en
+:export_tags: lean clojure formal-verification standard-library release lean-leanclove
+:export_draft: t
+:end:
+
+I made leanclove, a Lean 4 library that gives you 46 clojure.core functions such as =partition-all= and =frequencies=.
+The functions work on Lean lists, =Option=, and =HashMap=, and the library proves theorems about them: joining the chunks from =partitionAll= gives back the original list, and the count from =frequencies= equals the number of occurrences.
+
+The repository is [[https://github.com/conao3/lean-leanclove][conao3/lean-leanclove]], under the Apache-2.0 license, and it depends on nothing beyond the Lean standard library.
+This post uses Lean 4.35.0 and commit [[https://github.com/conao3/lean-leanclove/tree/9312d6c8ac058383d0fae6ffda2d2942e1906e50][9312d6c]], the head of main when I wrote it.
+
+Your own proofs can call these theorems, so when you prove a property of a Lean program you can use the laws of =partition-all= or =group-by= without proving them again.
+I have also written about Clojure in [[https://s.conao3.com/blog/2026/e4f733][I checked Clojure's core with Lean and differential testing and found unreported bugs in HAMT and vector-of]] and [[https://s.conao3.com/blog/2026/315a71][A Clojure core cheat sheet in math notation]].
+
+[[github:conao3/lean-leanclove::Lean][clojure.core-equivalent function library for Lean 4, with proofs]]
+
+** Install leanclove
+Add these lines to the =lakefile.toml= of a Lean 4.35.0 project.
+
+#+begin_src toml
+[[require]]
+name = "leanclove"
+git = "https://github.com/conao3/lean-leanclove.git"
+rev = "main"
+#+end_src
+
+Run =lake update leanclove=, and =import LeanClove= loads the library.
+The functions live in the =LeanClove= namespace, and the names follow Lean conventions, so Clojure's =partition-all= becomes =partitionAll=.
+
+Run =lake build=, and each =#eval= below prints the value in its comment.
+
+#+begin_src lean
+import LeanClove
+
+#eval LeanClove.partitionAll 2 [1, 2, 3, 4, 5]  -- [[1, 2], [3, 4], [5]]
+#eval LeanClove.reductions (· + ·) 0 [1, 2, 3]  -- [0, 1, 3, 6]
+#eval LeanClove.get (LeanClove.frequencies ["a", "b", "a"]) "a"  -- some 2
+#eval LeanClove.iterate 4 (· * 2) 1  -- [1, 2, 4, 8]
+#+end_src
+
+** Use the theorems in your own proofs
+I write a function =batches= that splits a list of words into chunks of three, and prove two properties of it.
+
+#+begin_src lean
+import LeanClove
+open LeanClove
+
+def batches (xs : List String) : List (List String) := partitionAll 3 xs
+
+theorem batches_flatten (xs : List String) : (batches xs).flatten = xs :=
+  flatten_partitionAll 3 xs (by decide)
+
+theorem frequencies_eq_sum (xs : List String) (w : String) :
+    (get (frequencies xs) w).getD 0 =
+      ((batches xs).map fun b => b.countP (· == w)).sum := by
+  rw [getD_frequencies, ← List.countP_flatten, batches_flatten]
+#+end_src
+
+=batches_flatten= says that joining the chunks gives back the original list, and its proof is one line that applies =flatten_partitionAll=.
+=flatten_partitionAll= requires a chunk size greater than 0, and the theorem fails without that hypothesis because =partitionAll 0= returns an empty list.
+
+=frequencies_eq_sum= says that counting a word with =frequencies= over the whole list gives the same number as counting it in each chunk and adding the results.
+The proof combines =getD_frequencies=, which says that the count from =frequencies= equals the number of occurrences, with =batches_flatten=, and =lake build= passes.
+
+** The properties leanclove proves
+The README table sorts the functions into six areas and lists the laws proved in each.
+
+[[./resources/public/img/c55cad-functions.png]]
+
+The library exports 50 theorems: 10 close with =rfl=, 25 restate lemmas from the Lean standard library, and 6 close with a short =simp=.
+I proved the other 9 inside leanclove with induction and similar arguments: =flatten_partitionAll=, =length_interleave=, =nodup_distinct=, =dedupe_sublist=, =length_iterate=, =get_selectKeys=, =getD_groupBy=, =getD_frequencies=, and =sum_frequencies=.
+
+#+begin_src lean
+theorem nodup_distinct [BEq α] [LawfulBEq α] (xs : List α) : (distinct xs).Nodup
+
+theorem getD_groupBy [LawfulBEq κ] (f : α → κ) (xs : List α) (key : κ) :
+    (get (groupBy f xs) key).getD [] = xs.filter fun x => f x == key
+
+theorem getD_frequencies [LawfulBEq α] (xs : List α) (key : α) :
+    (get (frequencies xs) key).getD 0 = xs.countP (fun x => x == key)
+
+theorem sum_frequencies [LawfulBEq α] (xs : List α) :
+    ((frequencies xs).toList.map Prod.snd).sum = xs.length
+#+end_src
+
+In the cheat sheet, I wrote the result of =distinct= with the condition "a_i ≠ a_j for every j < i", the value of =group-by= with "(f a_i) = y", and the value of =frequencies= with "cnt_i is how many times a_i occurs".
+leanclove's =nodup_distinct=, =getD_groupBy=, and =getD_frequencies= prove the same relations as Lean theorems, and =getD_groupBy= also says that each group keeps the order of the original list.
+
+** Differences from Clojure
+leanclove's functions have Lean types and compute the whole result list when you call them.
+They are typed, eager analogues of the Clojure functions, and a function with the same name can return a different result.
+
+I ran the same computations in Clojure 1.12.7 and in leanclove and got the results in this table.
+
+| Clojure | Result in Clojure 1.12.7 | leanclove | Result in leanclove |
+|---------+--------------------------+-----------+---------------------|
+| =(take 3 (partition-all 0 [1 2]))= | =(() () ())= | =partitionAll 0 [1, 2]= | =[]= |
+| =(some (constantly false) [0])= | =nil= | =LeanClove.some (fun _ => Option.some false) [0]= | =some false= |
+| =(conj [2 3] 1)= | =[2 3 1]= | =conj [2, 3] 1= | =[1, 2, 3]= |
+| =(take 4 (iterate #(* 2 %) 1))= | =(1 2 4 8)= | =iterate 4 (· * 2) 1= | =[1, 2, 4, 8]= |
+
+With a size of 0, Clojure's =partition-all= returns an endless sequence of empty chunks, and leanclove returns an empty list.
+
+leanclove's =some= takes a function that returns an =Option=, and it returns =Option.some false= as a found value.
+Clojure's =some= treats an element whose result is =false= as a miss and moves on to the next element, so the two give different results.
+
+leanclove's =conj= adds to the front of the list, which matches =conj= on a Clojure list and reverses the order you get from =conj= on a vector.
+leanclove's functions return lists, so =iterate= cannot build an infinite sequence and takes the count as its first argument.
+
+All the theorems in this post are about leanclove's Lean definitions, and I have neither proved nor tested that they return the same results as Clojure's implementation.
+
+In the post where I checked Clojure's core with Lean and differential testing, I copied small functions from Clojure's Java layer into Lean.
+leanclove takes the names and ideas of clojure.core and writes them as Lean functions, and it does not model Clojure's implementation.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
