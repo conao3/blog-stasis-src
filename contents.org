@@ -30587,10 +30587,11 @@ sshの先のEmacs 31.1に新しいバージョンのCorfuを入れていれば�
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] はtree-sitterのモードを開いたときに文法のライブラリが無ければ入れるかを決めます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] は使い始めた人に向けて既定では有効にしない設定をまとめたテーマです。
 
-** Emacs 27から31までの新機能
+** Emacs 27から開発版までの新機能
 
-Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
 
+- [[https://s.conao3.com/blog/2026/d711ab][Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
@@ -30748,10 +30749,11 @@ With Emacs 31.1 and a recent Corfu on the remote host, completion candidates pop
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] controls whether a tree-sitter mode installs a missing grammar library when it starts.
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] is a theme that collects settings for new users that are too invasive to turn on by default.
 
-** New features from Emacs 27 to 31
+** New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
+- [[https://s.conao3.com/blog/2026/4d4a52][Fun new features in the Emacs development version, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
@@ -30879,10 +30881,11 @@ Pythonのクラス =Store= のメソッド =put= の中にポイントがあり�
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] を有効にすると、字下げされたコードをコピーしたときに、先頭の字下げを外してキルリングに入れます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] より後ろに置いたモードラインの項目は、右に寄せて表示されます。
 
-** Emacs 27から31までの新機能
+** Emacs 27から開発版までの新機能
 
-Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
 
+- [[https://s.conao3.com/blog/2026/d711ab][Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
@@ -31014,10 +31017,11 @@ Line numbers and matching lines sit under the green file names, so a file with m
 - With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] on, copying indented code removes the leading indentation before the text goes into the kill ring.
 - Mode line items placed after [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] are aligned to the right.
 
-** New features from Emacs 27 to 31
+** New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
+- [[https://s.conao3.com/blog/2026/4d4a52][Fun new features in the Emacs development version, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
@@ -31121,10 +31125,11 @@ Emacsを使い始めた人の隣に出しておくと、 =C-x 0= と =C-x 1= の
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L681][duplicate-line]] は今の行を複製し、 =duplicate-dwim= はリージョンがあればリージョンを複製します。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L894][pixel-scroll-precision-mode]] を有効にすると、マウスのホイールやタッチパッドでピクセル単位でスクロールできます。
 
-** Emacs 27から31までの新機能
+** Emacs 27から開発版までの新機能
 
-Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
 
+- [[https://s.conao3.com/blog/2026/d711ab][Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
@@ -31231,10 +31236,11 @@ When you share your screen to explain something, one key makes everything readab
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L681][duplicate-line]] duplicates the current line, and =duplicate-dwim= duplicates the region when one is active.
 - With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L894][pixel-scroll-precision-mode]] on, the mouse wheel or touchpad scrolls by pixels.
 
-** New features from Emacs 27 to 31
+** New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
+- [[https://s.conao3.com/blog/2026/4d4a52][Fun new features in the Emacs development version, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
@@ -31337,10 +31343,11 @@ Pythonのファイルでは貼り付けや選択に加えて =Find Definition= �
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176][絵文字の表示]] が改善されて、肌の色や国旗のような絵文字の組み合わせも1文字として表示されます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843][modus-operandi と modus-vivendi]] のテーマが入りました。
 
-** Emacs 27から31までの新機能
+** Emacs 27から開発版までの新機能
 
-Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
 
+- [[https://s.conao3.com/blog/2026/d711ab][Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
@@ -31446,10 +31453,11 @@ In a Python file, the menu has =Find Definition=, =Find References= and a =Pytho
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176][Emoji support]] has improved, and emoji sequences such as skin tones and flags display as one glyph.
 - The themes [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843][modus-operandi and modus-vivendi]] are now part of Emacs.
 
-** New features from Emacs 27 to 31
+** New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
+- [[https://s.conao3.com/blog/2026/4d4a52][Fun new features in the Emacs development version, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
@@ -31555,10 +31563,11 @@ Icompleteを元にしたidoに似た [[https://github.com/emacs-mirror/emacs/blo
 =M-x tab-bar= と打ったところで =tab-bar-mode= を先頭にしてタブバーのコマンドが =|= で区切られて並んでいます。
 =RET= で先頭の候補を選べます。
 
-** Emacs 27から31までの新機能
+** Emacs 27から開発版までの新機能
 
-Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
 
+- [[https://s.conao3.com/blog/2026/d711ab][Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 - [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
@@ -31670,14 +31679,289 @@ The name stands for "Fake Ido".
 After =M-x tab-bar=, the tab bar commands appear separated by =|=, with =tab-bar-mode= first.
 =RET= picks the first candidate.
 
-** New features from Emacs 27 to 31
+** New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
+
+- [[https://s.conao3.com/blog/2026/4d4a52][Fun new features in the Emacs development version, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
+
+* Emacs開発版の新機能から、動かして楽しいものを画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/d711ab
+:export_date: 2026-11-27 23:30
+:export_updated: 2026-11-27 23:30
+:export_tags: emacs release-notes
+:end:
+Emacsの開発版 (次のEmacs 32になるmaster) のNEWSから、動かしてすぐに違いが分かる新機能を選び、実際の画面と一緒に紹介します。
+正規表現が入力の長さに比例する時間でマッチするようになったことと、置換のプレビューを中心にしました。
+
+開発版のNEWSはmasterの [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS][etc/NEWS]] に書き足されていて、この記事で使った [[https://github.com/emacs-mirror/emacs/commit/caf462d7415cdd1ba4bcf23df69be3455165accc][caf462d]] (2026-11-26) の時点で871行あります。
+Emacs 31.1のNEWSが4,274行なので、まだ2割ほどです。
+
+この記事はmasterに新機能が入るたびに書き足して、Emacs 32.1が出たらタイトルを「Emacs 32の新機能から」に変えます。
+
+** 試した版
+
+masterのEmacsはnix-communityの [[https://github.com/nix-community/emacs-overlay][emacs-overlay]] の =emacs-git= でビルドしました。
+
+#+begin_src sh
+nix build github:nix-community/emacs-overlay/ff3361a80b6e0f5a51ddf6e43525125d5a3a7f97#emacs-git
+#+end_src
+
+=emacs --version= は =GNU Emacs 32.0.50= で、 =emacs-repository-version= はcaf462dです。
+画面はすべて =emacs -Q= で起動して撮っていて、設定が要るものはその式を添えています。
+
+** 正規表現が入力の長さに比例する時間でマッチする
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L704][正規表現のエンジンが、マッチを線形時間で行うようになりました]]。
+これまでの実装は後戻りしながら探すので、組み合わせの多い正規表現では時間が指数的に伸びてEmacsが固まったように見えることがありました。
+
+=a= か =aa= の繰り返しの後に =b= が来る正規表現を =a= だけの文字列に当てて時間を測ってみました。
+
+#+begin_src emacs-lisp
+;;; regex-bench.el  -*- lexical-binding: t -*-
+(dolist (n '(24 28 32 36))
+  (let* ((s (make-string n ?a))
+         (start (float-time)))
+    (string-match "\\(?:a\\|aa\\)*b" s)
+    (message "%2d chars: %8.3f s" n (- (float-time) start))))
+#+end_src
+
+#+begin_src sh
+$ emacs --batch -Q -l regex-bench.el    # Emacs 31.1
+24 chars:    0.018 s
+28 chars:    0.123 s
+32 chars:    0.885 s
+36 chars:    5.902 s
+$ emacs --batch -Q -l regex-bench.el    # Emacs 32.0.50 (caf462d)
+24 chars:    0.000 s
+28 chars:    0.000 s
+32 chars:    0.000 s
+36 chars:    0.000 s
+#+end_src
+
+Emacs 31.1では4文字増えるごとに約7倍かかり、36文字で6秒近く止まりましたが、開発版はどの長さでも1ミリ秒未満で終わりました。
+NEWSには例外も書かれていて、後方参照と =\{N,M\}= の繰り返しを使う正規表現は今も指数的な時間がかかることがあります。
+
+** 置換の結果を、打つそばから画面で見る
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L209][query-replace-show-preview]] を設定すると、 =M-%= で置換後の文字列を打っているあいだに、ウィンドウに見えている一致の部分が置換後の姿で表示されます。
+
+#+begin_src emacs-lisp
+(setopt query-replace-show-preview 'both)
+#+end_src
+
+[[./resources/public/img/d711ab-replace.png]]
+
+画面は =M-% TODO RET= のあとで =DONE= まで打ったところで、2つの =TODO= に =TODO→DONE= と出ています。
+=both= は置換の前後を並べて見せ、 =replacement-only= は置換後だけを見せます。
+
+置換を始める前に、どこがどう変わるかを本文の上で確かめられます。
+
+** 端末でも =C-S-a= のようなキーを区別する
+
+端末エミュレーターが [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L64][Kitty Keyboard Protocol]] に対応していると、 =emacs -nw= がそのプロトコルでキーを受け取ります。
+GUIでしか区別できなかったキーの組み合わせを端末でも別のキーとして扱えます。
+
+footで =emacs -nw= を動かし、 =C-h k= のあとに =C-S-a= を押して比べました。
+
+[[./resources/public/img/d711ab-kitty.png]]
+
+Emacs 31.1には =C-S-a= が =C-a= として届いていて、開発版にはGUIと同じように =C-S-a= のまま届き、 =C-a= に読み替えられています。
+=C-S-a= に別のコマンドを割り当てれば端末でも使い分けられます。
+
+** コメントの見出しを、Outlineで畳んで一覧にする
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L406][outline-use-comment-regexp]] を =t= にすると、 =outline-minor-mode= が =;;; *= や =;;; **= のようにコメントで始まる行を見出しとして扱います。
+見出しの深さは =*= の数で決まります。
+
+#+begin_src emacs-lisp
+(setopt outline-use-comment-regexp t)
+(add-hook 'emacs-lisp-mode-hook #'outline-minor-mode)
+#+end_src
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L418][outline-find-headings]] はバッファの見出しをすべてXrefのバッファに並べます。
+
+[[./resources/public/img/d711ab-outline.png]]
+
+上がEmacs Lispのファイルで、下が =outline-find-headings= で出した見出しの一覧です。
+一覧の行を選ぶとその見出しに移ります。
+
+** ローマ数字と数を変換する
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L819][number-to-roman と roman-to-number]] がどこからでも呼べる関数になりました。
+
+#+begin_src emacs-lisp
+;;; roman.el  -*- lexical-binding: t -*-
+(message "%s" (number-to-roman 2026))
+(message "%s" (roman-to-number "XXXII"))
+#+end_src
+
+#+begin_src sh
+$ emacs --batch -Q -l roman.el
+MMXXVI
+32
+#+end_src
+
+** ほかに目についたもの
+
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] の画像は画素の配列を書き換えて =canvas-refresh= で描き直せます。
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] は識別子の名前の変更や関数の切り出しを言語によらず呼ぶためのライブラリで、Eglotから切り出されました。
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] はUUIDを作ったり読んだりするライブラリです。
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]] に対応しました。
+
+** Emacs 27から開発版までの新機能
+
+Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/92689a][Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+
+* Fun new features in the Emacs development version, shown in screenshots
+:properties:
+:export_file_name: generated/contents/blog/2026/4d4a52
+:export_date: 2026-11-27 23:30
+:export_updated: 2026-11-27 23:30
+:export_tags: emacs release-notes
+:export_lang: en
+:export_original: /blog/2026/d711ab
+:end:
+I picked new features from the NEWS of the Emacs development version (master, which will become Emacs 32) that you notice the moment you use them, and this post shows each one in a screenshot.
+The highlights are regexp matching in time proportional to the input length, and a preview while you type a replacement.
+
+The development NEWS grows in [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS][etc/NEWS]] on master, and at [[https://github.com/emacs-mirror/emacs/commit/caf462d7415cdd1ba4bcf23df69be3455165accc][caf462d]] (2026-11-26), the commit I used, it runs to 871 lines.
+The Emacs 31.1 NEWS has 4,274 lines, so master is about a fifth of the way there.
+
+I will add to this post as new features land on master, and when Emacs 32.1 comes out I will retitle it as the Emacs 32 post.
+
+** The version I tried
+
+I built master with =emacs-git= from nix-community's [[https://github.com/nix-community/emacs-overlay][emacs-overlay]].
+
+#+begin_src sh
+nix build github:nix-community/emacs-overlay/ff3361a80b6e0f5a51ddf6e43525125d5a3a7f97#emacs-git
+#+end_src
+
+=emacs --version= prints =GNU Emacs 32.0.50=, and =emacs-repository-version= is caf462d.
+I took every screenshot in Emacs started with =emacs -Q=, and I include the code for each feature that needs a setting.
+
+** Regexps match in time proportional to the input
+
+The [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L704][regexp engine now matches in linear time]].
+The old engine backtracks, so a regexp with many ways to match could take exponential time and make Emacs look frozen.
+
+I timed a regexp that repeats =a= or =aa= and then expects =b=, against strings of =a= only.
+
+#+begin_src emacs-lisp
+;;; regex-bench.el  -*- lexical-binding: t -*-
+(dolist (n '(24 28 32 36))
+  (let* ((s (make-string n ?a))
+         (start (float-time)))
+    (string-match "\\(?:a\\|aa\\)*b" s)
+    (message "%2d chars: %8.3f s" n (- (float-time) start))))
+#+end_src
+
+#+begin_src sh
+$ emacs --batch -Q -l regex-bench.el    # Emacs 31.1
+24 chars:    0.018 s
+28 chars:    0.123 s
+32 chars:    0.885 s
+36 chars:    5.902 s
+$ emacs --batch -Q -l regex-bench.el    # Emacs 32.0.50 (caf462d)
+24 chars:    0.000 s
+28 chars:    0.000 s
+32 chars:    0.000 s
+36 chars:    0.000 s
+#+end_src
+
+In Emacs 31.1 every four more characters cost about seven times as much, and 36 characters took almost 6 seconds.
+The development version finished every length in under a millisecond.
+The NEWS lists exceptions: regexps with backreferences or =\{N,M\}= repetition can still take exponential time.
+
+** Preview a replacement while you type it
+
+Set [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L209][query-replace-show-preview]], and while you type the replacement for =M-%=, the matches visible in the window show how they will look after the replacement.
+
+#+begin_src emacs-lisp
+(setopt query-replace-show-preview 'both)
+#+end_src
+
+[[./resources/public/img/d711ab-replace.png]]
+
+Here I typed =M-% TODO RET= and then =DONE=, and both =TODO= comments show =TODO→DONE=.
+=both= shows the match and the replacement side by side, and =replacement-only= shows the replacement alone.
+
+You see what will change, in place, before the replacement starts.
+
+** Tell keys such as =C-S-a= apart in a terminal
+
+When your terminal emulator supports the [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L64][Kitty Keyboard Protocol]], =emacs -nw= reads keys through it.
+Key chords that only the GUI could tell apart become separate keys in a terminal too.
+
+I ran =emacs -nw= in foot, typed =C-h k=, and pressed =C-S-a= in both versions.
+
+[[./resources/public/img/d711ab-kitty.png]]
+
+Emacs 31.1 receives =C-S-a= as =C-a=.
+The development version receives =C-S-a= as it is, as the GUI does, and then translates it to =C-a=.
+Bind a command to =C-S-a=, and you can use both keys in a terminal.
+
+** Fold comment headings with Outline and list them
+
+Set [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L406][outline-use-comment-regexp]] to =t=, and =outline-minor-mode= treats lines that start with a comment, such as =;;; *= and =;;; **=, as headings.
+The number of stars sets the heading level.
+
+#+begin_src emacs-lisp
+(setopt outline-use-comment-regexp t)
+(add-hook 'emacs-lisp-mode-hook #'outline-minor-mode)
+#+end_src
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L418][outline-find-headings]] lists every heading of the buffer in an Xref buffer.
+
+[[./resources/public/img/d711ab-outline.png]]
+
+The top window is an Emacs Lisp file, and the bottom one is the heading list from =outline-find-headings=.
+Pick a line in the list to jump to that heading.
+
+** Convert between numbers and Roman numerals
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L819][number-to-roman and roman-to-number]] are now autoloaded functions you can call from anywhere.
+
+#+begin_src emacs-lisp
+;;; roman.el  -*- lexical-binding: t -*-
+(message "%s" (number-to-roman 2026))
+(message "%s" (roman-to-number "XXXII"))
+#+end_src
+
+#+begin_src sh
+$ emacs --batch -Q -l roman.el
+MMXXVI
+32
+#+end_src
+
+** Other changes worth a look
+
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] images let you rewrite the pixel data and redraw with =canvas-refresh=.
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] is a library, extracted from Eglot, that runs actions such as renaming an identifier or extracting a function in any language.
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] is a library that generates and parses UUIDs.
+- Emacs supports [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]].
+
+** New features from Emacs 27 to the development version
+
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
 - [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5265b1][Seven fun new features in Emacs 27, shown in screenshots]]
 
 * Lean 4の警告についた修正をまとめて当てて、警告が減るものだけを残すlinterのLeankeelを作った
 :properties:

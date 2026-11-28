@@ -106,10 +106,11 @@ In a Python file, the menu has `Find Definition`, `Find References` and a `Pytho
 -   The themes [modus-operandi and modus-vivendi](https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843) are now part of Emacs.
 
 
-# New features from Emacs 27 to 31
+# New features from Emacs 27 to the development version
 
-I wrote one post in the same format for each Emacs release from 27 to 31.
+I wrote one post in the same format for each Emacs release from 27 to the development version.
 
+-   [Fun new features in the Emacs development version, shown in screenshots](https://s.conao3.com/blog/2026/4d4a52)
 -   [Seven fun new features in Emacs 31, shown in screenshots](https://s.conao3.com/blog/2026/26ed0f)
 -   [Seven fun new features in Emacs 30, shown in screenshots](https://s.conao3.com/blog/2026/516114)
 -   [Seven fun new features in Emacs 29, shown in screenshots](https://s.conao3.com/blog/2026/9e936f)
