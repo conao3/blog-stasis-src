@@ -31787,7 +31787,7 @@ example (xs : List Nat) : (xs ++ []).length = xs.length := by
   simp?
 #+end_src
 
-=area= の本体は =height= を使っていないので警告が出るのですが、4行目は =(height := 4)= と名前を付けて引数を渡しています。
+=area= の本体は =height= を使っていないので警告が出るのですが、4行目は ~(height := 4)~ と名前を付けて引数を渡しています。
 
 =simp?= のように自分の書き換えを提案するtacticの修正には =lean.tryThis= という規則が付きます。
 この規則は既定では当てないので、 =--rules= で選びます。
@@ -31812,7 +31812,7 @@ Named.lean:1:16: warn [linter.unusedVariables] Variable name `height` is not exp
 =--output text= では直したあとのファイルと、残った警告が出ます。
 
 =simp?= が提案した =simp only [List.append_nil]= は当たって、 =height= の警告は残りました。
-=height= を =_height= にすると4行目が =Invalid argument name `height` for function `area`= のエラーになるので、Leankeelはこの修正を戻しています。
+=height= を =_height= にすると4行目が =Invalid argument name `height` for function `area`= のエラーになり、比べる警告にはエラーも入るので、Leankeelはこの修正を戻しています。
 
 JSONの出力では =Rejected= に理由が付きます。
 
@@ -31862,6 +31862,7 @@ hasSorry = "deny"
 #+end_src
 
 #+begin_src sh
+printf 'theorem one_eq_one : 1 = 1 := sorry\n' > Todo.lean
 nix run github:conao3/rust-leankeel -- --output text \
   source check-source --file Todo.lean
 echo $?
@@ -31949,7 +31950,7 @@ Leanのfrontendを動かしてメッセージを取り出す =native/Main.lean= 
 
 ** 確かめているファイルの外
 確かめるのは直しているファイルだけです。
-上の =height= を =_height= にする修正は、 =(height := 4)= で呼んでいるのがほかのファイルだけなら当たってしまうので、直したあとはプロジェクトをビルドします。
+上の =height= を =_height= にする修正は、 ~(height := 4)~ で呼んでいるのがほかのファイルだけなら当たってしまうので、直したあとはプロジェクトをビルドします。
 
 Leankeelは自分ではチェックを足さず、elaborateの間にLeanが出すメッセージだけを扱います。
 Mathlibの =#lint= のような環境のlinterや、テキストを見るstyle linter、 =lake shake= はそれぞれのコマンドで動かします。
@@ -32057,7 +32058,7 @@ When the batch fails, Leankeel tries each fix alone, and it puts a fix that stil
 
 Leankeel repeats this until no fix is left, so it applies overlapping fixes, such as two unused arguments of one =simp=, one per round.
 
-Here is a file where Leankeel reverts a fix.
+Leankeel reverts a fix in a file like the following.
 
 #+begin_src lean
 def area (width height : Nat) : Nat :=
@@ -32069,7 +32070,7 @@ example (xs : List Nat) : (xs ++ []).length = xs.length := by
   simp?
 #+end_src
 
-The body of =area= doesn't use =height=, so Lean warns about it, but line 4 passes the argument by name as =(height := 4)=.
+The body of =area= doesn't use =height=, so Lean warns about it, but line 4 passes the argument by name as ~(height := 4)~.
 
 A tactic such as =simp?= suggests a replacement for itself, and its fix belongs to the rule =lean.tryThis=.
 Leankeel doesn't apply that rule by default, so select it with =--rules=.
@@ -32094,7 +32095,7 @@ Named.lean:1:16: warn [linter.unusedVariables] Variable name `height` is not exp
 With =--output text=, Leankeel prints the fixed file and the warnings left.
 
 The =simp only [List.append_nil]= that =simp?= suggested went in, and the warning on =height= stayed.
-Renaming =height= to =_height= turns line 4 into the error =Invalid argument name `height` for function `area`=, so Leankeel reverted that fix.
+Renaming =height= to =_height= turns line 4 into the error =Invalid argument name `height` for function `area`=, and the comparison counts errors too, so Leankeel reverted that fix.
 
 The JSON output gives the reason under =Rejected=.
 
@@ -32144,6 +32145,7 @@ hasSorry = "deny"
 #+end_src
 
 #+begin_src sh
+printf 'theorem one_eq_one : 1 = 1 := sorry\n' > Todo.lean
 nix run github:conao3/rust-leankeel -- --output text \
   source check-source --file Todo.lean
 echo $?
@@ -32180,7 +32182,7 @@ nix run github:conao3/rust-leankeel -- --output text \
 =scripts/mathlib/= in the repository runs =fix-source= without =--write= on every =Mathlib/**/*.lean= of Mathlib v4.35.0 and counts the applied and reverted fixes.
 Mathlib keeps its build free of warnings, so with the options of Mathlib's own build none of the 8,624 files had a warning.
 
-So I turned on =linter.unusedVariables.analyzeTactics=, which also reports unused variables in tactic proofs.
+I then turned on =linter.unusedVariables.analyzeTactics=, which also reports unused variables in tactic proofs.
 With that option, 1,007 files had 2,198 fixes for =linter.unusedVariables=, and Leankeel applied 2,152 and reverted 46.
 
 Each of the 46 reverted fixes either added a new warning or didn't reduce the count, so their warnings stay in 34 files.
@@ -32231,7 +32233,7 @@ The adapter =native/Main.lean=, which runs the Lean frontend and extracts the me
 
 ** Outside the file being fixed
 Leankeel checks only the file it fixes.
-If only other files pass =(height := 4)=, the fix that renames =height= to =_height= above goes in, so build the project after fixing.
+If only other files pass ~(height := 4)~, the fix that renames =height= to =_height= above goes in, so build the project after fixing.
 
 Leankeel adds no checks of its own and handles only the messages that Lean emits during elaboration.
 Environment linters such as Mathlib's =#lint=, style linters that read the text, and =lake shake= keep their own commands.
@@ -32314,7 +32316,7 @@ READMEの表は関数を6つの分野に分けて、それぞれで証明して�
 
 [[./resources/public/img/c55cad-functions.png]]
 
-公開している定理は50個で、 =rfl= で済むものが10個、Leanの標準ライブラリの補題を言い換えたものが25個、短い =simp= で済むものが6個です。
+公開している定理は50個で、 =rfl= で済むものが10個、Leanの標準ライブラリの補題を言い換えたものが25個、数行のタクティクで済むものが6個です。
 =flatten_partitionAll= 、 =length_interleave= 、 =nodup_distinct= 、 =dedupe_sublist= 、 =length_iterate= 、 =get_selectKeys= 、 =getD_groupBy= 、 =getD_frequencies= 、 =sum_frequencies= の9個を帰納法などでleancloveの中で証明しています。
 
 #+begin_src lean
@@ -32331,7 +32333,9 @@ theorem sum_frequencies [LawfulBEq α] (xs : List α) :
 #+end_src
 
 チートシートでは =distinct= の結果を「後ろの要素が前の要素と等しくない列」、 =group-by= の値を「 =f= の値が同じ要素の列」、 =frequencies= の値を「その要素が現れる回数」として式で書きました。
-leancloveの =nodup_distinct= と =getD_groupBy= と =getD_frequencies= は同じ関係をLeanの定理として証明していて、 =getD_groupBy= はグループの中の順序が元のリストと同じであることまで言っています。
+leancloveの =getD_groupBy= と =getD_frequencies= は、 =group-by= と =frequencies= の行と同じ関係をLeanの定理として証明していて、 =getD_groupBy= はグループの中の順序が元のリストと同じであることまで言っています。
+
+=distinct= については、結果に重複が無いことを =nodup_distinct= で、元のリストと同じ要素を持つことを =mem_distinct= で証明していて、どの出現を残すかと順序は定理に入っていません。
 
 ** Clojureとの違い
 leancloveの関数はLeanの型を持ち、呼んだときに結果のリストをすべて計算します。
@@ -32434,7 +32438,7 @@ The README table sorts the functions into six areas and lists the laws proved in
 
 [[./resources/public/img/c55cad-functions.png]]
 
-The library exports 50 theorems: 10 close with =rfl=, 25 restate lemmas from the Lean standard library, and 6 close with a short =simp=.
+The library exports 50 theorems: 10 close with =rfl=, 25 restate lemmas from the Lean standard library, and 6 close in a few lines of tactics.
 I proved the other 9 inside leanclove with induction and similar arguments: =flatten_partitionAll=, =length_interleave=, =nodup_distinct=, =dedupe_sublist=, =length_iterate=, =get_selectKeys=, =getD_groupBy=, =getD_frequencies=, and =sum_frequencies=.
 
 #+begin_src lean
@@ -32451,7 +32455,9 @@ theorem sum_frequencies [LawfulBEq α] (xs : List α) :
 #+end_src
 
 In the cheat sheet, I wrote the result of =distinct= with the condition "a_i ≠ a_j for every j < i", the value of =group-by= with "(f a_i) = y", and the value of =frequencies= with "cnt_i is how many times a_i occurs".
-leanclove's =nodup_distinct=, =getD_groupBy=, and =getD_frequencies= prove the same relations as Lean theorems, and =getD_groupBy= also says that each group keeps the order of the original list.
+leanclove's =getD_groupBy= and =getD_frequencies= prove the same relations as the =group-by= and =frequencies= rows, and =getD_groupBy= also says that each group keeps the order of the original list.
+
+For =distinct=, =nodup_distinct= proves that the result has no duplicates and =mem_distinct= proves that it has the same elements as the input, and the theorems leave out which occurrence it keeps and in what order.
 
 ** Differences from Clojure
 leanclove's functions have Lean types and compute the whole result list when you call them.
@@ -32843,6 +32849,537 @@ GitHub Actionsの =Update= のworkflowを手で起動すると、Emacsのmaster�
 ** おわりに
 =plamo-tr= で文章を訳し、 =plamo-tr-po= でPOファイルの項目を訳して、emacs-docでマニュアルとPOファイルを行き来するように分けたので、Emacsのmasterが進んでも変わった段落だけをPLaMo翻訳に送れます。
 訳を手で直した項目は =plamo-tr-po= が書き換えないので、機械翻訳の訳を少しずつ人の訳に置き換えていけます。
+
+* plamo-tr, plamo-tr-po, and emacs-doc: translating the Emacs manuals into Japanese with PLaMo Translate
+:properties:
+:export_file_name: generated/contents/blog/2026/5da1a9
+:export_date: 2026-11-27 23:22
+:export_updated: 2026-11-27 23:22
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/29c4d6
+:export_tags: emacs rust cli llm translation gettext release rust-plamo-tr rust-plamo-tr-po emacs-doc
+:end:
+
+I wrote =plamo-tr=, a CLI for PLaMo Translate, and =plamo-tr-po=, which fills gettext PO files with PLaMo Translate, and used the two to publish the GNU Emacs manuals machine-translated into Japanese at [[https://emacs-doc.conao3.com]].
+
+=plamo-tr= translates text, =plamo-tr-po= translates the entries of a PO file through =plamo-tr=, and emacs-doc turns the Emacs manuals into PO files and builds the translated HTML from them.
+With the work split this way, an update to the Emacs manuals only sends the changed paragraphs back to PLaMo Translate.
+
+The repositories are [[https://github.com/conao3/rust-plamo-tr][conao3/rust-plamo-tr]], [[https://github.com/conao3/rust-plamo-tr-po][conao3/rust-plamo-tr-po]], and [[https://github.com/conao3/emacs-doc][conao3/emacs-doc]], and both CLIs are under the Apache-2.0 license.
+emacs-doc distributes the manuals and their translations under the GFDL 1.3 or later, the license of the original manuals, and its scripts and configuration under Apache-2.0.
+
+I wrote all three on my own, and they're unofficial: none of them is affiliated with Preferred Networks or the Free Software Foundation.
+
+[[./resources/public/img/29c4d6-flow.svg]]
+
+[[github:conao3/rust-plamo-tr::Rust][Translate text from the command line with PLaMo Translate (unofficial)]]
+
+[[github:conao3/rust-plamo-tr-po::Rust][Translate gettext PO files with PLaMo Translate (unofficial)]]
+
+[[github:conao3/emacs-doc::Shell][Japanese machine translation of the GNU Emacs manuals with PLaMo Translate, served at emacs-doc.conao3.com]]
+
+** plamo-tr, a CLI for PLaMo Translate
+=plamo-tr= calls the same API as the browser extension of [[https://translate.preferredai.jp/][PLaMo Translate]] and prints the translation as JSON.
+With Nix, you can run it without installing it.
+
+#+begin_src console
+$ nix run github:conao3/rust-plamo-tr -- text translate-text \
+    --text "Emacs is the extensible, customizable, self-documenting real-time display editor."
+{
+  "TranslatedText": "Emacsは、拡張可能でカスタマイズでき、自己文書化されたリアルタイム表示エディタです。",
+  "SourceLanguageCode": null,
+  "TargetLanguageCode": "ja"
+}
+#+end_src
+
+If you don't give a target language, =plamo-tr= translates Japanese into English and any other language into Japanese.
+To read standard input, pass =--text file:///dev/stdin=, and to get only the translation, pipe the JSON to =jq=.
+
+#+begin_src console
+$ echo "Emacsのマニュアルを日本語で読めるようにしました。" \
+    | plamo-tr text translate-text --text file:///dev/stdin | jq -r .TranslatedText
+I've made the Emacs manual available in Japanese.
+#+end_src
+
+=plamo-tr= signs in with a refresh token that you copy out of a browser signed in to the PLaMo Translate web app, and the [[https://github.com/conao3/rust-plamo-tr#login][Login section of the README]] shows how to copy it and where to save it.
+Your translations count toward the browser extension quota of your plan.
+
+The command line has the same shape as [[/blog/2026/c5f673][plamo-tr-local]], which runs PLaMo 3 Translate on your own machine: both take named parameters after =text translate-text=.
+
+=plamo-tr= also builds as a Rust library, and I built =plamo-tr-po= on it.
+=Translator::translate_batch= sends several texts in one request, keeps their HTML tags, and renews the ID token while a long job runs.
+
+** plamo-tr-po, a translator for PO files
+A gettext PO file lists entries, each a pair of an original =msgid= and a translated =msgstr=, and when the original changes, =msgmerge= flags the entry =fuzzy= so you know it needs a new translation.
+=plamo-tr-po= sends the untranslated entries and the =fuzzy= entries it machine-translated earlier to PLaMo Translate, and writes the translations back into the PO file in place.
+
+To try it, I made =sample.ja.po= with two paragraphs modeled on the Emacs manual and one code block, all with an empty =msgstr=, and ran =plamo-tr-po= on it.
+
+#+begin_src console
+$ export PLAMO_AUTH_FILE=~/.config/plamo-tr/auth.json
+$ plamo-tr-po po-file translate-po-files --source-language en --format html \
+    --skip-context "<(pre|style|script)>" --po-files sample.ja.po
+2 distinct msgids in 2 entries to translate; 1 entries skipped by --skip-context; 0 fuzzy entries with a human translation left as is
+{
+  "PoFiles": [
+    "sample.ja.po"
+  ],
+  "DryRun": false,
+  "PendingMsgidCount": 2,
+  "PendingEntryCount": 2,
+  "SkippedEntryCount": 1,
+  "HumanFuzzyEntryCount": 0,
+  "TranslatedMsgidCount": 2,
+  "RejectedMsgidCount": 0
+}
+#+end_src
+
+Here are the three entries of =sample.ja.po= after the run.
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Visiting.html
+msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) and use the minibuffer to enter the name of the desired file."
+msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力し、ミニバッファを使用して目的のファイル名を入力してください。"
+
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+
+#. type: Content of: <html><body><pre>
+#: build/html/emacs/Visiting.html
+#, no-wrap
+msgid "C-x C-f test.emacs <kbd class=\"key\">RET</kbd>\n"
+msgstr ""
+#+end_src
+
+Each translated entry gets the comment =# Machine-translated by PLaMo Translate.=, and the contents of =<kbd>= and =<code>= stay in English.
+With =--format html=, =plamo-tr-po= replaces elements such as =code= and =kbd= with strings of the form =<x-N/>= before it sends the text, and puts them back when the translation returns.
+
+If a translation changes any other tags of the original, =plamo-tr-po= drops it and retries that entry alone, and if the tags still change, it leaves the entry untranslated.
+It skipped the third entry, which came from =<pre>=, because its =#.= comment matched the =--skip-context= regular expression.
+
+** Changed originals and hand-corrected translations
+Of the =fuzzy= entries, =plamo-tr-po= retranslates only the ones with the comment =# Machine-translated by PLaMo Translate.=.
+A =fuzzy= entry without that comment holds a translation someone wrote by hand, so =plamo-tr-po= leaves it for a person to review.
+
+The following =update.ja.po= has two entries whose originals changed: the first holds a machine translation, and the second holds a hand-written one.
+The =#|= lines hold the previous originals, which =msgmerge --previous= keeps.
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer."
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は現在のバッファを保存します。"
+
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x s</kbd> saves any buffers."
+msgid "<kbd class=\"kbd\">C-x s</kbd> saves any or all modified buffers."
+msgstr "<kbd class=\"kbd\">C-x s</kbd> でバッファを保存します。"
+#+end_src
+
+#+begin_src console
+$ plamo-tr-po po-file translate-po-files --source-language en --format html \
+    --po-files update.ja.po > /dev/null
+1 distinct msgids in 1 entries to translate; 0 entries skipped by --skip-context; 1 fuzzy entries with a human translation left as is
+#+end_src
+
+=plamo-tr-po= retranslated only the first entry and removed its =fuzzy= flag and previous original.
+The hand-written second entry is still =fuzzy=.
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x s</kbd> saves any buffers."
+msgid "<kbd class=\"kbd\">C-x s</kbd> saves any or all modified buffers."
+msgstr "<kbd class=\"kbd\">C-x s</kbd> でバッファを保存します。"
+#+end_src
+
+After you correct a machine translation by hand, delete the comment line of that entry, and =plamo-tr-po= won't overwrite your translation.
+
+** emacs-doc, the Emacs manuals in Japanese
+emacs-doc translates the manuals on the master branch of [[https://github.com/emacs-mirror/emacs][Emacs]] into Japanese and serves them at [[https://emacs-doc.conao3.com]].
+It covers three manuals: the GNU Emacs Manual, the GNU Emacs Lisp Reference Manual, and An Introduction to Programming in Emacs Lisp.
+
+Every page says that it's a machine translation and links to the original page on gnu.org.
+
+[[./resources/public/img/29c4d6-visiting.png]]
+
+emacs-doc handles the manuals with [[https://po4a.org/][po4a]], a tool that extracts the paragraphs of a document into a PO file and rebuilds the translated document from it.
+You build the site by running these =make= targets in order:
+
+1. =make fetch-latest= checks out the =doc= directory of the Emacs master branch and writes its commit to =EMACS_REVISION=.
+2. =make html= runs =makeinfo --html= to build each manual twice: one page per node, and the whole manual on one page.
+3. =make pot= has po4a extract the paragraphs of the HTML into =po/<manual>.ja.po= and merges it with the previous PO file through =msgmerge --previous=. A paragraph whose original changed becomes =fuzzy=, and a new paragraph is untranslated.
+4. =make translate= runs =plamo-tr-po= on the untranslated entries and the machine-translated =fuzzy= entries.
+5. =make site= has po4a write the translated HTML with =--keep 0= and adds the link to the original to each page. A paragraph without a translation shows in English.
+
+At the time of this post, emacs-doc translates the manuals of Emacs [[https://github.com/emacs-mirror/emacs/commit/e9429a2db33d5ef8c1195956d80639a1ae490435][e9429a2db3]], and =make stats= counts these entries:
+
+#+begin_src console
+$ make -s stats
+emacs: 38083 translated messages, 4 fuzzy translations, 491 untranslated messages.
+elisp: 52191 translated messages, 6 fuzzy translations, 2377 untranslated messages.
+eintr: 6808 translated messages, 1 fuzzy translation, 784 untranslated messages.
+#+end_src
+
+Of the untranslated entries, 445 in emacs, 2,278 in elisp, and 769 in eintr are code that po4a extracted from =<pre>= and similar elements, and =--skip-context= keeps them out of the translation.
+That leaves 46 untranslated entries in emacs, 99 in elisp, and 15 in eintr.
+
+I start the GitHub Actions workflow =Update= by hand, and it pulls in the Emacs master branch, merges the PO files, and rebuilds the site.
+New paragraphs and paragraphs whose original changed show in English until you run =make translate= locally, push the PO files, and start =Update= again.
+
+Cloudflare Workers Builds deploys the site on every push to master, so the repository holds no Cloudflare API token.
+I described how that works in [[/blog/2026/881c64][Deploying GitHub Actions builds to Cloudflare Workers without an API token in GitHub]].
+
+** Wrapping up
+With =plamo-tr= translating text, =plamo-tr-po= translating the entries of PO files, and emacs-doc moving between the manuals and the PO files, I only send the changed paragraphs to PLaMo Translate when the Emacs master branch moves on.
+=plamo-tr-po= leaves entries that you corrected by hand alone, so you can replace the machine translations with human ones a few at a time.
+
+* HonoでApollo Server 5を動かし、@deferの応答をできた分から返すapollo-server-integration-honoを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/963012
+:export_date: 2026-11-27 23:18
+:export_updated: 2026-11-27 23:18
+:export_tags: typescript graphql hono release ts-apollo-server-integration-hono
+:export_draft: t
+:end:
+
+HonoのアプリでApollo Server 5のGraphQLを動かすライブラリとして、apollo-server-integration-honoを作りました。
+関数 =startServerAndCreateHonoHandler= 1つで =ApolloServer= をHonoのハンドラーにでき、 =@defer= を使った問い合わせには、Apollo Serverができた部分から順に返す =multipart/mixed= の応答をそのまま流します。
+
+リポジトリは[[https://github.com/conao3/ts-apollo-server-integration-hono][conao3/ts-apollo-server-integration-hono]]、ライセンスはApache-2.0で、npmに[[https://www.npmjs.com/package/@conao3/apollo-server-integration-hono][@conao3/apollo-server-integration-hono]]として公開しています。
+この記事は0.1.3と、この記事を書いた時点のmasterの[[https://github.com/conao3/ts-apollo-server-integration-hono/tree/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f][b3a486e]]をもとに、Apollo Server 5.5.2とHono 4.13.23とNode.js 26.13.1で動かして書いています。
+
+本体は[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/src/index.ts][src/index.ts]]の112行で、Honoが受けたリクエストをApollo Serverの形に直して渡し、返ってきた本文をWeb標準の =Response= にしています。
+依存は =@apollo/server= と =hono= だけなので、Honoが動くランタイムでそのまま使えるように書いています。
+
+[[github:conao3/ts-apollo-server-integration-hono::TypeScript][Apollo Server integration for Hono]]
+
+** Honoのアプリに入れる
+空のディレクトリで、パッケージとApollo ServerとHonoを入れます。
+pnpm 12は依存のビルドスクリプトを動かすかを決めていないと =pnpm add= を失敗で終えるので、先に =pnpm-workspace.yaml= で =@apollo/protobufjs= のスクリプトを止めておきます。
+
+#+begin_src yaml
+allowBuilds:
+  "@apollo/protobufjs": false
+#+end_src
+
+#+begin_src shell
+pnpm add @conao3/apollo-server-integration-hono @apollo/server graphql@16 hono @hono/node-server
+#+end_src
+
+次の =server.mts= は、Honoのミドルウェアがヘッダー =x-user= から読んだ利用者の名前を、GraphQLのリゾルバーに渡すサーバーです。
+=context= の関数は引数 =c= にHonoのコンテキストを受け取り、 =HonoContextFunctionArgument<AppEnv>= で型を付けると =c.get("user")= がアプリの =Env= の型で読めます。
+
+#+begin_src typescript
+import { ApolloServer } from "@apollo/server"
+import { startServerAndCreateHonoHandler } from "@conao3/apollo-server-integration-hono"
+import type { HonoContextFunctionArgument } from "@conao3/apollo-server-integration-hono"
+import { serve } from "@hono/node-server"
+import { Hono } from "hono"
+
+type AppEnv = { Variables: { user: string } }
+type GraphQLContext = { user: string }
+
+const server = new ApolloServer<GraphQLContext>({
+  typeDefs: `#graphql
+    type Query {
+      hello: String!
+      user: String!
+    }
+  `,
+  resolvers: {
+    Query: {
+      hello: () => "world",
+      user: (_parent, _args, context) => context.user,
+    },
+  },
+})
+
+const app = new Hono<AppEnv>()
+app.use(async (c, next) => {
+  c.set("user", c.req.header("x-user") ?? "anonymous")
+  await next()
+})
+app.post(
+  "/api/graphql",
+  startServerAndCreateHonoHandler(server, {
+    context: async ({ c }: HonoContextFunctionArgument<AppEnv>) => ({ user: c.get("user") }),
+  }),
+)
+
+serve({ fetch: app.fetch, port: 4000 })
+#+end_src
+
+=node server.mts= で起動して =curl= で問い合わせると、 =x-user= を付けたときだけ =user= が変わります。
+
+#+begin_src shell
+$ curl -s http://localhost:4000/api/graphql \
+    -H 'content-type: application/json' \
+    -d '{"query":"{ hello user }"}'
+{"data":{"hello":"world","user":"anonymous"}}
+
+$ curl -s http://localhost:4000/api/graphql \
+    -H 'content-type: application/json' \
+    -H 'x-user: alice' \
+    -d '{"query":"{ hello user }"}'
+{"data":{"hello":"world","user":"alice"}}
+#+end_src
+
+=startServerAndCreateHonoHandler= はApollo Serverをバックグラウンドで起動するので、 =server.start()= を自分で呼ばずに、起動時に1回だけ呼びます。
+=hono/cors= のようなミドルウェアがHonoのコンテキストに付けたヘッダーは、GraphQLの応答にも付いたまま返ります。
+
+** @deferの応答を流す
+=@defer= は、問い合わせの一部を後から返してよいとサーバーに伝えるGraphQLのディレクティブです。
+Apollo Server 5は、graphqlのパッケージがちょうど =17.0.0-alpha.9= のときだけ =@defer= の部分を後から返すと[[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Serverのドキュメント]]に書かれているので、graphqlをこの版に入れ替えます。
+
+#+begin_src shell
+pnpm add graphql@17.0.0-alpha.9
+#+end_src
+
+次の =defer.mts= は、すぐ返る =hello= と、2秒かかる =slow= を持つサーバーです。
+スキーマには =@defer= の宣言を書いておきます。
+
+#+begin_src typescript
+import { ApolloServer } from "@apollo/server"
+import { startServerAndCreateHonoHandler } from "@conao3/apollo-server-integration-hono"
+import { serve } from "@hono/node-server"
+import { Hono } from "hono"
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const server = new ApolloServer({
+  typeDefs: `#graphql
+    directive @defer(if: Boolean! = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+    type Query {
+      hello: String!
+      slow: String!
+    }
+  `,
+  resolvers: {
+    Query: {
+      hello: () => "world",
+      slow: async () => {
+        await sleep(2000)
+        return "done"
+      },
+    },
+  },
+})
+
+const app = new Hono()
+app.post("/api/graphql", startServerAndCreateHonoHandler(server))
+
+serve({ fetch: app.fetch, port: 4000 })
+#+end_src
+
+次の =defer.sh= は、問い合わせを送ってから応答のJSONの部分が届くまでの秒数を、部分ごとに行の先頭に付けます。
+=@defer= を使わない問い合わせと使う問い合わせを、同じ =accept= ヘッダーで1回ずつ送ります。
+
+#+begin_src bash
+query() {
+  start=$(date +%s%N)
+  curl -sN http://localhost:4000/api/graphql \
+    -H 'content-type: application/json' \
+    -H 'accept: multipart/mixed; incrementalSpec=v0.2, application/json' \
+    -d "{\"query\":\"$1\"}" |
+    grep --line-buffered '^{' |
+    while IFS= read -r line; do
+      echo "$(( ($(date +%s%N) - start) / 1000000000 ))s ${line%$'\r'}"
+    done
+}
+query '{ hello slow }'
+query '{ hello ... @defer { slow } }'
+#+end_src
+
+=node defer.mts= で起動して =bash defer.sh= を実行すると、次のように出ます。
+
+#+begin_src shell
+$ bash defer.sh
+2s {"data":{"hello":"world","slow":"done"}}
+0s {"data":{"hello":"world"},"pending":[{"id":"0","path":[]}],"hasNext":true}
+2s {"hasNext":false,"incremental":[{"data":{"slow":"done"},"id":"0"}],"completed":[{"id":"0"}]}
+#+end_src
+
+=@defer= を使わない問い合わせは、 =slow= を待って2秒後に1つのJSONで返ります。
+=@defer= を使うと =hello= の部分が0秒で届き、 =slow= の部分は2秒後に =incremental= として届くので、応答を最後まで溜めずに流していることが分かります。
+
+** HonoとApollo Serverのあいだでしていること
+Apollo ServerはHTTPのリクエストとレスポンスを、フレームワークによらない =HTTPGraphQLRequest= と =HTTPGraphQLResponse= の形で受け渡します。
+統合のパッケージの仕事は、この形とフレームワークの形のあいだを直すことで、Apollo Serverの[[https://www.apollographql.com/docs/apollo-server/integrations/building-integrations][統合の作り方]]もこの手順で書かれています。
+
+[[./resources/public/img/963012-flow.svg]]
+
+リクエストの側では、 =c.req.raw= のヘッダーを =HeaderMap= に写し、クエリ文字列と本文を取り出して =executeHTTPGraphQLRequest= に渡します。
+=content-type= がJSONの本文は =JSON.parse= で読み、壊れたJSONには400を返します。
+=context= の関数には =c= を渡すので、リゾルバーからHonoのミドルウェアが付けた値を読めます。
+
+レスポンスの側では、Apollo Serverが返す本文の種類で分けています。
+=body.kind= が ="complete"= なら文字列をそのまま =Response= に入れ、 ="chunked"= なら本文の非同期イテレーターを =ReadableStream= にして入れます。
+
+#+begin_src typescript
+const encoder = new TextEncoder()
+const iterator = body.asyncIterator[Symbol.asyncIterator]()
+return new ReadableStream<Uint8Array>({
+  async pull(controller) {
+    const { done, value } = await iterator.next()
+    if (done) {
+      controller.close()
+    } else {
+      controller.enqueue(encoder.encode(value))
+    }
+  },
+  async cancel() {
+    await iterator.return?.()
+  },
+})
+#+end_src
+
+=pull= は読み手が次の部分を求めるたびに呼ばれ、イテレーターから1つ取って流すので、前の節の =hello= の部分は =slow= の解決を待たずに届きます。
+クライアントが途中で接続を切ったときは、 =cancel= がイテレーターの =return= を呼んで後始末をApollo Serverに渡します。
+
+** Apollo Serverの結合テスト
+Apollo Serverは統合のパッケージ向けのテスト集[[https://github.com/apollographql/apollo-server/tree/main/packages/integration-testsuite][@apollo/server-integration-testsuite]]を公開していて、apollo-server-integration-honoは[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/test/integration/integration.test.ts][test/integration/integration.test.ts]]でこれをJestで回しています。
+CIと同じgraphql 16では、270件のうち246件が通り、graphql 17が要る =@defer= と =@stream= の24件は飛ばされます。
+
+#+begin_example
+Tests:       24 skipped, 246 passed, 270 total
+#+end_example
+
+飛ばされる24件も、リポジトリの =pnpm-workspace.yaml= の =overrides= に =graphql: 17.0.0-alpha.9= を足し、古い形式の =@defer= のテストが読む =@yaacovcr/transform= を入れて、環境変数 =INCREMENTAL_DELIVERY_TESTS_ENABLED= を付けると動きます。
+
+#+begin_src shell
+pnpm add -D @yaacovcr/transform
+INCREMENTAL_DELIVERY_TESTS_ENABLED=1 pnpm exec jest --testTimeout=30000
+#+end_src
+
+#+begin_example
+Test Suites: 1 passed, 1 total
+Tests:       270 passed, 270 total
+#+end_example
+
+この条件では =@defer= と =@stream= のテストも含めて270件がすべて通りました。
+コンテキストの =c= 、ミドルウェアのヘッダー、GETの問い合わせ、壊れたJSONの400のようなHonoに特有の動きは、 =test/unit/= のVitestのテストで確かめています。
+
+* T3 CodeをElectronの代わりにRustとGPUIの窓で使うT3 Code GPUIを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/ed26d1
+:export_date: 2026-11-27 23:22
+:export_updated: 2026-11-27 23:22
+:export_draft: t
+:export_tags: rust gpui t3-code ai-agent release rust-t3code-gpui
+:end:
+
+コーディングエージェントを操作するT3 Codeのサーバーに、Electronのデスクトップアプリの代わりにRustとGPUIで描くネイティブの窓からつなぐ非公式のフロントエンド、T3 Code GPUIを作りました。
+サーバーの =t3 serve= には手を入れずにWebSocketのプロトコルでつなぎ、スレッドの一覧と返答のタイムラインと送信欄を描きます。
+
+リポジトリは[[https://github.com/conao3/rust-t3code-gpui][conao3/rust-t3code-gpui]]で、ライセンスはApache-2.0です。
+この記事では0.1.0 (commit =d5cfde1= ) をLinuxのX11で動かしました。
+エージェントの返答が流れている間も描き直しは1秒に4回までにまとめていて、伸びていく返答のうち組み直すのは末尾の塊だけです。
+
+T3 Code GPUIはT3 Codeの開発元とは関係のない非公式のプロジェクトで、開発元の承認も保守も受けていません。
+
+[[github:conao3/rust-t3code-gpui::Rust][Native GPUI frontend for T3 Code]]
+
+** T3 Codeとの関係
+[[https://t3.codes][T3 Code]] は、手元でログイン済みのClaude CodeやCodexなどのコーディングエージェントを1つの画面から動かすアプリで、サーバーの =t3 serve= と、そこにつなぐWebの画面やデスクトップアプリからできています。
+デスクトップアプリはElectronで作られているので、T3 Code GPUIはこの画面の部分をRustで書き、サーバーは本家のものをそのまま使うことにしました。
+
+画面は[[https://github.com/zed-industries/zed/tree/main/crates/gpui][GPUI]]で描いていて、GPUIはZedエディタのUIフレームワークです。
+ボタンや入力欄などの部品には[[https://github.com/longbridge/gpui-kit][gpui-kit]]を使っています。
+
+下の画像は、一時的に立てた =t3 serve= にT3 Code GPUIでつなぎ、新しいスレッドで2回話しかけたところです。
+左がスレッドの一覧、中央が返答のタイムラインと送信欄、右がGitのブランチや変更を示すパネルで、ホスト名などの表示は塗りつぶしています。
+
+[[./resources/public/img/ed26d1-window.png]]
+
+本家の画面にある機能は、順に移している途中です。
+
+** 入れ方とつなぎ方
+Nixのflakeにしてあるので、Linuxでは次のコマンドで窓が開きます。
+
+#+begin_src console
+$ nix run github:conao3/rust-t3code-gpui
+#+end_src
+
+つなぐサーバーごとにトークンが要るので、サーバーが動いているホストで次のコマンドを実行して発行します。
+
+#+begin_src console
+$ t3 auth session issue --ttl 365d --label t3code-gpui --token-only
+#+end_src
+
+発行したトークンは、サーバーのURLと名前と一緒に =~/.config/t3code-gpui/environments.json= に書きます。
+このファイルは自分以外のユーザーが読める権限だと読み込みを断るので、modeを600にしておきます。
+
+#+begin_src json
+{
+  "environments": [
+    { "label": "local", "httpBaseUrl": "http://127.0.0.1:39471", "token": "..." }
+  ]
+}
+#+end_src
+
+サーバーを複数並べると先頭のものが主のホストになり、サイドバーの上のボタンでホストごとにスレッドを絞り込めます。
+つながるかどうかは =check-environment= で確かめられて、認証が通れば =Authenticated= が =true= になります。
+
+#+begin_src console
+$ t3code-gpui environment check-environment --label local
+{
+  "Label": "local",
+  "EnvironmentId": "d2347fbc-2c6c-4188-b246-ba58ebb3840a",
+  "ServerVersion": "0.1.12-nightly.20261122.5111",
+  "OrchestrationProtocolVersion": 2,
+  "Authenticated": true
+}
+#+end_src
+
+** キー操作
+送信欄に書いて =Ctrl+Enter= を押すと送れます。
+新しいスレッドの画面で送るとスレッドは裏で始まり、出てきた通知の「Open」かサイドバーからそのスレッドを開けます。
+
+| キー                         | 操作                                                 |
+|------------------------------+------------------------------------------------------|
+| =Ctrl+Enter=                 | 送信欄の文を送る、開いている質問に答える             |
+| =Ctrl+Shift+O=               | 新しいスレッドを始める                               |
+| =Alt+O=                      | 終わったスレッドか入力を待つスレッドを順に開く       |
+| =Alt+P= / =Alt+N=            | 前後の自分のメッセージへ移る                         |
+| =Ctrl+Shift+]= / =Ctrl+Shift+[= | サイドバーの次と前のスレッドを開く                |
+
+エージェントの返答が終わったスレッドと入力を待ち始めたスレッドは、いま開いているもの以外をデスクトップの通知で知らせます。
+
+** 描き直しを1秒に4回にまとめる
+T3 Codeのサーバーは、エージェントが返答を書いている間、その時点の本文を入れた更新を[[https://github.com/pingdotgg/t3code/blob/b72cb0385cc7f682c05c1976d36fa9c712d995e0/apps/server/src/orchestration-v2/ThreadLiveEventCoalescer.ts#L18][50ミリ秒ごと]]にまとめて送ってきます。
+T3 Code GPUIは届いた更新をすぐ手元の状態に入れますが、描き直しは[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/app.rs#L108][250ミリ秒]]に1回にまとめるので、その間に届いた更新は最新のものだけが画面に出ます。
+
+返答の本文は、[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][1,200バイトほどたまるごとにコードブロックの外の空行で区切り]]、区切った塊をタイムラインの別の行にしています。
+書き終わった塊は中身が変わらないので、返答が伸びている間に組み直すのは末尾の塊だけになります。
+
+X11では画面の垂直同期を待たずにフレームを出すようにGPUIに手を入れてあり、描画がキー入力を待たせません。
+
+** 構成
+Cargoのworkspaceに3つのcrateを置いています。
+
+- =t3-client= : サーバーとの接続、スレッドの一覧とスレッドの状態、切れたときのつなぎ直しを受け持ちます。UIには依存していません。
+- =t3-terminal= : GhosttyのVTのモジュールをWebAssemblyとしてwasmtimeで動かす端末のエンジンです。これもUIには依存していません。
+- =t3code-gpui= : 窓とCLIです。
 
 * COMMENT Local variables
 # Local Variables:
