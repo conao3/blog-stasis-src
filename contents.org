@@ -22291,6 +22291,182 @@ leanassayは、実行できる定理しか確かめられません。
 また試すのは入力の標本なので、穴が見つからなくても試した入力では見つからなかったと言えるだけです。
 壊れていないとみなして報告から外すバージョンも、試した入力で元の関数と同じ値を返したというだけのことです。
 
+* leanassay: mutation testing for Lean 4 theorems, to measure how much they pin down the implementation
+:properties:
+:export_file_name: generated/contents/blog/2026/e3d3ca
+:export_date: 2026-11-27 19:13
+:export_updated: 2026-11-27 19:13
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/51d6b7
+:export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
+:end:
+
+I built leanassay, a mutation testing tool for Lean 4 theorems that measures theorem quality: it runs broken versions of your functions against your theorems.
+The idea comes from mizchi's Japanese article [[https://zenn.dev/mizchi/articles/mutation-test-quality][おい、 Mutation Test をやれ。テスト品質を、測るために]] ("Hey, run mutation tests, to measure test quality"), which says that before you trust coverage raised by AI, you should make mutants by rewriting the code and check whether the tests fail.
+
+The same holds for proofs in Lean.
+If a broken implementation satisfies the same theorem, the theorem says nothing about the implementation, even when the proof passes.
+Now that AI writes proofs for us, I think the question to ask is how much a theorem pins down the implementation, more than whether the proof passes.
+In a project that mapped Julia to Lean, [[https://discourse.julialang.org/t/formalizing-julia-in-lean-and-finding-400-bugs-in-base/140243][128 of 130 "proved" bounds checks]] only assumed that the index was in range.
+
+Lean can run both theorems and implementations, so I brought mutation testing into Lean: the tool breaks the functions that a theorem mentions and runs the theorem to see whether it still holds.
+I tried it on the theorems I had proved myself for lsp-touchstone, and every theorem still held for a state machine that broke the spec and for a conversion with the wrong UTF-16 width.
+I also ran it on six of my tools that turn Lean functions into Rust, found 56 holes in two of them, and added theorems that close all of them.
+
+The tool, leanassay, is at [[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]] under the Apache-2.0 license.
+The results in this post come from Lean 4.35.0 and leanassay 0.2.0.
+
+[[github:conao3/lean-leanassay::Lean][Check whether your Lean theorems pin down your implementation, by running broken implementations against them]]
+
+** A broken implementation that passes the proofs
+[[https://s.conao3.com/blog/2026/45f8b5][lsp-touchstone]] is a tool that checks whether LSP messages follow the spec.
+It describes in Lean how progress notifications move the state, and before I ran leanassay it had six proved theorems.
+
+#+begin_src lean
+def step : TokenState → ProgressKind → Option TokenState
+  | .created, .begin => some .begun
+  | .begun, .report => some .begun
+  | .begun, .finish => some .ended
+  | _, _ => none
+#+end_src
+
+LSP progress goes through =begin= , some =report= messages, and =end= , in that order and only once.
+In the code, =.finish= is the LSP =end= , and I call each line that starts with =|= an arm.
+Let's add one arm that takes =begin= in the =begun= state and stays in =begun= .
+
+#+begin_src lean
+  | .begun, .begin => some .begun
+#+end_src
+
+With this arm added, the six theorems still pass with the original proofs.
+I had not written any theorem that forbids a second =begin= , and lsp-touchstone uses this =step= to detect violations, so with this arm it would miss a second =begin= .
+
+Every theorem is true and every proof passes, so the problem is in the theorems I did not write.
+You cannot find those by rereading the proofs, however many times you do.
+
+** What leanassay does
+leanassay makes broken versions of the functions that appear in a theorem, and runs the theorem with each version.
+It does not use the proof: it evaluates the theorem's premises and conclusion on concrete inputs, so if it finds an input where the theorem fails, the theorem has killed that mutation, and if the theorem holds on every input, there is a hole.
+
+mizchi's article frames unit tests as the quality check for the implementation and mutation tests as the quality check for the test code, and leanassay puts theorems in place of the tests to measure how much your proved theorems guarantee about the implementation.
+
+It breaks functions in two ways.
+
+- Replace the whole function with one that is plainly wrong, such as a function that always returns =default= or =none= , one that returns its argument, or one that returns only the first element of a list argument.
+- Change the body a little: swap a comparison or arithmetic operator, shift a number literal by one, swap =take= and =drop= , replace the result of a match arm with another arm's result, add an arm for a combination of constructors that no arm covers, or swap the branches of an =if= .
+
+If a broken version returns the same value as the original on every input it tried, leanassay treats it as not broken and leaves it out of the report, and it reports as holes only the versions whose output changed but still passed the theorems.
+
+In the terms of mizchi's article, a version that a theorem kills is Killed, a hole is Survived, and a version left out of the report is an equivalent mutant.
+
+The inputs come from the generators of [[https://github.com/leanprover-community/plausible][plausible]], a Lean library that tests properties on random inputs.
+The seed is fixed, so every run gives the same result.
+When an argument type has few values, leanassay tries every combination, and for a theorem whose premise rarely holds, it tries more inputs until it has enough.
+
+** Usage
+Add leanassay to lakefile.toml and pass the function you want to audit to =#assay= .
+
+#+begin_src lean
+import Assay
+import LspTouchstone.Progress
+
+#assay proved.step
+#+end_src
+
+leanassay collects the theorems that mention the function, and the theorems that mention functions that call it.
+When a theorem's conclusion is joined with =∧= , it gives each part its own column, and it prints a table of which theorems killed each broken version.
+
+[[./resources/public/img/51d6b7-progress.svg]]
+
+The figure shows four rows from the output table, with shorter names for the mutations.
+
+=✗= means it found an input where the theorem fails, =·= means the theorem held on the inputs it tried, and =?= means it could not check because it found almost no inputs that satisfy the theorem's premise in the broken version.
+At least one theorem killed 17 of the 19 mutations, and the two that add an arm taking =begin= in =begun= remained as holes.
+For each hole it prints a warning with an input where the output differs from the original, and for this hole it reports that the output differs for the =begun= state with =begin= .
+
+With =set_option assay.failOnHole true= it reports holes as errors, so if you include this file in the build, =lake build= fails while any hole remains.
+
+** Results on lsp-touchstone
+I ran it on the three parts of lsp-touchstone that have proofs.
+
+| Part | Mutations | Killed | Holes |
+|---|---|---|---|
+| Progress state transitions | 19 | 17 | 2 |
+| Position unit conversion | 72 | 43 | 15 |
+| Document range replacement | 12 | 12 | 0 |
+
+Of the other 14 in the position unit conversion, 12 could not be built because the types did not match, 1 returned the same values as the original on the inputs it tried, and 1 could not be checked because too few inputs met the premise.
+
+The position unit conversion uses =unitWidth= to decide how many units one character takes in UTF-8, UTF-16, and UTF-32; for example, =😀= counts as 4 in UTF-8, 2 in UTF-16, and 1 in UTF-32.
+But when I changed this width to any other value of at least 1, all four theorems still held.
+The theorems only required the width to be at least 1, and did not say which characters count as 2 in UTF-16.
+leanassay reported as holes a version that changes the comparison at the UTF-16 width-2 boundary from =<= to =≤= , and a version whose UTF-16 width is always 1.
+
+The other hole was about positions that point inside a character.
+The theorem only said "if it judges that a position points inside a character, the position is inside a character", and there was no converse theorem saying "a position inside a character is always judged to be inside a character".
+So a version that judged positions inside the second or a later character to be character boundaries or line ends passed every theorem.
+
+Based on these results, I added three theorems to lsp-touchstone.
+
+- In the =begun= state, it accepts only =report= and =end= .
+- A position inside a character is always judged to be inside a character.
+- The width of one character equals Lean's =Char.utf8Size= in UTF-8; in UTF-16, only characters of 4 bytes in UTF-8 have width 2; in UTF-32, it is 1.
+
+With these theorems, none of the 19 progress mutations or the 72 position mutations remain as holes.
+The [[https://github.com/conao3/rust-lsp-touchstone/commit/f77cc2b][commit that adds the theorems]] and the [[https://github.com/conao3/lean-leanassay/tree/master/AssayTest][audit results]] from before and after are in the repositories.
+
+** Results on my other tools
+Besides lsp-touchstone, I have six tools that use Lean functions turned into Rust with [[https://github.com/conao3/lean-leanfran][leanfran]].
+I put =#assay= on the functions that Rust calls, and made =make check= run the audit.
+
+| Tool | Functions | Mutations | Killed | Holes |
+|---|---|---|---|---|
+| [[https://github.com/conao3/rust-leanwisp][leanwisp]] (Lean formatter) | 24 | 155 | 140 | 0 |
+| [[https://github.com/conao3/rust-leansail][leansail]] (Lean language server) | 7 | 420 | 385 | 0 |
+| [[https://github.com/conao3/rust-leankeel][leankeel]] (Lean linter) | 7 | 40 | 40 | 0 |
+| [[https://github.com/conao3/rust-leanwake][leanwake]] (finds Lean declarations that got slower) | 3 | 10 | 10 | 0 |
+| [[https://github.com/conao3/rust-ritsuryo][ritsuryo]] (statutory periods and tax amounts) | 5 | 14 | 10 | 0 |
+| [[https://github.com/conao3/rust-ritsulint][ritsulint]] (linter for statutes) | 17 | 203 | 137 | 0 |
+| Total | 63 | 842 | 722 | 0 |
+
+The mutations that were not killed are versions that could not be built because the types did not match, and versions that returned the same values as the original on the inputs tried.
+I also left some functions out of the audit.
+In leanwisp, =key= , which builds cache keys, is left out because =fields= , which it builds on, still has two holes, and ritsuryo's =describe= , which returns the list of commands, has no theorems.
+
+Before the audit, leanwisp had 17 holes and leansail had 39, and some functions were not mentioned by any theorem: 6 in ritsuryo, 4 in leanwisp, and 1 in leankeel.
+
+Most holes were in theorems that stated only an upper bound or only one direction.
+For example, leanwisp's [[https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L54][softblockIndent]] computes the indent width with =min indent.toNat (base + 2)= , and its theorem only said that the result exceeds neither value, so a version that always returns 0 and a version that turns =+= into =-= both passed.
+After I added a [[https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L87-L90][theorem that the result equals one of the two values]], the hole went away.
+
+In leansail, the language server's state transition function [[https://github.com/conao3/rust-leansail/blob/67d191376c7025d718c3c0f902d05056a184cc60/src/lifecycle.rs#L13-L24][transition]] had 39 holes.
+The original theorem was an implication, "if it moves to =running= , the previous state is one of these", and only 3 of 63 inputs met the premise, so many broken versions went unchecked.
+I rewrote it as an =↔= and added an =↔= theorem for each target state, and all 39 holes went away.
+
+Every hole was a missing theorem, and I did not have to change any function definition.
+mizchi's article recommends using mutation testing as a tool for refactoring rather than running all mutants in CI every time, but I made every tool check in =make check= that there are no holes, so that I notice when a theorem is removed or weakened.
+For example, if I remove [[https://github.com/conao3/rust-leansail/blob/67d191376c7025d718c3c0f902d05056a184cc60/src/lifecycle.rs#L45-L47][initializing_iff_initialize]], which I added to leansail, 29 holes appear and the build fails.
+
+** How it differs from tools that check whether the proof breaks
+Lean already has a tool that breaks functions to measure how strong theorems are.
+[[https://github.com/jubnzv/Mutate.lean][Mutate.lean]] changes a function body and checks whether the proofs in the file stop passing, and Microsoft CCF used it to [[https://github.com/microsoft/CCF/pull/8683][look for holes in its Lean model]].
+
+But when you judge by whether the proof breaks, the result depends on how the proof is written.
+If I write by hand the version that judges a position inside a character to be a character boundary, =simp= closes the goal in one branch of the case split and the tactics after it have nothing left to do, so the proof of [[https://github.com/conao3/lean-leanassay/blob/ca31e1d3253382db32c8da631910a0fb5d9e76a6/Examples/LspTouchstone/Position.lean#L78-L98][resolve_splits]] fails.
+By that measure the version counts as killed, and you do not see that the converse theorem is missing.
+leanassay runs the theorem's statement itself, so it finds that this version satisfies the theorem, and it also works on theorems whose proof is still =sorry= .
+
+For the progress state transitions, Mutate.lean makes only two well-typed mutations, and it found no holes.
+The holes that leanassay found came from the mutation that adds an arm, and Mutate.lean does not make that kind of mutation.
+
+** What it cannot check
+leanassay can only check theorems that it can run.
+The premise and conclusion must be decidable propositions and the argument types need plausible generators, so it reports theorems about real numbers or infinite sets as theorems it cannot run.
+
+It tries a sample of inputs, so when it finds no hole, that only means it found none on the inputs it tried.
+A version that it treats as not broken and leaves out of the report also only returned the same values as the original on the inputs it tried.
+
 * Lean 4で証明した関数をTypeScriptから呼べるlean-tsを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/b62ab3
@@ -22812,6 +22988,155 @@ Leanの型と仕様を、複数の言語で使う共通語にしたいと考え�
 
 まず試すなら、使っている言語のREADMEから、短い関数と証明を1つ動かしてみてください。
 [[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript/samples/steps][leanfranの段階ごとのサンプル]]では、関数の呼び出しから、型、入力の検査、関数の検証まで順に試せます。
+
+* leanfran: call Lean 4 functions from Rust, Python, TypeScript and Clojure, and prove their functions in Lean
+:properties:
+:export_file_name: generated/contents/blog/2026/21ebbd
+:export_date: 2026-11-27 19:13
+:export_updated: 2026-11-27 19:13
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/23d62c
+:export_tags: lean rust python typescript clojure formal-verification code-generation release lean-leanfran
+:end:
+I built leanfran, which lets you call functions written and proved in Lean 4 from Rust, Python, TypeScript, and Clojure.
+It also works the other way: it translates functions written in each of those languages into Lean so you can prove their properties, so you can both build implementations proved in Lean into your application and verify in Lean the implementations you write in your usual language.
+
+To generate code from Lean, leanfran reads the compiler's intermediate representation and builds a library for each language, and the generated code runs on that language's runtime with leanfran's runtime library.
+
+The repository is [[https://github.com/conao3/lean-leanfran][conao3/lean-leanfran]], under the Apache-2.0 license.
+This post covers the features of v0.6.0.
+
+[[github:conao3/lean-leanfran::Lean][Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure]]
+
+[[./resources/public/img/23d62c-backends.svg]]
+
+** Using proved functions in an application
+Lean is a language in which you write functions and prove their properties; for example, you can write a function that doubles its argument and a theorem that the result is always twice the argument like this.
+
+#+begin_src lean
+def double (n : Nat) : Nat := n + n
+
+theorem double_eq (n : Nat) : double n = 2 * n := by
+  unfold double
+  omega
+#+end_src
+
+=Nat= is the type of integers 0 and above.
+=double_eq= states that the equation holds for every =n= , and Lean checks the proof to confirm that the equation holds for every natural number.
+
+When I use this function in an application, I want to use the proved implementation as it is.
+If I rewrite the function in another language, I have to check again that the rewrite and the Lean function compute the same thing, so leanfran generates source in the application's language from the Lean function.
+
+I have in mind writing functions such as date and money calculations, sorting data, and state transitions in Lean, and writing the UI and the HTTP handling in the language you usually use.
+
+** Supported languages
+leanfran supports Rust, Python, TypeScript, and Clojure, and for each language it can generate code from Lean and translate that language's functions into Lean to verify them.
+Each package is on that language's registry.
+
+| Language | Package | Source and usage |
+|------+------------+----------------|
+| Rust | [[https://crates.io/crates/leanfran][leanfran]] | [[https://github.com/conao3/lean-leanfran/tree/master/langs/Rust][langs/Rust/]] |
+| Python | [[https://pypi.org/project/leanfran/][leanfran]] | [[https://github.com/conao3/lean-leanfran/tree/master/langs/Python][langs/Python/]] |
+| TypeScript | [[https://www.npmjs.com/package/leanfran][leanfran]] | [[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript][langs/TypeScript/]] |
+| Clojure | [[https://clojars.org/io.github.conao3/leanfran][io.github.conao3/leanfran]] | [[https://github.com/conao3/lean-leanfran/tree/master/langs/Clojure][langs/Clojure/]] |
+
+Every backend uses Lean 4.35.0, and all of them are released with the same version number.
+Each backend can load Lean code from a separate file or embed it in the source of the target language.
+
+In TypeScript, for example, saving the following code as =src/arith.ts= embeds the function and theorem from above.
+
+#+begin_src typescript
+import { lean } from "leanfran"
+import * as arith from "./_lean/arith.ts"
+
+export const arithBlock = lean(
+  "arith",
+  String.raw`
+def double (n : Nat) : Nat := n + n
+
+theorem double_eq (n : Nat) : double n = 2 * n := by
+  unfold double
+  omega
+`,
+)
+
+console.log(arith.double(21n))
+#+end_src
+
+When you run =leanfran sync= , Lean checks the theorem and leanfran generates the function in =_lean/arith.ts= ; after that you can call the generated function from TypeScript, and this example prints =42n= .
+The setup steps are in the [[https://github.com/conao3/lean-leanfran/blob/master/langs/TypeScript/README.md#install][TypeScript README]], and an example with structures is in the [[https://github.com/conao3/lean-leanfran/blob/master/docs/typescript-guide.md#structures-inductive-types-and-standard-schema][guide to types and schemas]].
+
+** Types and input validation
+leanfran converts not only the computation but also the arguments and return values into forms the target language can handle: from Lean structures and inductive types, each backend generates the types it exposes and the conversion code.
+
+In TypeScript, it generates TypeScript types and a Standard Schema compatible schema from the Lean types, so you can pass that schema to Hono's validator to check HTTP requests, and the other way around, you can turn a schema you already have, such as a zod schema, into a Lean structure and use its constraints as premises of a proof.
+In Python, you can handle the data as pydantic models.
+
+There are concrete examples in [[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript/samples/pricing-api][the TypeScript pricing-api]] and [[https://github.com/conao3/lean-leanfran/tree/master/langs/Python/samples/pricing-api][the Python pricing-api]].
+
+Input validation here means checking the values the application receives to confirm that they meet the conditions the Lean proofs assume; for example, if you use a proof that assumes the lower bound is at most the upper bound, values from outside must meet that condition too.
+
+** Verifying functions written in your usual language
+In the other direction, you can compare functions written in Rust and the other languages with a Lean specification: leanfran translates functions within the supported subset into Lean, and you prove theorems about the translation.
+
+In Rust, functions marked with =#[leanfran::model]= are translated into Lean models with [[https://github.com/AeneasVerif/charon][Charon]] and [[https://github.com/AeneasVerif/aeneas][Aeneas]].
+Charon extracts the Rust compiler's intermediate representation, and Aeneas translates it into Lean functions.
+In the example below, =Std.U32= , =step*= , and =scalar_tac= are a type and tactics that Aeneas provides.
+The next example is a function that doubles its input and returns =u32::MAX= when the result would exceed the limit, taken from the [[https://github.com/conao3/lean-leanfran/tree/master/langs/Rust/samples/steps/10-ensures][10-ensures sample]].
+
+#+begin_src rust
+#[leanfran::model(ensures(ge = double::ge))]
+pub fn saturating_double(x: u32) -> u32 {
+    if x > u32::MAX / 2 {
+        u32::MAX
+    } else {
+        x * 2
+    }
+}
+#+end_src
+
+=double::ge= is the specification "the return value is at least the input", defined in Lean like this.
+
+#+begin_src lean
+def ge (x r : Std.U32) : Bool := decide (x.val ≤ r.val)
+#+end_src
+
+Running =cargo leanfran extract= generates a Lean model translated from the Rust function and a proposition stating that it meets the specification, and the sample writes the proof of that proposition in =lean/Proofs/SaturatingDouble.lean= .
+
+#+begin_src lean
+theorem saturating_double.proof.ge : saturating_double.obligation.ge := by
+  intro x
+  unfold saturating_double _root_.double.ge
+  step* <;> simp_all [core.num.U32.MAX, U32.rMax] <;> scalar_tac
+#+end_src
+
+=cargo leanfran check= checks this proof, which shows that for every input the return value is at least the input, and also that the multiplication that runs does not overflow.
+The application runs the function written in Rust as it is, while its properties are verified in Lean.
+
+TypeScript supports verification in the same direction: you mark a function with =model= and give =refines= for agreement with a specification or =ensures= for a condition on the return value.
+
+What you prove here, though, is the function translated into Lean, so to carry the result over to running in the original language, the translation has to preserve meaning and you have to keep the assumptions the translation makes.
+For example, when it verifies a TypeScript =number= as an integer, it assumes that the arguments and intermediate values stay within the safe integer range, and the [[https://github.com/conao3/lean-leanfran/blob/master/docs/typescript-guide.md#verifying-typescript-functions][guide to verifying functions]] describes the supported syntax and the assumptions.
+
+** How the conversion works and what the proofs cover
+leanfran reads the intermediate representation that the Lean compiler produces, where the handling of the functions and data needed at run time has already become concrete instructions.
+Each backend turns those instructions into code in the target language, and the runtime library handles operations on integers, strings, arrays, and so on, so the generated code runs entirely within that language.
+
+What Lean's theorems guarantee directly are the properties of the functions defined in Lean.
+For those properties to hold in the generated code, the backends and runtime libraries must reproduce Lean's computation correctly, so I check this part with tests, including tests that compare the results of the generated code with the results from Lean's C backend.
+
+I have not proved in Lean that leanfran's conversion itself is correct.
+
+** Lean as a lingua franca
+I made the name leanfran from lingua franca, a common language.
+I want Lean's types and specifications to be a common language shared by several programming languages.
+
+For now, what you can use is generating code from Lean for each language and verifying each language's functions against Lean specifications, and next I am thinking about a way to generate argument and return value conversions from Lean types when, for example, Rust calls a Python function.
+These cross-language calls are still only an idea.
+
+If you want to try it, start from the README for your language and run one short function and its proof.
+The [[https://github.com/conao3/lean-leanfran/tree/master/langs/TypeScript/samples/steps][step-by-step leanfran samples]] walk through calling functions, types, input validation, and verifying functions, in that order.
 
 * 20のAIスレッドと参加したMongoDBハッカソンの一日
 :properties:
