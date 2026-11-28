@@ -7,7 +7,7 @@ Original: /blog/2026/bfc7fe
 Tags: lean paper formal-verification ai-agent lean-ritsuryo
 
 
-I wrote an English paper on lean-ritsuryo, the Lean 4 library I introduced in [an earlier post](https://s.conao3.com/blog/2026/5499a8), and submitted it to aiXiv.
+I wrote an English paper on lean-ritsuryo, the Lean 4 library I introduced in [an earlier post](https://s.conao3.com/blog/2026/232531), and submitted it to aiXiv.
 You can read the paper at [aiXiv:2611.00464](https://aixiv.online/abs/2611.00464), and its page shows the title, the authors, and the AI involvement category, AI-derived, among other fields.
 
 ![img](../../../../resources/public/img/bfc7fe-aixiv-abs.png)

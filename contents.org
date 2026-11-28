@@ -17861,7 +17861,7 @@ Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https
 :export_tags: lean paper formal-verification ai-agent lean-ritsuryo
 :end:
 
-I wrote an English paper on lean-ritsuryo, the Lean 4 library I introduced in [[https://s.conao3.com/blog/2026/5499a8][an earlier post]], and submitted it to aiXiv.
+I wrote an English paper on lean-ritsuryo, the Lean 4 library I introduced in [[https://s.conao3.com/blog/2026/232531][an earlier post]], and submitted it to aiXiv.
 You can read the paper at [[https://aixiv.online/abs/2611.00464][aiXiv:2611.00464]], and its page shows the title, the authors, and the AI involvement category, AI-derived, among other fields.
 
 [[./resources/public/img/bfc7fe-aixiv-abs.png]]
@@ -20207,7 +20207,7 @@ It also works in the other direction, so you can prove properties of Rust functi
 
 The repository is [[https://github.com/conao3/lean-rs][conao3/lean-rs]], under Apache-2.0.
 The crate is on crates.io as =lean-rust=, and this post shows results from version 0.2.1.
-lean-rs is now the Rust backend of [[https://s.conao3.com/blog/2026/23d62c][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Rust][langs/Rust/ of conao3/lean-leanfran]], with the crate name =leanfran=.
+lean-rs is now the Rust backend of [[https://s.conao3.com/blog/2026/21ebbd][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Rust][langs/Rust/ of conao3/lean-leanfran]], with the crate name =leanfran=.
 
 lean-rs compiles the intermediate representation of the Lean compiler to Rust source, so cargo alone builds the generated Rust, with no Lean toolchain and no Lean C runtime.
 [[https://s.conao3.com/blog/2026/311be4][lean-clj]], which I introduced earlier, calls Lean functions from Clojure, and lean-rs brings the same mechanism to Rust.
@@ -20999,7 +20999,7 @@ Lean structures and inductive types become pydantic models, so you can use them 
 
 The repository is [[https://github.com/conao3/lean-py][conao3/lean-py]], under Apache-2.0.
 The package is on PyPI as =lean-python=, and this post shows results from version 0.2.0.
-lean-py is now the Python backend of [[https://s.conao3.com/blog/2026/23d62c][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Python][langs/Python/ of conao3/lean-leanfran]], with the package name =leanfran=.
+lean-py is now the Python backend of [[https://s.conao3.com/blog/2026/21ebbd][leanfran]], in [[https://github.com/conao3/lean-leanfran/tree/master/langs/Python][langs/Python/ of conao3/lean-leanfran]], with the package name =leanfran=.
 
 lean-py compiles the intermediate representation of the Lean compiler to Python source, and the generated Python runs on the =lean-python= package and pydantic alone, so you don't need Lean at run time.
 [[https://s.conao3.com/blog/2026/311be4][lean-clj]] and [[https://s.conao3.com/blog/2026/1ff994][lean-rs]] call Lean functions from Clojure and Rust, and lean-py brings the same mechanism to Python.
