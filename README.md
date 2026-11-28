@@ -1,4 +1,12 @@
-# blog-stasis-src
+<p align="center"><img src="docs/assets/banner.png" alt="blog-stasis-src: A static blog built with Stasis, with posts written in Org-mode and compiled to HTML" width="880"></p>
+
+<p align="center"><strong>A static blog built with Stasis, with posts written in Org-mode and compiled to HTML</strong></p>
+
+<p align="center"><a href="https://github.com/conao3/blog-stasis-src/actions/workflows/check.yml"><img src="https://github.com/conao3/blog-stasis-src/actions/workflows/check.yml/badge.svg?branch=master" alt="CI"></a> <a href="https://github.com/conao3/blog-stasis-src/stargazers"><img src="https://img.shields.io/github/stars/conao3/blog-stasis-src?style=flat" alt="GitHub stars"></a></p>
+
+<p align="center"><a href="#requirements">Requirements</a> | <a href="#getting-started">Getting Started</a> | <a href="#writing-articles">Writing Articles</a> | <a href="#deployment">Deployment</a></p>
+
+<h1>blog-stasis-src</h1>
 
 A static blog built with [Stasis](https://github.com/magnars/stasis), a simple and flexible Clojure static site generator. Articles are written in Org-mode, exported to Markdown, and compiled into HTML.
 
