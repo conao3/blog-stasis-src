@@ -33,7 +33,7 @@ theorem double_eq (n : Nat) : double n = 2 * n := by
 ```
 
 `Nat` is the type of integers 0 and above.
-`double_eq` states that the equation holds for every `n` , and Lean checks the proof to confirm that the equation holds for every natural number.
+`double_eq` states that the equation holds for every `n`, and Lean checks the proof to confirm that the equation holds for every natural number.
 
 When I use this function in an application, I want to use the proved implementation as it is.
 If I rewrite the function in another language, I have to check again that the rewrite and the Lean function compute the same thing, so leanfran generates source in the application's language from the Lean function.
@@ -90,7 +90,7 @@ Each package is on that language's registry.
 </tbody>
 </table>
 
-Every backend uses Lean 4.35.0, and all of them are released with the same version number.
+Every backend uses Lean 4.35.0, and I release all of them with the same version number.
 Each backend can load Lean code from a separate file or embed it in the source of the target language.
 
 In TypeScript, for example, saving the following code as `src/arith.ts` embeds the function and theorem from above.
@@ -113,7 +113,7 @@ theorem double_eq (n : Nat) : double n = 2 * n := by
 console.log(arith.double(21n))
 ```
 
-When you run `leanfran sync` , Lean checks the theorem and leanfran generates the function in `_lean/arith.ts` ; after that you can call the generated function from TypeScript, and this example prints `42n` .
+When you run `leanfran sync`, Lean checks the theorem and leanfran generates the function in `_lean/arith.ts`; after that you can call the generated function from TypeScript, and this example prints `42n`.
 The setup steps are in the [TypeScript README](https://github.com/conao3/lean-leanfran/blob/master/langs/TypeScript/README.md#install), and an example with structures is in the [guide to types and schemas](https://github.com/conao3/lean-leanfran/blob/master/docs/typescript-guide.md#structures-inductive-types-and-standard-schema).
 
 
@@ -133,9 +133,9 @@ Input validation here means checking the values the application receives to conf
 
 In the other direction, you can compare functions written in Rust and the other languages with a Lean specification: leanfran translates functions within the supported subset into Lean, and you prove theorems about the translation.
 
-In Rust, functions marked with `#[leanfran::model]` are translated into Lean models with [Charon](https://github.com/AeneasVerif/charon) and [Aeneas](https://github.com/AeneasVerif/aeneas).
+In Rust, leanfran translates functions marked with `#[leanfran::model]` into Lean models with [Charon](https://github.com/AeneasVerif/charon) and [Aeneas](https://github.com/AeneasVerif/aeneas).
 Charon extracts the Rust compiler's intermediate representation, and Aeneas translates it into Lean functions.
-In the example below, `Std.U32` , `step*` , and `scalar_tac` are a type and tactics that Aeneas provides.
+In the example below, `Std.U32`, `step*`, and `scalar_tac` are a type and tactics that Aeneas provides.
 The next example is a function that doubles its input and returns `u32::MAX` when the result would exceed the limit, taken from the [10-ensures sample](https://github.com/conao3/lean-leanfran/tree/master/langs/Rust/samples/steps/10-ensures).
 
 ```rust
@@ -155,7 +155,7 @@ pub fn saturating_double(x: u32) -> u32 {
 def ge (x r : Std.U32) : Bool := decide (x.val ≤ r.val)
 ```
 
-Running `cargo leanfran extract` generates a Lean model translated from the Rust function and a proposition stating that it meets the specification, and the sample writes the proof of that proposition in `lean/Proofs/SaturatingDouble.lean` .
+Running `cargo leanfran extract` generates a Lean model translated from the Rust function and a proposition stating that it meets the specification, and the sample writes the proof of that proposition in `lean/Proofs/SaturatingDouble.lean`.
 
 ```lean
 theorem saturating_double.proof.ge : saturating_double.obligation.ge := by
@@ -165,20 +165,20 @@ theorem saturating_double.proof.ge : saturating_double.obligation.ge := by
 ```
 
 `cargo leanfran check` checks this proof, which shows that for every input the return value is at least the input, and also that the multiplication that runs does not overflow.
-The application runs the function written in Rust as it is, while its properties are verified in Lean.
+The application runs the function written in Rust as it is, and you verify its properties in Lean.
 
 TypeScript supports verification in the same direction: you mark a function with `model` and give `refines` for agreement with a specification or `ensures` for a condition on the return value.
 
-What you prove here, though, is the function translated into Lean, so to carry the result over to running in the original language, the translation has to preserve meaning and you have to keep the assumptions the translation makes.
+Here, though, you prove properties of the function translated into Lean, so to carry the result over to running in the original language, the translation has to preserve meaning and you have to keep the assumptions the translation makes.
 For example, when it verifies a TypeScript `number` as an integer, it assumes that the arguments and intermediate values stay within the safe integer range, and the [guide to verifying functions](https://github.com/conao3/lean-leanfran/blob/master/docs/typescript-guide.md#verifying-typescript-functions) describes the supported syntax and the assumptions.
 
 
 # How the conversion works and what the proofs cover
 
 leanfran reads the intermediate representation that the Lean compiler produces, where the handling of the functions and data needed at run time has already become concrete instructions.
-Each backend turns those instructions into code in the target language, and the runtime library handles operations on integers, strings, arrays, and so on, so the generated code runs entirely within that language.
+Each backend turns those instructions into code in the target language, and the runtime library handles operations on integers, strings, arrays, and so on, so the generated code runs within that language.
 
-What Lean's theorems guarantee directly are the properties of the functions defined in Lean.
+Lean's theorems directly guarantee the properties of the functions defined in Lean.
 For those properties to hold in the generated code, the backends and runtime libraries must reproduce Lean's computation correctly, so I check this part with tests, including tests that compare the results of the generated code with the results from Lean's C backend.
 
 I have not proved in Lean that leanfran's conversion itself is correct.

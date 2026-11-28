@@ -38,16 +38,16 @@ def step : TokenState → ProgressKind → Option TokenState
   | _, _ => none
 ```
 
-LSP progress goes through `begin` , some `report` messages, and `end` , in that order and only once.
-In the code, `.finish` is the LSP `end` , and I call each line that starts with `|` an arm.
-Let's add one arm that takes `begin` in the `begun` state and stays in `begun` .
+LSP progress goes through `begin`, some `report` messages, and `end`, in that order and only once.
+In the code, `.finish` is the LSP `end`, and I call each line that starts with `|` an arm.
+Let's add one arm that takes `begin` in the `begun` state and stays in `begun`.
 
 ```lean
 | .begun, .begin => some .begun
 ```
 
 With this arm added, the six theorems still pass with the original proofs.
-I had not written any theorem that forbids a second `begin` , and lsp-touchstone uses this `step` to detect violations, so with this arm it would miss a second `begin` .
+I had not written any theorem that forbids a second `begin`, and lsp-touchstone uses this `step` to detect violations, so with this arm it would miss a second `begin`.
 
 Every theorem is true and every proof passes, so the problem is in the theorems I did not write.
 You cannot find those by rereading the proofs, however many times you do.
@@ -62,21 +62,21 @@ mizchi's article frames unit tests as the quality check for the implementation a
 
 It breaks functions in two ways.
 
--   Replace the whole function with one that is plainly wrong, such as a function that always returns `default` or `none` , one that returns its argument, or one that returns only the first element of a list argument.
--   Change the body a little: swap a comparison or arithmetic operator, shift a number literal by one, swap `take` and `drop` , replace the result of a match arm with another arm's result, add an arm for a combination of constructors that no arm covers, or swap the branches of an `if` .
+-   Replace the whole function with a wrong one, such as a function that always returns `default` or `none`, one that returns its argument, or one that returns only the first element of a list argument.
+-   Change the body a little: swap a comparison or arithmetic operator, shift a number literal by one, swap `take` and `drop`, replace the result of a match arm with another arm's result, add an arm for a combination of constructors that no arm covers, or swap the branches of an `if`.
 
 If a broken version returns the same value as the original on every input it tried, leanassay treats it as not broken and leaves it out of the report, and it reports as holes only the versions whose output changed but still passed the theorems.
 
 In the terms of mizchi's article, a version that a theorem kills is Killed, a hole is Survived, and a version left out of the report is an equivalent mutant.
 
 The inputs come from the generators of [plausible](https://github.com/leanprover-community/plausible), a Lean library that tests properties on random inputs.
-The seed is fixed, so every run gives the same result.
-When an argument type has few values, leanassay tries every combination, and for a theorem whose premise rarely holds, it tries more inputs until it has enough.
+The seed is fixed, so repeated runs give the same result.
+When an argument type has few values, leanassay tries every combination, and for a theorem whose premise holds for few inputs, it tries more inputs until it has enough.
 
 
 # Usage
 
-Add leanassay to lakefile.toml and pass the function you want to audit to `#assay` .
+Add leanassay to lakefile.toml and pass the function you want to audit to `#assay`.
 
 ```lean
 import Assay
@@ -86,7 +86,7 @@ import LspTouchstone.Progress
 ```
 
 leanassay collects the theorems that mention the function, and the theorems that mention functions that call it.
-When a theorem's conclusion is joined with `∧` , it gives each part its own column, and it prints a table of which theorems killed each broken version.
+When a theorem's conclusion is joined with `∧`, it gives each part its own column, and it prints a table of which theorems killed each broken version.
 
 ![img](../../../../resources/public/img/51d6b7-progress.svg)
 
@@ -94,7 +94,7 @@ The figure shows four rows from the output table, with shorter names for the mut
 
 `✗` means it found an input where the theorem fails, `·` means the theorem held on the inputs it tried, and `?` means it could not check because it found almost no inputs that satisfy the theorem's premise in the broken version.
 At least one theorem killed 17 of the 19 mutations, and the two that add an arm taking `begin` in `begun` remained as holes.
-For each hole it prints a warning with an input where the output differs from the original, and for this hole it reports that the output differs for the `begun` state with `begin` .
+For each hole it prints a warning with an input where the output differs from the original, and for this hole it reports that the output differs for the `begun` state with `begin`.
 
 With `set_option assay.failOnHole true` it reports holes as errors, so if you include this file in the build, `lake build` fails while any hole remains.
 
@@ -152,15 +152,15 @@ Of the other 14 in the position unit conversion, 12 could not be built because t
 The position unit conversion uses `unitWidth` to decide how many units one character takes in UTF-8, UTF-16, and UTF-32; for example, `😀` counts as 4 in UTF-8, 2 in UTF-16, and 1 in UTF-32.
 But when I changed this width to any other value of at least 1, all four theorems still held.
 The theorems only required the width to be at least 1, and did not say which characters count as 2 in UTF-16.
-leanassay reported as holes a version that changes the comparison at the UTF-16 width-2 boundary from `<` to `≤` , and a version whose UTF-16 width is always 1.
+leanassay reported as holes a version that changes the comparison at the UTF-16 width-2 boundary from `<` to `≤`, and a version whose UTF-16 width is always 1.
 
 The other hole was about positions that point inside a character.
 The theorem only said "if it judges that a position points inside a character, the position is inside a character", and there was no converse theorem saying "a position inside a character is always judged to be inside a character".
-So a version that judged positions inside the second or a later character to be character boundaries or line ends passed every theorem.
+Because of this, a version that judged positions inside a character after the second to be character boundaries or line ends passed every theorem.
 
 Based on these results, I added three theorems to lsp-touchstone.
 
--   In the `begun` state, it accepts only `report` and `end` .
+-   In the `begun` state, it accepts only `report` and `end`.
 -   A position inside a character is always judged to be inside a character.
 -   The width of one character equals Lean's `Char.utf8Size` in UTF-8; in UTF-16, only characters of 4 bytes in UTF-8 have width 2; in UTF-32, it is 1.
 
@@ -257,20 +257,20 @@ I put `#assay` on the functions that Rust calls, and made `make check` run the a
 
 The mutations that were not killed are versions that could not be built because the types did not match, and versions that returned the same values as the original on the inputs tried.
 I also left some functions out of the audit.
-In leanwisp, `key` , which builds cache keys, is left out because `fields` , which it builds on, still has two holes, and ritsuryo's `describe` , which returns the list of commands, has no theorems.
+leanwisp's `key`, which builds cache keys, builds on `fields`, which still has two holes, and ritsuryo's `describe`, which returns the list of commands, has no theorems.
 
 Before the audit, leanwisp had 17 holes and leansail had 39, and some functions were not mentioned by any theorem: 6 in ritsuryo, 4 in leanwisp, and 1 in leankeel.
 
 Most holes were in theorems that stated only an upper bound or only one direction.
-For example, leanwisp's [softblockIndent](https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L54) computes the indent width with `min indent.toNat (base + 2)` , and its theorem only said that the result exceeds neither value, so a version that always returns 0 and a version that turns `+` into `-` both passed.
+For example, leanwisp's [softblockIndent](https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L54) computes the indent width with `min indent.toNat (base + 2)`, and its theorem only said that the result exceeds neither value, so a version that always returns 0 and a version that turns `+` into `-` both passed.
 After I added a [theorem that the result equals one of the two values](https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L87-L90), the hole went away.
 
 In leansail, the language server's state transition function [transition](https://github.com/conao3/rust-leansail/blob/67d191376c7025d718c3c0f902d05056a184cc60/src/lifecycle.rs#L13-L24) had 39 holes.
-The original theorem was an implication, "if it moves to `running` , the previous state is one of these", and only 3 of 63 inputs met the premise, so many broken versions went unchecked.
+The original theorem was an implication, "if it moves to `running`, the previous state is one of these", and only 3 of 63 inputs met the premise, so many broken versions went unchecked.
 I rewrote it as an `↔` and added an `↔` theorem for each target state, and all 39 holes went away.
 
-Every hole was a missing theorem, and I did not have to change any function definition.
-mizchi's article recommends using mutation testing as a tool for refactoring rather than running all mutants in CI every time, but I made every tool check in `make check` that there are no holes, so that I notice when a theorem is removed or weakened.
+Each hole was a missing theorem, and I did not have to change any function definition.
+mizchi's article recommends using mutation testing as a tool for refactoring rather than running all mutants in CI every time, but I made each tool check in `make check` that there are no holes, so that I notice when a theorem is removed or weakened.
 For example, if I remove [initializing\_iff\_initialize](https://github.com/conao3/rust-leansail/blob/67d191376c7025d718c3c0f902d05056a184cc60/src/lifecycle.rs#L45-L47), which I added to leansail, 29 holes appear and the build fails.
 
 
@@ -282,7 +282,7 @@ Lean already has a tool that breaks functions to measure how strong theorems are
 But when you judge by whether the proof breaks, the result depends on how the proof is written.
 If I write by hand the version that judges a position inside a character to be a character boundary, `simp` closes the goal in one branch of the case split and the tactics after it have nothing left to do, so the proof of [resolve\_splits](https://github.com/conao3/lean-leanassay/blob/ca31e1d3253382db32c8da631910a0fb5d9e76a6/Examples/LspTouchstone/Position.lean#L78-L98) fails.
 By that measure the version counts as killed, and you do not see that the converse theorem is missing.
-leanassay runs the theorem's statement itself, so it finds that this version satisfies the theorem, and it also works on theorems whose proof is still `sorry` .
+leanassay runs the theorem's statement itself, so it finds that this version satisfies the theorem, and it also works on theorems whose proof is still `sorry`.
 
 For the progress state transitions, Mutate.lean makes only two well-typed mutations, and it found no holes.
 The holes that leanassay found came from the mutation that adds an arm, and Mutate.lean does not make that kind of mutation.
