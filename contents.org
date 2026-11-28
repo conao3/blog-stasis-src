@@ -26485,6 +26485,170 @@ heliosのT3 Codeで動いていたワーカーが「redかblueか」と質問し
 使ってみて、工場がうまく動くかどうかは仕事の分け方と結果の確かめ方で決まると感じています。
 crates.ioへの公開のように取り消せない操作ではワーカーがタスクを確認待ちにして承認を求めるので、私が判断するのは主にそうした操作です。
 
+* A software factory on Vercel Board: I talk to one thread, and coding agents work on two PCs
+:properties:
+:export_file_name: generated/contents/blog/2026/048a8b
+:export_date: 2026-11-27 20:06
+:export_updated: 2026-11-27 20:06
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/a80aa6
+:export_tags: ai-agent vercel-board t3-code nix
+:end:
+
+I looked into software factory cases in [[https://s.conao3.com/blog/2026/5e0ecc][the previous post]], so I built my own software factory with Vercel Board.
+I talk to a single agent thread that I call the conductor, and the conductor splits the work into tasks and puts them on the Board.
+Other agents that I call workers then take those tasks one at a time on two PCs: a desktop that runs all the time and a laptop.
+
+The Board keeps the tasks in order, stops two agents from starting the same task, and keeps the records.
+The Board also has =vb tasks run=, which claims a task, runs a command, and marks the task completed or failed by the command's exit code, but I could not use it to start workers.
+
+I start a worker with a command that opens an agent thread, and that command exits as soon as the thread is open, so the exit code says neither whether the worker has finished nor whether the result is a completion or a question for me.
+The Board alone also cannot tell the conductor that a task is done, or pass a reply on a task to the worker in charge of it.
+
+To fill these gaps, I wrote a management server in about 500 lines of Python.
+The management server claims a task and opens a worker thread, and when the worker finishes its reply, it reads the last line of the last message and marks the task completed, blocked, or failed.
+
+The configuration and code are in [[https://github.com/conao3/nixos-configuration][nixos-configuration]].
+This post shows the results with =@vercel/board= 0.54.0, T3 Code 0.1.9, and bb 0.49.0.
+
+** The overall setup
+[[https://github.com/vercel/board][Vercel Board]] is a message board that agents and people share, and it can treat a board thread as a task.
+The Board calls starting a task "claiming" it: only one agent can claim a task, and for a set time after that no other agent can claim it.
+
+I run this Board with =vb serve= on helios, my desktop that runs all the time, and my laptop eos reads and writes the same Board over the Tailscale network.
+
+[[./resources/public/img/a80aa6-factory.svg]]
+
+The one I talk to is the conductor thread at the bottom left of the figure.
+I call the span from an agent receiving a request to finishing its reply a turn, and the conductor splits the work into pieces that a worker can finish in one turn before putting them on the Board.
+
+The management server on helios claims tasks that are ready to start and opens a worker thread for each.
+At the end of a worker's turn, the management server turns the result into the task's state and notifies the conductor.
+
+I use two tools to run workers: [[https://github.com/pingdotgg/t3code][T3 Code]] and [[https://github.com/get-bb/bb][bb]].
+Both run agents such as Claude Code and Codex from a GUI, and both also let you open threads and send follow-ups from the CLI.
+
+** Putting tasks on the Board
+Tasks go to a =work/<リポジトリ>= channel for each repository I work on, and labels set the PC and the model that run them.
+
+#+begin_src bash
+vb tasks create work/rust-sellaite "<依頼>" \
+  --label host=helios --label model=opus \
+  --label notify=t3@eos:<指揮役のスレッドのID>
+#+end_src
+
+The =host= label names the PC that runs the task, and the =model= label is one of fable, opus, sonnet, and haiku.
+Every PC is logged in to services such as Claude and Codex with the same accounts, so I can pick the =model= value without regard to the PC.
+
+The =model= values are names of Claude models, but the management server picks a model that matches the value from among OpenAI's Codex and Cognition's Devin models too.
+For example, it may pick Codex's gpt-6.2-sol for opus and Devin's swe-2-high for haiku.
+
+If the task has an =effort= label, the management server also sets the reasoning effort to that value.
+
+The conductor writes the ID of its own thread, which receives the results, in the =notify= label.
+The conductor links tasks that must run in order with =--needs=, so the next task cannot start until the previous one is completed.
+
+The request text gives the goal, the target files, the completion criteria, the documents to read, and the branches the worker may push to, so that a worker can start from the request text alone.
+A worker reads the request in a new thread that knows nothing of the earlier conversation, so missing information lowers the quality of the work.
+
+** Starting workers
+Every 10 seconds the management server looks at the tasks that are ready to start, oldest first, and claims up to 5 at a time on each PC.
+The limit is 5 tasks on every PC, and a task run with T3 Code and a task run with bb each count as one.
+
+The command that claims a task is =vb tasks claim=, and by default no other agent can claim the task for 15 minutes after that.
+While the work goes on, the management server extends that time with =vb tasks renew= every 5 minutes, so the task stays claimed.
+
+If the management server stops, the renewals stop too, and after 15 minutes other agents can claim the task.
+
+The task's =harness= label decides whether the worker runs on T3 Code or bb, and if there is no label, the management server writes bb.
+bb creates a separate working directory of the repository with git worktree for each task, so tasks on the same repository can run at the same time without their changes colliding.
+
+helios also runs the agents on the other PC through the T3 Code and bb CLIs.
+bb can connect another PC and run threads on it, so I connected eos to bb on helios and open threads on eos with =bb thread spawn --machine conao-nixos-eos=.
+
+T3 Code can open a thread on another connected PC from its GUI, so I added =--environment= with a [[https://github.com/conao3/nixos-configuration/blob/bb949af/pkgs/t3code-thread-cli-environment.patch][patch]] so that the CLI's =t3 thread= can name the target PC too.
+Running =t3 thread start --environment <eosの接続先のID>= on helios opens a thread in T3 Code on eos.
+
+** Setting the state at the end of the turn
+The management server adds the following instruction to the end of the request it gives a worker.
+
+#+begin_example
+End your turn with a final message whose last line is one of these:
+DONE
+BLOCKED: <the question for the owner and the options, with the one you recommend>
+FAILED: <what you tried and why you could not go on>
+#+end_example
+
+Once a worker's turn ends, the management server passes the final message to [[https://github.com/conao3/nixos-configuration/blob/767db70/pkgs/agent-board-server.py#L387-L393][this function]].
+
+#+begin_src python
+def outcome(text):
+    lines = [line.strip() for line in text.strip().splitlines() if line.strip()]
+    last = lines[-1] if lines else ""
+    for word in OUTCOMES:
+        if last.startswith(word):
+            return word.rstrip(":").lower(), last[len(word):].strip()
+    return "failed", f"The worker ended its turn without DONE, BLOCKED or FAILED. Its last line: {last[:300]}"
+#+end_src
+
+The function looks only at the start of the last line.
+A line that starts with =DONE= means completed, and one that starts with =FAILED:= means failed.
+
+If the line starts with =BLOCKED:=, the function marks the task blocked, with the question that follows as the reason.
+If none of these match, the task fails with the last line attached.
+
+The management server that claimed the task updates its state under its own name.
+The worker's job is to reply to the thread with its result.
+
+If a worker ends its turn while it waits for CI in the background, the management server marks the task failed at that point.
+The request text therefore tells workers to wait for slow checks such as CI in the foreground with =gh run watch <id> --exit-status=.
+
+** Replies and notifications
+If I or the conductor reply on a task's thread, the management server receives the reply through =vb tail work/ --json=, which streams the Board's events, and passes it on to the worker thread in charge as a follow-up.
+For a blocked task it lifts the block, and for a failed task it makes the task ready again, claims it again, and lets the worker continue in the same thread.
+
+A worker running in T3 Code on helios asked "red or blue" and put its task in blocked.
+I replied "blue", and 17 seconds later the same thread answered =BLUE= and the task moved to completed.
+If I reply to a completed task, the agent in the same thread answers too.
+
+Each time a task becomes completed, blocked, or failed, the management server sends the following notification to the thread in the =notify= label.
+
+#+begin_example
+[factory] Board task #435, which you created, is now completed. https://<Boardのホスト>/?thread=435
+#+end_example
+
+If the conductor is in the middle of a turn, the management server sends the notification with steer, a feature that inserts a message into the running turn, and if the conductor is idle, the notification starts a new turn.
+
+The conductor checks the result when it gets a notification and then puts the next tasks on the Board.
+For a blocked notification, it decides whether to answer the question itself or ask me.
+
+I only get the conductor's reports after it has checked the results, and the questions it cannot decide alone.
+
+The laptop sleeps while I carry it around, so the management server resends undelivered notifications and replies every minute.
+The management server claims the tasks for a PC that was asleep together once it wakes up.
+
+** Restarting the management server
+The management server is installed as part of the NixOS configuration of helios, so applying a configuration change also restarts it.
+It writes a file for each task that records which thread runs the task, and when it starts, it reads these files and goes back to waiting for the running threads' turns to end.
+
+The worker threads run in T3 Code and bb processes separate from the management server, so the work goes on while the management server is down.
+That means I can apply the NixOS configuration at any time, even while tasks are running.
+
+** Using it
+In the two days up to the time of writing, I put 78 tasks on the Board, and 67 of them were completed.
+
+In one job, I ran 20 of my Emacs packages through the checks of [[https://github.com/conao3/ts-elispore][ts-elispore]], which tests whether a package follows the rules of the MELPA package archive, and the conductor put 20 tasks on the Board, one per package, in 76 seconds.
+With at most 4 tasks running at once, all of them were completed 54 minutes after the first task went on the Board.
+
+The work times of the tasks added up to 105 minutes, and because they ran in parallel, the job finished in about half that time.
+
+In [[https://github.com/conao3/rust-sellaite][rust-sellaite]], a worker updated the dependencies pinned with Nix, pushed, and then marked its task blocked to ask me to apply the new configuration to the two PCs.
+After I applied the configuration and replied, the worker in the same thread went on with the remaining checks and marked the task completed.
+
+From using it, I feel that whether the factory runs well depends on how the work is split and how the results are checked.
+For operations that cannot be undone, such as publishing to crates.io, the worker marks the task blocked and asks for approval, so the decisions I make are mostly about those operations.
+
 * Lean 4で証明した関数をPHPから呼べて、PHPの関数をLeanで証明できるleanfranのPHP版を作った
 :properties:
 :export_file_name: generated/contents/blog/2026/ec8faf
@@ -26826,6 +26990,351 @@ Float32の超越関数などの65件は、浮動小数点数の最小の刻み1�
 Leanの =IO= の関数をPHPのコマンドとして動かすgreet-cliもあります。
 
 導入の手順は[[https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md][PHPのREADME]]、型の対応やCLIの詳細は[[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md][PHPのガイド]]にあります。
+
+* leanfran for PHP: call Lean 4 functions from PHP, and prove PHP functions in Lean
+:properties:
+:export_file_name: generated/contents/blog/2026/88e5f5
+:export_date: 2026-11-27 20:06
+:export_updated: 2026-11-27 20:06
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/ec8faf
+:export_tags: lean php formal-verification code-generation release lean-leanfran
+:end:
+I built the PHP version of leanfran, which lets you call functions written and proved in Lean 4 from PHP classes.
+Lean structures and inductive types become PHP classes that check Lean's conditions when you create a value, and in the other direction you can translate functions written in PHP into Lean and prove their properties in Lean.
+
+The repository is [[https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP][langs/PHP/ in conao3/lean-leanfran]], under the Apache-2.0 license.
+The package is on Packagist as [[https://packagist.org/packages/conao3/leanfran][conao3/leanfran]], and this post is based on running version 0.7.0.
+
+leanfran turns the intermediate representation of the Lean compiler into PHP source, and the generated PHP runs with only the Composer package, so you don't need Lean at run time.
+
+[[https://s.conao3.com/blog/2026/21ebbd][The post that introduced leanfran]] covers the other four languages, Rust, Python, TypeScript, and Clojure, and PHP ships from the same repository at the same version.
+
+[[github:conao3/lean-leanfran::Lean][Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure]]
+
+** Three ways to use it
+There are three ways to use leanfran from PHP.
+
+[[./resources/public/img/ec8faf-uses.svg]]
+
+1. Write Lean functions and theorems in a PHP class with =#[Lean(...)]=, and call the methods that =vendor/bin/leanfran sync= generates from PHP.
+2. Pass Lean structures and inductive types around as PHP classes that come with checks and JSON conversion.
+3. Add =#[Model(...)]= to a function written in PHP to translate it into Lean, and check the proofs of its properties with =vendor/bin/leanfran check=.
+
+1 and 2 go from Lean to PHP, and 3 goes from PHP to Lean.
+
+** Writing Lean in a PHP class
+Install =leanfran-php=, the CLI that converts Lean code, with nix, and add the Composer package to your application.
+
+#+begin_src console
+$ nix profile install github:conao3/lean-leanfran/v0.7.0#php
+$ composer require conao3/leanfran
+#+end_src
+
+The package runs on 64-bit PHP 8.4 or later with the GMP and Tokenizer extensions.
+Generating code and checking proofs also need =lean= and =lake= from Lean 4.35.0 on your =PATH=.
+
+In =autoload.psr-4= of =composer.json=, map the =App= namespace to =src/=, and write the following class in =src/Pricing.php=.
+
+#+begin_src php
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Conao3\Leanfran\Lean;
+
+#[Lean(<<<'LEAN'
+    structure Range where
+      lo : Nat
+      hi : Nat
+      ok : lo ≤ hi
+
+    def width (r : Range) : Nat := r.hi - r.lo
+
+    theorem width_le (r : Range) : width r ≤ r.hi := by
+      unfold width
+      omega
+    LEAN)]
+final class Pricing
+{
+    use Pricing\Functions;
+}
+#+end_src
+
+The =#[Lean(...)]= attribute holds the Lean source as a nowdoc, and the class uses the generated trait =Pricing\Functions=.
+The =ok= field of =Range= holds a proof of =lo ≤ hi=, and =width_le= is a theorem that the width is at most the upper bound.
+
+The caller, =main.php=, creates a =Range= from the generated class and passes it to =Pricing::width=.
+
+#+begin_src php
+<?php
+
+declare(strict_types=1);
+
+use App\Pricing;
+use App\Pricing\Range;
+
+require __DIR__ . '/vendor/autoload.php';
+
+echo Pricing::width(new Range(lo: 2, hi: 5)), PHP_EOL;
+#+end_src
+
+=vendor/bin/leanfran sync= has Lean check the theorem and then generates the PHP, so after that you can run the code with PHP alone.
+
+#+begin_src console
+$ vendor/bin/leanfran sync
+leanfran: 1 block checked and generated
+$ php main.php
+3
+#+end_src
+
+The generated files go to =src/Pricing/=, next to the class.
+
+#+begin_src console
+$ find src -type f | sort
+src/Pricing/Functions.php
+src/Pricing/Internal/LeanPricing.php
+src/Pricing/leanfran.json
+src/Pricing.php
+src/Pricing/Range.php
+#+end_src
+
+=Functions.php= is the trait with the =width= method, =Range.php= is the class for the type, and =Internal/LeanPricing.php= is the body generated from Lean's intermediate representation.
+=leanfran.json= records the hash of the block and the generated files.
+
+If you commit the generated files to the repository, CI can check with =vendor/bin/leanfran status= that they are up to date without installing Lean.
+
+If you change the theorem to =width r ≤ r.lo=, the proof fails and generation stops there.
+
+#+begin_src console
+$ vendor/bin/leanfran sync
+src/Pricing.php:19:7: error: (lean block App\Pricing, Lean 10:2) omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 0
+  a - b ≤ 0
+  2*a - b ≤ -1
+where
+ a := ↑r.lo
+ b := ↑r.hi
+lake build failed
+#+end_src
+
+The error starts with the line and column in the PHP file, followed by the line and column of the Lean code inside the block.
+If generation fails, the previously generated PHP stays in place, so =php main.php= still prints =3= after this.
+
+** Lean types become PHP classes
+=Range= becomes a =final readonly class=, =lo= and =hi= become public properties, and the proof field =ok= becomes a check in the constructor.
+The following =range.php= creates a value from JSON, passes input that breaks the condition to the constructor, and then prints the JSON Schema.
+
+#+begin_src php
+<?php
+
+declare(strict_types=1);
+
+use App\Pricing\Range;
+use Conao3\Leanfran\ValidationError;
+
+require __DIR__ . '/vendor/autoload.php';
+
+$r = Range::fromJson('{"lo":1,"hi":4}');
+echo $r->hi, PHP_EOL;
+
+try {
+    new Range(lo: 5, hi: 2);
+} catch (ValidationError $e) {
+    echo $e->getMessage(), PHP_EOL;
+}
+
+echo json_encode(Range::jsonSchema(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), PHP_EOL;
+#+end_src
+
+#+begin_src console
+$ php range.php
+4
+Range.ok: lo ≤ hi
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+        "lo": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "hi": {
+            "type": "integer",
+            "minimum": 0
+        }
+    },
+    "required": [
+        "lo",
+        "hi"
+    ],
+    "additionalProperties": false
+}
+#+end_src
+
+The constructor runs the =lo ≤ hi= check with code compiled from Lean, so a value whose =lo= is greater than =hi= raises a =ValidationError=.
+
+JSON Schema cannot express =lo ≤ hi=, which spans two fields, so the schema only shows the lower bound of =Nat=.
+The constructor checks this condition, and the same check runs when you create a value from an array or pass a generated class to the [[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#valinor][Valinor]] mapper.
+
+If you pass a =readonly= class written in PHP to =models= in =#[Lean(...)]=, it comes into Lean as a structure, and ranges such as =int<0, 100>= in the class's PHPDoc become proof fields.
+
+** Proving PHP functions in Lean
+For the other direction, write =clamp=, which keeps a value within a range, in PHP, and tie it to a Lean specification with =#[Model(...)]=.
+
+#+begin_src php
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Conao3\Leanfran\Lean;
+use Conao3\Leanfran\Model;
+
+#[Lean(<<<'LEAN'
+    def clampSpec (x lo hi : Int) : Int := max lo (min hi x)
+    def ordered (_x lo hi : Int) : Bool := lo ≤ hi
+    def inRange (_x lo hi : Int) (r : Int) : Bool := lo ≤ r && r ≤ hi
+    LEAN)]
+final class Calc
+{
+    use Calc\Functions;
+
+    #[Model(refines: 'clampSpec', requires: 'ordered', ensures: ['in_range' => 'inRange'])]
+    public static function clamp(int $x, int $lo, int $hi): int
+    {
+        if ($x < $lo) {
+            return $lo;
+        }
+        if ($x > $hi) {
+            return $hi;
+        }
+        return $x;
+    }
+}
+#+end_src
+
+=refines= names a Lean function that returns the same value as the implementation, =requires= the precondition on the input, and =ensures= the conditions the return value meets.
+In this example, the proof obligations are that =clamp= returns the same value as =clampSpec= when =lo ≤ hi=, and that the return value is at least =lo= and at most =hi=.
+
+=vendor/bin/leanfran check= reads the PHP syntax tree, translates the function into a Lean function in =do= notation, and creates the obligation propositions with names such as =clamp.obligation.refines=.
+The proofs go in =lean/Proofs/= next to =composer.json=, and here I use [[https://github.com/conao3/lean-leanfran/blob/v0.7.0/langs/PHP/samples/verified-clamp/lean/Proofs/Calc.lean][the proof from the verified-clamp sample]] as is.
+
+#+begin_src lean
+import LeanPhpModel.App.Calc
+
+open LeanPhpEmbed.App.Calc
+namespace LeanPhpModel.App.Calc
+
+theorem clamp.proof.refines : clamp.obligation.refines := by
+  intro x lo hi h
+  simp only [ordered, decide_eq_true_eq] at h
+  simp only [clamp, clampSpec]
+  split <;> (try split) <;> simp_all <;> omega
+
+theorem clamp.proof.in_range : clamp.obligation.in_range := by
+  intro x lo hi h
+  simp only [ordered, decide_eq_true_eq] at h
+  simp only [clamp, inRange]
+  split <;> (try split) <;> simp_all <;> omega
+
+end LeanPhpModel.App.Calc
+#+end_src
+
+leanfran reads the PHP syntax tree with =nikic/php-parser=, so add it as a development dependency and then run =check=.
+
+#+begin_src console
+$ composer require -q --dev --no-interaction 'nikic/php-parser:^5.9'
+$ vendor/bin/leanfran check --require proved
+leanfran: 2 blocks checked and generated
+App\Calc\clamp refines: proved
+App\Calc\clamp in_range: proved
+leanfran: all blocks up to date
+#+end_src
+
+With =--require proved=, the exit code is 1 if any obligation is not =proved=.
+=proved= means that the type of the theorem matches the obligation and the proof relies on neither =sorry= nor any axiom outside the three standard ones.
+
+You can also compare the PHP implementation with the Lean specification in a random test that doesn't use Lean.
+
+#+begin_src php
+<?php
+
+declare(strict_types=1);
+
+use App\Calc;
+use Conao3\Leanfran\Verify;
+use Conao3\Leanfran\Verify\PropertyFailure;
+
+require __DIR__ . '/vendor/autoload.php';
+
+try {
+    Verify::checkClass(Calc::class);
+    echo 'ok', PHP_EOL;
+} catch (PropertyFailure $e) {
+    echo $e->getMessage(), PHP_EOL;
+}
+#+end_src
+
+#+begin_src console
+$ php verify.php
+ok
+#+end_src
+
+=Verify::checkClass= builds inputs from boundary values such as 0 and the integer limits and from random numbers with a fixed seed, and collects 200 inputs that meet =requires=.
+For each input, it compares the return value of the PHP =clamp= with the value of the generated =clampSpec=.
+
+Now change the second =if= of the implementation so that it returns =$hi - 1= when =$x= is greater than or equal to =$hi=.
+
+#+begin_src php
+        if ($x >= $hi) {
+            return $hi - 1;
+        }
+#+end_src
+
+=check= can no longer pass the two proofs, so it prints Lean's errors to standard error and marks each obligation =failed=.
+
+#+begin_src console
+$ vendor/bin/leanfran check --require proved 2>/dev/null
+leanfran: 2 blocks checked and generated
+App\Calc\clamp refines: failed
+App\Calc\clamp in_range: failed
+leanfran: all blocks up to date
+#+end_src
+
+The random test also finds a counterexample, an input where all three arguments are 0.
+
+#+begin_src console
+$ php verify.php
+App\Calc\clamp [refines] failed (seed=1, input=[0, 0, 0]): implementation returned -1; spec expected 0
+#+end_src
+
+** What the proofs guarantee
+The Lean theorems guarantee properties of the functions written in Lean and of the Lean models translated from PHP.
+For those properties to hold when the generated PHP or the original PHP runs, the converter, the runtime, and the model of PHP's operations must be correct, and I check these parts with tests.
+
+Integer operations in PHP are checked within the 64-bit range, and a calculation that overflows into a float fails in the model too.
+In a function with =#[Model(...)]=, ranges such as =int<0, 100>= in the PHPDoc of the arguments are not assumptions for the proof, so write the conditions the proof uses in =requires=.
+
+leanfran can translate a subset of PHP: it handles =foreach=, =match=, list indexing, =readonly= classes, and =enum=, but not pass-by-reference, =??=, or functions that do input and output.
+The full list of supported syntax is in [[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#php-subset][the PHP guide]].
+
+For the generated PHP, tests compare its results with those of Lean's C backend.
+
+At the time of writing, the results of 1,707,520 numeric operations built from boundary values and random numbers match the C backend byte for byte on both PHP 8.4 and 8.5.
+65 cases, such as Float32 transcendental functions, differ by no more than one step of the smallest floating-point increment.
+
+** Wrapping up
+Besides the examples in this post, [[https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples][the PHP samples]] include verified-cart, which proves a loop that computes a total, assuming upper bounds on prices and quantities, and embed-orders, which shares types between two blocks.
+There is also greet-cli, which runs a Lean =IO= function as a PHP command.
+
+The setup steps are in [[https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md][the PHP README]], and the details of the type mapping and the CLI are in [[https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md][the PHP guide]].
 
 * Clojure本体をLeanと差分テストで調べて、HAMTとvector-ofに未報告の不具合を見つけた
 :properties:
