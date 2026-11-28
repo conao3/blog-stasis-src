@@ -32565,7 +32565,7 @@ Lean 4でclojure.coreの =partition-all= や =frequencies= など46個の関数�
 定理は使う側の証明から呼べるので、Leanで書いたプログラムの性質を証明するときに =partition-all= や =group-by= の性質を自分で証明し直さずに済みます。
 Clojureの記事としては [[https://s.conao3.com/blog/2026/8bda7e][Clojure本体をLeanと差分テストで調べた記事]] と [[https://s.conao3.com/blog/2026/76293c][clojure.coreの関数を数式で表したチートシート]] も書いています。
 
-[[github:conao3/lean-leanclove::Lean][clojure.core-equivalent function library for Lean 4, with proofs]]
+[[github:conao3/lean-leanclove::Lean][clojure.core functions for Lean 4, with proofs]]
 
 ** leancloveを入れる
 Lean 4.35.0のプロジェクトの =lakefile.toml= に次の行を足します。
@@ -32687,7 +32687,7 @@ This post uses Lean 4.35.0 and commit [[https://github.com/conao3/lean-leanclove
 Your own proofs can call these theorems, so when you prove a property of a Lean program you can use the laws of =partition-all= or =group-by= without proving them again.
 I have also written about Clojure in [[https://s.conao3.com/blog/2026/e4f733][I checked Clojure's core with Lean and differential testing and found unreported bugs in HAMT and vector-of]] and [[https://s.conao3.com/blog/2026/315a71][A Clojure core cheat sheet in math notation]].
 
-[[github:conao3/lean-leanclove::Lean][clojure.core-equivalent function library for Lean 4, with proofs]]
+[[github:conao3/lean-leanclove::Lean][clojure.core functions for Lean 4, with proofs]]
 
 ** Install leanclove
 Add these lines to the =lakefile.toml= of a Lean 4.35.0 project.
