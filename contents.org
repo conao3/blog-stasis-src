@@ -32051,10 +32051,10 @@ The diff of the file follows, and each change is the fix that Lean attached to t
 Leankeel first elaborates the file and reads the fixes embedded in each message.
 It applies the fixes of the selected rules whose ranges don't overlap, in source order, and elaborates the file again.
 
-When the warnings went down and every warning left was there before, Leankeel keeps the change.
+Leankeel keeps the change if the warnings went down and each warning left was there before.
 It compares the warnings before and after by rule, severity and message text, and leaves the text of the fix out of the comparison.
 
-When the batch fails, Leankeel tries each fix alone, and it puts a fix that still fails into =Rejected= and never tries it again.
+If the batch fails, Leankeel tries each fix alone, and it puts a fix that still fails into =Rejected= and doesn't try it again.
 
 Leankeel repeats this until no fix is left, so it applies overlapping fixes, such as two unused arguments of one =simp=, one per round.
 
