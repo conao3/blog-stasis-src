@@ -34266,6 +34266,245 @@ vug 0.2.28
 レコードはデータだけなので、パッケージを足すときはソースのURLとSHA-256とビルドの種類と依存を書いて、 =check-tree= とビルドで確かめます。
 vug-packagesのレコードを読んで、気になったパッケージをvugでビルドしてみてください。
 
+* vug: a declarative package manager that builds Linux from TOML records, starting from BusyBox and zig
+:properties:
+:export_file_name: generated/contents/blog/2026/a4163a
+:export_original: /blog/2026/d4bc96
+:export_date: 2026-11-27 23:11
+:export_updated: 2026-11-27 23:11
+:export_lang: en
+:export_tags: rust package-management linux zig lean lean-leanfran release rust-vug vug-packages
+:export_draft: t
+:end:
+I wrote vug, a declarative package manager, in Rust.
+You write packages, services and systems as TOML records that hold only data, and vug builds them in a sandbox that starts from 2 binaries, BusyBox and zig, all the way up to a Linux system that boots in QEMU.
+
+vug puts each build output in a store directory named after the hash of its contents.
+A system is a generation that collects store paths, so you can switch to it and go back to the previous one.
+
+The records live in [[https://github.com/conao3/vug-packages][conao3/vug-packages]], which held 1,295 packages when I wrote this post.
+
+The repository is [[https://github.com/conao3/rust-vug][conao3/rust-vug]], under [[https://github.com/conao3/rust-vug/blob/7026623/LICENSE][Apache-2.0]].
+vug-packages is under [[https://github.com/conao3/vug-packages/blob/004fd8f/LICENSE][MIT]], and this post uses vug 0.2.28 and [[https://github.com/conao3/vug-packages/commit/004fd8f][004fd8f]] of vug-packages.
+
+[[github:conao3/rust-vug::Rust][A package manager and system builder with declarative TOML package records, a content-addressed store, and sandboxed builds]]
+
+[[github:conao3/vug-packages][Package records for vug]]
+
+** What vug does
+
+- Write packages, services and systems as TOML records that hold only data.
+- Build packages in a sandbox that starts from BusyBox and zig, and put each output in the store under the hash of its contents.
+- Run a program of a package in the store, in an environment that shows the store at =/vug/store=.
+- Write a disk image that boots in QEMU from a system record.
+- Build the next system on a running machine, switch to it, and go back to the previous generation.
+- Export build outputs to a signed binary cache, and take them from the cache on another machine in place of building.
+
+** Writing a package in TOML
+
+A package record lives in =packages/<first 2 letters of the name>/<name>/= and consists of =package.toml= and one =versions/<version>.toml= per version.
+The record for version 2.12.2 of GNU Hello looks like this.
+
+#+begin_src toml
+version = "2.12.2"
+
+[source]
+url = "https://ftp.gnu.org/gnu/hello/hello-2.12.2.tar.gz"
+sha256 = "5a9a996dc292cc24dcf411cee87e92f6aae5b8d13bd9c6819b4c7a9dce0818ab"
+
+[build]
+kind = "autotools"
+configure-flags = [
+  "--disable-nls",
+]
+
+[dependencies]
+build = [
+  "make",
+]
+run = []
+
+[check]
+enabled = true
+skip = []
+#+end_src
+
+A record holds only data: the source URL and its SHA-256, the build kind, and the dependencies.
+vug carries the build steps for each build kind, such as =autotools=, =cmake= and =cargo=, and a record names its kind and passes flags.
+
+=vug record check-tree= checks every record in the repository.
+
+#+begin_src sh
+$ vug record check-tree --root .
+{
+  "Errors": [],
+  "Packages": 1295,
+  "Systems": 5,
+  "Versions": 1328
+}
+#+end_src
+
+** Building in a sandbox that starts from BusyBox and zig
+
+[[./resources/public/img/a4163a-flow.svg]]
+
+A vug build starts from 2 binaries that vug calls the seed, and vug-packages lists them in =seed.toml=.
+
+#+begin_src toml
+[busybox]
+url = "https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox"
+sha256 = "6e123e7f3202a8c1e9b1f94d8941580a25135382b99e8d3e34fb858bba311348"
+
+[zig]
+url = "https://ziglang.org/download/0.17.1/zig-x86_64-linux-0.17.1.tar.xz"
+sha256 = "3581863e3cbcfd0fce0efc682ce7e9e93da96668a977791d356a26d2a7e9b17a"
+#+end_src
+
+BusyBox from the seed provides =sh=, =tar=, =sed= and the other basic tools, and =cc= and =c++= call =zig cc= and =zig c++=, so make, perl, python, LLVM and the Linux kernel all build from this seed.
+
+The Rust and Go compilers are the binaries their upstreams distribute, unpacked into the store.
+When I wrote this post, 99 packages were records that take their outputs from the Nix binary cache.
+
+The build runs under =bwrap --unshare-all=, cut off from the network and the host file system, and sees only the seed, the declared dependencies and the source.
+
+The output goes to =/vug/store/<id>=.
+vug computes =<id>= from the BLAKE3 hash of the output's file tree, so the package name and version aren't part of the path.
+
+Putting outputs in a store and switching generations resembles Nix and Guix, but Nix and Guix derive a store path from the build inputs, and vug derives it from the hash of the output's contents.
+
+An output can contain its own path, so the build installs into a placeholder path of the same length, computes the hash, and then replaces the placeholder with the real path.
+
+#+begin_src sh
+$ vug package build-package --root . --name hello --output text
+/vug/store/mrhlynr4ckz4frus7zgii7cj4374xedx
+$ vug package run-package --root . --name hello --program bin/hello
+Hello, world!
+#+end_src
+
+=build-package= builds the package when the store has no output for it, and prints the store path.
+=run-package= runs the program in a namespace with the store mounted at =/vug/store=, so programs that load shared libraries from the store run too.
+
+vug-packages also has records for LLVM with clang, and for vug itself.
+
+#+begin_src sh
+$ vug package run-package --root . --name llvm:tools --program bin/clang --arguments --version
+clang version 23.1.6
+Target: x86_64-unknown-linux-musl
+Thread model: posix
+InstalledDir: /vug/store/5sbeidlvsehmdgmsvswgq56pnvi7aetf/bin
+$ vug package run-package --root . --name vug --program bin/vug --arguments --version
+vug 0.2.28
+#+end_src
+
+=llvm:tools= names the auxiliary tools among the outputs of the LLVM package.
+
+** Building a system and booting it in QEMU
+
+A system record lists a kernel, packages, files below =/etc=, and users.
+=systems/minimal.toml= in vug-packages is a system that prints the versions of a few commands at boot and then runs bash.
+
+#+begin_src toml
+name = "minimal"
+kernel = "linux"
+init = "{pkg:bash}/bin/bash /etc/vug-init"
+sh = "{pkg:bash}/bin/bash"
+packages = [
+  "bash",
+  "coreutils",
+  "findutils",
+  "grep",
+  "procps",
+  "sed",
+  "util-linux",
+]
+
+[[file]]
+path = "/etc/vug-init"
+mode = "755"
+content = """
+#!/bin/bash
+export PATH=/bin
+mount -t sysfs sys /sys
+echo "vug system: $(cat /etc/hostname)"
+bash --version | head -n 1
+ls --version | head -n 1
+mount --version
+uname -srm
+echo "processes: $(ps -e | wc -l)"
+echo VUG-SYSTEM-OK
+exec bash
+"""
+#+end_src
+
+=vug system build-image= builds the system into the store and writes a disk image.
+=Kernel= in the JSON that =build-image= prints is the path of the kernel file, and you pass it to QEMU to boot.
+
+#+begin_src sh
+$ KERNEL=$(vug system build-image --root . --name minimal --image minimal.img | jq -r .Kernel)
+$ qemu-system-x86_64 -enable-kvm -m 2048 -nographic \
+    -kernel "$KERNEL" \
+    -drive file=minimal.img,if=virtio,format=raw \
+    -append "console=ttyS0 root=/dev/vda rw init=/vug/profiles/system/init"
+#+end_src
+
+Apart from the kernel log, the serial console shows the following.
+
+#+begin_src sh
+vug system: vug-minimal
+GNU bash, version 5.3.0(1)-release (x86_64-unknown-linux-musl)
+ls (GNU coreutils) 9.12
+mount from util-linux 2.41.2 (libmount 2.41.2: namespaces, idmapping, fd-based-mount, statx, assert, debug)
+Linux 6.18.45 x86_64
+processes: 38
+VUG-SYSTEM-OK
+#+end_src
+
+On a running machine, you edit the records in =/vug/tree= and run =vug system switch-system=, and vug builds the next system on the machine and switches to it.
+Each switch adds a generation, and running =/vug/profiles/system-<N>/bin/switch-to-system= takes you back to generation N.
+
+vug-packages also has a system with systemd, PAM and sshd, a system on a GPT disk that boots through EFI, and a service that adds a sway desktop.
+I have booted systems built with vug only in QEMU, and as the [[https://github.com/conao3/rust-vug/blob/7026623/README.md#vug][rust-vug README]] says, they haven't run on real hardware yet.
+
+** Sharing build outputs through a binary cache
+
+=vug store export-cache= writes the outputs in the store to a directory you can serve over HTTP, and signs each entry with Ed25519.
+When you build on another machine with =--binary-cache= and =--trusted-key=, vug takes from the cache only the outputs that the trusted key signed.
+[[https://github.com/conao3/rust-vug/blob/7026623/docs/cache.md][docs/cache.md]] describes the layout of a cache.
+
+** Writing version comparison and naming rules in Lean 4
+
+I wrote vug's version comparison and the rules for package names and paths in Lean 4, and [[https://github.com/conao3/lean-leanfran][leanfran]] turns them into Rust.
+
+#+begin_src sh
+$ vug version compare-versions --left 1.2.10 --right 1.2.9
+{
+  "Ordering": "Greater"
+}
+#+end_src
+
+vug compares runs of digits in a version as numbers, so 1.2.10 is greater than 1.2.9.
+
+For any 2 strings, I proved in Lean that [[https://github.com/conao3/rust-vug/blob/7026623/src/version.rs#L422][swapping the arguments reverses the result]] of this comparison, and that [[https://github.com/conao3/rust-vug/blob/7026623/src/version.rs#L444][the less-than relation is transitive]].
+The proofs are about the Lean definitions; whether the Rust code that leanfran generates behaves like those definitions lies outside the proofs.
+
+** Installing vug
+
+The [[https://github.com/conao3/rust-vug/releases/tag/v0.2.28][release]] has a statically linked executable for x86_64 Linux.
+
+#+begin_src sh
+$ curl -sL https://github.com/conao3/rust-vug/releases/download/v0.2.28/vug-0.2.28-x86_64-linux-musl.tar.gz | tar xz
+$ ./vug --version
+vug 0.2.28
+#+end_src
+
+Building packages requires =bwrap= on =PATH=.
+With an empty store, the first build fetches the seed and builds the tool chain from it.
+
+** Wrapping up
+
+A record holds only data, so to add a package you write the source URL, its SHA-256, the build kind and the dependencies, then check it with =check-tree= and a build.
+Read the records in vug-packages and try building a package you like with vug.
+
 * AIエージェントが人のカーソルとフォーカスを奪わずにLinuxのGUIを操作できるsellaiteを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/70596e
