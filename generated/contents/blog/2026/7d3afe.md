@@ -95,7 +95,7 @@ configuration.nix
 }
 ```
 
-With this setting, emacsclient starts together with the OS.
+NixOS turns this setting into the [systemd user service](https://github.com/NixOS/nixpkgs/blob/2786a2a72088ecf32aea5b3ec52099e6a7cff78f/nixos/modules/services/editors/emacs.nix#L68-L89) `emacs`, which runs `emacs --fg-daemon` when you log in to the desktop.
 
 Setting `defaultEditor` as well points `EDITOR` at emacsclient, so programs that use `EDITOR` open files in emacsclient without any setup of their own.
 
@@ -133,9 +133,9 @@ The default is `pkgs.emacs`, and you can also set emacs-nox, emacs-pgtk, or an E
 # Usage
 
 
-## After boot
+## After login
 
-emacsclient starts when the OS boots, so you can open a new frame right away.
+The Emacs server starts when you log in to the desktop, so emacsclient can open a new frame right away.
 Earlier you made `e` an alias for `$EDITOR`, so running `e` alone opens a new frame.
 Add `&` so the command doesn't block the shell.
 

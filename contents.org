@@ -15910,7 +15910,7 @@ nix run nixpkgs#nix-update -- clj-kondo --build --commit
 :properties:
 :export_file_name: generated/contents/blog/2026/26583e
 :export_date: 2026-01-24
-:export_updated: 2026-01-24
+:export_updated: 2026-11-27 22:23
 :export_tags: emacs nix tutorial
 :end:
 
@@ -16000,7 +16000,7 @@ configuration.nix
 }
 #+end_src
 
-この設定でOS起動時に同時にemacsclientを起動することができます。
+NixOSはこの設定から[[https://github.com/NixOS/nixpkgs/blob/2786a2a72088ecf32aea5b3ec52099e6a7cff78f/nixos/modules/services/editors/emacs.nix#L68-L89][systemdのユーザーのサービス]] =emacs= を作り、このサービスがデスクトップへのログインと一緒に =emacs --fg-daemon= を実行します。
 
 さらに =defaultEditor= を設定することで =EDITOR= をemacsclientを利用するように設定できるため、 =EDITOR= を利用するソフトウェアとも透過的にemacsclientを利用することができます。
 
@@ -16035,7 +16035,7 @@ configuration.nix
 :PROPERTIES:
 :ID:       f1a2c804-e101-429a-b0cb-8369353e76ac
 :END:
-emacsclientはOS起動時に起動しているため、新規フレームを開くことができます。
+デスクトップにログインした時点でEmacsサーバーが起動しているので、emacsclientで新規フレームを開くことができます。
 先ほど =e= を =$EDITOR= のエイリアスとして設定したので、 =e= を実行するだけで新しいフレームが開きます。
 =&= を付けてブロックしないようにすると良いです。
 
@@ -16257,7 +16257,7 @@ configuration.nix
 }
 #+end_src
 
-With this setting, emacsclient starts together with the OS.
+NixOS turns this setting into the [[https://github.com/NixOS/nixpkgs/blob/2786a2a72088ecf32aea5b3ec52099e6a7cff78f/nixos/modules/services/editors/emacs.nix#L68-L89][systemd user service]] =emacs=, which runs =emacs --fg-daemon= when you log in to the desktop.
 
 Setting =defaultEditor= as well points =EDITOR= at emacsclient, so programs that use =EDITOR= open files in emacsclient without any setup of their own.
 
@@ -16288,8 +16288,8 @@ The default is =pkgs.emacs=, and you can also set emacs-nox, emacs-pgtk, or an E
 #+end_src
 
 ** Usage
-*** After boot
-emacsclient starts when the OS boots, so you can open a new frame right away.
+*** After login
+The Emacs server starts when you log in to the desktop, so emacsclient can open a new frame right away.
 Earlier you made =e= an alias for =$EDITOR=, so running =e= alone opens a new frame.
 Add =&= so the command doesn't block the shell.
 
