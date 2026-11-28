@@ -6,7 +6,7 @@ Tags: lean diff git differential-testing release lean-leansplice
 
 
 Lean 4でunified diffを生成し、パッチに書かれた行番号どおりにだけ適用するライブラリとCLIのleanspliceを作りました。
-`git apply` は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチでは何も出力せずにエラーで終わります。
+`git apply` は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチでは当てた結果を出力せずにエラーで終わります。
 
 リポジトリは [conao3/lean-leansplice](https://github.com/conao3/lean-leansplice) で、ライセンスはApache-2.0です。
 Lean 4.36.0の標準ライブラリだけで書いています。

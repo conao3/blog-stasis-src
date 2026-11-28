@@ -32495,7 +32495,7 @@ leanclove takes the names and ideas of clojure.core and writes them as Lean func
 :end:
 
 Lean 4でunified diffを生成し、パッチに書かれた行番号どおりにだけ適用するライブラリとCLIのleanspliceを作りました。
-=git apply= は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチでは何も出力せずにエラーで終わります。
+=git apply= は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチでは当てた結果を出力せずにエラーで終わります。
 
 リポジトリは [[https://github.com/conao3/lean-leansplice][conao3/lean-leansplice]] で、ライセンスはApache-2.0です。
 Lean 4.36.0の標準ライブラリだけで書いています。
@@ -32662,7 +32662,7 @@ IssueやPRは大歓迎です。
 :end:
 
 I built leansplice, a Lean 4 library and CLI that generates unified diffs and applies a patch only at the line numbers the patch states.
-=git apply= searches for a hunk in a file whose lines have shifted and applies it where it finds it, while leansplice rejects a patch whose line numbers and content do not match, and prints nothing.
+=git apply= searches for a hunk in a file whose lines have shifted and applies it where it finds it, while leansplice rejects a patch whose line numbers and content do not match, and prints no patched text.
 
 The repository is [[https://github.com/conao3/lean-leansplice][conao3/lean-leansplice]], and its license is Apache-2.0.
 It uses only the standard library of Lean 4.36.0.
