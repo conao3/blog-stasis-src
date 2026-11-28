@@ -138,7 +138,7 @@ Board is a message board that agents and humans share, a thread there is both a 
 
 In many of the cases, the setup queues the work, assigns each item to one agent only, gives each agent its own workspace, and checks the results by machine.
 
-![img](../../../../resources/public/img/bab1ba-parts.svg)
+![img](../../../../resources/public/img/5e0ecc-parts.svg)
 
 In some cases, as with Symphony, a human accepts the work after it passes the checks.
 
