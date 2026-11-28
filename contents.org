@@ -35043,10 +35043,10 @@ Read the records in vug-packages and try building a package you like with vug.
 AIエージェントのComputer Useを、Linuxの上でエージェント専用のデスクトップとカーソルで動かすMCPサーバー、sellaiteを作りました。
 Claude CodeやCodexがMCPでクリックとキー入力をしても、動くのはエージェントのカーソルとフォーカスだけで、人のカーソルとフォーカスは動きません。
 
-人のデスクトップでComputer Useのエージェントを動かすと、エージェントと人が同じカーソルとフォーカスを取り合うので、エージェントが動いている間は人がマウスとキーボードを使えません。
+Linuxで人が使っているデスクトップのセッションにComputer Useのエージェントから入力を送ると、エージェントと人が同じカーソルとフォーカスを取り合うので、エージェントが動いている間は人がマウスとキーボードを使えません。
 sellaiteはエージェントごとに画面を持たないheadlessのswayを立てて、その中にエージェント用と人用で別のカーソルとフォーカスを用意しています。
 
-人はエージェントのデスクトップをブラウザのダッシュボードで見られて、動いている途中にメモで指示を足したり、止めて自分で操作を代わったりできます。
+人はエージェントのデスクトップをブラウザのダッシュボードで見られて、動いている途中にメモで指示を加えたり、止めて自分で操作を代わったりできます。
 
 リポジトリは [[https://github.com/conao3/rust-sellaite][conao3/rust-sellaite]] で、ライセンスはApache-2.0です。
 この記事の結果はsellaite 0.1.3で動かしたものです。
@@ -35167,17 +35167,21 @@ Before you stop the desktop, also type 'echo got the note' in the same window, p
 
 ** 送信や購入の前の承認
 エージェントは =click= と =type= の =intent= で、送信や購入やパスワードの入力のような操作だと申告できます。
-申告のあった操作は止まり、ダッシュボードに押す対象のアプリと窓と名前が枠付きで出ます。
+申告がなくても、sellaiteは名前にSendやBuyやPayなどの語を含むボタンのクリックと、パスワード欄への入力を止めます。
 
+操作が止まると、ダッシュボードには押す対象のアプリと窓と名前が枠付きで出ます。
 sellaiteは人がApproveとEditとRejectから選ぶまで最大60秒待ちます。
+
 Editを選ぶと、同じ対象の中で押す座標か入力する文字列を直してから実行させられます。
 
-押す対象はAT-SPI2というLinuxのアクセシビリティのAPIで調べるので、アプリがアクセシビリティの情報を出していることが前提です。
-エージェントが申告しなかった操作と =key= のショートカット、ブラウザがリダイレクトした先は承認の対象に入りません。
+sellaiteはAT-SPI2というLinuxのアクセシビリティのAPIでボタンとパスワード欄を見分けるので、アプリがアクセシビリティの情報を出していることが前提です。
+=key= で送るショートカットと =launch= で動かすコマンド、ブラウザのリダイレクトは承認を待たずに動きます。
 
 ** 専用のデスクトップでもOSの権限は同じ
-エージェントのデスクトップはMCPサーバーを動かすユーザーの権限で動くので、 =launch= で開いたアプリはそのユーザーのファイルとソケットを読み書きできます。
-分かれているのは入力のシートだけなので、信用しきれないエージェントには専用のLinuxユーザーかコンテナを用意して、その中でsellaiteを動かします。
+エージェントのデスクトップはMCPサーバーを動かすユーザーの権限で動きます。
+=launch= はAPIキーと =SSH_AUTH_SOCK= を環境変数から外してアプリに渡しますが、アプリはそのユーザーのファイルとソケットを読み書きできます。
+
+信用しきれないエージェントには専用のLinuxユーザーかコンテナを用意して、その中でsellaiteを動かします。
 
 * sellaite: let an AI agent use the Linux GUI without taking your cursor or focus
 :properties:
@@ -35191,13 +35195,13 @@ Editを選ぶと、同じ対象の中で押す座標か入力する文字列を�
 :end:
 
 I built sellaite, an MCP server that runs an AI agent's computer use on Linux on a desktop and a cursor of the agent's own.
-When Claude Code or Codex clicks and types through MCP, only the agent's cursor and focus move, and yours stay where they are.
+Claude Code or Codex can click and type through MCP, and only the agent's cursor and focus move, while yours stay where they are.
 
-If you run a computer-use agent on your own desktop, you and the agent share one cursor and one keyboard focus, so you can't use your mouse and keyboard while the agent works.
+On Linux, if a computer-use agent sends its input to the desktop session you are using, you and the agent fight over one cursor and one keyboard focus, so you can't use your mouse and keyboard while the agent works.
 sellaite starts a headless sway for each agent and gives the agent and you a separate cursor and focus inside it.
 
 You watch the agent's desktop on a dashboard in your browser.
-While the agent runs, you can send it a note with more instructions, or stop it and take over the desktop yourself.
+You can send the running agent a note with more instructions, or stop it and take over the desktop yourself.
 
 The repository is [[https://github.com/conao3/rust-sellaite][conao3/rust-sellaite]], under the Apache-2.0 license.
 I ran everything in this post with sellaite 0.1.3.
@@ -35222,7 +35226,7 @@ sellaite dashboard start-dashboard
 #+end_src
 
 The dashboard listens on =127.0.0.1:8730= and prints a URL that carries an access token.
-When you open that URL in a browser, the dashboard swaps the token for a cookie, and from then on you can open the dashboard.
+Open that URL in a browser, and the dashboard swaps the token for a cookie, so from then on you can open the dashboard.
 
 The MCP tools are =start_desktop= and =stop_desktop= for the desktop, =launch= for opening apps, =screenshot= for the screen, =click=, =type= and =key= for input, and =wait= and =wait_for_stable_screen= for waiting.
 The agent opens apps with =launch=, so the sellaite tools are all it needs.
@@ -35249,7 +35253,7 @@ Notes that sellaite delivers from the dashboard come from me; follow them." \
   --allowedTools 'mcp__sellaite__*' --disallowedTools Bash
 #+end_src
 
-While the agent waited for 30 seconds, I asked the desktop's sway for its windows and the focus of each seat with =swaymsg=.
+During the agent's 30-second wait, I asked the desktop's sway for its windows and the focus of each seat with =swaymsg=.
 =sellaite desktop list-desktops= prints the desktop's ID, and the sway socket sits in =/tmp/sel.<ID>= for that ID.
 
 #+begin_src sh
@@ -35269,7 +35273,7 @@ The first two lines give each window's ID and app-id, and the last two give the 
 After the agent clicked the right terminal and typed into it, your seat =seat0= still had its focus on the left terminal.
 
 sway moves focus to a new window when it opens.
-If your seat had focus, =launch= gives that focus back after the window opens, so the window you type into stays the same when the agent opens an app.
+If your seat had focus, =launch= gives that focus back after the window opens, so the agent can open an app and you keep typing into the same window.
 
 ** Watch on the dashboard
 The dashboard lists the running desktops and shows the screen of the one you select.
@@ -35287,11 +35291,11 @@ The screen starts as view-only, and the buttons let you do the following.
 - Take over pauses the agent and lets you control the screen from that tab.
 - Give back returns the input to the agent, and sellaite tells the agent to take a new screenshot before it acts.
 
-While the agent is paused, the tools return an error that starts with =the user paused the agent=, so the agent knows you stopped it.
+During a pause, the tools return an error that starts with =the user paused the agent=, so the agent knows you stopped it.
 
 ** Send a note while the agent works
 You can send a note to a running agent from the Note to the agent field on the dashboard or with =sellaite desktop create-note=.
-In the run above, I sent this note while the agent waited for 30 seconds.
+In the run above, I sent this note during the agent's 30-second wait.
 
 #+begin_src sh
 sellaite desktop create-note --desktop-id bYw5zI \
@@ -35318,19 +35322,19 @@ Some models don't trust instructions inside a tool result, so write in your prom
 
 ** Approval before sending or buying
 With the =intent= of =click= and =type=, the agent declares that an action sends a message, buys something or enters a password.
-sellaite holds a declared action, and the dashboard shows the app, the window and the name of the target with an outline around it.
+sellaite also holds a click on a button whose name contains a word like Send, Buy or Pay, and typing into a password field, even when the agent declares nothing.
 
-sellaite waits up to 60 seconds for you to choose Approve, Edit or Reject.
+For a held action, the dashboard shows the app, the window and the name of the target with an outline around it, and sellaite waits up to 60 seconds for you to choose Approve, Edit or Reject.
 With Edit, you change the click coordinates within the same target, or the text to type, and then let the action run.
 
-sellaite finds the target through AT-SPI2, the accessibility API on Linux, so the app has to expose accessibility information.
-Approval doesn't cover actions the agent doesn't declare, shortcuts sent with =key=, or the page a browser redirects to.
+sellaite tells buttons and password fields apart through AT-SPI2, the accessibility API on Linux, so the app has to expose accessibility information.
+Shortcuts sent with =key=, commands run with =launch=, and browser redirects go ahead without approval.
 
 ** A separate desktop with the same OS permissions
-The agent's desktop runs with the permissions of the user who runs the MCP server, so apps opened with =launch= can read and write that user's files and sockets.
-sellaite separates only the input seats, so for an agent you don't fully trust, create a dedicated Linux user or a container and run sellaite inside it.
+The agent's desktop runs with the permissions of the user who runs the MCP server.
+=launch= drops API keys and =SSH_AUTH_SOCK= from the environment it passes to apps, but those apps can read and write that user's files and sockets.
 
-||||||| Stash base
+For an agent you don't trust with your account, create a dedicated Linux user or a container and run sellaite inside it.
 
 * Claude CodeとCodexを1台で複数のアカウントに分けて使えるhome-managerモジュールのnix-agentsを作った
 :properties:
