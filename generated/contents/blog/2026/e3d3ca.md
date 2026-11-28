@@ -89,7 +89,7 @@ import LspTouchstone.Progress
 leanassay collects the theorems that mention the function, and the theorems that mention functions that call it.
 When a theorem's conclusion is joined with `∧`, it gives each part its own column, and it prints a table of which theorems killed each broken version.
 
-![img](../../../../resources/public/img/51d6b7-progress.svg)
+![img](../../../../resources/public/img/e3d3ca-progress.svg)
 
 The figure shows four rows from the output table, with shorter names for the mutations.
 
