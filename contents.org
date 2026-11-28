@@ -24919,6 +24919,196 @@ HasuraにHTTPでクエリを送って15回測った時間の中央値は、次�
 ** 調べ方
 権限の式を入れたクエリも購読も、最後は1本のSQLになっていたので、Hasuraの動きで分からないところはExplain APIが返すSQLを読めば確かめられます。
 
+* How Hasura compiles a GraphQL query into one SQL query for PostgreSQL
+:properties:
+:export_file_name: generated/contents/blog/2026/2c4407
+:export_date: 2026-11-27 19:38
+:export_updated: 2026-11-27 19:38
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/360ae9
+:export_tags: hasura graphql postgresql performance
+:end:
+
+Hasura is a server that builds a GraphQL API from PostgreSQL tables.
+I like it and use it, but until now I hadn't looked into how Hasura generates SQL.
+
+Looking into it, I found that Hasura is a compiler with no resolvers: it builds a GraphQL schema from the definitions of tables, relationships, and permissions, and turns each incoming query into one SQL query.
+PostgreSQL receives that SQL and does all the work of fetching rows, joining them, and building the JSON.
+
+The SQL is long, so I also measured its speed.
+Queries that fetch one page of data finished in the same time as hand-written SQL, and only a nested query that fetches tens of thousands of parents and children at once took about twice as long as the hand-written SQL.
+
+This post covers v2 of the Hasura GraphQL Engine, and Hasura v2.51.6 connected to PostgreSQL 17.11 generated all the SQL shown here.
+
+** Architecture
+[[./resources/public/img/360ae9-architecture.svg]]
+
+Every setup runs the Hasura container and PostgreSQL, and every request goes through permission checks, GraphQL schema generation, and translation from GraphQL to SQL (the blue parts of the diagram).
+
+The metadata decides the shape of the API.
+The metadata defines the tables to expose, the relationships between tables, and the permissions for each role, and when you register it from the Console, the CLI, or the Metadata API, Hasura stores it as JSON in a PostgreSQL schema called =hdb_catalog=.
+According to the [[https://hasura.io/docs/2.0/getting-started/how-it-works/index/#tracking-tables--schema-generation][official documentation]], when you register one table, Hasura creates its type and fields to query it, fetch a row by primary key, aggregate, insert, update, delete, and subscribe.
+
+The parts with dotted lines in the diagram run only when you configure them.
+[[https://hasura.io/docs/2.0/auth/overview/][Authentication]] happens outside Hasura, and Hasura receives the role and session variables through a JWT or a webhook.
+Actions and Remote Schemas add external APIs to the schema, and Event Triggers send row changes to a webhook.
+Hasura connects to MySQL, Oracle, and other databases through a service called a [[https://hasura.io/docs/2.0/databases/data-connectors/][data connector agent]].
+
+** The path of one query
+[[./resources/public/img/360ae9-flow.svg]]
+
+For each query a client sends, Hasura builds the SQL in steps ② to ⑤ of the diagram.
+Hasura's [[https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md][design document]] describes these steps: ② takes out the role and session variables, ③ parses the query into a GraphQL AST, ④ adds each role's permission expressions to the AST, and ⑤ turns that AST into an SQL AST and then into an SQL string.
+
+Hasura runs one SQL query per root field, so a query with one root field becomes one SQL query.
+PostgreSQL returns the result JSON as a single value, and Hasura wraps it in =data= to build the response.
+For a query that fetches 2,000 authors with their articles and comments, the SQL result was 8,423,123 bytes and the HTTP response was 8,423,143 bytes, and the 20-byte difference was =data= and the field name at the start and end of the response.
+
+A server whose resolvers fetch data field by field runs one child SQL query for each parent row, which is the N+1 problem.
+The design document describes the [[https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md#idea-1-compile-a-graphql-query-to-a-single-sql-query][idea of compiling the whole query into one SQL query]] like this:
+
+#+begin_quote
+Part of Hasura is a transpiler that uses the metadata of mapping information for the data models to the GraphQL schema to “compile” GraphQL queries to the SQL queries to fetch data from the database.
+
+GraphQL query → GraphQL AST → SQL AST → SQL
+
+This gets rid of the N+1 query problem and allows the database to optimise data-fetching now that it can see the entire query.
+#+end_quote
+
+The N+1 problem goes away, and the database can optimize the query because it sees all of it.
+
+** How GraphQL maps to SQL
+To test this, I created three tables: authors, articles, and comments.
+I sent a query that fetches the 20 newest articles by publication date, with each author's name and the first 5 comments, to the [[https://hasura.io/docs/2.0/api-reference/explain/][Explain API]], which returns the SQL that Hasura generates.
+In the next figure, the query I sent is at the top and the SQL that came back is at the bottom, and I added the line breaks and indentation to the SQL.
+
+[[./resources/public/img/360ae9-mapping.svg]]
+
+Each level of nesting in GraphQL becomes one subquery in SQL.
+=LATERAL= joins the subqueries.
+A subquery marked =LATERAL= can use columns of the row on its left in its conditions, and it produces a result for each row on the left.
+
+- The blue =article= and its arguments become a subquery that narrows the articles table with =ORDER BY= and =LIMIT 20=.
+- The yellow =id= and =title= are the columns passed to =row_to_json=.
+- The green =author= is a relationship from one article to one author, and it becomes a subquery with =LEFT OUTER JOIN LATERAL= and =LIMIT 1=.
+- The purple =comments= is a relationship from one article to many comments, and =json_agg= inside =LEFT OUTER JOIN LATERAL= turns the comment rows into an array.
+
+The value of the outermost =json_agg=, which has no color, is the array in the response.
+
+** Permissions
+A permission defines, for each role, an expression that decides which rows the role can see.
+As a test, I gave a role named =user= a permission to see only the articles the user wrote and the comments on those articles, and the condition on articles was that =author_id= equals the session variable =X-Hasura-User-Id=.
+
+I sent the same query to the Explain API as a request with the role =user= and =X-Hasura-User-Id= set to 42, and the subquery for articles changed like this:
+
+#+begin_src sql
+FROM (SELECT * FROM "public"."article"
+      WHERE (("public"."article"."author_id") = (('42')::integer))
+      ORDER BY "published_at" DESC NULLS FIRST LIMIT 20 ) AS "_root.base"
+#+end_src
+
+The permission expression is in the place where the first SQL, generated with the admin role, had =WHERE ('true')=.
+The subquery for comments gained the permission expression for comments as an =EXISTS=.
+The part to look at is =("__be_0_article"."author_id") = (('42')::integer)= on line 5, which checks that the author of the comment's article is 42.
+
+#+begin_src sql
+FROM (SELECT * FROM "public"."comment"
+      WHERE ((("_root.base"."id") = ("article_id"))
+        AND (EXISTS (SELECT 1 FROM "public"."article" AS "__be_0_article"
+          WHERE (((("__be_0_article"."id") = ("public"."comment"."article_id")) AND ('true'))
+            AND (('true') AND (((("__be_0_article"."author_id") = (('42')::integer))
+              AND ('true')) AND ('true')))) )))
+      ORDER BY "id" ASC NULLS LAST LIMIT 5 ) AS "_root.ar.root.comments.base"
+#+end_src
+
+Hasura puts a permission expression into each subquery that reads a table, and when I counted articles with this role, it saw 20 of the 200,000.
+
+** Subscriptions
+[[./resources/public/img/360ae9-subscription.svg]]
+
+Subscriptions run on the same mechanism of compiling to one SQL query.
+This section covers the kind of Hasura subscription called a live query, and according to the [[https://hasura.io/docs/2.0/subscriptions/postgres/livequery/execution/][official documentation]], Hasura reruns each subscribed query at a fixed interval (1 second by default) and sends a new result only to the subscriptions whose result changed since the last run.
+Hasura also [[https://hasura.io/docs/2.0/subscriptions/postgres/livequery/execution/#subscription-multiplexing][combines up to 100 subscriptions into one SQL query]] when they have the same role and shape and differ only in their variables.
+
+I sent the Explain API a query that subscribes to one article with its id as a variable and got the following SQL (the =...= lines are parts I left out).
+
+#+begin_src sql
+SELECT "__subs"."result_id" , "__fld_resp"."root" AS "result"
+FROM UNNEST(($1)::uuid[], ($2)::json[]) AS "__subs"("result_id", "result_vars")
+LEFT OUTER JOIN LATERAL (
+  ...
+      FROM (SELECT * FROM "public"."article"
+            WHERE (("public"."article"."id") =
+                   ((("__subs"."result_vars"#>>ARRAY['query', 'id']))::integer)) ) AS "_root.base"
+  ...
+) AS "__fld_resp" ON ('true')
+#+end_src
+
+=$1= is an array of subscription IDs and =$2= is an array of each subscription's variables, =UNNEST= turns the two into a table with one row per subscription, and the query inside =LATERAL= narrows the articles with each row's variables, so the results also come back one per row.
+
+** How fast the single SQL query is
+The generated SQL is long, so I measured whether it runs slower than hand-written SQL.
+The data was 10,000 authors, 200,000 articles, and 1,000,000 comments, with indexes on the foreign key columns, the role was admin, and Hasura and PostgreSQL ran in Docker containers limited to 2 CPU cores each.
+
+I measured these three queries:
+
+- A is the query from "How GraphQL maps to SQL", which fetches 20 articles with their authors and 5 comments each.
+- B fetches 50,000 articles with their authors.
+- C fetches 2,000 authors with their 40,000 articles nested inside and the 200,000 comments on those articles nested inside the articles.
+
+I wrote hand-written SQL with JOINs and =json_build_object= that returns the same data, ran each SQL query 15 times with psql, and put the median times in the following table.
+
+| Query | Response size | Hasura's SQL | Hand-written SQL |
+|-------+---------------+--------------+------------------|
+| A     | 4.8KB         | 1.7ms        | 1.5ms            |
+| B     | 3.4MB         | 71.7ms       | 81.4ms           |
+| C     | 8.4MB         | 689ms        | 358ms            |
+
+The difference for A is 0.2ms and the ranges of the 15 runs overlap, Hasura's SQL finished faster for B, and only C took about twice as long as the hand-written SQL.
+
+C is slow because PostgreSQL ran the relationship subqueries once for each parent row.
+These lines from the =EXPLAIN (ANALYZE)= of C, with the costs and times removed, show that PostgreSQL read the articles table 2,000 times and the comments table 40,000 times (=loops= is the number of runs).
+
+#+begin_src text
+->  Aggregate  (rows=1 loops=2000)
+      ->  Nested Loop Left Join  (rows=20 loops=2000)
+            ->  Bitmap Heap Scan on article  (rows=20 loops=2000)
+            ->  Aggregate  (rows=1 loops=40000)
+                  ->  Bitmap Heap Scan on comment  (rows=5 loops=40000)
+#+end_src
+
+For the hand-written SQL, PostgreSQL joined the three tables with Hash Joins and read the comments table only once.
+
+A bulk fetch like C gets faster when you drop the nesting and use three root fields side by side.
+
+#+begin_src graphql
+query D {
+  author(limit: 2000, order_by: {id: asc}) { id name }
+  article(where: {author_id: {_lte: 2000}}) { id title author_id }
+  comment(where: {article: {author_id: {_lte: 2000}}}) { article_id body }
+}
+#+end_src
+
+A relationship in the =where= of =comment= becomes an =EXISTS= subquery in SQL, and PostgreSQL chose a Hash Join for it.
+The client builds the nesting from =author_id= and =article_id=.
+This works only when you can also write the condition that selects the parents in the children's =where=, and in this data the author ids run in order from 1, so the condition =author_id= of 2000 or less selected the same authors as =limit: 2000=, which selects the first 2,000.
+
+You can also register the hand-written SQL in Hasura as a [[https://hasura.io/docs/2.0/schema/postgres/native-queries/][Native Query]], but then the articles and comments come back as one field of type =json=, and GraphQL can't select the fields inside it.
+
+Here are the median times of 15 runs, sending each query to Hasura over HTTP:
+
+| Approach             | Time  | Response size |
+|----------------------+-------+---------------|
+| Nested               | 699ms | 8.4MB         |
+| Separate root fields | 280ms | 12.5MB        |
+| Native Query         | 375ms | 9.1MB         |
+
+For page-sized queries that feed a screen, the length of the generated SQL had no effect on speed, so I think the queries worth rewriting are the ones that fetch tens of thousands of parents and children at once, such as exports and aggregations.
+
+** How to find out
+Queries with permission expressions and subscriptions both ended up as one SQL query, so when you can't tell what Hasura does, you can find out by reading the SQL that the Explain API returns.
+
 * e-Govの法令8,986件を90秒で検査して、条文を読んで確かめた食い違いを44法令で出すritsulintを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/2a0865
@@ -25112,6 +25302,206 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 それでも、引用が条文にあるかは機械で確かめられ、e-Govの法令すべてでも90秒で終わります。
 
 改正案を作る段階で同じ検査にかければ、取り残された引用は公布の前に見つかります。
+
+* ritsulint: a linter for Japanese law that checks all 8,986 e-Gov statutes in 90 seconds, with conflicts confirmed in 44
+:properties:
+:export_file_name: generated/contents/blog/2026/28ac3e
+:export_date: 2026-11-27 19:38
+:export_updated: 2026-11-27 19:38
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/2a0865
+:export_tags: rust lean japanese-law linter formal-verification release rust-ritsulint lean-leanfran
+:end:
+
+I built ritsulint, a linter for Japanese law.
+It reads the statute XML that [[https://laws.e-gov.go.jp/][e-Gov Law Search]] distributes and warns where provisions conflict with each other.
+
+A statute points to other provisions by quoting their position and their wording.
+An amendment rewrites only part of a provision, so when only the quoted side changes, the quotation no longer appears anywhere in the provision.
+As of 2026-11-17, e-Gov holds 8,986 statutes: the Constitution, Acts, Cabinet Orders, Imperial Ordinances, Ministerial Ordinances, and Rules.
+Reading the main provisions of all of them and running 13 kinds of checks takes about 90 seconds on one thread of a Core i5-8400.
+ritsulint found read-as provisions in 30 statutes whose quotation appears nowhere in the quoted provision.
+14 statutes also have references like "paragraph 2 of the preceding Article" that point to a paragraph that doesn't exist.
+For these 44 statutes, I read each warning against the provisions and confirmed the conflict.
+
+The list of warnings is public at [[https://ritsulint.conao3.com/][ritsulint.conao3.com]].
+The repository is [[https://github.com/conao3/rust-ritsulint][conao3/rust-ritsulint]], under the Apache-2.0 license.
+
+[[github:conao3/rust-ritsulint::Rust][A linter for Japanese statutes (e-Gov law XML): quotations, references, numbers, tables of contents, brackets and defined terms that do not agree with the text. Rules for reading provisions are written in Lean 4 and compiled to Rust.]]
+
+** A read-as quotation that isn't in the provision
+Japanese statutes have read-as provisions of the form "the term 'A' in Article X shall be read as 'B'".
+They let the same provision serve in another situation.
+A is a copy of the exact wording of the quoted provision.
+
+[[https://laws.e-gov.go.jp/law/326CO0000000319#Mp-Ch_3-Se_3-At_13-Pr_7][Article 13, paragraph 7 of the Immigration Control and Refugee Recognition Act]] quotes the following wording to apply [[https://laws.e-gov.go.jp/law/326CO0000000319#Mp-Ch_5-Se_2-At_41-Pr_1][Article 41, paragraph 1]] to provisional landing.
+
+#+begin_quote
+三十日以内とする。但し、主任審査官は、やむを得ない事由があると認めるときは、三十日を限り延長することができる。
+#+end_quote
+
+In my translation, it reads "The period shall be within thirty days; provided, however, that the supervising immigration inspector may extend it by up to thirty days on finding that there are unavoidable circumstances."
+The current Article 41, paragraph 1 writes "provided, however" as ただし in hiragana, and 但し doesn't appear in it.
+ritsulint reports this conflict like this:
+
+[[./resources/public/img/2a0865-warning.png]]
+
+Checking all past versions of each statute shows which version a warning starts from.
+This warning starts from the version in force from 2024-06-10.
+Act No. 56 of 2023 rewrote Article 41 and left the quotation in Article 13 as it was.
+In the same way, the version history shows that 30 warnings come from a change to the quoted side alone.
+
+** "The preceding Article" points to a different article
+Statutes also point to provisions by relative position, as in "paragraph 2 of the preceding Article", "the following paragraph", or "the preceding three items".
+An amendment that inserts an article in between makes the same words point to a different article.
+
+[[https://laws.e-gov.go.jp/law/362M50000800006#Mp-Ch_3-At_46][Article 46 of the Ordinance for Enforcement of the Railway Business Act]] says "the drawing showing the location of the ropeway facilities under paragraph 2, item 1 of the preceding Article".
+Article 45, paragraph 2 is the provision that requires the drawing.
+An amendment in force from 2019-09-14 inserted Article 45-2 in between, and "the preceding Article" now points to Article 45-2, which has only one paragraph.
+
+In a program, adding one function doesn't change which function a call reaches.
+A statute points to provisions by their position, so an amendment that adds an article breaks those references.
+
+** Program checks applied to statutes
+ritsulint has 13 kinds of checks.
+Each one applies to statutes something that linters and compilers do for programs.
+
+| Check in a program | Check in a statute | Warnings |
+|---|---|---|
+| Mismatch of a copied constant | Is a read-as quotation in the quoted provision? | 477 |
+| Call to a function that doesn't exist | Does "paragraph 2 of the preceding Article" or "the following paragraph" point to something? | 26 |
+| Expression whose result depends on evaluation order | Do two quotations that read the same article overlap? | 12 |
+| Syntax error | Missing 条 (Article), unbalanced brackets, duplicate numbers, table-of-contents ranges | 114 |
+| Type mismatch | Is X of "X provided in the preceding paragraph" in the preceding paragraph? | 98 |
+| Unused variable | Is a defined term used anywhere else? | 484 |
+| Naming convention | Is the same word written both with small kana and with full-size kana? | 121 |
+| Undefined variable, scope violation | Words one character off from a defined term, use outside the article that defines the term | 495 |
+
+ritsulint sorts warnings into 3 levels of confidence.
+Warnings I confirmed by reading the provisions and warnings that the structure of the provisions alone decides, such as numbers and tables of contents, are "high", and there are 139 of them.
+The rest include false positives.
+The two checks in the last row of the table often pick up other words or common words, so all of their warnings are "low".
+
+ritsulint doesn't check whether a reference that writes out an article number points to an article that exists.
+I couldn't find a way for a machine to decide whether "Article 10, paragraph 2" means an article of the statute itself or of another statute named a little earlier.
+Context also decides which statute a position belongs to, and that is where statutes differ from name resolution in programs.
+
+** Usage
+With Nix, you can check one statute XML file.
+
+#+begin_src shell
+nix run github:conao3/rust-ritsulint -- law check-law \
+  --xml-file 326CO0000000319_20240610_505AC0000000056.xml \
+  | jq '.Warnings[] | select(.Rule == "read-as-quote") | {Id, Status, Source, Targets, Confidence}'
+#+end_src
+
+The version of the Immigration Control and Refugee Recognition Act in force from 2024-06-10 gives one read-as quotation warning.
+
+#+begin_src json
+{
+  "Id": "bd316ca07e22167f",
+  "Status": "absent",
+  "Source": {
+    "Article": "13",
+    "Paragraph": 7
+  },
+  "Targets": [
+    {
+      "Article": "41",
+      "Paragraph": 1
+    }
+  ],
+  "Confidence": "high"
+}
+#+end_src
+
+ritsulint computes =Id= from the statute, the check, the article and paragraph, and the quoted wording, without the version.
+Matching the output of two versions by ID shows the warnings that the amendments between them added.
+The previous version, in force from 2024-04-01, doesn't give this warning.
+
+To check all statutes at once, pass the directory where you extracted e-Gov's [[https://laws.e-gov.go.jp/bulkdownload/][bulk download]] and a reference date.
+Reading and checking the 8,986 statutes takes about 90 seconds.
+
+#+begin_src shell
+nix run github:conao3/rust-ritsulint -- corpus check-corpus \
+  --xml-dir path/to/xml --as-of 20261117
+#+end_src
+
+** Rules for reading provisions in Lean
+I wrote the rules for reading provisions, such as kanji numerals, splitting read-as provisions, and resolving "the same Article" and "the preceding paragraph", in Lean 4.
+=decide= checks their output on real provisions, and Lean's kernel verifies it.
+In this post I call one "the term 'A' shall be read as 'B'" pair of a read-as provision a clause.
+For Article 13, paragraph 7 of the Immigration Control Act, the checks confirm that its 4 read-as clauses point to Article 40, Article 40, Article 41 paragraph 1, and Article 41 paragraph 3 with Article 42 paragraph 1.
+[[https://s.conao3.com/blog/2026/21ebbd][leanfran]] compiles the Lean code to Rust, and the Rust code that loads the XML and matches the quotations calls it.
+
+ritsulint gives no warning for wording it can't resolve.
+Of the 59,659 read-as clauses, it resolved 21,848 to an article and paragraph of the same statute and matched them.
+Of the clauses that point to an article of another statute, it matches only the 1,233 where the statute name or statute number identifies the statute.
+
+** Defining the meaning of read-as provisions and proving a theorem
+A read-as provision lists several clauses in one paragraph, so the way you apply the clauses can change the reading.
+[[https://laws.e-gov.go.jp/law/325AC1000000100#Mp-Ch_5-At_34_2-Pr_4][Paragraph 4]] of [[https://laws.e-gov.go.jp/law/325AC1000000100#Mp-Ch_5-At_34_2][Article 34-2 of the Public Offices Election Act]] reads [[https://laws.e-gov.go.jp/law/325AC1000000100#Mp-Ch_5-At_34_2-Pr_3][paragraph 3]] for the case where the head of a local government and the members of its assembly swap places, and the 3rd to 5th of its 10 clauses are these.
+
+#+begin_quote
+「@@html:<strong>@@長の任期満了による選挙@@html:</strong>@@」とあるのは「@@html:<strong>@@議会の議員の任期満了による一般選挙@@html:</strong>@@」と、「議会の議員が任期満了以外の事由によりすべてなくなつた」とあるのは「長が任期満了以外の事由により欠け、又は退職を申し出た」と、「@@html:<strong>@@議会の議員の任期満了による一般選挙@@html:</strong>@@」とあるのは「@@html:<strong>@@長の任期満了による選挙@@html:</strong>@@」と
+#+end_quote
+
+In my translation, the clauses read: "election at the expiry of the head's term" shall be read as "general election at the expiry of the assembly members' terms", "all the assembly members have ceased to hold office for a reason other than the expiry of their terms" shall be read as "the head has left office, or has given notice of resignation, for a reason other than the expiry of the term", and "general election at the expiry of the assembly members' terms" shall be read as "election at the expiry of the head's term".
+
+The 3rd and 5th clauses only swap two terms, but "general election at the expiry of the assembly members' terms" is both a term the 3rd clause writes and a term the 5th clause quotes.
+So if you apply the clauses to the provision one at a time in the order the paragraph lists them, the 5th clause turns the "general election at the expiry of the assembly members' terms" that the 3rd clause wrote back into "election at the expiry of the head's term".
+The two terms appear 3 times in total in the first half of paragraph 3, they all become "election at the expiry of the head's term", and the sentence then says that the local government holds an election for the head when the head leaves office, which makes no sense.
+The only way to read this paragraph is to apply all the clauses at once to the original paragraph 3 and not to read again the terms the clauses wrote.
+
+So I defined the meaning of read-as provisions in Lean.
+The definition reads the provision once from left to right, and where a clause's quoted wording appears, it writes that clause's replacement wording.
+If the quotations of several clauses sit at the same place, it takes the longer one.
+It doesn't read again the wording that a clause wrote.
+ritsulint compiles this definition to Rust and runs it.
+
+I also defined in Lean the condition under which replacing clause by clause gives the same text as this definition.
+The condition has two parts: no clause's quotation overlaps the quotation of an earlier clause, and no clause's quotation appears in the wording that an earlier clause wrote.
+The following theorem proves that, for all clauses and all provisions, the two ways of reading give the same text when the clauses meet the condition.
+
+#+begin_src lean
+theorem applySeq_eq_applyAll (cs : List (Clause α)) (t : List α)
+    (h : independent cs t = true) : applySeq cs t = applyAll cs t
+#+end_src
+
+The statutes on e-Gov have 4,854 places where one paragraph applies two or more clauses to the same article or paragraph.
+In 4,602 of them, the clauses meet the condition, and replacing them one at a time gives the same text.
+In 219 places, replacing the clauses one at a time changes the text, and Article 34-2 of the Public Offices Election Act is one of them.
+There were 0 places where the clauses meet the condition and the text still changes.
+
+In some places, you can read the text in more than one way.
+[[https://laws.e-gov.go.jp/law/426AC0000000084#Mp-Ch_4-At_30][Article 30 of the Act on Protection of the Names of Specific Agricultural, Forestry and Fishery Products and Foodstuffs]] reads 変更の登録 ("registration of a change") in [[https://laws.e-gov.go.jp/law/426AC0000000084#Mp-Ch_2-At_3-Pr_2][Article 3, paragraph 2]] as 指定の変更 ("change of a designation"), and 登録の日 ("date of registration") as 指定の日 ("date of designation").
+The provision has 変更の登録の日 ("date of registration of a change"), and the two quotations overlap at 登録 ("registration").
+Reading from the left gives 指定の変更の日 ("date of change of a designation"), and reading from the right gives 変更の指定の日 ("date of designation of a change").
+There are 12 places where the direction of reading changes the text, and ritsulint reports them as warnings.
+
+[[https://github.com/conao3/lean-leanassay][lean-leanassay]] checks whether the theorem stops holding when I make small breaks in the functions of the definition.
+It makes 54 broken versions and confirms that the theorem stops holding for all of them.
+In the version without one of the condition checks, the two ways of reading disagree on the swapping clauses.
+
+I haven't proved the code that takes provisions out of the XML, the code that splits a paragraph into clauses, or the compilation from Lean to Rust.
+Matching whether a quotation is in a provision is also a string comparison in Rust, outside the proof.
+The definition fixes the way of reading as left to right, taking the longer quotation.
+
+35 of the "high" read-as warnings carry a record in which Lean's kernel computed that applying the read-as clauses to the quoted provision leaves the text unchanged.
+Each record checks one case, so I call them certificates to keep them apart from the theorem.
+The definitions and proofs are in [[https://github.com/conao3/rust-ritsulint/blob/master/lean/Ritsulint/ReadAs.lean][ReadAs.lean]], and the certificates are in [[https://github.com/conao3/rust-ritsulint/blob/master/lean/Ritsulint/Findings.lean][Findings.lean]].
+
+** What a warning tells you
+A warning shows a conflict in e-Gov's data.
+The original text of the amending statute decides whether the statute as published in the Official Gazette has the error.
+For 7 statutes, including the Immigration Control Act, the Regulation for Enforcement of the Radio Act, and the Order for Enforcement of the Long-Term Care Insurance Act, I confirmed that the original text of the amending statute doesn't fix the quotation either.
+The warning in the Load Line Regulations is a difference between full-width and half-width alphanumeric characters, which I think came from turning the statute into data.
+
+A person reading a read-as quotation that is one character off from the provision can still tell which provision it means.
+Even so, a machine can check whether a quotation is in the provision, and the check finishes in 90 seconds for all statutes on e-Gov.
+
+If drafters run the same checks while writing an amendment bill, they will find the quotations left behind before promulgation.
 
 * Lean 4で時間のかかっている証明とtacticの位置を1コマンドで出すLeanwakeを作った
 :properties:
