@@ -33342,7 +33342,7 @@ emacs-doc distributes the manuals and their translations under the GFDL 1.3 or l
 
 I wrote all three on my own, and they're unofficial: none of them is affiliated with Preferred Networks or the Free Software Foundation.
 
-[[./resources/public/img/29c4d6-flow.svg]]
+[[./resources/public/img/5da1a9-flow.svg]]
 
 [[github:conao3/rust-plamo-tr::Rust][Translate text from the command line with PLaMo Translate (unofficial)]]
 
