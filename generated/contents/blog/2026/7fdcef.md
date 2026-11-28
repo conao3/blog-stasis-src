@@ -240,7 +240,7 @@ The response contents matched Lean's own server for all 8 kinds of requests on a
 
 From opening a file to the first diagnostic, Lean's own server took 6.9 seconds and Leansail 7.0 seconds, almost the same, and that time goes to Lake setup, imports, and processing the file, all outside the language server.
 
-None of my measurements found an operation that got faster when I moved it to Rust.
+None of my measurements found an operation that would run faster in Rust.
 I also considered moving FileWorker management to Rust, but when I measured with 3 files processed at once, the gain was small, so I dropped the idea.
 
 The measurement conditions, the full tables, and the steps to reproduce them are in [docs/mathlib-benchmark.md](https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md).

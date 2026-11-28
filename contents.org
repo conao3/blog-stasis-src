@@ -24303,7 +24303,7 @@ The input still decides two things: whether declarations have zero or one blank 
 A Lean file can add new notation, and code later in the file can use notation added with =notation=, =syntax=, or =macro= right away.
 Modules you =import= can add notation too.
 
-Most of Mathlib is written in such notation, so a separate parser with a fixed grammar misreads that code.
+Mathlib's authors write most of its code in such notation, so a separate parser with a fixed grammar misreads that code.
 
 leanwisp reads one command at a time with Lean's own parser.
 It elaborates only the commands that add notation, so Lean can read the following commands with that notation, and it doesn't run proofs or =#eval=.
@@ -24330,7 +24330,7 @@ leanwisp replaces line-break candidates in the document to follow Lean's [[https
 - =by= and =do= go at the end of the line, and the block sits 2 columns in from the start of the declaration.
 - The [[https://mathlib.org/contribute/style.html#instances][fields of an instance]] in =instance ... where= go one per line on the following lines.
 
-Where both guides allow either style, I picked one.
+I picked one style for each place where both guides allow either.
 An attribute goes on the same line when the whole declaration fits on one line and on its own line otherwise, and leanwisp keeps zero or one blank line between declarations and turns two or more into one.
 
 ** Checks that keep formatting from breaking code
@@ -24384,7 +24384,7 @@ The repository's [[https://github.com/conao3/rust-leanwisp/blob/master/docs/math
 ** Where the formatting time goes
 [[./resources/public/img/d60a7d-workers.svg]]
 
-When you pass several files with =--paths=, leanwisp starts one worker per CPU and sends files that =import= the same modules to the same worker.
+Given several files with =--paths=, leanwisp starts one worker per CPU and sends files that =import= the same modules to the same worker.
 Each worker starts one Lean process and formats its files in turn.
 
 For each file, the Lean process first builds an environment from the file's =import= lines, with the table of constants from the imported modules and the registered notation and formatters.
@@ -24729,7 +24729,7 @@ The response contents matched Lean's own server for all 8 kinds of requests on a
 
 From opening a file to the first diagnostic, Lean's own server took 6.9 seconds and Leansail 7.0 seconds, almost the same, and that time goes to Lake setup, imports, and processing the file, all outside the language server.
 
-None of my measurements found an operation that got faster when I moved it to Rust.
+None of my measurements found an operation that would run faster in Rust.
 I also considered moving FileWorker management to Rust, but when I measured with 3 files processed at once, the gain was small, so I dropped the idea.
 
 The measurement conditions, the full tables, and the steps to reproduce them are in [[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]].
