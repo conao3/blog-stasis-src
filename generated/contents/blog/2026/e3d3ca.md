@@ -258,8 +258,14 @@ I put `#assay` on the functions that Rust calls, and made `make check` run the a
 </table>
 
 The mutations that were not killed are versions that could not be built because the types did not match, and versions that returned the same values as the original on the inputs tried.
+
 I also left some functions out of the audit.
-leanwisp's `key`, which builds cache keys, builds on `fields`, which still has two holes, and ritsuryo's `describe`, which returns the list of commands, has no theorems.
+I left out leanwisp's `key`, which builds cache keys, because `fields`, the function it builds on, still has two holes.
+
+I left out leanwisp's four constants for the exit codes and the minimum and maximum line width as well, since a theorem about one of them would restate its value.
+
+ritsuryo's `describe`, which returns the list of commands, has no theorems.
+In ritsulint, `analyze`, which finds the provisions that the read-as clauses of a statute name, and `relativeRefs`, which finds references by position, have no theorems either, and I check the output of these three with tests.
 
 Before the audit, leanwisp had 17 holes and leansail had 39, and no theorem mentioned 7 of the audited functions in ritsulint, 5 in ritsuryo, 3 in leanwisp, and 1 in leankeel.
 

@@ -22343,7 +22343,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
 :export_date: 2026-11-17 12:43
-:export_updated: 2026-11-28 00:36
+:export_updated: 2026-11-28 01:07
 :export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
 :end:
 
@@ -22476,8 +22476,14 @@ Rustから呼んでいる関数に =#assay= を当てて、 =make check= で監�
 | 合計 | 63 | 842 | 722 | 0 |
 
 弾いていない分は型が合わずに作れなかったバージョンと、試した入力で元と同じ値を返したバージョンです。
+
 監査から外した関数もあります。
-leanwispのキャッシュのキーを作る =key= はもとになる =fields= に穴が2つ残っていて、ritsuryoのコマンドの一覧を返す =describe= には定理がありません。
+leanwispのキャッシュのキーを作る =key= はもとになる =fields= に穴が2つ残っているので外しました。
+
+leanwispの終了コードと行幅の下限と上限を返す4つの定数も、定理を書いても値をもう一度書くだけになるので外しています。
+
+ritsuryoのコマンドの一覧を返す =describe= には定理がありません。
+ritsulintでは読替えの句が指す条項を求める =analyze= と位置で条文を指す参照を取り出す =relativeRefs= に定理がなく、この3つは出力をテストで確かめています。
 
 当てる前の穴はleanwispに17とleansailに39で、監査した関数のうち定理が1つも触れていないものもritsulintに7つ、ritsuryoに5つ、leanwispに3つ、leankeelに1つありました。
 
@@ -22654,8 +22660,14 @@ I put =#assay= on the functions that Rust calls, and made =make check= run the a
 | Total | 63 | 842 | 722 | 0 |
 
 The mutations that were not killed are versions that could not be built because the types did not match, and versions that returned the same values as the original on the inputs tried.
+
 I also left some functions out of the audit.
-leanwisp's =key=, which builds cache keys, builds on =fields=, which still has two holes, and ritsuryo's =describe=, which returns the list of commands, has no theorems.
+I left out leanwisp's =key=, which builds cache keys, because =fields=, the function it builds on, still has two holes.
+
+I left out leanwisp's four constants for the exit codes and the minimum and maximum line width as well, since a theorem about one of them would restate its value.
+
+ritsuryo's =describe=, which returns the list of commands, has no theorems.
+In ritsulint, =analyze=, which finds the provisions that the read-as clauses of a statute name, and =relativeRefs=, which finds references by position, have no theorems either, and I check the output of these three with tests.
 
 Before the audit, leanwisp had 17 holes and leansail had 39, and no theorem mentioned 7 of the audited functions in ritsulint, 5 in ritsuryo, 3 in leanwisp, and 1 in leankeel.
 
