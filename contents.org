@@ -33548,6 +33548,364 @@ Cargoのworkspaceに3つのcrateを置いています。
 - =t3-terminal= : GhosttyのVTのモジュールをWebAssemblyとしてwasmtimeで動かす端末のエンジンです。これもUIには依存していません。
 - =t3code-gpui= : 窓とCLIです。
 
+* Dockerなしで6言語のテストの中で動くAWSモックのwasmoを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/22089f
+:export_draft: t
+:export_date: 2026-11-27 23:07
+:export_updated: 2026-11-27 23:07
+:export_tags: rust webassembly aws testing release wasm-wasmo
+:end:
+
+AWS SDKのHTTPクライアントを差し替えて、テストのプロセスの中で状態を持つAWSを動かすモック =wasmo= を作りました。
+Dockerもポートも別のプロセスも使わずに、DynamoDBに書いた値が次の =GetItem= で返り、S3に置いたオブジェクトが =ListObjects= の結果に入ります。
+
+パッケージはGoとJavaScriptとJVMと.NETとPythonとRubyの6言語にあり、どのパッケージでもRustで書いた同じWebAssemblyのモジュールが応答を返すので、言語が違ってもモックの振る舞いは同じです。
+
+リポジトリは[[https://github.com/conao3/wasm-wasmo][conao3/wasm-wasmo]]で、ライセンスはApache-2.0です。
+この記事では各言語のレジストリに公開している0.1.1を使います。
+
+同じくAWSのモックの[[https://s.conao3.com/blog/2026/2653f0][bunsai]]は別のプロセスのサーバーとしてポート4566で待ち受けますが、wasmoはテストのプロセスの中で動きます。
+
+[[github:conao3/wasm-wasmo::Rust][Stateful in-process AWS mock for every language, powered by a single WebAssembly module]]
+
+** 使ってみる
+Pythonでは =pip install wasmo boto3= で入れます。
+=wasmo.mock_aws()= の中で作ったboto3のクライアントは、リクエストをモックに送ります。
+次のスクリプトは1つのモックの中で動き、S3のバケットにオブジェクトができたらLambdaの関数を呼び、その関数がDynamoDBのテーブルにキーを書きます。
+
+#+begin_src python
+import boto3
+import wasmo
+
+with wasmo.mock_aws() as aws:
+    s3 = boto3.client("s3")
+    ddb = boto3.client("dynamodb")
+    lam = boto3.client("lambda")
+
+    ddb.create_table(
+        TableName="uploads",
+        KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
+        AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
+        BillingMode="PAY_PER_REQUEST",
+    )
+
+    def on_upload(event, context):
+        for record in event["Records"]:
+            key = record["s3"]["object"]["key"]
+            boto3.client("dynamodb").put_item(
+                TableName="uploads", Item={"key": {"S": key}}
+            )
+        return {"ok": True}
+
+    aws.register_function("on-upload", on_upload)
+    fn = lam.create_function(
+        FunctionName="on-upload",
+        Runtime="python3.12",
+        Role="arn:aws:iam::000000000000:role/lambda",
+        Handler="index.handler",
+        Code={"ZipFile": b"unused"},
+    )
+
+    s3.create_bucket(Bucket="photos")
+    s3.put_bucket_notification_configuration(
+        Bucket="photos",
+        NotificationConfiguration={
+            "LambdaFunctionConfigurations": [
+                {"LambdaFunctionArn": fn["FunctionArn"], "Events": ["s3:ObjectCreated:*"]}
+            ]
+        },
+    )
+
+    s3.put_object(Bucket="photos", Key="cat.jpg", Body=b"...")
+    print(ddb.get_item(TableName="uploads", Key={"key": {"S": "cat.jpg"}})["Item"])
+#+end_src
+
+#+begin_src console
+$ python demo.py
+{'key': {'S': 'cat.jpg'}}
+#+end_src
+
+wasmoは =CreateFunction= に渡したコードを実行せずに、同じ関数名で =register_function= に登録したPythonの関数を呼びます。
+S3の通知は =PutObject= の呼び出しの中で届くので、 =put_object= が返った時点でDynamoDBに項目があります。
+
+wasmoはモックが次のリクエストを受け付けられる状態で登録した関数を呼ぶので、関数の中から同じモックにリクエストを送れます。
+同じ流れをAWS SDK for JavaScript v3と =@conao3/wasmo= で書いても、 =GetItem= は同じ項目を返しました。
+
+Intel Core Ultra 5 225Uの手元のPCでは、プロセスの最初のリクエストはモジュールのコンパイルを含むので0.6〜1.0秒かかりました。
+
+2回目からは1回あたり2ms以下でした。
+モックを新しく作って最初の応答を受けるまでは9msなので、テストごとにモックを作り直せます。
+
+** 仕組み
+どの言語のAWS SDKもHTTPクライアントを差し替えられるので、wasmoはAWSの通信のプロトコルそのものを言語の境目にしています。
+
+#+begin_src text
+各言語のAWS SDK
+  └─ HTTPクライアントのアダプター (言語ごとに数百行)
+       └─ WebAssemblyのランタイム (Go: wazero、JVM: Chicory、JS: 組み込み、Ruby: wasmtime-rb、Pythonと.NET: wasmtime)
+            └─ wasmo.wasm (Rust、wasm32-unknown-unknown)
+#+end_src
+
+アダプターはSDKが組み立てたリクエストから、メソッドとURLとヘッダーのJSONと本文のバイト列を作ってモジュールの =wasmo_handle= に渡し、返ってきた応答をSDKに戻します。
+署名とリトライ、チェックサムの検証と応答の解析はSDKが行うので、テストでも本物のAWSに向けたときと同じSDKのコードが動きます。
+
+モジュールはWASIを使わずに、時計と乱数とLambdaの呼び出しの3つの関数をホストからimportします。
+状態はWebAssemblyのインスタンスの中にあり、モックごとにインスタンスを1つ作るので、並列に動くテストどうしで状態は混ざりません。
+
+Lambdaのハンドラを待つときは、モジュールは応答の代わりに =await= の印を返すので、アダプターは登録した関数を動かして結果を =wasmo_complete= に渡し、待つものが無くなるまでこれを繰り返します。
+
+** 6言語で同じモジュール
+PyPIとnpmとGoのパッケージに入っている =wasmo.wasm= を比べると、どれも同じバイト列でした。
+
+#+begin_src console
+$ python3 -m venv .venv && .venv/bin/pip install wasmo==0.1.1
+$ npm install @conao3/wasmo@0.1.1
+$ GOMODCACHE=$PWD/gomod go mod download github.com/conao3/wasm-wasmo/go@v0.1.1
+$ sha256sum .venv/lib/python3.14/site-packages/wasmo/wasmo.wasm \
+    node_modules/@conao3/wasmo/wasmo.wasm \
+    gomod/github.com/conao3/wasm-wasmo/go@v0.1.1/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  .venv/lib/python3.14/site-packages/wasmo/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  node_modules/@conao3/wasmo/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  gomod/github.com/conao3/wasm-wasmo/go@v0.1.1/wasmo.wasm
+#+end_src
+
+RubyGemsのgemにも同じ =wasmo.wasm= が入っていて、NuGetの =Wasmo.dll= は同じバイト列を埋め込んでいます。
+JVMのパッケージはビルドのときにChicoryで同じモジュールをJVMのバイトコードにしたものを持っています。
+
+** bunsaiとの違い
+bunsaiとwasmoはどちらもAWSのモックですが、動く場所が違います。
+
+bunsaiはBunで書いたサーバーで、ポート4566でAWSのゲートウェイとダッシュボードを待ち受けるので、SDKのほかにAWS CLIやTerraformもエンドポイントを向ければ使えます。
+
+サービスは141です。
+bunsaiのLambdaはホストにあるPythonやRubyの言語のランタイムを起動して関数のコードをそのまま動かします。
+
+wasmoはテストのプロセスの中で動き、SDKのHTTPクライアントだけを差し替えるので、テストはモックを作って使ったら閉じるだけです。
+
+サービスは19です。
+wasmoのLambdaは関数のコードを動かす代わりにテストの言語で登録した関数を呼びます。
+
+wasmoのサービスの振る舞いは、実際のAWSに由来する期待値を持つbunsaiのparity fixtureを流して確かめていて、確かめ方は[[https://github.com/conao3/wasm-wasmo#conformance][READMEのConformanceの節]]にあります。
+
+AWS CLIやTerraformから使いたいときと状態をダッシュボードで見たいときはbunsaiを、言語のテストの中で完結させたいときはwasmoを使います。
+
+** 対応しているサービス
+0.1.1は次の19のサービスに応答します。
+
+- 認証と鍵と秘密の情報: STS、IAM、KMS、Secrets Manager、SSM Parameter Store
+- メッセージとストリーム: SQS、SNS、EventBridge、Kinesis、Data Firehose
+- データ: S3、DynamoDB、DynamoDB Streams
+- 監視: CloudWatch、CloudWatch Logs
+- 関数とAPI: Lambda、Step Functions、API GatewayのREST APIとHTTP API
+
+サービスの間の配信もモックの中で動き、次の向きに届きます。
+
+- SNSからSQSとLambdaへ
+- EventBridgeからSQSとSNSとLambdaとStep Functionsへ
+- S3の通知からSQSとSNSとEventBridgeとLambdaへ
+
+Step Functionsはステートマシンの定義をモックの中で解釈し、Lambdaを呼ぶタスクは登録した関数が返るまで待つので、 =StartSyncExecution= は関数を動かしたあとの出力を返します。
+サービスごとに対応している操作は[[https://github.com/conao3/wasm-wasmo#coverage][READMEのCoverageの節]]にあります。
+
+READMEではまだ開発の初期の段階としています。
+リポジトリのテストではGoのアダプターが各サービスを細かく試し、ほかの5言語はサービスごとに1つ以上の通しのシナリオをSDKから試しています。
+
+** 入れ方
+各言語のパッケージは次のコマンドで入れます。
+
+| 言語                    | 入れ方                                      |
+|-------------------------+---------------------------------------------|
+| Go                      | =go get github.com/conao3/wasm-wasmo/go=    |
+| JavaScriptとTypeScript  | =npm install --save-dev @conao3/wasmo=      |
+| JVM                     | Mavenの =io.github.conao3:wasmo=            |
+| .NET                    | =dotnet add package Wasmo=                  |
+| Python                  | =pip install wasmo=                         |
+| Ruby                    | =gem install wasmo=                         |
+
+各言語のテストのフレームワークでの書き方は、READMEの言語ごとの節にあります。
+
+* wasmo: an AWS mock that runs inside your tests in six languages, without Docker
+:properties:
+:export_file_name: generated/contents/blog/2026/ac829b
+:export_draft: t
+:export_date: 2026-11-27 23:07
+:export_updated: 2026-11-27 23:07
+:export_lang: en
+:export_original: /blog/2026/22089f
+:export_tags: rust webassembly aws testing release wasm-wasmo
+:end:
+
+I built =wasmo=, an AWS mock that replaces the HTTP client of the AWS SDK and runs a stateful AWS inside your test process.
+You need no Docker, no open port, and no second process: a value you write to DynamoDB comes back from the next =GetItem=, and an object you put in S3 shows up in =ListObjects=.
+
+wasmo ships packages for six languages: Go, JavaScript, the JVM, .NET, Python, and Ruby.
+Every package runs the same WebAssembly module, written in Rust, so the mock answers the same way in each language.
+
+The repository is [[https://github.com/conao3/wasm-wasmo][conao3/wasm-wasmo]], under the Apache-2.0 license.
+This post uses 0.1.1, the version on each language's registry.
+
+[[https://s.conao3.com/blog/2026/2653f0][bunsai]] is another AWS mock I wrote, and it listens on port 4566 as a separate server process, while wasmo runs inside the test process.
+
+[[github:conao3/wasm-wasmo::Rust][Stateful in-process AWS mock for every language, powered by a single WebAssembly module]]
+
+** Try it
+In Python, you install it with =pip install wasmo boto3=.
+A boto3 client you create inside =wasmo.mock_aws()= sends its requests to the mock.
+
+The script below runs one mock: when an object lands in an S3 bucket, S3 invokes a Lambda function, and the function writes the object's key to a DynamoDB table.
+
+#+begin_src python
+import boto3
+import wasmo
+
+with wasmo.mock_aws() as aws:
+    s3 = boto3.client("s3")
+    ddb = boto3.client("dynamodb")
+    lam = boto3.client("lambda")
+
+    ddb.create_table(
+        TableName="uploads",
+        KeySchema=[{"AttributeName": "key", "KeyType": "HASH"}],
+        AttributeDefinitions=[{"AttributeName": "key", "AttributeType": "S"}],
+        BillingMode="PAY_PER_REQUEST",
+    )
+
+    def on_upload(event, context):
+        for record in event["Records"]:
+            key = record["s3"]["object"]["key"]
+            boto3.client("dynamodb").put_item(
+                TableName="uploads", Item={"key": {"S": key}}
+            )
+        return {"ok": True}
+
+    aws.register_function("on-upload", on_upload)
+    fn = lam.create_function(
+        FunctionName="on-upload",
+        Runtime="python3.12",
+        Role="arn:aws:iam::000000000000:role/lambda",
+        Handler="index.handler",
+        Code={"ZipFile": b"unused"},
+    )
+
+    s3.create_bucket(Bucket="photos")
+    s3.put_bucket_notification_configuration(
+        Bucket="photos",
+        NotificationConfiguration={
+            "LambdaFunctionConfigurations": [
+                {"LambdaFunctionArn": fn["FunctionArn"], "Events": ["s3:ObjectCreated:*"]}
+            ]
+        },
+    )
+
+    s3.put_object(Bucket="photos", Key="cat.jpg", Body=b"...")
+    print(ddb.get_item(TableName="uploads", Key={"key": {"S": "cat.jpg"}})["Item"])
+#+end_src
+
+#+begin_src console
+$ python demo.py
+{'key': {'S': 'cat.jpg'}}
+#+end_src
+
+wasmo ignores the code you pass to =CreateFunction= and calls the Python function you registered under the same name with =register_function=.
+S3 delivers the notification during the =PutObject= call, so the item is in DynamoDB by the time =put_object= returns.
+
+wasmo calls your registered function at a point where the mock can take the next request, so the function can send requests to the same mock.
+I wrote the same flow with the AWS SDK for JavaScript v3 and =@conao3/wasmo=, and =GetItem= returned the same item.
+
+On my PC with an Intel Core Ultra 5 225U, the first request of a process took 0.6 to 1.0 seconds because it includes compiling the module.
+
+Later requests took 2ms or less each.
+Creating a new mock and getting its first response took 9ms, so you can create a fresh mock for each test.
+
+** How it works
+The AWS SDK of each of these six languages lets you replace its HTTP client, so wasmo uses the AWS wire protocol itself as the boundary between languages.
+
+#+begin_src text
+your language's AWS SDK
+  └─ HTTP client adapter (a few hundred lines per language)
+       └─ WebAssembly runtime (Go: wazero, JVM: Chicory, JS: built-in, Ruby: wasmtime-rb, Python/.NET: wasmtime)
+            └─ wasmo.wasm (Rust, wasm32-unknown-unknown)
+#+end_src
+
+The adapter turns the request the SDK built into a JSON of the method, URL, and headers plus the body bytes, passes them to the module's =wasmo_handle=, and hands the response back to the SDK.
+The SDK still signs, retries, checks checksums, and parses responses, so your test runs the same SDK code it runs against real AWS.
+
+The module needs no WASI and imports three host functions: a clock, a random source, and a Lambda invocation.
+The state lives in a WebAssembly instance, and each mock gets its own instance, so tests that run in parallel keep their state apart.
+
+When a response has to wait for a Lambda handler, the module returns an =await= marker in place of the response, and the adapter runs the registered function, passes the result to =wasmo_complete=, and repeats this until nothing is left to wait for.
+
+** One module in six languages
+I compared the =wasmo.wasm= files inside the PyPI, npm, and Go packages, and all three hold the same bytes.
+
+#+begin_src console
+$ python3 -m venv .venv && .venv/bin/pip install wasmo==0.1.1
+$ npm install @conao3/wasmo@0.1.1
+$ GOMODCACHE=$PWD/gomod go mod download github.com/conao3/wasm-wasmo/go@v0.1.1
+$ sha256sum .venv/lib/python3.14/site-packages/wasmo/wasmo.wasm \
+    node_modules/@conao3/wasmo/wasmo.wasm \
+    gomod/github.com/conao3/wasm-wasmo/go@v0.1.1/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  .venv/lib/python3.14/site-packages/wasmo/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  node_modules/@conao3/wasmo/wasmo.wasm
+5bc6bd3da1a35ed095659c03b5020044d7ed7a7567a912fdc102210fadac2f4f  gomod/github.com/conao3/wasm-wasmo/go@v0.1.1/wasmo.wasm
+#+end_src
+
+The RubyGems gem contains the same =wasmo.wasm=, and the NuGet package's =Wasmo.dll= embeds the same bytes.
+The JVM package holds the same module as JVM bytecode, which its build generates with Chicory.
+
+** How wasmo differs from bunsai
+bunsai and wasmo both mock AWS, and they run in different places.
+
+bunsai is a server written in Bun that serves the AWS gateway and a dashboard on port 4566, so besides the SDKs, the AWS CLI and Terraform can use it once you point their endpoint at it.
+
+It covers 141 services.
+bunsai's Lambda starts the language runtime on the host, such as Python or Ruby, and runs your function code as it is.
+
+wasmo runs inside the test process and replaces only the SDK's HTTP client, so a test creates a mock, uses it, and closes it.
+
+It covers 19 services.
+wasmo's Lambda calls a function you registered in your test's language in place of running your function code.
+
+I check the behavior of wasmo's services by replaying bunsai's parity fixtures, whose expectations come from real AWS, and the [[https://github.com/conao3/wasm-wasmo#conformance][Conformance section of the README]] describes the method.
+
+Use bunsai when you want the AWS CLI or Terraform or want to see the state on a dashboard, and use wasmo when you want everything to stay inside your language's tests.
+
+** Supported services
+0.1.1 answers the following 19 services.
+
+- Identity, keys, and secrets: STS, IAM, KMS, Secrets Manager, SSM Parameter Store
+- Messages and streams: SQS, SNS, EventBridge, Kinesis, Data Firehose
+- Data: S3, DynamoDB, DynamoDB Streams
+- Monitoring: CloudWatch, CloudWatch Logs
+- Functions and APIs: Lambda, Step Functions, API Gateway REST APIs and HTTP APIs
+
+Services also deliver to each other inside the mock, along these routes.
+
+- SNS to SQS and Lambda
+- EventBridge to SQS, SNS, Lambda, and Step Functions
+- S3 notifications to SQS, SNS, EventBridge, and Lambda
+
+Step Functions interprets the state machine definition inside the mock, and a task that calls Lambda waits for your registered function to return, so =StartSyncExecution= returns the output after your function has run.
+The [[https://github.com/conao3/wasm-wasmo#coverage][Coverage section of the README]] lists the operations each service supports.
+
+The README marks the project as early development.
+In the repository's tests, the Go adapter covers each service in depth, and the other five languages run at least one end-to-end scenario per service through their SDKs.
+
+** Install
+Install the package for your language with the following command.
+
+| Language                | Install                                     |
+|-------------------------+---------------------------------------------|
+| Go                      | =go get github.com/conao3/wasm-wasmo/go=    |
+| JavaScript / TypeScript | =npm install --save-dev @conao3/wasmo=      |
+| JVM                     | Maven =io.github.conao3:wasmo=              |
+| .NET                    | =dotnet add package Wasmo=                  |
+| Python                  | =pip install wasmo=                         |
+| Ruby                    | =gem install wasmo=                         |
+
+The README has a section for each language that shows how to write tests with its test frameworks.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
