@@ -34147,6 +34147,305 @@ vug 0.2.28
 レコードはデータだけなので、パッケージを足すときはソースのURLとSHA-256とビルドの種類と依存を書いて、 =check-tree= とビルドで確かめます。
 vug-packagesのレコードを読んで、気になったパッケージをvugでビルドしてみてください。
 
+* AIエージェントが人のカーソルとフォーカスを奪わずにLinuxのGUIを操作できるsellaiteを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/70596e
+:export_date: 2026-11-27 23:08
+:export_updated: 2026-11-27 23:08
+:export_tags: rust ai-agent claude-code mcp computer-use wayland release rust-sellaite
+:export_draft: t
+:end:
+
+AIエージェントのComputer Useを、Linuxの上でエージェント専用のデスクトップとカーソルで動かすMCPサーバー、sellaiteを作りました。
+Claude CodeやCodexがMCPでクリックとキー入力をしても、動くのはエージェントのカーソルとフォーカスだけで、人のカーソルとフォーカスは動きません。
+
+人のデスクトップでComputer Useのエージェントを動かすと、エージェントと人が同じカーソルとフォーカスを取り合うので、エージェントが動いている間は人がマウスとキーボードを使えません。
+sellaiteはエージェントごとに画面を持たないheadlessのswayを立てて、その中にエージェント用と人用で別のカーソルとフォーカスを用意しています。
+
+人はエージェントのデスクトップをブラウザのダッシュボードで見られて、動いている途中にメモで指示を足したり、止めて自分で操作を代わったりできます。
+
+リポジトリは [[https://github.com/conao3/rust-sellaite][conao3/rust-sellaite]] で、ライセンスはApache-2.0です。
+この記事の結果はsellaite 0.1.3で動かしたものです。
+
+[[github:conao3/rust-sellaite::Rust][Give an AI computer-use agent its own Linux desktop and its own cursor, so it never takes over yours]]
+
+** 入れ方とClaude Codeへの登録
+Nixが使えるLinuxでは、次のコマンドで入ります。
+
+#+begin_src sh
+nix profile install github:conao3/rust-sellaite
+#+end_src
+
+パッケージにはデスクトップに使うswayと画面を撮るgrim、ダッシュボードに画面を配るwayvncが入っていて、エージェントに開かせるアプリは別に入れておく必要があります。
+この記事では端末のfootを開かせます。
+
+Claude Codeにはstdioで話すMCPサーバーとして登録し、ダッシュボードは別のプロセスで起動します。
+
+#+begin_src sh
+claude mcp add sellaite -- sellaite mcp serve-mcp
+sellaite dashboard start-dashboard
+#+end_src
+
+ダッシュボードは =127.0.0.1:8730= で待ち受けて、アクセス用のトークンの付いたURLを出力します。
+そのURLをブラウザで開くとトークンがCookieに替わり、以後はダッシュボードを見られます。
+
+MCPのツールにはデスクトップを立てる =start_desktop= と止める =stop_desktop= 、アプリを開く =launch= 、画面を撮る =screenshot= 、入力の =click= と =type= と =key= があり、待つための =wait= と =wait_for_stable_screen= もあります。
+アプリは =launch= で開くので、エージェントに渡すツールはsellaiteのものだけで足ります。
+
+** エージェントのシートと人のシート
+シートはWaylandで1人分の入力をまとめた単位で、カーソル1本とキーボードのフォーカス1つを持ちます。
+swayは [[https://man.archlinux.org/man/sway-input.5#SEAT_CONFIGURATION][sway-input(5)]] のとおりシートを複数持てるので、シートごとにカーソルとフォーカスが別になります。
+
+sellaiteの =start_desktop= は人のシート =seat0= とエージェントのシート =agent= を持つswayを立てます。
+sellaiteは [[https://github.com/conao3/rust-sellaite/blob/v0.1.3/src/input.rs#L160-L161][=agent= のシートに作った仮想のポインターとキーボード]] からエージェントのクリックとキー入力を送るので、 =agent= のカーソルとフォーカスだけが動きます。
+
+シェルのツールを外したClaude Codeに、端末を2つ開いて右の端末に入力するよう頼んでみました。
+
+#+begin_src sh
+cat > sellaite.json <<'EOF'
+{"mcpServers": {"sellaite": {"command": "sellaite", "args": ["mcp", "serve-mcp"]}}}
+EOF
+claude -p "Start a desktop. Launch foot with the arguments --app-id left bash --norc --noprofile and wait for its window. \
+Then launch foot with the arguments --app-id right bash --norc --noprofile and wait for its window. \
+Take a screenshot, click the middle of the right window, type 'echo typed by the agent', press Return and take a screenshot. \
+Then wait 30000 ms, take a screenshot, and stop the desktop. \
+Notes that sellaite delivers from the dashboard come from me; follow them." \
+  --mcp-config sellaite.json --strict-mcp-config \
+  --allowedTools 'mcp__sellaite__*' --disallowedTools Bash
+#+end_src
+
+エージェントが30秒待っている間に、デスクトップのswayに =swaymsg= で窓の一覧とシートごとのフォーカスを尋ねました。
+デスクトップのIDは =sellaite desktop list-desktops= で分かり、swayのソケットはそのIDの =/tmp/sel.<ID>= にあります。
+
+#+begin_src sh
+sock=$(echo /tmp/sel.bYw5zI/sway-ipc.*.sock)
+swaymsg -s "$sock" -t get_tree | jq -r '.. | select(.app_id?) | "\(.id) \(.app_id)"'
+swaymsg -s "$sock" -t get_seats | jq -r '.[] | "\(.name) \(.focus)"'
+#+end_src
+
+#+begin_src text
+5 left
+6 right
+agent 6
+seat0 5
+#+end_src
+
+上の2行が窓のIDとapp-idで、下の2行がシートごとにフォーカスのある窓のIDです。
+エージェントが右の端末をクリックして入力したあとも、人のシート =seat0= のフォーカスは左の端末に残っていました。
+
+新しい窓が開くと、swayはその窓にフォーカスを移します。
+人のシートにフォーカスがあったときは =launch= が窓を開いたあとにそのフォーカスを戻すので、エージェントがアプリを開いても人が入力している窓は変わりません。
+
+** ダッシュボードで見守る
+ダッシュボードは動いているデスクトップの一覧と選んだデスクトップの画面を出します。
+上の実行の途中で開いたダッシュボードが次の画像です。
+
+[[./resources/public/img/70596e-dashboard.png]]
+
+デスクトップのwayvncが人のシートにつながって画面を配り、ブラウザのnoVNCがその画面を描いています。
+右の端末にはエージェントが入力していますが、タイトルが選択中の色になっているのは人のシートのフォーカスがある左の端末です。
+
+画面は最初は見るだけで、ボタンで次のことができます。
+
+- Stop the agentを押すとエージェントが一時停止して、 =screenshot= と =wait= は動きますが、 =launch= と =click= と =type= と =key= はエラーを返します。
+- Resumeを押すと、人のシートの入力が1秒止んだあとにエージェントが再開します。
+- Take overを押すとエージェントが一時停止して、そのタブから画面を操作できます。
+- Give backで入力を返すとエージェントが再開し、sellaiteは操作の前に画面を撮り直すようエージェントに伝えます。
+
+一時停止の間はツールが =the user paused the agent= で始まるエラーを返すので、エージェントは止められたことが分かります。
+
+** 動いている途中にメモを送る
+ダッシュボードのNote to the agentの欄か =sellaite desktop create-note= で、動いているエージェントにメモを送れます。
+上の実行では、エージェントが30秒待っている間に次のメモを送りました。
+
+#+begin_src sh
+sellaite desktop create-note --desktop-id bYw5zI \
+  --text "Before you stop the desktop, also type 'echo got the note' in the same window, press Return and take a screenshot."
+#+end_src
+
+#+begin_src text
+{"Height":720,"Id":"bYw5zI","Paused":false,"PausedReason":null,"PendingApproval":null,"PendingNotes":1,"Pid":2716012,"ResumePending":false,"TakingOver":false,"UserSeatIdle":true,"Width":1280}
+#+end_src
+
+メモはエージェントの次のツール呼び出しに1回だけ付くので、 =wait= の結果に次のテキストが加わりました。
+
+#+begin_src text
+[sellaite] Note from the user (sent from the sellaite dashboard while you were working; shown once):
+Before you stop the desktop, also type 'echo got the note' in the same window, press Return and take a screenshot.
+#+end_src
+
+エージェントはこれを読んで、デスクトップを止める前に右の端末に =echo got the note= を入力しました。
+次の画像はエージェントが最後に撮った画面の上の部分です。
+
+[[./resources/public/img/70596e-note.png]]
+
+ツールの結果の中の指示を信用しないモデルもあるので、sellaiteが届けるメモは自分からのものだと上の例の最後の文のように依頼文に書いておきます。
+
+** 送信や購入の前の承認
+エージェントは =click= と =type= の =intent= で、送信や購入やパスワードの入力のような操作だと申告できます。
+申告のあった操作は止まり、ダッシュボードに押す対象のアプリと窓と名前が枠付きで出ます。
+
+sellaiteは人がApproveとEditとRejectから選ぶまで最大60秒待ちます。
+Editを選ぶと、同じ対象の中で押す座標か入力する文字列を直してから実行させられます。
+
+押す対象はAT-SPI2というLinuxのアクセシビリティのAPIで調べるので、アプリがアクセシビリティの情報を出していることが前提です。
+エージェントが申告しなかった操作と =key= のショートカット、ブラウザがリダイレクトした先は承認の対象に入りません。
+
+** 専用のデスクトップでもOSの権限は同じ
+エージェントのデスクトップはMCPサーバーを動かすユーザーの権限で動くので、 =launch= で開いたアプリはそのユーザーのファイルとソケットを読み書きできます。
+分かれているのは入力のシートだけなので、信用しきれないエージェントには専用のLinuxユーザーかコンテナを用意して、その中でsellaiteを動かします。
+
+* sellaite: let an AI agent use the Linux GUI without taking your cursor or focus
+:properties:
+:export_file_name: generated/contents/blog/2026/b98860
+:export_date: 2026-11-27 23:08
+:export_updated: 2026-11-27 23:08
+:export_lang: en
+:export_original: /blog/2026/70596e
+:export_tags: rust ai-agent claude-code mcp computer-use wayland release rust-sellaite
+:export_draft: t
+:end:
+
+I built sellaite, an MCP server that runs an AI agent's computer use on Linux on a desktop and a cursor of the agent's own.
+When Claude Code or Codex clicks and types through MCP, only the agent's cursor and focus move, and yours stay where they are.
+
+If you run a computer-use agent on your own desktop, you and the agent share one cursor and one keyboard focus, so you can't use your mouse and keyboard while the agent works.
+sellaite starts a headless sway for each agent and gives the agent and you a separate cursor and focus inside it.
+
+You watch the agent's desktop on a dashboard in your browser.
+While the agent runs, you can send it a note with more instructions, or stop it and take over the desktop yourself.
+
+The repository is [[https://github.com/conao3/rust-sellaite][conao3/rust-sellaite]], under the Apache-2.0 license.
+I ran everything in this post with sellaite 0.1.3.
+
+[[github:conao3/rust-sellaite::Rust][Give an AI computer-use agent its own Linux desktop and its own cursor, so it never takes over yours]]
+
+** Install and register with Claude Code
+On Linux with Nix, install it with this command.
+
+#+begin_src sh
+nix profile install github:conao3/rust-sellaite
+#+end_src
+
+The package brings sway for the desktop, grim for screenshots and wayvnc for sending the screen to the dashboard.
+You install the apps you want the agent to open yourself, and in this post the agent opens the foot terminal.
+
+Register sellaite with Claude Code as an MCP server that talks over stdio, and start the dashboard as a separate process.
+
+#+begin_src sh
+claude mcp add sellaite -- sellaite mcp serve-mcp
+sellaite dashboard start-dashboard
+#+end_src
+
+The dashboard listens on =127.0.0.1:8730= and prints a URL that carries an access token.
+When you open that URL in a browser, the dashboard swaps the token for a cookie, and from then on you can open the dashboard.
+
+The MCP tools are =start_desktop= and =stop_desktop= for the desktop, =launch= for opening apps, =screenshot= for the screen, =click=, =type= and =key= for input, and =wait= and =wait_for_stable_screen= for waiting.
+The agent opens apps with =launch=, so the sellaite tools are all it needs.
+
+** The agent's seat and your seat
+In Wayland, a seat groups one user's input devices, with one cursor and one keyboard focus.
+sway can have several seats, and as [[https://man.archlinux.org/man/sway-input.5#SEAT_CONFIGURATION][sway-input(5)]] describes, each seat has its own cursor and focus.
+
+sellaite's =start_desktop= starts a sway with your seat =seat0= and the agent's seat =agent=.
+sellaite sends the agent's clicks and keystrokes from [[https://github.com/conao3/rust-sellaite/blob/v0.1.3/src/input.rs#L160-L161][a virtual pointer and keyboard created on the =agent= seat]], so only the cursor and focus of =agent= move.
+
+To try it, I took the shell tool away from Claude Code and asked it to open two terminals and type into the right one.
+
+#+begin_src sh
+cat > sellaite.json <<'EOF'
+{"mcpServers": {"sellaite": {"command": "sellaite", "args": ["mcp", "serve-mcp"]}}}
+EOF
+claude -p "Start a desktop. Launch foot with the arguments --app-id left bash --norc --noprofile and wait for its window. \
+Then launch foot with the arguments --app-id right bash --norc --noprofile and wait for its window. \
+Take a screenshot, click the middle of the right window, type 'echo typed by the agent', press Return and take a screenshot. \
+Then wait 30000 ms, take a screenshot, and stop the desktop. \
+Notes that sellaite delivers from the dashboard come from me; follow them." \
+  --mcp-config sellaite.json --strict-mcp-config \
+  --allowedTools 'mcp__sellaite__*' --disallowedTools Bash
+#+end_src
+
+While the agent waited for 30 seconds, I asked the desktop's sway for its windows and the focus of each seat with =swaymsg=.
+=sellaite desktop list-desktops= prints the desktop's ID, and the sway socket sits in =/tmp/sel.<ID>= for that ID.
+
+#+begin_src sh
+sock=$(echo /tmp/sel.bYw5zI/sway-ipc.*.sock)
+swaymsg -s "$sock" -t get_tree | jq -r '.. | select(.app_id?) | "\(.id) \(.app_id)"'
+swaymsg -s "$sock" -t get_seats | jq -r '.[] | "\(.name) \(.focus)"'
+#+end_src
+
+#+begin_src text
+5 left
+6 right
+agent 6
+seat0 5
+#+end_src
+
+The first two lines give each window's ID and app-id, and the last two give the ID of the window each seat focuses.
+After the agent clicked the right terminal and typed into it, your seat =seat0= still had its focus on the left terminal.
+
+sway moves focus to a new window when it opens.
+If your seat had focus, =launch= gives that focus back after the window opens, so the window you type into stays the same when the agent opens an app.
+
+** Watch on the dashboard
+The dashboard lists the running desktops and shows the screen of the one you select.
+I opened the dashboard in the middle of the run above and took this screenshot.
+
+[[./resources/public/img/70596e-dashboard.png]]
+
+The desktop's wayvnc connects to your seat and serves the screen, and noVNC draws it in the browser.
+The agent typed into the right terminal, yet the title bar in the selected color belongs to the left terminal, where your seat has focus.
+
+The screen starts as view-only, and the buttons let you do the following.
+
+- Stop the agent pauses the agent. =screenshot= and =wait= keep working, and =launch=, =click=, =type= and =key= return an error.
+- Resume lets the agent continue once your seat has had no input for 1 second.
+- Take over pauses the agent and lets you control the screen from that tab.
+- Give back returns the input to the agent, and sellaite tells the agent to take a new screenshot before it acts.
+
+While the agent is paused, the tools return an error that starts with =the user paused the agent=, so the agent knows you stopped it.
+
+** Send a note while the agent works
+You can send a note to a running agent from the Note to the agent field on the dashboard or with =sellaite desktop create-note=.
+In the run above, I sent this note while the agent waited for 30 seconds.
+
+#+begin_src sh
+sellaite desktop create-note --desktop-id bYw5zI \
+  --text "Before you stop the desktop, also type 'echo got the note' in the same window, press Return and take a screenshot."
+#+end_src
+
+#+begin_src text
+{"Height":720,"Id":"bYw5zI","Paused":false,"PausedReason":null,"PendingApproval":null,"PendingNotes":1,"Pid":2716012,"ResumePending":false,"TakingOver":false,"UserSeatIdle":true,"Width":1280}
+#+end_src
+
+sellaite attaches a note once, to the agent's next tool call, so the result of =wait= got this text.
+
+#+begin_src text
+[sellaite] Note from the user (sent from the sellaite dashboard while you were working; shown once):
+Before you stop the desktop, also type 'echo got the note' in the same window, press Return and take a screenshot.
+#+end_src
+
+The agent read it and typed =echo got the note= into the right terminal before it stopped the desktop.
+The image below is the top of the last screenshot the agent took.
+
+[[./resources/public/img/70596e-note.png]]
+
+Some models don't trust instructions inside a tool result, so write in your prompt that the notes sellaite delivers come from you, as the last sentence of the prompt above does.
+
+** Approval before sending or buying
+With the =intent= of =click= and =type=, the agent declares that an action sends a message, buys something or enters a password.
+sellaite holds a declared action, and the dashboard shows the app, the window and the name of the target with an outline around it.
+
+sellaite waits up to 60 seconds for you to choose Approve, Edit or Reject.
+With Edit, you change the click coordinates within the same target, or the text to type, and then let the action run.
+
+sellaite finds the target through AT-SPI2, the accessibility API on Linux, so the app has to expose accessibility information.
+Approval doesn't cover actions the agent doesn't declare, shortcuts sent with =key=, or the page a browser redirects to.
+
+** A separate desktop with the same OS permissions
+The agent's desktop runs with the permissions of the user who runs the MCP server, so apps opened with =launch= can read and write that user's files and sockets.
+sellaite separates only the input seats, so for an agent you don't fully trust, create a dedicated Linux user or a container and run sellaite inside it.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
