@@ -17141,7 +17141,7 @@ The library's tax function calls the specification =incomeTaxCentsSpec= in the s
 
 The inheritance tax rate table uses the same form.
 
-[[./resources/public/img/5499a8-csimp.svg]]
+[[./resources/public/img/232531-csimp.svg]]
 
 You can see the rewrite in the IR, the intermediate representation that the compiler prints, and here is the IR of =probeIncome=, a function that only returns =incomeTaxCentsSpec x=.
 
