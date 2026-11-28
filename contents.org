@@ -34345,7 +34345,7 @@ bunsaiとwasmoはどちらもAWSのモックですが、動く場所が違いま
 
 bunsaiはBunで書いたサーバーで、ポート4566でAWSのゲートウェイとダッシュボードを待ち受けるので、SDKのほかにAWS CLIやTerraformもエンドポイントを向ければ使えます。
 
-サービスは141です。
+サービスは146です。
 bunsaiのLambdaはホストにあるPythonやRubyの言語のランタイムを起動して関数のコードをそのまま動かします。
 
 wasmoはテストのプロセスの中で動き、SDKのHTTPクライアントだけを差し替えるので、テストはモックを作って使ったら閉じるだけです。
@@ -34407,7 +34407,7 @@ I built =wasmo=, an AWS mock that replaces the HTTP client of the AWS SDK and ru
 You need no Docker, no open port, and no second process: a value you write to DynamoDB comes back from the next =GetItem=, and an object you put in S3 shows up in =ListObjects=.
 
 wasmo ships packages for six languages: Go, JavaScript, the JVM, .NET, Python, and Ruby.
-Every package runs the same WebAssembly module, written in Rust, so the mock answers the same way in each language.
+All six packages run the same WebAssembly module, written in Rust, so the mock answers the same way in each language.
 
 The repository is [[https://github.com/conao3/wasm-wasmo][conao3/wasm-wasmo]], under the Apache-2.0 license.
 This post uses 0.1.1, the version on each language's registry.
@@ -34526,7 +34526,7 @@ bunsai and wasmo both mock AWS, and they run in different places.
 
 bunsai is a server written in Bun that serves the AWS gateway and a dashboard on port 4566, so besides the SDKs, the AWS CLI and Terraform can use it once you point their endpoint at it.
 
-It covers 141 services.
+It covers 146 services.
 bunsai's Lambda starts the language runtime on the host, such as Python or Ruby, and runs your function code as it is.
 
 wasmo runs inside the test process and replaces only the SDK's HTTP client, so a test creates a mock, uses it, and closes it.
