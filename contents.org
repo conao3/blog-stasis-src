@@ -34675,9 +34675,9 @@ RustとGoのコンパイラは上流が配っているバイナリを展開し�
 出力は =/vug/store/<id>= に置きます。
 =<id>= は出力のファイルの木をBLAKE3でハッシュした値から作るので、パッケージの名前とバージョンはパスに入りません。
 
-出力をストアに置いて世代を切り替える作りはNixやGuixと似ていますが、NixやGuixはストアのパスをビルドの入力から決めて、vugは出力の中身のハッシュから決めます。
+出力をストアに置いて世代を切り替える作りはNixやGuixと似ていますが、 [[https://nix.dev/manual/nix/2.28/glossary#gloss-input-addressed-store-object][既定のNix]] と [[https://guix.gnu.org/manual/en/html_node/Features.html][Guix]] はストアのパスをビルドの入力から決めて、vugは [[https://github.com/conao3/rust-vug/blob/7026623/docs/build.md#store-paths][出力の中身のハッシュ]] から決めます。
 
-出力は自分のパスを含むことがあるので、ビルドでは同じ長さの仮のパスに出力を入れて、ハッシュを計算してから仮のパスを本当のパスに書き換えます。
+出力は自分のパスを含むことがあるので、ビルドでは [[https://github.com/conao3/rust-vug/blob/7026623/docs/build.md#self-references][同じ長さの仮のパス]] に出力を入れて、ハッシュを計算してから仮のパスを本当のパスに書き換えます。
 
 #+begin_src sh
 $ vug package build-package --root . --name hello --output text
@@ -34767,7 +34767,10 @@ VUG-SYSTEM-OK
 動いているマシンでは、 =/vug/tree= に置いたレコードを書き換えて =vug system switch-system= を実行すると、マシンの上で次のシステムをビルドして切り替えます。
 切り替えるたびに世代が増えて、 =/vug/profiles/system-<N>/bin/switch-to-system= を実行すると世代Nに戻ります。
 
-vug-packagesにはsystemdとPAMとsshdを入れたシステムや、EFIで起動するGPTのディスクのシステム、swayのデスクトップを足すサービスもあります。
+システムを切り替える方法と前の世代に戻す方法は [[https://github.com/conao3/rust-vug/blob/7026623/docs/system.md#switching][docs/system.md]] に書いています。
+
+vug-packagesには [[https://github.com/conao3/vug-packages/blob/004fd8f/systems/systemd.toml][systemdとPAMとsshdを入れたシステム]] や [[https://github.com/conao3/vug-packages/blob/004fd8f/systems/generic.toml][EFIで起動してGPTのディスクを使うシステム]] があります。
+このほかにも [[https://github.com/conao3/vug-packages/blob/004fd8f/services/sway.toml][swayのデスクトップを足すサービス]] があります。
 vugで作ったシステムを起動したのはQEMUの中だけで、 [[https://github.com/conao3/rust-vug/blob/7026623/README.md#vug][rust-vugのREADME]] にも書いているとおり実機ではまだ起動していません。
 
 ** ビルドの出力をバイナリキャッシュで配る
@@ -34907,16 +34910,16 @@ sha256 = "3581863e3cbcfd0fce0efc682ce7e9e93da96668a977791d356a26d2a7e9b17a"
 BusyBox from the seed provides =sh=, =tar=, =sed= and the other basic tools, and =cc= and =c++= call =zig cc= and =zig c++=, so make, perl, python, LLVM and the Linux kernel all build from this seed.
 
 The Rust and Go compilers are the binaries their upstreams distribute, unpacked into the store.
-When I wrote this post, 99 packages were records that take their outputs from the Nix binary cache.
+At the time of writing, 99 packages were records that take their outputs from the Nix binary cache.
 
 The build runs under =bwrap --unshare-all=, cut off from the network and the host file system, and sees only the seed, the declared dependencies and the source.
 
 The output goes to =/vug/store/<id>=.
 vug computes =<id>= from the BLAKE3 hash of the output's file tree, so the package name and version aren't part of the path.
 
-Putting outputs in a store and switching generations resembles Nix and Guix, but Nix and Guix derive a store path from the build inputs, and vug derives it from the hash of the output's contents.
+Putting outputs in a store and switching generations resembles Nix and Guix, but [[https://nix.dev/manual/nix/2.28/glossary#gloss-input-addressed-store-object][default Nix builds]] and [[https://guix.gnu.org/manual/en/html_node/Features.html][Guix]] derive a store path from the build inputs, and vug derives it from [[https://github.com/conao3/rust-vug/blob/7026623/docs/build.md#store-paths][the hash of the output's contents]].
 
-An output can contain its own path, so the build installs into a placeholder path of the same length, computes the hash, and then replaces the placeholder with the real path.
+An output can contain its own path, so the build installs into [[https://github.com/conao3/rust-vug/blob/7026623/docs/build.md#self-references][a placeholder path of the same length]], computes the hash, and then replaces the placeholder with the real path.
 
 #+begin_src sh
 $ vug package build-package --root . --name hello --output text
@@ -35006,13 +35009,15 @@ VUG-SYSTEM-OK
 On a running machine, you edit the records in =/vug/tree= and run =vug system switch-system=, and vug builds the next system on the machine and switches to it.
 Each switch adds a generation, and running =/vug/profiles/system-<N>/bin/switch-to-system= takes you back to generation N.
 
-vug-packages also has a system with systemd, PAM and sshd, a system on a GPT disk that boots through EFI, and a service that adds a sway desktop.
+[[https://github.com/conao3/rust-vug/blob/7026623/docs/system.md#switching][docs/system.md]] describes how to switch systems and how to go back to an earlier generation.
+
+vug-packages also has [[https://github.com/conao3/vug-packages/blob/004fd8f/systems/systemd.toml][a system with systemd, PAM and sshd]], [[https://github.com/conao3/vug-packages/blob/004fd8f/systems/generic.toml][a system on a GPT disk that boots through EFI]], and [[https://github.com/conao3/vug-packages/blob/004fd8f/services/sway.toml][a service that adds a sway desktop]].
 I have booted systems built with vug only in QEMU, and as the [[https://github.com/conao3/rust-vug/blob/7026623/README.md#vug][rust-vug README]] says, they haven't run on real hardware yet.
 
 ** Sharing build outputs through a binary cache
 
 =vug store export-cache= writes the outputs in the store to a directory you can serve over HTTP, and signs each entry with Ed25519.
-When you build on another machine with =--binary-cache= and =--trusted-key=, vug takes from the cache only the outputs that the trusted key signed.
+To build on another machine from the cache, pass =--binary-cache= and =--trusted-key=, and vug takes from the cache only the outputs that the trusted key signed.
 [[https://github.com/conao3/rust-vug/blob/7026623/docs/cache.md][docs/cache.md]] describes the layout of a cache.
 
 ** Writing version comparison and naming rules in Lean 4
