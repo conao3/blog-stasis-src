@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="420" viewBox="0 0 1100 420" font-family="sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1100" height="420" rx="16" fill="#fff"/>
+  <rect x="30" y="50" width="290" height="120" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="175" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#0f4c81">lean-ritsuryo</text>
+  <text x="175" y="138" font-size="19" text-anchor="middle" fill="#222">Calculations and proofs</text>
+  <rect x="405" y="50" width="290" height="120" rx="12" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="550" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#0f4c81">RitsuryoRs.Api</text>
+  <text x="550" y="138" font-size="19" text-anchor="middle" fill="#222">Functions exposed to Rust</text>
+  <rect x="780" y="50" width="290" height="120" rx="12" fill="#f8ece4" stroke="#a0410d" stroke-width="2"/>
+  <text x="925" y="102" font-size="26" font-weight="bold" text-anchor="middle" fill="#a0410d">ritsuryo</text>
+  <text x="925" y="138" font-size="19" text-anchor="middle" fill="#222">Generated Rust crate</text>
+  <rect x="780" y="260" width="290" height="120" rx="12" fill="#efe8f7" stroke="#5b3a91" stroke-width="2"/>
+  <text x="925" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#5b3a91">ritsuryo-wasm</text>
+  <text x="925" y="348" font-size="19" text-anchor="middle" fill="#222">WebAssembly functions</text>
+  <rect x="405" y="260" width="290" height="120" rx="12" fill="#f2f2f2" stroke="#555" stroke-width="2"/>
+  <text x="550" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#333">Web page</text>
+  <text x="550" y="348" font-size="19" text-anchor="middle" fill="#222">Calculate in the browser</text>
+  <rect x="30" y="260" width="290" height="120" rx="12" fill="#f8ece4" stroke="#a0410d" stroke-width="2"/>
+  <text x="175" y="312" font-size="26" font-weight="bold" text-anchor="middle" fill="#a0410d">Rust program</text>
+  <text x="175" y="348" font-size="19" text-anchor="middle" fill="#222">Uses it from crates.io</text>
+  <line x1="324" y1="110" x2="401" y2="110" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="362" y="96" font-size="19" text-anchor="middle" fill="#222">import</text>
+  <line x1="699" y1="110" x2="776" y2="110" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="737" y="96" font-size="19" text-anchor="middle" fill="#222">lean-rs</text>
+  <line x1="925" y1="174" x2="925" y2="256" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="938" y="222" font-size="19" fill="#222">wasm-bindgen</text>
+  <line x1="776" y1="320" x2="699" y2="320" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+  <path d="M 780 165 Q 550 215 324 268" fill="none" stroke="#333" stroke-width="2.5" marker-end="url(#a)"/>
+</svg>
