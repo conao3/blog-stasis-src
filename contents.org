@@ -37469,8 +37469,8 @@ Claude CodeやCodexをスレッドとして動かすbbを、EmacsからbbのGUI�
 操作はすべてbbのCLIを呼んで行い、サーバーで起きた変化は私が作った [[https://github.com/conao3/ts-bb-events][bb-events]] で受け取っています。
 スレッドはbbのサーバーで動くのでEmacsを閉じても止まらず、同じスレッドをbbのデスクトップアプリとブラウザからも開けます。
 
-リポジトリは [[https://github.com/conao3/bb-agent.el][conao3/bb-agent.el]] で、ライセンスは [[https://github.com/conao3/bb-agent.el/blob/ad40f3e86dfc936494adcfaed34865653b198bd6/LICENSE][GPL-3.0]] です。
-この記事ではmasterの [[https://github.com/conao3/bb-agent.el/commit/ad40f3e86dfc936494adcfaed34865653b198bd6][ad40f3e]] と、bb 0.49.0とbb-events 0.4.0を使いました。
+リポジトリは [[https://github.com/conao3/bb-agent.el][conao3/bb-agent.el]] で、ライセンスは [[https://github.com/conao3/bb-agent.el/blob/0a65ad1484b2b40d087f0190a635dd661887c713/LICENSE][GPL-3.0]] です。
+この記事ではmasterの [[https://github.com/conao3/bb-agent.el/commit/0a65ad1484b2b40d087f0190a635dd661887c713][0a65ad1]] と、bb 0.49.0とbb-events 0.4.0を使いました。
 
 [[github:conao3/bb-agent.el::Emacs Lisp][Emacs frontend that follows and drives bb agent threads]]
 
@@ -37506,7 +37506,7 @@ bb-agent.elはEmacs 31.1と、私が作った非同期処理のライブラリ�
 bb-eventsはNixで入れられます。
 
 #+begin_src sh
-nix profile install github:conao3/ts-bb-events
+nix profile add github:conao3/ts-bb-events
 #+end_src
 
 vowとbb-agent.elは、leafなら次の式で入ります。
@@ -37538,7 +37538,7 @@ GUIではドラッグで操作する区分への移動と親スレッドの設�
 [[./resources/public/img/b3e7d9-thread.png]]
 
 スレッドを開くと依頼と返答のあいだの作業が =Edited 2 files, ran 1 command= のような1行にまとまって並びます。
-まとめ方と語の順は、GUIのソースを読んで同じにしました。
+まとめ方と語の順は、GUIの [[https://github.com/get-bb/bb/blob/b0ddaad731565d7e4de68d824120d802fc78f7d5/packages/thread-view/src/timeline-view.ts][ソース]] を読んで同じにしました。
 
 =TAB= を押すと1行にまとめた作業が開き、読んだファイルや実行したコマンドとその出力が見られます。
 エージェントが作業しているあいだは届いた順に返答の文とコマンドの出力が表示されていきます。
@@ -37586,12 +37586,15 @@ bbのCLIに同じ働きを足す提案は [[https://github.com/get-bb/bb/issues/
 ** GUIと同じにした範囲
 
 本物のbbのサーバーにつないだEmacsでキーとボタンを押し、サーバーの状態とEmacsの画面の両方でbb-agent.elの機能を確かめました。
-同じスレッドをブラウザのbbの画面と並べて、行のまとめ方と見出しの語が一致することも見ています。
+同じスレッドをブラウザのbbの画面と並べて、作業をまとめた行の数と見出しの語が一致することも確かめています。
 
 pull requestのMergeとbb本体の更新のように状態を変える操作は作りましたが、本物のサーバーには実行していません。
 todoのカードは手元のClaude CodeとCodexが計画の道具を使わなかったので、テストだけで確かめています。
 
 GUIのside chatとバックグラウンドで動く作業を1つだけ止める操作は作っていません。
+
+サーバーはGUIに渡す表示のデータを作るときに、コマンドの種類から「Listed files in .」のような見出しを付けます。
+この見出しはイベントに入っていないので、bb-agent.elには出ません。
 
 * COMMENT Local variables
 # Local Variables:
