@@ -17949,7 +17949,7 @@ It worked as a place to collect code and proofs written with AI, as with the [[h
 :properties:
 :export_file_name: generated/contents/blog/2026/12e5f6
 :export_date: 2026-11-04 20:32
-:export_updated: 2026-11-04 20:32
+:export_updated: 2026-11-27 21:45
 :export_tags: github-actions cloudflare ci deployment security emacs-doc
 :end:
 
@@ -18013,7 +18013,7 @@ tarのオプションは、同じ内容のファイルから同じバイト列�
 ワークフローの権限は =contents: write= で、Actionsが自動で発行する =GITHUB_TOKEN= だけで足ります。
 
 *** 2. SHA-256をmasterにcommitする
-続けて =SITE_SHA256= をmasterにcommitしてpushしますが、tarの中身が前回と同じなら =SITE_SHA256= も変わらないので、そのときはcommitを作りません。
+続けて =EMACS_REVISION= と =SITE_SHA256= とPOファイルをmasterにcommitしてpushしますが、3つのファイルのどれもmasterから変わっていなければcommitを作りません。
 次のステップは、POファイルの扱いを省いて抜粋したものです。
 
 #+begin_src yaml
@@ -18052,12 +18052,12 @@ deploy commandでは、 =wrangler.jsonc= の =assets.directory= が =./dist= な
 ** この構成の性質
 - CloudflareのAPIトークンを自分で発行せず、GitHubのSecretsは空です。Workers Buildsが使うトークンは[[https://developers.cloudflare.com/workers/ci-cd/builds/configuration/#api-token][Cloudflareが自動で作って]]Cloudflareの中に持ち、Actionsが使うのは =GITHUB_TOKEN= だけです。
 - 生成物をgitの履歴に入れません。サイトは2,240ファイルで、tarにすると49 MB、zstdで圧縮すると4.7 MBですが、サイトについて履歴に入るのは64文字のSHA-256だけです。
-- tarは同じ内容のファイルから同じバイト列になるので、サイトの中身が変わらなければ =SITE_SHA256= も変わらず、Actionsがcommitを作らないのでデプロイも走りません。
+- tarは同じ内容のファイルから同じバイト列になるので、サイトの中身が変わらなければ =SITE_SHA256= も変わりません。 =EMACS_REVISION= とPOファイルも変わらなければ、Actionsがcommitを作らないのでデプロイも走りません。
 - READMEの修正など、 =SITE_SHA256= を変えないpushでもWorkers Buildsは動きますが、このときは同じtarを取って同じサイトをデプロイし直すだけです。
 - =SITE_SHA256= とReleaseのtarが食い違うと、 =sha256sum --check= が失敗してbuild commandも失敗します。deploy commandは実行されないので公開中のサイトは前のままで、公開されるのは =SITE_SHA256= と一致したtarに限られます。
 
-一方で、この構成では古いcommitからデプロイし直せません。
-Releaseのtarは常に最新の1つだけなので、古いcommitの =SITE_SHA256= は今のtarと合わずにビルドが失敗します。
+一方で、この構成ではReleaseのtarが常に最新の1つだけなので、古いcommitからビルドしても前のバージョンのサイトをデプロイし直せません。
+Workers Buildsはそのcommitの =SITE_SHA256= が今のtarと違えば照合で失敗し、同じなら今のtarをデプロイします。
 
 同じ理由で、Actionsがtarを上げてから =SITE_SHA256= をpushするまでの間に別のpushがあると、そのビルドも失敗します。
 
@@ -18148,7 +18148,7 @@ The workflow replaces the asset on the =site= release with the new archive.
 With =contents: write=, the workflow can upload the asset using the =GITHUB_TOKEN= that GitHub Actions issues.
 
 *** 2. Commit the SHA-256 to master
-The workflow stages =SITE_SHA256= for a commit to master. If the archive contents stay the same, the checksum gives Git nothing to commit.
+The workflow stages =EMACS_REVISION=, =SITE_SHA256=, and the PO files for a commit to master. If all three match master, it makes no commit.
 This excerpt leaves out how the workflow handles PO files.
 
 #+begin_src yaml
@@ -18189,11 +18189,12 @@ After deployment, GitHub shows a =Workers Builds: emacs-doc= check run on the co
 ** What this setup means for deployments
 - I leave the GitHub repository's secrets empty. [[https://developers.cloudflare.com/workers/ci-cd/builds/configuration/#api-token][Cloudflare creates and stores the token]] that Workers Builds uses, and GitHub Actions uses its own =GITHUB_TOKEN=.
 - The site has 2,240 files. The tar archive takes up 49 MB, and zstd compresses it to 4.7 MB. Git tracks the 64-character SHA-256.
-- Identical site contents produce identical archive bytes and the same =SITE_SHA256=. Workers Builds gets a push from the workflow only when Git has changes to commit.
+- Identical site contents produce identical archive bytes and the same =SITE_SHA256=. If =EMACS_REVISION= and the PO files also stay the same, the workflow makes no commit and Workers Builds doesn't run.
 - Pushes that leave =SITE_SHA256= untouched, such as a README edit, still trigger Workers Builds. It fetches the same archive and redeploys the same site.
 - If the release archive and =SITE_SHA256= disagree, =sha256sum --check= fails and stops the build before deployment. The live site keeps serving the last archive that passed the check.
 
-The release holds one archive, so a redeploy from an older commit fails if its =SITE_SHA256= differs from the current archive's checksum.
+The release holds a single archive, so you can't redeploy an earlier version of the site from an older commit.
+Workers Builds fails the check if that commit's =SITE_SHA256= differs from the current archive, and deploys the current archive if they match.
 
 A push between the archive upload and the push that updates =SITE_SHA256= can also trigger a build with a mismatched checksum.
 
