@@ -22343,7 +22343,7 @@ https://clojure.github.io/clojure/clojure.data-api.html
 :properties:
 :export_file_name: generated/contents/blog/2026/51d6b7
 :export_date: 2026-11-17 12:43
-:export_updated: 2026-11-17 12:43
+:export_updated: 2026-11-28 00:36
 :export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
 :end:
 
@@ -22360,7 +22360,7 @@ Leanで書いた関数をRustに変換して使っている自作のツール6�
 いま残っている穴は監査から外したleanwispの =fields= の2つです。
 
 作った道具のleanassayは[[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]]に置いていて、ライセンスはApache-2.0です。
-この記事の結果は、Lean 4.35.0とleanassay 0.2.0で動かしたものです。
+この記事の結果はLean 4.35.0とleanassayのcommit [[https://github.com/conao3/lean-leanassay/commit/ef054d7c45ab4f9e14a201ae7e3bfbe9dd080abb][ef054d7]]で動かしたもので、このcommitは0.2.0とLeanのコードが同じです。
 
 [[github:conao3/lean-leanassay::Lean][Check whether your Lean theorems pin down your implementation, by running broken implementations against them]]
 
@@ -22479,7 +22479,7 @@ Rustから呼んでいる関数に =#assay= を当てて、 =make check= で監�
 監査から外した関数もあります。
 leanwispのキャッシュのキーを作る =key= はもとになる =fields= に穴が2つ残っていて、ritsuryoのコマンドの一覧を返す =describe= には定理がありません。
 
-当てる前の穴はleanwispに17とleansailに39で、定理が1つも触れていない関数もritsuryoに6つ、leanwispに4つ、leankeelに1つありました。
+当てる前の穴はleanwispに17とleansailに39で、監査した関数のうち定理が1つも触れていないものもritsulintに7つ、ritsuryoに5つ、leanwispに3つ、leankeelに1つありました。
 
 穴の多くは、上限だけや一方向だけを述べた定理のところに出ていました。
 たとえばleanwispの[[https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L54][softblockIndent]]は字下げの幅を =min indent.toNat (base + 2)= で決める関数で、定理は結果がどちらの値も超えないことしか述べていなかったのでいつも0を返すバージョンや =+= を =-= に替えたバージョンも通ってしまいました。
@@ -22538,7 +22538,7 @@ I also ran it on six of my tools that turn Lean functions into Rust, and in the 
 Two holes remain, in leanwisp's =fields=, which I left out of the audit.
 
 The tool, leanassay, is at [[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]] under the Apache-2.0 license.
-The results in this post come from Lean 4.35.0 and leanassay 0.2.0.
+The results in this post come from Lean 4.35.0 and leanassay at commit [[https://github.com/conao3/lean-leanassay/commit/ef054d7c45ab4f9e14a201ae7e3bfbe9dd080abb][ef054d7]], whose Lean code is the same as in 0.2.0.
 
 [[github:conao3/lean-leanassay::Lean][Check whether your Lean theorems pin down your implementation, by running broken implementations against them]]
 
@@ -22657,7 +22657,7 @@ The mutations that were not killed are versions that could not be built because 
 I also left some functions out of the audit.
 leanwisp's =key=, which builds cache keys, builds on =fields=, which still has two holes, and ritsuryo's =describe=, which returns the list of commands, has no theorems.
 
-Before the audit, leanwisp had 17 holes and leansail had 39, and some functions were not mentioned by any theorem: 6 in ritsuryo, 4 in leanwisp, and 1 in leankeel.
+Before the audit, leanwisp had 17 holes and leansail had 39, and no theorem mentioned 7 of the audited functions in ritsulint, 5 in ritsuryo, 3 in leanwisp, and 1 in leankeel.
 
 Most holes were in theorems that stated only an upper bound or only one direction.
 For example, leanwisp's [[https://github.com/conao3/rust-leanwisp/blob/a1902d928cbcf106f0992bec23f9e7d12cc7017f/src/layout.rs#L54][softblockIndent]] computes the indent width with =min indent.toNat (base + 2)=, and its theorem only said that the result exceeds neither value, so a version that always returns 0 and a version that turns =+= into =-= both passed.
