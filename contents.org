@@ -28255,7 +28255,7 @@ In the other direction, you can translate functions written in Go into Lean and 
 A Lean structure becomes a Go struct that checks its field conditions when you create a value, and inductive types for enumerations and case splits become Go types too.
 
 The repository is [[https://github.com/conao3/lean-leanfran/tree/v0.13.2/langs/Go][langs/Go/ in conao3/lean-leanfran]], under the Apache-2.0 license.
-The Go module is on pkg.go.dev as [[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.13.2][github.com/conao3/leanfran-go]], and this post uses the results of running version 0.13.2.
+I publish the Go module as [[https://pkg.go.dev/github.com/conao3/leanfran-go@v0.13.2][github.com/conao3/leanfran-go]], and this post uses the results of running version 0.13.2.
 
 leanfran converts the intermediate representation of the Lean compiler into Go.
 The generated Go runs with only this module and the Go standard library, so you need neither Lean nor cgo at run time.
