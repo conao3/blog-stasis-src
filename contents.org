@@ -24829,7 +24829,7 @@ I wrote this post from results with Lean 4.35.0 and Leansail 0.1.0.
 ** Architecture
 Leansail runs as two processes: a host written in Rust and a backend written in Lean.
 
-[[./resources/public/img/060bea-architecture.svg]]
+[[./resources/public/img/7fdcef-architecture.svg]]
 
 The host speaks LSP with the editor and relays the messages it receives to the backend.
 The backend is an executable that embeds [[https://github.com/leanprover/lean4/tree/master/src/Lean/Server][Lean.Server]], and as in Lean's own server, the Watchdog holds the index of the whole project and starts a FileWorker for each open file to process it.
@@ -24919,7 +24919,7 @@ FileWorker spends most of its time checking proofs and inferring type class inst
 
 The chart and table below show medians on =IntegralEqImproper.lean=, measured by running Lean's own server and Leansail in turn within the same measurement run.
 
-[[./resources/public/img/060bea-speed.svg]]
+[[./resources/public/img/7fdcef-speed.svg]]
 
 | Operation                              | Lean's server | Leansail |  Ratio |
 |----------------------------------------+---------------+----------+--------|
