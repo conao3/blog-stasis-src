@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520">
+<rect width="1100" height="520" rx="16" fill="white"/>
+<defs><marker id="forward" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#276749" stroke-width="1.5"/></marker><marker id="reverse" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#285ea8" stroke-width="1.5"/></marker></defs>
+<style>.heading { font-size: 30px; font-weight: 700; } .node { font-size: 26px; } .description { font-size: 20px; }</style>
+<g font-family="sans-serif" fill="#172b4d">
+<text x="40" y="48" class="heading">Use functions proved in Lean in your usual language</text>
+<rect x="40" y="85" width="240" height="140" rx="12" fill="#e7f0ff"/>
+<rect x="360" y="85" width="320" height="140" rx="12" fill="#e1f5ed"/>
+<rect x="760" y="85" width="300" height="140" rx="12" fill="#eef1f5"/>
+<g text-anchor="middle"><text x="160" y="135" class="node">Lean 4</text><text x="160" y="177" class="description">Functions and proofs</text>
+<text x="520" y="135" class="node">leanfran</text><text x="520" y="177" class="description">Generates code from the</text><text x="520" y="206" class="description">intermediate representation</text>
+<text x="910" y="135" class="node">Rust / Python</text><text x="910" y="170" class="node">TypeScript / Clojure</text><text x="910" y="205" class="description">Called from applications</text></g>
+<text x="40" y="310" class="heading">Verify functions written in your usual language in Lean</text>
+<rect x="40" y="350" width="240" height="140" rx="12" fill="#e7f0ff"/>
+<rect x="360" y="350" width="320" height="140" rx="12" fill="#e1f5ed"/>
+<rect x="760" y="350" width="300" height="140" rx="12" fill="#eef1f5"/>
+<g text-anchor="middle"><text x="160" y="400" class="node">Lean 4</text><text x="160" y="442" class="description">Translated model</text><text x="160" y="471" class="description">Proofs of properties</text>
+<text x="520" y="400" class="node">leanfran</text><text x="520" y="442" class="description">Translates supported</text><text x="520" y="471" class="description">functions</text>
+<text x="910" y="400" class="node">Rust / Python</text><text x="910" y="435" class="node">TypeScript / Clojure</text><text x="910" y="470" class="description">Functions in each language</text></g>
+</g>
+<g fill="none" stroke-width="3"><path d="M285 155H345" stroke="#276749" marker-end="url(#forward)"/><path d="M685 155H745" stroke="#276749" marker-end="url(#forward)"/><path d="M755 420H695" stroke="#285ea8" marker-end="url(#reverse)"/><path d="M355 420H295" stroke="#285ea8" marker-end="url(#reverse)"/></g>
+</svg>

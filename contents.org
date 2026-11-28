@@ -23230,7 +23230,7 @@ This post covers the features of v0.6.0.
 
 [[github:conao3/lean-leanfran::Lean][Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure]]
 
-[[./resources/public/img/23d62c-backends.svg]]
+[[./resources/public/img/21ebbd-backends.svg]]
 
 ** Using proved functions in an application
 Lean is a language in which you write functions and prove their properties; for example, you can write a function that doubles its argument and a theorem that the result is always twice the argument like this.
