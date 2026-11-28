@@ -31693,7 +31693,7 @@ I wrote one post in the same format for each Emacs release from 27 to the develo
 :properties:
 :export_file_name: generated/contents/blog/2026/d711ab
 :export_date: 2026-11-27 23:30
-:export_updated: 2026-11-27 23:30
+:export_updated: 2026-11-27 23:51
 :export_tags: emacs release-notes
 :end:
 Emacsの開発版 (次のEmacs 32になるmaster) のNEWSから、動かしてすぐに違いが分かる新機能を選び、実際の画面と一緒に紹介します。
@@ -31791,6 +31791,23 @@ Emacs 31.1には =C-S-a= が =C-a= として届いていて、開発版にはGUI
 上がEmacs Lispのファイルで、下が =outline-find-headings= で出した見出しの一覧です。
 一覧の行を選ぶとその見出しに移ります。
 
+** 識別子の名前の変更を、diffで確かめてから当てる
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] は、識別子の名前の変更や関数の切り出しのようなリファクタリングを、言語によらず同じコマンドで呼ぶためのライブラリです。
+Eglotから切り出されたもので、Eglotが言語サーバーの機能をこのライブラリの操作として渡します。
+
+PythonのファイルでEglotを =pylsp= につなぎ、関数 =load= の上で =M-x refactor-rename RET load_json RET= と打ちました。
+=refactor-confirmation= を =diff= にしておくと、変更をすぐには当てずに =*refactor changes*= バッファにdiffで出します。
+
+#+begin_src emacs-lisp
+(setopt refactor-confirmation 'diff)
+#+end_src
+
+[[./resources/public/img/d711ab-refactor.png]]
+
+定義の =def load= と呼び出しの =load(path)= が =load_json= に変わり、同じ名前の =json.load(f)= は言語サーバーが別のものと分かっているので残っています。
+diffを確かめたら =C-c C-a= で1つずつ、 =C-c RET a= でまとめて当てられます。
+
 ** ローマ数字と数を変換する
 
 [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L819][number-to-roman と roman-to-number]] がどこからでも呼べる関数になりました。
@@ -31809,8 +31826,7 @@ MMXXVI
 
 ** ほかに目についたもの
 
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] の画像は画素の配列を書き換えて =canvas-refresh= で描き直せます。
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] は識別子の名前の変更や関数の切り出しを言語によらず呼ぶためのライブラリで、Eglotから切り出されました。
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] の画像は、画素の配列を書き換えて =canvas-refresh= で描き直す、速い描き直しのための画像です。caf462dのビルドでは、X11とpgtkのどちらでも渡した配列の色が描かれなかったので、直ったら節にします。
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] はUUIDを作ったり読んだりするライブラリです。
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]] に対応しました。
 
@@ -31828,7 +31844,7 @@ Emacs 27から開発版までのNEWSを、1つの版ごとに同じ形で紹介�
 :properties:
 :export_file_name: generated/contents/blog/2026/4d4a52
 :export_date: 2026-11-27 23:30
-:export_updated: 2026-11-27 23:30
+:export_updated: 2026-11-27 23:51
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/d711ab
@@ -31930,6 +31946,23 @@ The number of stars sets the heading level.
 The top window is an Emacs Lisp file, and the bottom one is the heading list from =outline-find-headings=.
 Pick a line in the list to jump to that heading.
 
+** Rename an identifier and check the diff before applying it
+
+[[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] is a library that runs refactorings such as renaming an identifier or extracting a function with the same commands in any language.
+It was extracted from Eglot, and Eglot hands the language server's refactorings to it.
+
+I connected Eglot to =pylsp= in a Python file and typed =M-x refactor-rename RET load_json RET= on the function =load=.
+With =refactor-confirmation= set to =diff=, the changes do not apply right away and show up as a diff in the =*refactor changes*= buffer.
+
+#+begin_src emacs-lisp
+(setopt refactor-confirmation 'diff)
+#+end_src
+
+[[./resources/public/img/d711ab-refactor.png]]
+
+The definition =def load= and the call =load(path)= become =load_json=, and =json.load(f)= keeps its name because the language server knows it is a different function.
+After checking the diff, =C-c C-a= applies one hunk and =C-c RET a= applies them all.
+
 ** Convert between numbers and Roman numerals
 
 [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L819][number-to-roman and roman-to-number]] are now autoloaded functions you can call from anywhere.
@@ -31948,8 +31981,7 @@ MMXXVI
 
 ** Other changes worth a look
 
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] images let you rewrite the pixel data and redraw with =canvas-refresh=.
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L667][refactor]] is a library, extracted from Eglot, that runs actions such as renaming an identifier or extracting a function in any language.
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] images are made for fast redraws: you rewrite the pixel data and call =canvas-refresh=. In the caf462d build, neither the X11 nor the pgtk version drew the colors I passed in, so I will add a section once that works.
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] is a library that generates and parses UUIDs.
 - Emacs supports [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]].
 
