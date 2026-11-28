@@ -37122,6 +37122,120 @@ If you only want the sleep math, use the =Backoff= type by itself in your own re
 ** Wrapping up
 If you run consumers that watch queues that sit empty most of the time, try swapping them for =sqs-poller=.
 
+* EmacsでGmailとGoogleカレンダーを複数アカウントまとめて読めるgog.elを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/7cbf16
+:export_date: 2026-11-28 00:44
+:export_updated: 2026-11-28 00:44
+:export_draft: t
+:export_tags: emacs emacs-lisp gmail google-calendar gogcli vow-el release gog-el
+:end:
+EmacsからGmailとGoogleカレンダーを読んでメールを整理し、返信を書いてGmailの下書きに保存できるgog.elというパッケージを作りました。
+Googleのサービスをコマンドラインで扱う [[https://github.com/openclaw/gogcli][gog]] を内部で呼ぶので、gogで認可した複数のGoogleアカウントのメールと予定を1つのバッファにまとめて表示できます。
+
+リポジトリは [[https://github.com/conao3/gog.el][conao3/gog.el]] で、ライセンスは [[https://github.com/conao3/gog.el/blob/b5bc9ed/LICENSE][GPL-3.0]] です。
+この記事ではmasterの [[https://github.com/conao3/gog.el/commit/b5bc9ed][b5bc9ed]] とgog v0.48.1を使いました。
+
+[[github:conao3/gog.el::Emacs Lisp][Gmail and Google Calendar in Emacs through the gog CLI]]
+
+** gog.elでできること
+
+[[./resources/public/img/7cbf16-dashboard.png]]
+
+=M-x gog-dashboard= を開くと、どのアカウントの未読のメールも1つの一覧に並び、その下に今日と明日の予定が出ます。
+画像はgogの代わりにテストデータを返すスクリプトを使って撮りました。
+=me= と =work= はgogでアカウントに付けた別名です。
+
+- 複数のアカウントの受信トレイを1つの一覧で見る。
+- スレッドを開いて読み、アーカイブしたり既読にしたりラベルを付け外ししたりする。
+- =message-mode= で返信や新しいメールを書いて、Gmailの下書きに保存する。
+- Googleカレンダーの予定を1週間分並べ、作成と変更と削除をする。
+
+** gogでGoogleアカウントを認可する
+
+gogはGmailやGoogleカレンダーやDriveのAPIをコマンドラインから呼ぶツールです。
+=--json= を付けると結果をJSONで出します。
+
+gog.elは操作のたびに =gog --json --no-input= を非同期に起動して、出てきたJSONを読んでバッファに描いています。
+
+gogを使うには、Google CloudでデスクトップアプリのOAuthクライアントを作り、そのJSONをgogに登録してから、アカウントごとに認可します。
+
+#+begin_src sh
+gog auth credentials ~/Downloads/client_secret.json
+gog auth add you@example.com --services gmail,calendar
+#+end_src
+
+OAuthクライアントの作り方とgogの使い方は [[https://deva.conao3.com/gogcli/][gogcli: Gmail and Calendar from the Terminal]] にまとめています。
+gog.elは =gog auth list= に出てくるすべてのアカウントのメールと予定を読み込むので、2つ目のアカウントも =gog auth add= で足すだけで一覧に入ります。
+
+** gog.elを入れる
+
+gog.elはEmacs 31.1と、私が作った非同期処理のライブラリの [[https://s.conao3.com/blog/2026/7d9eba][vow]] を使います。
+leafなら次の式で入ります。
+
+#+begin_src emacs-lisp
+(leaf vow
+  :vc (:url "https://github.com/conao3/vow.el"))
+
+(leaf gog
+  :vc (:url "https://github.com/conao3/gog.el"))
+#+end_src
+
+空の =user-emacs-directory= を使うEmacs 31.1にMELPAからleafを入れてこの2つの式を評価し、 =gog-mail= を読み込めることを確かめました。
+
+** 複数アカウントのGmailを1つの一覧で見る
+
+[[./resources/public/img/7cbf16-search.png]]
+
+=M-x gog-mail= でGmailの検索語を入れると、アカウントごとに =gog gmail search= を並べて走らせ、結果を日付の新しい順に混ぜて並べます。
+スレッドごとにAccountの列へアカウント名が出るので、仕事と個人のメールを同じ一覧で見分けられます。
+
+未読のスレッドは太字になり、スターの付いたスレッドには =★= が付きます。
+ラベルは件名の前に出していて、 =INBOX= のように毎回付くラベルは出しません。
+
+一覧の上では =a= でアーカイブ、 =u= で未読と既読の切り替え、 =*= でスター、 =+= と =-= でラベルの付け外し、 =d= でゴミ箱に移せます。
+アーカイブしたスレッドは一覧から消さずに薄く表示して、カーソルを次のスレッドに進めます。
+
+** スレッドを読む
+
+[[./resources/public/img/7cbf16-thread.png]]
+
+スレッドを開くと、メッセージごとに差出人と日時の見出しが並びます。
+読み終えたメッセージは見出しとGmailの要約の1行に畳み、最後のメッセージと未読のメッセージだけを開いています。
+
+本文は =gog gmail raw= でメッセージをそのまま取り出し、Gnusと同じ =mm-decode= で読んでいます。
+HTMLのメールは =shr= で描きますが、外部の画像は =i= を押すまで読み込みません。
+
+引用の行は深さで色を分け、8行を超える引用は最初の3行を残して畳んでボタンにしています。
+
+=SPC= を押していくと画面を送り、メッセージの終わりに来ると次のメッセージに進みます。
+スレッドの終わりに来ると一覧の次のスレッドに進みます。
+
+** 返信をGmailの下書きに保存する
+
+[[./resources/public/img/7cbf16-draft.png]]
+
+スレッドの上で =r= を押すと、宛先と件名と引用を入れた =message-mode= のバッファが開きます。
+引用の1行目は =message-citation-line-format= の形で作るので、Gnusで設定している書式がそのまま使えます。
+
+=C-c C-c= で =gog gmail drafts create= を呼んでGmailの下書きに保存し、バッファを閉じます。
+=C-x C-s= ではバッファを残したまま保存して、2度目からは同じ下書きを =gog gmail drafts update= で書き換えます。
+
+メールはGmailの画面で下書きを見返してから送りたいので、gog.elにはメールを送る機能を作っていません。
+gogにも =gog config no-send set <アカウント>= でアカウントごとに送信を止める設定があり、私は両方のアカウントで送信を止めています。
+
+** Googleカレンダーの予定を並べる
+
+[[./resources/public/img/7cbf16-calendar.png]]
+
+=M-x gog-calendar= は、どのアカウントのどのカレンダーの予定も1週間分を日ごとに並べます。
+今日の見出しには色を付けて、今の時刻の位置に線を引き、終わった予定は薄く表示しています。
+
+=f= と =b= で週を進めて戻し、 =.= で今日に、 =j= で好きな日付に移ります。
+予定の上で =RET= を押すと場所や参加者や説明を出し、 =c= と =e= と =d= で予定を作成と変更と削除できます。
+
+どの画面でも =?= でキーの一覧が出て、キーとカスタマイズできる変数は [[https://github.com/conao3/gog.el/blob/b5bc9ed/README.org][README]] にまとめています。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
