@@ -30434,6 +30434,156 @@ The full list is in [[https://github.com/conao3/vow.el/blob/afb6269/README.org#e
 With =vow-await=, you read the waiting code from top to bottom in the body, and you handle its errors with =condition-case=.
 Edebug steps through that code, so give vow a try the next time you wait for a process or a timer.
 
+* Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/a0c17f
+:export_date: 2026-11-27 22:23
+:export_updated: 2026-11-27 22:23
+:export_tags: emacs release-notes
+:export_draft: t
+:end:
+Emacs 31.1のNEWSから、動かしてすぐに違いが分かる新機能を7つ選び、実際の画面と一緒に紹介します。
+補完の候補が打つそばから絞り込まれる機能や、grepの結果を書き換えて元のファイルに反映する機能のように、毎日の編集で手間が減るものを中心にしました。
+
+NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS][etc/NEWS]] にあり、4,274行あります。
+全部を並べるより手元で試したくなるものを選んで1つずつ動かしてみました。
+
+画面はすべて =emacs -Q= で起動したEmacs 31.1で撮っていて、設定が要るものはその式を添えています。
+
+** 補完の候補が、打つそばから絞り込まれる
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L175][completion-eager-display]] を =t= にすると、補完のあるミニバッファを開いた時点で =*Completions*= バッファが出ます。
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L185][completion-eager-update]] を =t= にすると、文字を打つたびに候補の一覧が更新されます。
+
+#+begin_src emacs-lisp
+(setopt completion-eager-display t
+        completion-eager-update t)
+#+end_src
+
+どちらも既定値は =auto= で、補完の表がその指定を持つときだけ一覧を出したり更新したりします。
+どちらも =t= にするとTABを押さなくても候補が見えたままになり、VerticoのようなパッケージもIcompleteも使わない =emacs -Q= で使いやすくなります。
+
+下の画面は =M-x= で =window-layout-= まで打ったところです。
+
+[[./resources/public/img/a0c17f-completions.png]]
+
+候補が5つのコマンドに絞り込まれ、それぞれのキーバインドも並んでいます。
+次の節ではこのコマンドを使ってみます。
+
+** ウィンドウの配置を、回す、裏返す、縦横を入れ替える
+
+フレームの中のウィンドウの配置を丸ごと組み替える [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L327][コマンド]] が入りました。
+どれも =C-x w= の下にあります。
+
+| キー | コマンド | 動き |
+|------+----------+------|
+| =C-x w r <right>= | =window-layout-rotate-clockwise= | 配置を時計回りに回す |
+| =C-x w r <left>= | =window-layout-rotate-anticlockwise= | 配置を反時計回りに回す |
+| =C-x w f <down>= | =window-layout-flip-topdown= | 配置を上下に裏返す |
+| =C-x w f <right>= | =window-layout-flip-leftright= | 配置を左右に裏返す |
+| =C-x w t= | =window-layout-transpose= | 横の分割と縦の分割を入れ替える |
+| =C-x w o <right>= | =rotate-windows= | 配置はそのままで、バッファを隣のウィンドウへ順に送る |
+
+左に1つ、右に上下2つのウィンドウを並べて =C-x w r <right>= を押すと、左のウィンドウが上に、右の2つが下に回りました。
+
+[[./resources/public/img/a0c17f-layout.png]]
+
+縦長の画面と横長の画面を行き来したときや横に並べたdiffを縦に並べ直したいときにウィンドウを作り直さずに済みます。
+
+** grepの結果を書き換えて、元のファイルに反映する
+
+=M-x grep= の結果のバッファで =e= を押すと、結果の行を [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L2353][編集できるGrep Editモード]] になります。
+行を書き換えるとそのファイルを開いたバッファにも同じ変更が入ります。
+編集を終えたら =C-c C-c= で元のモードに戻ります。
+
+下の画面では =TODO= を探した結果の4行で =M-%= を使い、 =TODO= を =DONE= に置き換えました。
+
+[[./resources/public/img/a0c17f-grep-edit.png]]
+
+上のutil.elのバッファにも =DONE= が入り、モードラインに未保存の印の =**= が付いています。
+変更はバッファに入るだけなのでファイルへの保存は =C-x s= で行います。
+
+Occurモードの =e= と同じ操作で、パッケージのwgrepを入れたときと同じことができます。
+
+** 置換する前に、置換した後のdiffを見る
+
+=M-%= で置換している途中に =d= を押すと、 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L2203][置換をすべて行った場合のdiff]] が =*replace-diff*= バッファに出ます。
+
+[[./resources/public/img/a0c17f-replace-diff.png]]
+
+画面はapp.pyで =TODO= を =FIXME= に置き換える途中で =d= を押したところです。
+diffを見たあとも置換の問い合わせは続いているので、そのまま =y= や =!= で置換を進められます。
+
+=?= で出るヘルプにも「 =d= to display the diff buffer with all replacements」と書かれています。
+置換する数が多いときに1件ずつ =y= を押す前に全体を確かめられます。
+
+** 畳んだブロックに、開閉の印と行数を出す
+
+=hs-minor-mode= で関数やクラスを畳むと、 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1276][hs-show-indicators]] を =t= にしたときは左端に開閉の印が出ます。
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1272][hs-display-lines-hidden]] を =t= にすると、畳んだ行数が省略記号の横に出ます。
+
+#+begin_src emacs-lisp
+(setopt hs-show-indicators t
+        hs-display-lines-hidden t)
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+#+end_src
+
+[[./resources/public/img/a0c17f-hideshow.png]]
+
+畳んだ =save= と =get= には右向きの印と「3 lines」「1 line」が、開いているブロックには下向きの印が付いています。
+印はクリックでも開閉できます。
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1255][hs-cycle]] を使うと、親のブロックを畳む、入れ子のブロックだけを畳む、全部開く、の3つを順に切り替えられます。
+
+** 全角の英数字を半角に、半角を全角にする
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1437][halfwidth-region]] はリージョンの全角の英数字と記号を半角にして、 =fullwidth-region= はその逆をします。
+=halfwidth-word= と =fullwidth-word= はポイントの後の単語を変換し、 =C-u 3= のように数を付けるとその数の単語を変換します。
+
+[[./resources/public/img/a0c17f-fullwidth.png]]
+
+1行目の全角で書かれた文に =halfwidth-region= をかけると、2行目のように英数字と全角の空白が半角になります。
+3つ目の例の =query-replace d= に =C-u 3 M-x fullwidth-word= をかけると、区切りの =-= と空白も全角になりました。
+
+日本語の文に混じった全角の英数字を揃えたいときに置換の正規表現を書かずに済みます。
+
+** 端末のEmacsでも子フレームを出す
+
+子フレームは親のフレームの中に重ねて出す小さなフレームです。
+GUIではCorfuやPosframeが補完の候補やポップアップに使っていて、Emacs 31.1では =emacs -nw= の [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L117][端末でも子フレームを作れます]]。
+
+端末で子フレームが使えるかは =(featurep 'tty-child-frames)= で分かります。
+NEWSによると、新しいバージョンのPosframeとCorfuは端末で子フレームが使えるときはそれを使います。
+ツールチップを端末の子フレームで出すには =tty-tip-mode= を有効にします。
+
+下の画面はfootで動かした =emacs -nw= で次の式を評価して子フレームを作ったところです。
+
+#+begin_src emacs-lisp
+(let ((frame (make-frame `((parent-frame . ,(selected-frame))
+                           (left . 22) (top . 6)
+                           (width . 40) (height . 3)
+                           (minibuffer . nil)))))
+  (with-current-buffer (get-buffer-create "*doc*")
+    (insert "json.load(fp, *, cls=None, ...)\n"
+            "Deserialize fp (a .read()-supporting\n"
+            "file) to a Python object.")
+    (setq mode-line-format nil)
+    (goto-char (point-min)))
+  (set-window-buffer (frame-root-window frame) "*doc*"))
+#+end_src
+
+[[./resources/public/img/a0c17f-tty-child.png]]
+
+子フレームは罫線の枠付きで本文の上に重なり、重なった部分のコードだけが隠れています。
+Corfuを入れていればsshの先の =emacs -nw= でも補完の候補がポップアップで出ます。
+
+** ほかに目についたもの
+
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L46][xterm-mouse-mode]] は対応した端末では最初から有効で、 =emacs -nw= でもマウスが使えます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L814][kill-region-dwim]] を設定すると、リージョンが無いときの =C-w= が直前の単語を消します。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L653][C-h u]] でユーザーオプションを探す =apropos-user-option= を呼べます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] はtree-sitterのモードを開いたときに文法のライブラリが無ければ入れるかを決めます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] は使い始めた人に向けて既定では有効にしない設定をまとめたテーマです。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
