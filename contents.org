@@ -35979,6 +35979,300 @@ Each of them has only a planned argument so far and is not yet a theorem.
 The repository is at [[https://github.com/conao3/lean-abcbound]].
 Issues and PRs are welcome.
 
+* MELPAとGNU ELPAとGitHubのEmacsパッケージを1つの検索欄で探せるElisporeを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/bed0c7
+:export_date: 2026-11-27 23:23
+:export_updated: 2026-11-27 23:23
+:export_draft: t
+:export_tags: emacs emacs-lisp melpa package-management release ts-elispore
+:end:
+MELPAとGNU ELPAとNonGNU ELPAに載っているEmacsパッケージも、GitHubに置いてあるだけのものも、1つの検索欄で探せるElisporeというサイトを作りました。
+パッケージ名を打つとその名前がすでに使われているかが分かり、検索結果の行を開くとleafやuse-packageで入れる式と、MELPAの決まりに沿っているかを検査した結果が出ます。
+
+サイトは [[https://elispore.conao3.com][elispore.conao3.com]] で、この記事を書いた時点で6,889件のパッケージを載せています。
+載せているパッケージのカタログはGitHub Actionsが毎日作り直しています。
+
+リポジトリは [[https://github.com/conao3/ts-elispore][conao3/ts-elispore]] で、ライセンスは [[https://github.com/conao3/ts-elispore/blob/b456119/LICENSE][Apache-2.0]] です。
+この記事ではmasterの [[https://github.com/conao3/ts-elispore/commit/b456119][b456119]] と、2026-11-27に作り直したカタログを使いました。
+
+[[github:conao3/ts-elispore::TypeScript][Find Emacs packages hosted on GitHub]]
+
+** Elisporeでできること
+
+- MELPAとGNU ELPAとNonGNU ELPAとGitHubのEmacsパッケージを、1つの検索欄で探す。
+- =user:minad= や =stars:>=1000= のような修飾子で絞り込む。
+- パッケージ名がカタログの中で使われているかを確かめる。
+- leafかuse-packageの =:vc= でGitリポジトリから入れる式をコピーする。
+- MELPAの決まりに沿っているかを、22個の必須のルールで検査した結果を見る。
+
+** MELPAの審査を待たずにEmacsパッケージを探す
+
+MELPAに新しいパッケージを載せるときはレシピをプルリクエストで送り、MELPAのメンテナーがパッケージを見て審査します。
+[[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L34][プルリクエストのテンプレート]] には次の確認の項目があります。
+
+#+begin_quote
+I understand the package must have been maintained in a public repository for 1 month or more
+#+end_quote
+
+AIを使って書いたパッケージについては、 [[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/CONTRIBUTING.org?plain=1#L92-L95][CONTRIBUTING.org]] が次のように求めています。
+
+#+begin_quote
+Using AI to assist in writing your packages is not prohibited, but the human author must be the *first* and *most thorough* reviewer of any such output.
+#+end_quote
+
+AIを使うとパッケージを書く速さが上がるので、1つずつ人が審査する仕組みでは追いつかなくなると思っています。
+機械で確かめられる決まりは機械で検査して、GitHubに置いたパッケージをそのまま探して入れられるようにしたいと考えて作りました。
+
+Emacs Lispは名前空間が1つしかないので、MELPAの一覧はパッケージ名がすでに使われているかを調べるのにも役に立っていました。
+ElisporeではGitHubにだけあるパッケージも含めて名前を調べられるようにしています。
+
+** Emacsパッケージを名前で探す
+
+[[./resources/public/img/bed0c7-search.png]]
+
+検索欄に =leaf= と打つと、 =leaf= という名前のパッケージがすでにあることと、 =leaf= と =leaf-= で始まる名前のパッケージが合わせて7件あることが出ます。
+名前が使われているかは絞り込みの条件によらずカタログ全体で確かめます。
+
+その下には名前と説明とトピックが検索語に合う11件が並びます。
+leaf.elの行にはGitHubのスター数557と19/19が出ていて、検査した必須のルール19個をすべて通したことを示しています。
+
+検索欄には =source:gnu-elpa= や =user:minad= 、 =topic:completion= 、 =license:gpl-3.0= 、 =pushed:>=2026-01-01= 、 =stars:>=1000= のような修飾子も書けて、左の絞り込みで選んだ条件も検索欄の文字列に入ります。
+検索欄の文字列はURLの =?q== にも入るので、例えば =user:minad stars:>=1000= でminadさんのorg-modernとverticoとconsultとcorfuの4件に絞り込んだ結果をURLで渡せます。
+
+** leafやuse-packageで入れる式をコピーする
+
+行を開くと、ライセンスや最後にpushした日時、載っている場所と一緒に、パッケージを入れる式が出ます。
+式は初めはleafの形で、コードブロックの右上のボタンでuse-packageの形に切り替えられます。
+
+GitHubにだけあるパッケージはリポジトリのURLを =:vc= に書いた式になります。
+例えば [[https://s.conao3.com/blog/2026/7d9eba][vow]] の行には次の式が出ます。
+
+#+begin_src emacs-lisp
+(leaf vow
+  :vc (:url "https://github.com/conao3/vow.el"))
+#+end_src
+
+MELPAのレシピがあるパッケージでは、レシピのブランチと、リポジトリで確かめたLispのディレクトリが式に入ります。
+magitはLispのファイルが =lisp/= にあるので、 =:lisp-dir= の付いた式になります。
+
+#+begin_src emacs-lisp
+(leaf magit
+  :vc (:url "https://github.com/magit/magit" :lisp-dir "lisp"))
+#+end_src
+
+leafの =:vc= はEmacs 29で入った [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fetching-Package-Sources.html][package-vc]] でGitリポジトリからパッケージを入れるキーワードです。
+この記事を書いた時点ではMELPAのleafで使えて、空の =user-emacs-directory= を使うEmacs 31.1にMELPAからleafを入れてこの2つの式を評価し、vowとmagitを読み込めることを確かめました。
+
+use-packageの =:vc= はEmacs 30から使えます。
+GNU ELPAかNonGNU ELPAに載っているパッケージはELPAの切り替えを選ぶと =:ensure t= の式になります。
+
+** MELPAの決まりに沿っているかを検査する
+
+[[./resources/public/img/bed0c7-checks.png]]
+
+行を開くと、パッケージを検査した結果も出ます。
+
+検査のルールはMELPAの [[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/CONTRIBUTING.org][CONTRIBUTING.org]] と、CONTRIBUTING.orgが従うよう求めている [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Tips.html][Emacs Lispの規約]] と、MELPAに出すパッケージの検査に使われている [[https://github.com/riscy/melpazoid][melpazoid]] から取っています。
+どのルールにも出典の原文の引用を付けています。
+
+必須のルールは22個でパッケージの点数になり、例えば =<package>.el= があることや、どのファイルも1行目で =lexical-binding= を有効にしていること、どのファイルも =;;; <file>.el ends here= の行で終わることなどを確かめます。
+melpazoidのほかの検査84個は助言として並べ、点数には入れません。
+
+ルールごとの説明と引用はサイトの [[https://elispore.conao3.com/about/#package-checks-about][ルールの一覧]] で読めます。
+検査はパッケージのファイルを読むだけでEmacsで動かさないので、バイトコンパイルとcheckdocとpackage-lintは含みません。
+
+同じパッケージでも載っている場所ごとに検査します。
+leafはMELPAのバージョン20261122.915が19個のルールをすべて通していて、GNU ELPAのバージョン4.5.5は関数名を =#'= で渡すルールで落ちています。
+
+リポジトリでしか確かめられないルールは場所ごとに飛ばすので、通ったルールの数の分母はMELPAで19、GNU ELPAで18になります。
+
+検査するコマンドはRustで書いていて、必須のルールは [[https://s.conao3.com/blog/2026/23d62c][leanfran]] を使ってLeanで定義し、Rustのコードにしています。
+GitHubのリポジトリを手元で検査するときは、 =owner/repo= を1行に1つ書いたファイルを渡します。
+
+#+begin_src sh
+$ printf 'conao3/leaf.el\nconao3/flylint.el\n' > repos.txt
+$ nix run github:conao3/ts-elispore#checker -- \
+    --source github --github-list repos.txt --output checks.json | head -n 1
+Packages: 2; errors: 0; cached: 0; downloaded: 2
+$ jq '.results | map_values(.failed)' checks.json
+{
+  "github/conao3/flylint.el": [
+    "provide",
+    "footer"
+  ],
+  "github/conao3/leaf.el": [
+    "mz-have-you-done-the-paperwork-to"
+  ]
+}
+#+end_src
+
+flylintはテストを補うファイル =flylint-tests-flylint.el= に =provide= が無く、最後の行が =;;; flylint-tests.el ends here= になっているので、2つの必須のルールで落ちました。
+
+leaf.elは必須のルールをすべて通っています。
+著作権をFSFに譲渡したGNU ELPAのパッケージなので、著作権の表示にmelpazoidの「Have you done the paperwork to assign this copyright?」の助言が付きます。
+
+[[https://s.conao3.com/blog/2026/a80aa6][Vercel Boardで組んだソフトウェア工場]] では、私のEmacsパッケージ20個をこの検査にかける仕事を、パッケージごとのタスク20件に分けて動かしました。
+
+** カタログに載るEmacsパッケージ
+
+カタログはGitHubの検索とMELPAとGNU ELPAとNonGNU ELPAから毎日作り直します。
+フォークや設定ファイルの集まり、awesomeの一覧は外し、直下か =lisp/= に =.el= のファイルがあるリポジトリだけを載せます。
+
+GitHubの検索では、スターが20以上のEmacs Lispのリポジトリをスターの多い順に400件まで読みます。
+トピック =emacs-package= のリポジトリと、2026-01-01より後にpushされたEmacs Lispのリポジトリはそれぞれ200件まで読み、ほかのトピックのリポジトリも加えます。
+
+MELPAに載っていない自分のパッケージをカタログに載せたいときは、フォークでない公開のリポジトリの直下か =lisp/= に =.el= のファイルを置き、リポジトリにトピック =emacs-package= を付けます。
+=emacs-package= の検索はスターの多い順に200件までなので、トピックを付けても載らないことがあります。
+
+* Elispore: search Emacs packages from MELPA, GNU ELPA and GitHub in one search box
+:properties:
+:export_file_name: generated/contents/blog/2026/48ea25
+:export_date: 2026-11-27 23:23
+:export_updated: 2026-11-27 23:23
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/bed0c7
+:export_tags: emacs emacs-lisp melpa package-management release ts-elispore
+:end:
+I built Elispore, a site where one search box finds Emacs packages from MELPA, GNU ELPA and NonGNU ELPA, and packages that only live on GitHub.
+When you type a package name, it tells you whether the name is taken, and when you open a row in the results, you get a leaf or use-package form to install the package and the results of checks against MELPA's rules.
+
+The site runs at [[https://elispore.conao3.com][elispore.conao3.com]] and lists 6,889 packages as of this writing.
+GitHub Actions rebuilds its catalog of packages every day.
+
+The repository is [[https://github.com/conao3/ts-elispore][conao3/ts-elispore]], under the [[https://github.com/conao3/ts-elispore/blob/b456119/LICENSE][Apache-2.0]] license.
+For this post I used [[https://github.com/conao3/ts-elispore/commit/b456119][b456119]] on master and the catalog rebuilt on 2026-11-27.
+
+[[github:conao3/ts-elispore::TypeScript][Find Emacs packages hosted on GitHub]]
+
+** What you can do with Elispore
+
+- Search Emacs packages from MELPA, GNU ELPA, NonGNU ELPA and GitHub in one search box.
+- Narrow the results with qualifiers such as =user:minad= and =stars:>=1000=.
+- Check whether a package name is taken in the catalog.
+- Copy a leaf or use-package form that installs the package from its Git repository with =:vc=.
+- See the results of checks against 22 required rules that follow MELPA's guidelines.
+
+** Finding Emacs packages without waiting for MELPA's review
+
+To add a new package to MELPA, you send its recipe in a pull request, and MELPA's maintainers look at the package and review it.
+The [[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L34][pull request template]] has this item on its checklist:
+
+#+begin_quote
+I understand the package must have been maintained in a public repository for 1 month or more
+#+end_quote
+
+For packages written with AI, [[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/CONTRIBUTING.org?plain=1#L92-L95][CONTRIBUTING.org]] asks for this:
+
+#+begin_quote
+Using AI to assist in writing your packages is not prohibited, but the human author must be the *first* and *most thorough* reviewer of any such output.
+#+end_quote
+
+AI lets people write packages faster, so I think a process where people review each package by hand will fall behind.
+I built Elispore so that machines check the rules a machine can check, and so that you can find a package on GitHub and install it from there.
+
+Emacs Lisp has a single namespace, so the MELPA list also helped people check whether a package name was taken.
+Elispore lets you check names against packages that exist only on GitHub as well.
+
+** Searching Emacs packages by name
+
+[[./resources/public/img/bed0c7-search.png]]
+
+When you type =leaf= in the search box, Elispore says that a package named =leaf= exists and that 7 packages are named =leaf= or start with =leaf-=.
+It checks the name against the whole catalog, whatever filters you have selected.
+
+Below that, the 11 packages whose name, description or topics match the query appear.
+The leaf.el row shows 557 GitHub stars and 19/19, which means it passed all 19 required rules that apply.
+
+The search box also takes qualifiers such as =source:gnu-elpa=, =user:minad=, =topic:completion=, =license:gpl-3.0=, =pushed:>=2026-01-01= and =stars:>=1000=, and the filters you select on the left appear in the query too.
+The query goes into the URL as =?q==, so you can share a filtered result by its URL, for example =user:minad stars:>=1000=, which lists minad's org-modern, vertico, consult and corfu.
+
+** Copying a leaf or use-package form
+
+When you open a row, you see the license, the date of the last push and the sources that list the package, next to a form that installs it.
+The form starts in leaf style, and the button at the top right of the code block switches it to use-package.
+
+For a package that exists only on GitHub, the form puts the repository URL in =:vc=.
+The row for [[https://s.conao3.com/blog/2026/aeda19][vow]] shows this form:
+
+#+begin_src emacs-lisp
+(leaf vow
+  :vc (:url "https://github.com/conao3/vow.el"))
+#+end_src
+
+For a package with a MELPA recipe, the form includes the recipe's branch and the Lisp directory that Elispore confirmed in the repository.
+magit keeps its Lisp files in =lisp/=, so its form has =:lisp-dir=.
+
+#+begin_src emacs-lisp
+(leaf magit
+  :vc (:url "https://github.com/magit/magit" :lisp-dir "lisp"))
+#+end_src
+
+leaf's =:vc= keyword installs a package from its Git repository with [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Fetching-Package-Sources.html][package-vc]], which arrived in Emacs 29.
+As of this writing, the leaf on MELPA supports it: I installed leaf from MELPA into Emacs 31.1 with an empty =user-emacs-directory=, evaluated these two forms, and loaded vow and magit.
+
+use-package has =:vc= from Emacs 30.
+For a package in GNU ELPA or NonGNU ELPA, the ELPA switch gives you a form with =:ensure t=.
+
+** Checking packages against MELPA's rules
+
+[[./resources/public/img/bed0c7-checks.png]]
+
+An open row also shows the results of the package checks.
+
+The rules come from MELPA's [[https://github.com/melpa/melpa/blob/c906d3e4d5e04766a3656feffb2bcde941c4d25b/CONTRIBUTING.org][CONTRIBUTING.org]], the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Tips.html][Emacs Lisp conventions]] that CONTRIBUTING.org asks packages to follow, and [[https://github.com/riscy/melpazoid][melpazoid]], which people use to check packages before they submit them to MELPA.
+Each rule quotes the source text it comes from.
+
+The 22 required rules make up a package's score, and they check, for example, that =<package>.el= exists, that every file enables =lexical-binding= on its first line, and that every file ends with a =;;; <file>.el ends here= line.
+Elispore lists melpazoid's other 84 checks as advice, and they do not count toward the score.
+
+The [[https://elispore.conao3.com/about/#package-checks-about][list of rules]] on the site explains each rule with its quotes.
+The checks only read the package files and do not run them in Emacs, so they leave out byte compilation, checkdoc and package-lint.
+
+Elispore checks a package once for each source that lists it.
+For leaf, the MELPA version 20261122.915 passes all 19 rules, and the GNU ELPA version 4.5.5 fails the rule about passing function names with =#'=.
+
+Elispore skips the rules that only a repository can answer for some sources, so the count is out of 19 for MELPA and out of 18 for GNU ELPA.
+
+The checker is a command written in Rust, and I defined its required rules in Lean and turned them into Rust code with [[https://s.conao3.com/blog/2026/21ebbd][leanfran]].
+To check GitHub repositories on your machine, pass it a file with one =owner/repo= per line.
+
+#+begin_src sh
+$ printf 'conao3/leaf.el\nconao3/flylint.el\n' > repos.txt
+$ nix run github:conao3/ts-elispore#checker -- \
+    --source github --github-list repos.txt --output checks.json | head -n 1
+Packages: 2; errors: 0; cached: 0; downloaded: 2
+$ jq '.results | map_values(.failed)' checks.json
+{
+  "github/conao3/flylint.el": [
+    "provide",
+    "footer"
+  ],
+  "github/conao3/leaf.el": [
+    "mz-have-you-done-the-paperwork-to"
+  ]
+}
+#+end_src
+
+flylint fails two required rules because its test helper file =flylint-tests-flylint.el= has no =provide= and its last line reads =;;; flylint-tests.el ends here=.
+
+leaf.el passes all the required rules.
+It is a GNU ELPA package whose copyright belongs to the FSF, so its copyright notice gets melpazoid's advice "Have you done the paperwork to assign this copyright?"
+
+In the [[https://s.conao3.com/blog/2026/048a8b][software factory I built on Vercel Board]], I ran 20 of my Emacs packages through these checks as 20 tasks, one per package.
+
+** Emacs packages in the catalog
+
+Elispore rebuilds the catalog every day from GitHub search, MELPA, GNU ELPA and NonGNU ELPA.
+It leaves out forks, collections of configuration files and awesome lists, and keeps only repositories with an =.el= file at the root or in =lisp/=.
+
+From GitHub search it reads up to 400 Emacs Lisp repositories with 20 or more stars, most starred first.
+It also reads up to 200 repositories with the =emacs-package= topic and up to 200 Emacs Lisp repositories pushed after 2026-01-01, and adds repositories with a few other topics.
+
+To get your own package into the catalog when it is not on MELPA, put an =.el= file at the root or in =lisp/= of a public repository that is not a fork, and add the =emacs-package= topic to the repository.
+The =emacs-package= search reads only the 200 most starred repositories, so the topic alone may not get your package listed.
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
