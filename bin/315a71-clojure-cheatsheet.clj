@@ -36,19 +36,21 @@
 (defn mp [& xs] (str "\\{" (str/join ",\\ " xs) "\\}"))
 (defn ul [& xs] (str "\\underline{" (apply sp xs) "}"))
 (defn ub [body label] (str "\\underbrace{" body "}_{" label "}"))
-(defn t [s] (str "\\text{" s "}"))
+(defn t
+  ([s] (t s s))
+  ([en ja] (str "\u0001" en "\u0002" ja "\u0003")))
 (defn kw [s] (str "\\mathtt{" s "}"))
 (def dots "\\ldots")
 (def nil' (kw "nil"))
 (def true' (kw "true"))
 (def false' (kw "false"))
-(defn wh [& xs] (str "\\quad " (t "wh. ") (apply str xs)))
+(defn wh [& xs] (str "\\quad " (t "wh. " "ただし ") (apply str xs)))
 (defn lam [args body] (str args " \\mapsto " body))
 (defn cases [& rows]
   (str "\\begin{array}{ll}"
        (str/join " \\\\ " (map (fn [[v c]] (str v " & " c)) (partition 2 rows)))
        "\\end{array}"))
-(defn first-wh [& cond'] (str "i" (t " is the first index with ") (apply str cond')))
+(defn first-wh [& cond'] (str "i" (t " is the first index with " " は ") (apply str cond') (t "" " となる最初の位置")))
 
 (def A (sq "a_0" "a_1" dots))
 (def Al (sq "a_0" dots "a_{l-1}"))
@@ -82,9 +84,9 @@
 (defn tm [& xs] (str (apply mp xs) "^{!}"))
 (defn ts [& xs] (str (apply st xs) "^{!}"))
 
-(defn pred-row [name kinds samples-true checks]
+(defn pred-row [name kinds kinds-ja checks]
   {:name name
-   :cases [{:args ["x"] :out (cases true' (str (t "wh. ") "x" (t (str " is " kinds))) false' (t "otherwise"))}]
+   :cases [{:args ["x"] :out (cases true' (str (t "wh. " "") "x" (t (str " is " kinds) (str " が" kinds-ja "のとき"))) false' (t "otherwise" "それ以外のとき"))}]
    :checks checks})
 
 (def sections
@@ -97,28 +99,28 @@
      {:name "sequence"
       :cases [{:args [(vc "a_0" "a_1" dots)] :out A}
               {:args [(vc)] :out (sq)}
-              {:args [xf A] :lazy true :out (str (sq "b_0" "b_1" dots) (wh (t "the ") "b_i" (t " are what ") xf (t " passes on")))}]
+              {:args [xf A] :lazy true :out (str (sq "b_0" "b_1" dots) (wh (t "the " "") "b_i" (t " are what " " は ") xf (t " passes on" " が渡す値")))}]
       :checks [(= (sequence [1 2]) [1 2]) (= () (sequence [])) (= (sequence (filter odd?) [1 2 3]) [1 3])
                (instance? clojure.lang.LazySeq (sequence (map inc) [1]))]}
      {:name "list*"
       :cases [{:args ["x_0" dots A] :out (sq "x_0" dots "a_0" "a_1" dots)}]
       :checks [(= (list* 1 2 [3 4]) [1 2 3 4]) (= #{} (realized-by #(do (list* :x %) nil)))]}
      {:name "re-seq" :lazy true
-      :cases [{:args ["\\mathit{re}" "\\mathit{str}"] :out (str (sq "s_0" "s_1" dots) (wh "s_i" (t " is the i-th match, as ") "\\mathtt{re\\text{-}find}" (t " returns it")))}
-              {:args ["\\mathit{re}" "\\mathit{str}"] :out (str nil' (wh (t "there is no match")))}]
+      :cases [{:args ["\\mathit{re}" "\\mathit{str}"] :out (str (sq "s_0" "s_1" dots) (wh "s_i" (t " is the i-th match, as " " は ") "\\mathtt{re\\text{-}find}" (t " returns it" " が返すi番目の一致")))}
+              {:args ["\\mathit{re}" "\\mathit{str}"] :out (str nil' (wh (t "there is no match" "一致が無いとき")))}]
       :checks [(= (re-seq #"\d" "a1b2") ["1" "2"]) (nil? (re-seq #"\d" "ab")) (= (re-seq #"(\d)(\w)" "1a") [["1a" "1" "a"]])]}
      {:name "subseq"
-      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy false :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "> \\ge"))}
-              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "< \\le"))}
-              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t " and ") (ap "\\mathit{test}'" "a_i" "k'")))}]
+      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k"] :lazy false :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with " "、") "\\mathit{test}" (t " one of " " は ") "> \\ge" (t "" " のどちらか")))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t ", with " "、") "\\mathit{test}" (t " one of " " は ") "< \\le" (t "" " のどちらか")))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq "a_i" dots) (wh (ap "\\mathit{test}" "a_i" "k") (t " and " " かつ ") (ap "\\mathit{test}'" "a_i" "k'")))}]
       :checks [(= (subseq (sorted-set 1 2 3) > 1) [2 3]) (= (subseq (sorted-set 1 2 3 4) > 1 < 4) [2 3]) (= (subseq (sorted-map 1 :a 2 :b) >= 2) [[2 :b]])
                (not (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2) > 0)))
                (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2) < 2))
                (instance? clojure.lang.LazySeq (subseq (sorted-set 1 2 3) > 0 < 3))]}
      {:name "rsubseq"
-      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy false :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "< \\le"))}
-              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with ") "\\mathit{test}" (t " one of ") "> \\ge"))}
-              {:args [(str (st "a_0" "a_1" dots) (t " sorted")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t " and ") (ap "\\mathit{test}'" "a_i" "k'")))}]
+      :cases [{:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k"] :lazy false :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with " "、") "\\mathit{test}" (t " one of " " は ") "< \\le" (t "" " のどちらか")))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t ", with " "、") "\\mathit{test}" (t " one of " " は ") "> \\ge" (t "" " のどちらか")))}
+              {:args [(str (st "a_0" "a_1" dots) (t " sorted" " (ソート済み)")) "\\mathit{test}" "k" "\\mathit{test}'" "k'"] :lazy true :out (str (sq dots "a_i") (wh (ap "\\mathit{test}" "a_i" "k") (t " and " " かつ ") (ap "\\mathit{test}'" "a_i" "k'")))}]
       :checks [(= (rsubseq (sorted-set 1 2 3) < 3) [2 1]) (= (rsubseq (sorted-set 1 2 3 4) > 1 < 4) [3 2])
                (not (instance? clojure.lang.LazySeq (rsubseq (sorted-set 1 2) < 2)))
                (instance? clojure.lang.LazySeq (rsubseq (sorted-set 1 2) > 0))]}
@@ -126,7 +128,7 @@
       :cases [{:args [] :out (sq "0" "1" "2" dots)}
               {:args ["n"] :out (sq "0" "1" dots "n-1")}
               {:args ["i" "j"] :out (sq "i" "i+1" dots "j-1")}
-              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh "s \\ne 0" (t ", and it stops before reaching ") "j"))}]
+              {:args ["i" "j" "s"] :out (str (sq "i" "i+s" "i+2s" dots) (wh "s \\ne 0" (t ", and it stops before reaching " " で、") "j" (t "" " に達する前に止まる")))}]
       :checks [(= (take 3 (range)) [0 1 2]) (= (range 3) [0 1 2]) (= (range 2 5) [2 3 4]) (= (range 0 7 3) [0 3 6])
                (= (range 5 0 -2) [5 3 1])]}
      {:name "repeat" :lazy true
@@ -227,13 +229,13 @@
                :out (str (sq "a_i" dots) (wh (first-wh pa-false)))}]
       :checks [(= (drop-while #(< % 3) (range 5)) [3 4])]}
      {:name "distinct" :lazy true :xf true
-      :cases [{:args [A] :out (str (sq "a_i" dots) (wh "a_i \\ne a_j" (t " for every ") "j < i"))}]
+      :cases [{:args [A] :out (str (sq "a_i" dots) (wh "a_i \\ne a_j" (t " for every " " がすべての ") "j < i" (t "" " で成り立つ")))}]
       :checks [(= (distinct [1 2 1 3 2]) [1 2 3]) (lazy-on-infinite? distinct)]}
      {:name "dedupe" :lazy true :xf true
       :cases [{:args [A] :out (str (sq "a_0" "a_i" dots) (wh "a_i \\ne a_{i-1}"))}]
       :checks [(= (dedupe [1 1 2 2 1]) [1 2 1]) (lazy-on-infinite? dedupe)]}
      {:name "random-sample" :lazy true :xf true
-      :cases [{:args ["\\mathit{prob}" A] :out (str (sq "a_i" dots) (wh (t "each ") "a_i" (t " is kept with probability ") "\\mathit{prob}"))}]
+      :cases [{:args ["\\mathit{prob}" A] :out (str (sq "a_i" dots) (wh (t "each " "各") "a_i" (t " is kept with probability " " を確率 ") "\\mathit{prob}" (t "" " で残す")))}]
       :checks [(= (random-sample 1.0 [1 2]) [1 2]) (= (random-sample 0.0 [1 2]) [])]}]}
 
    {:id "transforming"
@@ -249,7 +251,7 @@
       :cases [{:args [F A] :out (vc (ap "f" "a_0") (ap "f" "a_1") dots)}]
       :checks [(= (mapv inc [1 2]) [2 3]) (vector? (mapv inc [1]))]}
      {:name "pmap" :lazy true
-      :cases [{:args [F A] :out (str (sq (ap "f" "a_0") (ap "f" "a_1") dots) (wh (ap "f" "a_i") (t " runs in parallel")))}]
+      :cases [{:args [F A] :out (str (sq (ap "f" "a_0") (ap "f" "a_1") dots) (wh (ap "f" "a_i") (t " runs in parallel" " を並列に計算する")))}]
       :checks [(= (pmap inc [1 2 3]) [2 3 4])]}
      {:name "map-indexed" :lazy true :xf true
       :cases [{:args ["f : i\\ x \\to y" A] :out (sq (ap "f" "0" "a_0") (ap "f" "1" "a_1") dots)}]
@@ -306,25 +308,25 @@
       :checks [(= (reverse [1 2 3]) [3 2 1])]}
      {:name "sort"
       :cases [{:args [A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh "a_{\\sigma(0)} \\le a_{\\sigma(1)} \\le \\ldots"))}
-              {:args ["c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (t "ordered by ") "c"))}]
+              {:args ["c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (t "ordered by " "") "c" (t "" " の順に並べる")))}]
       :checks [(= (sort [3 1 2]) [1 2 3]) (= (sort > [3 1 2]) [3 2 1]) (= (sort compare [2 1]) [1 2])]}
      {:name "sort-by"
       :cases [{:args [G A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap kf "a_{\\sigma(0)}") " \\le " (ap kf "a_{\\sigma(1)}") " \\le \\ldots"))}
-              {:args [G "c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap kf "a_{\\sigma(i)}") (t " ordered by ") "c"))}]
+              {:args [G "c" A] :out (str (sq "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh (ap kf "a_{\\sigma(i)}") (t " ordered by " " を ") "c" (t "" " の順に並べる")))}]
       :checks [(= (sort-by count ["bb" "a" "ccc"]) ["a" "bb" "ccc"]) (= (sort-by first [[1 :b] [0 :x] [1 :a]]) [[0 :x] [1 :b] [1 :a]])
                (= (sort-by count > ["a" "ccc" "bb"]) ["ccc" "bb" "a"])]}
      {:name "shuffle"
-      :cases [{:args [A] :out (str (vc "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh "\\sigma" (t " is a random permutation")))}]
+      :cases [{:args [A] :out (str (vc "a_{\\sigma(0)}" "a_{\\sigma(1)}" dots) (wh "\\sigma" (t " is a random permutation" " はランダムな置換")))}]
       :checks [(= (sort (shuffle [3 1 2])) [1 2 3]) (vector? (shuffle [1]))]}]}
 
    {:id "splitting"
     :rows
     [{:name "partition" :lazy true
-      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped")))}
+      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped" "最後の組が短ければ捨てる")))}
               {:args ["n" "s" A] :out (sq (sq "a_0" dots "a_{n-1}") (sq "a_s" dots "a_{s+n-1}") dots)}]
       :checks [(= (partition 2 [0 1 2 3 4]) [[0 1] [2 3]]) (= (partition 2 1 [0 1 2]) [[0 1] [1 2]])]}
      {:name "partition-all" :lazy true :xf true
-      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short")))}]
+      :cases [{:args ["n" A] :out (str (sq (sq "a_0" dots "a_{n-1}") (sq "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short" "最後の組は短いことがある")))}]
       :checks [(= (partition-all 2 [0 1 2 3 4]) [[0 1] [2 3] [4]])]}
      {:name "partition-by" :lazy true :xf true
       :cases [{:args [F (sq "a_0" dots "a_{i-1}" "a_i" dots)]
@@ -338,10 +340,10 @@
                :out (str (vc (sq "a_0" dots "a_{i-1}") (sq "a_i" dots)) (wh (first-wh pa-false)))}]
       :checks [(= (split-with odd? [1 3 2 5]) [[1 3] [2 5]])]}
      {:name "partitionv" :lazy true
-      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped")))}]
+      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "a short last group is dropped" "最後の組が短ければ捨てる")))}]
       :checks [(= (partitionv 2 [0 1 2]) [[0 1]]) (vector? (first (partitionv 2 [0 1])))]}
      {:name "partitionv-all" :lazy true :xf true
-      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short")))}]
+      :cases [{:args ["n" A] :out (str (sq (vc "a_0" dots "a_{n-1}") (vc "a_n" dots "a_{2n-1}") dots) (wh (t "the last group may be short" "最後の組は短いことがある")))}]
       :checks [(= (partitionv-all 2 [0 1 2]) [[0 1] [2]]) (vector? (first (partitionv-all 2 [0])))]}
      {:name "splitv-at"
       :cases [{:args ["n" (sq "a_0" dots "a_{n-1}" "a_n" dots)] :out (vc (vc "a_0" dots "a_{n-1}") (sq "a_n" dots))}]
@@ -386,7 +388,7 @@
       :checks [(= (last [1 2 3]) 3) (nil? (last []))]}
      {:name "nth"
       :cases [{:args [(sq "a_0" dots "a_i" (ul dots)) "i"] :out "a_i"}
-              {:args [Al "i \\ge l"] :out (t "throws")}
+              {:args [Al "i \\ge l"] :out (t "throws" "例外を投げる")}
               {:args [Al "i \\ge l" "d"] :out "d"}]
       :checks [(= (nth [1 2 3] 1) 2) (= :d (nth [1] 5 :d))
                (= :thrown (try (nth [1] 5) (catch IndexOutOfBoundsException _ :thrown)))
@@ -399,30 +401,30 @@
                  (ffirst outer)
                  (= #{0} @seen))]}
      {:name "rand-nth"
-      :cases [{:args [Al] :out (str "a_i" (wh "i" (t " is random")))}]
+      :cases [{:args [Al] :out (str "a_i" (wh "i" (t " is random" " はランダムに選んだ位置")))}]
       :checks [(contains? #{1 2} (rand-nth [1 2]))]}
      {:name "some"
       :cases [{:args [F (sq "a_0" dots "a_i" (ul dots))]
-               :out (cases (ap "f" "a_i") (str (t "wh. ") (first-wh (ap "f" "a_i") (t " truthy")))
-                           nil' (t "otherwise"))}]
+               :out (cases (ap "f" "a_i") (str (t "wh. " "ただし ") (first-wh (ap "f" "a_i") (t " truthy" " が真")))
+                           nil' (t "otherwise" "そのようなiが無いとき"))}]
       :checks [(= (some #(when (> % 1) (* 10 %)) [1 2 3]) 20) (nil? (some even? [1 3]))
                (= #{0 1 2} (realized-by #(some (fn [x] (when (= x 2) x)) %)))]}
      {:name "every?"
       :cases [{:args [P (sq "a_0" dots "a_i" (ul dots))]
-               :out (cases false' (str (t "wh. ") (first-wh pa-false))
-                           true' (t "otherwise"))}]
+               :out (cases false' (str (t "wh. " "ただし ") (first-wh pa-false))
+                           true' (t "otherwise" "そのようなiが無いとき"))}]
       :checks [(true? (every? odd? [1 3])) (false? (every? odd? [1 2 3])) (true? (every? odd? []))
                (= #{0 1} (realized-by #(every? (fn [x] (< x 1)) %)))]}
      {:name "not-every?"
       :cases [{:args [P (sq "a_0" dots "a_i" (ul dots))]
-               :out (cases true' (str (t "wh. ") (first-wh pa-false))
-                           false' (t "otherwise"))}]
+               :out (cases true' (str (t "wh. " "ただし ") (first-wh pa-false))
+                           false' (t "otherwise" "そのようなiが無いとき"))}]
       :checks [(true? (not-every? odd? [1 2])) (false? (not-every? odd? [1 3]))
                (= #{0 1} (realized-by #(not-every? (fn [x] (< x 1)) %)))]}
      {:name "not-any?"
       :cases [{:args [P (sq "a_0" dots "a_i" (ul dots))]
-               :out (cases false' (str (t "wh. ") (first-wh pa-true))
-                           true' (t "otherwise"))}]
+               :out (cases false' (str (t "wh. " "ただし ") (first-wh pa-true))
+                           true' (t "otherwise" "そのようなiが無いとき"))}]
       :checks [(true? (not-any? even? [1 3])) (false? (not-any? even? [1 2]))
                (= #{0 1} (realized-by #(not-any? (fn [x] (= x 1)) %)))]}
      {:name "empty?"
@@ -432,13 +434,13 @@
       :cases [{:args [(sq)] :out nil'} {:args [(sq "a_0" dots)] :out (sq "a_0" dots)}]
       :checks [(nil? (not-empty [])) (= [1] (not-empty [1]))]}
      {:name "distinct?"
-      :cases [{:args ["x_0" "x_1" dots] :out (cases true' (str (t "wh. ") "x_i \\ne x_j" (t " for every ") "i \\ne j") false' (t "otherwise"))}]
+      :cases [{:args ["x_0" "x_1" dots] :out (cases true' (str (t "wh. " "") "x_i \\ne x_j" (t " for every " " がすべての ") "i \\ne j" (t "" " で成り立つとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(true? (distinct? 1 2 3)) (false? (distinct? 1 2 1)) (true? (distinct? 1))]}
      {:name "max-key"
-      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the largest (the last one on a tie)")))}]
+      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the largest (the last one on a tie)" " が最大 (同じ値なら最後のもの)")))}]
       :checks [(= "ccc" (max-key count "a" "ccc" "bb")) (= "cd" (max-key count "ab" "cd")) (= "ef" (max-key count "ab" "cd" "ef"))]}
      {:name "min-key"
-      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the smallest (the last one on a tie)")))}]
+      :cases [{:args [(str kf " : x \\to " (t "number")) "x_0" "x_1" dots] :out (str "x_i" (wh (ap kf "x_i") (t " is the smallest (the last one on a tie)" " が最小 (同じ値なら最後のもの)")))}]
       :checks [(= "a" (min-key count "a" "ccc" "bb")) (= "cd" (min-key count "ab" "cd")) (= "ef" (min-key count "ab" "cd" "ef"))]}]}
 
    {:id "collecting"
@@ -461,7 +463,7 @@
       :checks [(= (zipmap [:a :b] [1 2 3]) {:a 1 :b 2})
                (= #{0 1 2} (realized-by #(zipmap [:a :b] %)))]}
      {:name "frequencies"
-      :cases [{:args [A] :out (str (mp (sp "a_i" "\\mathit{cnt}_i") dots) (wh "\\mathit{cnt}_i" (t " is how many times ") "a_i" (t " occurs")))}]
+      :cases [{:args [A] :out (str (mp (sp "a_i" "\\mathit{cnt}_i") dots) (wh "\\mathit{cnt}_i" (t " is how many times " " は ") "a_i" (t " occurs" " の出現回数")))}]
       :checks [(= (frequencies [:a :b :a]) {:a 2 :b 1})]}
      {:name "group-by"
       :cases [{:args [F A] :out (str (mp (sp "y" (vc "a_i" dots)) dots) (wh (ap "f" "a_i") " = y"))}]
@@ -480,7 +482,7 @@
       :cases [{:args [(st "a_0" dots "x" dots) "x"] :out (st "a_0" dots)}]
       :checks [(= (disj #{1 2} 2) #{1})]}
      {:name "assoc"
-      :cases [{:args [M "k" "v"] :out (str (mp (sp "k_0" "v_0") dots (sp "k" "v")) (wh (t "a previous value of ") "k" (t " is replaced")))}
+      :cases [{:args [M "k" "v"] :out (str (mp (sp "k_0" "v_0") dots (sp "k" "v")) (wh (t "a previous value of " "") "k" (t " is replaced" " の前の値を置き換える")))}
               {:args [(vc "a_0" dots "a_i" dots) "i" "x"] :out (vc "a_0" dots "x" dots)}]
       :checks [(= (assoc {:a 1} :b 2) {:a 1 :b 2}) (= (assoc {:a 1} :a 2) {:a 2}) (= (assoc [1 2] 1 :x) [1 :x]) (= (assoc [1] 1 :x) [1 :x])]}
      {:name "dissoc"
@@ -488,8 +490,8 @@
       :checks [(= (dissoc {:a 1 :b 2} :b) {:a 1})]}
      {:name "get"
       :cases [{:args [(mp dots (sp "k" "v") dots) "k"] :out "v"}
-              {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of ") "m"))}
-              {:args ["m" "k" "d"] :out (str "d" (wh "k" (t " is not a key of ") "m"))}
+              {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of " " が ") "m" (t "" " のキーでないとき")))}
+              {:args ["m" "k" "d"] :out (str "d" (wh "k" (t " is not a key of " " が ") "m" (t "" " のキーでないとき")))}
               {:args [(vc "a_0" dots "a_i" dots) "i"] :out "a_i"}]
       :checks [(= (get {:a 1} :a) 1) (nil? (get {} :a)) (= :d (get {} :a :d)) (= 2 (get [1 2] 1))]}
      {:name "get-in"
@@ -513,28 +515,28 @@
       :checks [(= (update-vals {:a 1} inc) {:a 2})]}
      {:name "merge"
       :cases [{:args [(mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots) dots]
-               :out (str (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots) (wh (t "the later map wins")))}]
+               :out (str (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots) (wh (t "the later map wins" "後のマップの値を取る")))}]
       :checks [(= (merge {:a 1 :b 2} {:a 3 :c 4}) {:a 3 :b 2 :c 4}) (nil? (merge))]}
      {:name "merge-with"
       :cases [{:args ["f : v\\ w \\to v" (mp (sp "k_0" "v_0") dots) (mp (sp "k_0" "w_0") (sp "k_1" "w_1") dots)]
                :out (mp (sp "k_0" (ap "f" "v_0" "w_0")) (sp "k_1" "w_1") dots)}]
       :checks [(= (merge-with + {:a 1 :b 2} {:a 3 :c 4}) {:a 4 :b 2 :c 4})]}
      {:name "select-keys"
-      :cases [{:args ["m" (vc "k_0" "k_1" dots)] :out (str (mp (sp "k_i" "v_i") dots) (wh "k_i" (t " is a key of ") "m"))}]
+      :cases [{:args ["m" (vc "k_0" "k_1" dots)] :out (str (mp (sp "k_i" "v_i") dots) (wh "k_i" (t " is a key of " " は ") "m" (t "" " のキー")))}]
       :checks [(= (select-keys {:a 1 :b 2} [:a :z]) {:a 1})]}
      {:name "contains?"
-      :cases [{:args ["m" "k"] :out (cases true' (str (t "wh. ") "k" (t " is a key of ") "m") false' (t "otherwise"))}
-              {:args [(vc "a_0" dots "a_{l-1}") "i"] :out (cases true' (str (t "wh. ") "0 \\le i < l") false' (t "otherwise"))}]
+      :cases [{:args ["m" "k"] :out (cases true' (str (t "wh. " "") "k" (t " is a key of " " が ") "m" (t "" " のキーのとき")) false' (t "otherwise" "それ以外のとき"))}
+              {:args [(vc "a_0" dots "a_{l-1}") "i"] :out (cases true' (str (t "wh. " "") "0 \\le i < l" (t "" " のとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(true? (contains? {:a nil} :a)) (false? (contains? {} :a)) (true? (contains? [:x :y] 1)) (false? (contains? [:x :y] :x))]}
      {:name "find"
       :cases [{:args [(mp dots (sp "k" "v") dots) "k"] :out (vc "k" "v")}
-              {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of ") "m"))}]
+              {:args ["m" "k"] :out (str nil' (wh "k" (t " is not a key of " " が ") "m" (t "" " のキーでないとき")))}]
       :checks [(= (find {:a 1} :a) [:a 1]) (map-entry? (find {:a 1} :a)) (nil? (find {} :a))]}
      {:name "key"
-      :cases [{:args ["e"] :out (str "k" (wh "e = " (vc "k" "v") (t " is a map entry")))}]
+      :cases [{:args ["e"] :out (str "k" (wh "e = " (vc "k" "v") (t " is a map entry" " はマップのエントリー")))}]
       :checks [(= :a (key (first {:a 1})))]}
      {:name "val"
-      :cases [{:args ["e"] :out (str "v" (wh "e = " (vc "k" "v") (t " is a map entry")))}]
+      :cases [{:args ["e"] :out (str "v" (wh "e = " (vc "k" "v") (t " is a map entry" " はマップのエントリー")))}]
       :checks [(= 1 (val (first {:a 1})))]}
      {:name "peek"
       :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out "a_{l-1}"}
@@ -544,8 +546,8 @@
      {:name "pop"
       :cases [{:args [(vc "a_0" dots "a_{l-1}")] :out (vc "a_0" dots "a_{l-2}")}
               {:args [(ls "a_0" "a_1" dots)] :out (ls "a_1" dots)}
-              {:args [(vc)] :out (t "throws")}
-              {:args [(ls)] :out (t "throws")}]
+              {:args [(vc)] :out (t "throws" "例外を投げる")}
+              {:args [(ls)] :out (t "throws" "例外を投げる")}]
       :checks [(= (pop [1 2 3]) [1 2]) (= (pop '(1 2 3)) '(2 3))
                (= :thrown (try (pop []) (catch IllegalStateException _ :thrown)))
                (= :thrown (try (pop ()) (catch IllegalStateException _ :thrown)))]}
@@ -568,19 +570,19 @@
       :cases [{:args ["x_0" "x_1" dots] :out (vc "x_0" "x_1" dots)}]
       :checks [(= (vector 1 2) [1 2]) (vector? (vector))]}
      {:name "vector-of"
-      :cases [{:args ["\\mathit{type}" "x_0" dots] :out (str (vc "x_0" dots) (wh (t "elements are stored as the primitive ") "\\mathit{type}"))}]
+      :cases [{:args ["\\mathit{type}" "x_0" dots] :out (str (vc "x_0" dots) (wh (t "elements are stored as the primitive " "要素をプリミティブ型の ") "\\mathit{type}" (t "" " で持つ")))}]
       :checks [(= (vector-of :int 1 2) [1 2]) (instance? clojure.core.Vec (vector-of :long))]}
      {:name "hash-map"
       :cases [{:args ["k_0" "v_0" "k_1" "v_1" dots] :out M}]
       :checks [(= (hash-map :a 1 :b 2) {:a 1 :b 2}) (= (hash-map :a 1 :a 2) {:a 2})]}
      {:name "array-map"
-      :cases [{:args ["k_0" "v_0" "k_1" "v_1" dots] :out (str M (wh (t "keys stay in the given order")))}]
+      :cases [{:args ["k_0" "v_0" "k_1" "v_1" dots] :out (str M (wh (t "keys stay in the given order" "キーは渡した順のまま")))}]
       :checks [(= (keys (array-map :b 1 :a 2)) [:b :a])]}
      {:name "sorted-map"
       :cases [{:args ["k_0" "v_0" "k_1" "v_1" dots] :out (str (mp (sp "k_{\\sigma(0)}" "v_{\\sigma(0)}") (sp "k_{\\sigma(1)}" "v_{\\sigma(1)}") dots) (wh "k_{\\sigma(0)} < k_{\\sigma(1)} < \\ldots"))}]
       :checks [(= (keys (sorted-map :b 1 :a 2)) [:a :b]) (sorted? (sorted-map))]}
      {:name "sorted-map-by"
-      :cases [{:args ["c" "k_0" "v_0" "k_1" "v_1" dots] :out (str (mp (sp "k_{\\sigma(0)}" "v_{\\sigma(0)}") (sp "k_{\\sigma(1)}" "v_{\\sigma(1)}") dots) (wh (t "keys ordered by ") "c"))}]
+      :cases [{:args ["c" "k_0" "v_0" "k_1" "v_1" dots] :out (str (mp (sp "k_{\\sigma(0)}" "v_{\\sigma(0)}") (sp "k_{\\sigma(1)}" "v_{\\sigma(1)}") dots) (wh (t "keys ordered by " "キーを ") "c" (t "" " の順に並べる")))}]
       :checks [(= (keys (sorted-map-by > 1 :a 2 :b)) [2 1])]}
      {:name "hash-set"
       :cases [{:args ["x_0" "x_1" dots] :out (st "x_0" "x_1" dots)}]
@@ -589,39 +591,39 @@
       :cases [{:args ["x_0" "x_1" dots] :out (str (st "x_{\\sigma(0)}" "x_{\\sigma(1)}" dots) (wh "x_{\\sigma(0)} < x_{\\sigma(1)} < \\ldots"))}]
       :checks [(= (seq (sorted-set 3 1 2)) [1 2 3])]}
      {:name "sorted-set-by"
-      :cases [{:args ["c" "x_0" "x_1" dots] :out (str (st "x_{\\sigma(0)}" "x_{\\sigma(1)}" dots) (wh (t "ordered by ") "c"))}]
+      :cases [{:args ["c" "x_0" "x_1" dots] :out (str (st "x_{\\sigma(0)}" "x_{\\sigma(1)}" dots) (wh (t "ordered by " "") "c" (t "" " の順に並べる")))}]
       :checks [(= (seq (sorted-set-by > 1 3 2)) [3 2 1])]}]}
 
    {:id "predicates"
     :rows
-    [(pred-row "coll?" "a list, vector, map, set, map entry or seq" nil
+    [(pred-row "coll?" "a list, vector, map, set, map entry or seq" "リスト、ベクター、マップ、セット、マップのエントリー、seqのどれか"
                [(= (true-for coll?) #{:list :vector :seq :lazy :map :set :entry :sorted-map :sorted-set})])
-     (pred-row "seq?" "a list or a seq" nil
+     (pred-row "seq?" "a list or a seq" "リストかseq"
                [(= (true-for seq?) #{:list :seq :lazy})])
-     (pred-row "seqable?" "a collection, nil, a string or a Java array" nil
+     (pred-row "seqable?" "a collection, nil, a string or a Java array" "コレクション、nil、文字列、Javaの配列のどれか"
                [(= (true-for seqable?) (set (keys samples)))])
-     (pred-row "sequential?" "a list, vector, map entry or seq" nil
+     (pred-row "sequential?" "a list, vector, map entry or seq" "リスト、ベクター、マップのエントリー、seqのどれか"
                [(= (true-for sequential?) #{:list :vector :seq :lazy :entry})])
-     (pred-row "associative?" "a map, vector or map entry" nil
+     (pred-row "associative?" "a map, vector or map entry" "マップ、ベクター、マップのエントリーのどれか"
                [(= (true-for associative?) #{:map :sorted-map :vector :entry})])
-     (pred-row "counted?" "a list, vector, map, set or map entry, or a seq that knows its length, such as a vector's seq" nil
+     (pred-row "counted?" "a list, vector, map, set or map entry, or a seq that knows its length, such as a vector's seq" "リスト、ベクター、マップ、セット、マップのエントリーのどれかか、ベクターのseqのように長さを知っているseq"
                [(= (true-for counted?) #{:list :vector :seq :map :set :entry :sorted-map :sorted-set})
                 (false? (counted? (cons 1 '(2)))) (true? (counted? (range 10)))])
-     (pred-row "reversible?" "a vector, map entry, sorted map or sorted set" nil
+     (pred-row "reversible?" "a vector, map entry, sorted map or sorted set" "ベクター、マップのエントリー、ソート済みマップ、ソート済みセットのどれか"
                [(= (true-for reversible?) #{:vector :entry :sorted-map :sorted-set})])
-     (pred-row "sorted?" "a sorted map or sorted set" nil
+     (pred-row "sorted?" "a sorted map or sorted set" "ソート済みマップかソート済みセット"
                [(= (true-for sorted?) #{:sorted-map :sorted-set})])
-     (pred-row "indexed?" "a vector or map entry" nil
+     (pred-row "indexed?" "a vector or map entry" "ベクターかマップのエントリー"
                [(= (true-for indexed?) #{:vector :entry})])
-     (pred-row "list?" "a list" nil
+     (pred-row "list?" "a list" "リスト"
                [(= (true-for list?) #{:list})])
-     (pred-row "vector?" "a vector or map entry" nil
+     (pred-row "vector?" "a vector or map entry" "ベクターかマップのエントリー"
                [(= (true-for vector?) #{:vector :entry})])
-     (pred-row "map?" "a map" nil
+     (pred-row "map?" "a map" "マップ"
                [(= (true-for map?) #{:map :sorted-map})])
-     (pred-row "set?" "a set" nil
+     (pred-row "set?" "a set" "セット"
                [(= (true-for set?) #{:set :sorted-set})])
-     (pred-row "map-entry?" "a map entry" nil
+     (pred-row "map-entry?" "a map entry" "マップのエントリー"
                [(= (true-for map-entry?) #{:entry})])]}
 
    {:id "transients"
@@ -632,7 +634,7 @@
               {:args [(st "a_0" dots)] :out (ts "a_0" dots)}]
       :checks [(= [1] (persistent! (transient [1]))) (= {:a 1} (persistent! (transient {:a 1}))) (= #{1} (persistent! (transient #{1})))]}
      {:name "persistent!"
-      :cases [{:args [(tr "a_0" dots)] :out (str (vc "a_0" dots) (wh (t "the transient can no longer be used")))}]
+      :cases [{:args [(tr "a_0" dots)] :out (str (vc "a_0" dots) (wh (t "the transient can no longer be used" "transientはもう使えない")))}]
       :checks [(let [t (transient [1])] (persistent! t) (= :thrown (try (conj! t 2) (catch IllegalAccessError _ :thrown))))]}
      {:name "conj!"
       :cases [{:args [(tr "a_0" dots) "x"] :out (tr "a_0" dots "x")}]
@@ -654,16 +656,16 @@
    {:id "values"
     :rows
     [{:name "="
-      :cases [{:args ["x_0" "x_1" dots] :out (cases true' (str (t "wh. every ") "x_i" (t " is equal to ") "x_0") false' (t "otherwise"))}]
+      :cases [{:args ["x_0" "x_1" dots] :out (cases true' (str (t "wh. every " "すべての ") "x_i" (t " is equal to " " が ") "x_0" (t "" " と等しいとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(true? (= [1 2] '(1 2))) (false? (= [1] #{1})) (true? (= 1 1 1)) (false? (= 1 1.0))]}
      {:name "not="
       :cases [{:args ["x_0" "x_1" dots] :out (ap "not" (ap "=" "x_0" "x_1" dots))}]
       :checks [(true? (not= 1 2)) (false? (not= [1] '(1)))]}
      {:name "identical?"
-      :cases [{:args ["x" "y"] :out (cases true' (str (t "wh. ") "x" (t " and ") "y" (t " are the same object")) false' (t "otherwise"))}]
+      :cases [{:args ["x" "y"] :out (cases true' (str (t "wh. " "") "x" (t " and " " と ") "y" (t " are the same object" " が同じオブジェクトのとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(let [v [1]] (true? (identical? v v))) (false? (identical? [1] [1]))]}
      {:name "compare"
-      :cases [{:args ["x" "y"] :out (cases (t "a negative number") (str (t "wh. ") "x" (t " comes before ") "y") "0" (str (t "wh. ") "x" (t " and ") "y" (t " are in the same place")) (t "a positive number") (str (t "wh. ") "x" (t " comes after ") "y"))}]
+      :cases [{:args ["x" "y"] :out (cases (t "a negative number" "負の数") (str (t "wh. " "") "x" (t " comes before " " が ") "y" (t "" " より前のとき")) "0" (str (t "wh. " "") "x" (t " and " " と ") "y" (t " are in the same place" " が同じ位置のとき")) (t "a positive number" "正の数") (str (t "wh. " "") "x" (t " comes after " " が ") "y" (t "" " より後のとき")))}]
       :checks [(neg? (compare 1 2)) (zero? (compare [1 2] [1 2])) (pos? (compare "b" "a")) (neg? (compare nil 1)) (zero? (compare 1 1.0)) (pos? (compare [1 2] [3]))]}
      {:name "nil?"
       :cases [{:args [nil'] :out true'} {:args ["x"] :out (str false' (wh "x \\ne " nil'))}]
@@ -678,13 +680,13 @@
       :cases [{:args [false'] :out true'} {:args ["x"] :out (str false' (wh "x \\ne " false'))}]
       :checks [(true? (false? false)) (false? (false? nil))]}
      {:name "not"
-      :cases [{:args [(str nil' (t " or ") false')] :out true'} {:args ["x"] :out (str false' (wh (t "any other ") "x"))}]
+      :cases [{:args [(str nil' (t " or " " か ") false')] :out true'} {:args ["x"] :out (str false' (wh (t "any other " "") "x" (t "" " がそれ以外の値のとき")))}]
       :checks [(true? (not nil)) (true? (not false)) (false? (not 0))]}
      {:name "instance?"
-      :cases [{:args ["\\mathit{class}" "x"] :out (cases true' (str (t "wh. ") "x" (t " is an instance of ") "\\mathit{class}") false' (t "otherwise"))}]
+      :cases [{:args ["\\mathit{class}" "x"] :out (cases true' (str (t "wh. " "") "x" (t " is an instance of " " が ") "\\mathit{class}" (t "" " のインスタンスのとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(true? (instance? Long 1)) (false? (instance? String 1))]}
      {:name "record?"
-      :cases [{:args ["x"] :out (cases true' (str (t "wh. ") "x" (t " is a record made by ") "\\mathtt{defrecord}") false' (t "otherwise"))}]
+      :cases [{:args ["x"] :out (cases true' (str (t "wh. " "") "x" (t " is a record made by " " が ") "\\mathtt{defrecord}" (t "" " で作ったレコードのとき")) false' (t "otherwise" "それ以外のとき"))}]
       :checks [(false? (record? {:a 1}))]}]}
 
    {:id "functions"
@@ -712,7 +714,7 @@
       :cases [{:args ["f" "g" dots] :out (lam "x" (vc (ap "f" "x") (ap "g" "x") dots))}]
       :checks [(= ((juxt inc dec) 1) [2 0])]}
      {:name "fnil"
-      :cases [{:args ["f" "d"] :out (lam (sq "x" dots) (str (ap "f" "x'" dots) (wh "x' = d" (t " if ") "x = " nil' (t ", else ") "x' = x")))}]
+      :cases [{:args ["f" "d"] :out (lam (sq "x" dots) (str (ap "f" "x'" dots) (wh "x' = d" (t " if " " (") "x = " nil' (t ", else " " のとき)、") "x' = x" (t "" " (それ以外のとき)"))))}]
       :checks [(= ((fnil inc 0) nil) 1) (= ((fnil inc 0) 5) 6) (= ((fnil not 0) false) true)]}
      {:name "every-pred"
       :cases [{:args ["p" "q" dots] :out (lam "x" (ap "boolean" (ap "and" (ap "p" "x") (ap "q" "x") dots)))}]
@@ -721,10 +723,10 @@
       :cases [{:args ["f" "g" dots] :out (lam "x" (ap "or" (ap "f" "x") (ap "g" "x") dots))}]
       :checks [(= ((some-fn :a :b) {:b 2}) 2) (nil? ((some-fn :a :b) {}))]}
      {:name "trampoline"
-      :cases [{:args ["f" "x_0" dots] :out (str "r" (wh "r" (t " is the first value for which ") "\\mathtt{fn?}" (t " is false in ") (sq (ap "f" "x_0" dots) (ap (ap "f" "x_0" dots)) dots)))}]
+      :cases [{:args ["f" "x_0" dots] :out (str "r" (wh "r" (t " is the first value for which " " は ") "\\mathtt{fn?}" (t " is false in " " が偽になる最初の値で、調べる値の並びは ") (sq (ap "f" "x_0" dots) (ap (ap "f" "x_0" dots)) dots)))}]
       :checks [(= 5 (trampoline (fn [] (fn [] 5)))) (letfn [(g [x] (if (< x 3) #(g (inc x)) x))] (= 3 (trampoline g 0)))]}
      {:name "memoize"
-      :cases [{:args [F] :out (str "f'" (wh (ap "f'" "x") (t " calls ") (ap "f" "x") (t " once per distinct ") "x"))}]
+      :cases [{:args [F] :out (str "f'" (wh (ap "f'" "x") (t " calls " " は ") (ap "f" "x") (t " once per distinct " " を異なる ") "x" (t "" " ごとに1回呼ぶ")))}]
       :checks [(let [n (atom 0) g (memoize (fn [x] (swap! n inc) x))] (g 1) (g 1) (g 2) (= 2 @n))]}]}])
 
 (defn math [s]
@@ -735,9 +737,25 @@
 (defn doc-url [name]
   (str "https://clojure.github.io/clojure/clojure.core-api.html#clojure.core/" name))
 
+(def placeholder #"\u0001([^\u0002]*)\u0002([^\u0003]*)\u0003")
+
+(defn localize [lang s]
+  (let [s (str/replace s placeholder
+                       (fn [[_ en ja]]
+                         (let [x (if (= lang :ja) ja en)]
+                           (if (= x "") "" (str "\\text{" x "}")))))]
+    (if (= lang :ja)
+      (-> (loop [s s]
+            (let [s' (str/replace s #"\\text\{([^}]*)\}\\text\{([^}]*)\}" "\\\\text{$1$2}")]
+              (if (= s s') s (recur s'))))
+          (str/replace #"(?<=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}]) (?=[\p{IsHan}\p{IsHiragana}\p{IsKatakana}])" ""))
+      s)))
+
+(defn strip-text [s] (str/replace s #"\\text\{[^}]*\}" ""))
+
 (defn escape [s] (str/escape s {\< "&lt;" \> "&gt;" \& "&amp;" \" "&quot;"}))
 
-(defn row-html [{:keys [name lazy xf cases]}]
+(defn row-html [lang {:keys [name lazy xf cases]}]
   (let [n (count cases)
         span (fn [body] (str "<td" (when (> n 1) (str " rowspan=\"" n "\"")) ">" body "</td>"))
         per-case-lazy? (some #(contains? % :lazy) cases)
@@ -749,8 +767,8 @@
         (str "<tr>"
              (when (zero? i)
                (span (str "<a href=\"" (doc-url name) "\"><code style=\"white-space: nowrap\">" (escape name) "</code></a>")))
-             "<td>" (if (seq args) (str/join ", " (map math args)) "") "</td>"
-             "<td>" (math out) "</td>"
+             "<td>" (if (seq args) (str/join ", " (map (comp math (partial localize lang)) args)) "") "</td>"
+             "<td>" (math (localize lang out)) "</td>"
              (if per-case-lazy?
                (str "<td>" (mark (:lazy c)) "</td>")
                (when (zero? i) (span (mark lazy))))
@@ -758,9 +776,13 @@
              "</tr>"))
       cases))))
 
-(defn table-html [{:keys [rows]}]
-  (str "<table>\n<thead><tr><th>Function</th><th>Arguments</th><th>Result</th><th>Lazy</th><th>xf</th></tr></thead>\n<tbody>\n"
-       (str/join "\n" (map row-html rows))
+(def headers
+  {:en ["Function" "Arguments" "Result" "Lazy" "xf"]
+   :ja ["関数" "引数" "結果" "遅延" "xf"]})
+
+(defn table-html [lang {:keys [rows]}]
+  (str "<table>\n<thead><tr>" (apply str (map #(str "<th>" % "</th>") (headers lang))) "</tr></thead>\n<tbody>\n"
+       (str/join "\n" (map (partial row-html lang) rows))
        "\n</tbody>\n</table>\n"))
 
 (defmacro checked-sections []
@@ -797,15 +819,30 @@
         dupes (for [[name n] (frequencies (map :name rows)) :when (> n 1)] name)
         xf-mismatch (for [{:keys [name xf]} rows
                           :when (not= (boolean xf) (transducer-arity? name))]
-                      name)]
+                      name)
+        texs (for [{:keys [name cases]} rows
+                   {:keys [args out]} cases
+                   tex (cons out args)]
+               [name tex])
+        untranslated (for [[name tex] texs
+                           [_ en ja] (re-seq placeholder tex)
+                           :when (or (and (= en "") (= ja ""))
+                                     (and (not= en "") (= en ja) (not (#{"bool" "number"} en))))]
+                       [name en])
+        math-mismatch (for [[name tex] texs
+                            :when (not= (strip-text (localize :en tex)) (strip-text (localize :ja tex)))]
+                        name)]
     (doseq [[name form] failures] (println "FAIL" name (pr-str form)))
     (doseq [name missing] (println "NOT IN clojure.core" name))
     (doseq [name dupes] (println "DUPLICATE" name))
     (doseq [name xf-mismatch] (println "XF MISMATCH" name))
-    (when (or (seq failures) (seq missing) (seq dupes) (seq xf-mismatch)) (System/exit 1))
-    (io/make-parents (io/file out-dir "x"))
-    (doseq [{:keys [id] :as section} sections]
-      (spit (io/file out-dir (str id ".html")) (table-html section)))
+    (doseq [[name en] untranslated] (println "UNTRANSLATED" name (pr-str en)))
+    (doseq [name math-mismatch] (println "MATH MISMATCH" name))
+    (when (or (seq failures) (seq missing) (seq dupes) (seq xf-mismatch) (seq untranslated) (seq math-mismatch)) (System/exit 1))
+    (doseq [[lang dir] [[:en (io/file out-dir)] [:ja (io/file out-dir "ja")]]]
+      (io/make-parents (io/file dir "x"))
+      (doseq [{:keys [id] :as section} sections]
+        (spit (io/file dir (str id ".html")) (table-html lang section))))
     (println "ok" (clojure-version)
              (count rows) "functions"
              (count (mapcat :checks rows)) "checks")))
