@@ -18088,7 +18088,7 @@ The site hosts a machine translation of the GNU Emacs manual into Japanese, and 
 GitHub Actions attaches the build to a GitHub release.
 Cloudflare Workers Builds downloads that attachment and deploys it.
 
-[[./resources/public/img/12e5f6-flow.svg]]
+[[./resources/public/img/881c64-flow.svg]]
 
 ** The standard GitHub Actions setup
 To follow Cloudflare's [[https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/][GitHub Actions guide]], store =CLOUDFLARE_API_TOKEN= and =CLOUDFLARE_ACCOUNT_ID= as repository secrets and pass them to =cloudflare/wrangler-action=.
