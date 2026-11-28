@@ -24781,8 +24781,8 @@ FileWorkerの時間の多くは証明の検査と型クラスの推論で、中�
 | =workspace/symbol=              |   851 ms |    87 ms | 9.7倍 |
 | 参照                            |    21 ms |    13 ms | 1.6倍 |
 | 定義                            |    21 ms |    13 ms | 1.6倍 |
-| hover                           |   1.4 ms |   1.4 ms | 0.94倍 |
-| =plainGoal=                     |   1.4 ms |   1.6 ms | 0.92倍 |
+| hover                           |  1.36 ms |  1.44 ms | 0.94倍 |
+| =plainGoal=                     |  1.45 ms |  1.57 ms | 0.92倍 |
 | プロジェクトの索引の準備        |  21.4 秒 |   5.5 秒 | 3.9倍 |
 | 3つの文書を解析した直後のメモリ | 3596 MiB | 2526 MiB | 1.4倍 |
 
@@ -24934,8 +24934,8 @@ The chart and table below show medians on =IntegralEqImproper.lean=, measured by
 | =workspace/symbol=                     |        851 ms |    87 ms |   9.7x |
 | References                             |         21 ms |    13 ms |   1.6x |
 | Definition                             |         21 ms |    13 ms |   1.6x |
-| Hover                                  |        1.4 ms |   1.4 ms |  0.94x |
-| =plainGoal=                            |        1.4 ms |   1.6 ms |  0.92x |
+| Hover                                  |       1.36 ms |  1.44 ms |  0.94x |
+| =plainGoal=                            |       1.45 ms |  1.57 ms |  0.92x |
 | Preparing the project index            |        21.4 s |    5.5 s |   3.9x |
 | Memory right after processing 3 files  |      3596 MiB | 2526 MiB |   1.4x |
 

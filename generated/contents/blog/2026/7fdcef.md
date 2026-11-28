@@ -199,15 +199,15 @@ The chart and table below show medians on `IntegralEqImproper.lean`, measured by
 
 <tr>
 <td class="org-left">Hover</td>
-<td class="org-left">1.4 ms</td>
-<td class="org-left">1.4 ms</td>
+<td class="org-left">1.36 ms</td>
+<td class="org-left">1.44 ms</td>
 <td class="org-right">0.94x</td>
 </tr>
 
 <tr>
 <td class="org-left"><code>plainGoal</code></td>
-<td class="org-left">1.4 ms</td>
-<td class="org-left">1.6 ms</td>
+<td class="org-left">1.45 ms</td>
+<td class="org-left">1.57 ms</td>
 <td class="org-right">0.92x</td>
 </tr>
 
