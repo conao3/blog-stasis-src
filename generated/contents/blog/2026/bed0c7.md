@@ -104,7 +104,7 @@ melpazoidのほかの検査84個は助言として並べ、点数には入れま
 同じパッケージでも載っている場所ごとに検査します。
 leafはMELPAのバージョン20261122.915が19個のルールをすべて通していて、GNU ELPAのバージョン4.5.5は関数名を `#'` で渡すルールで落ちています。
 
-リポジトリでしか確かめられないルールは場所ごとに飛ばすので、通ったルールの数の分母はMELPAで19、GNU ELPAで18になります。
+GitHubのリポジトリだけで確かめるルールが3つと、MELPAのバージョンだけで確かめるルールが1つあるので、通ったルールの数の分母はMELPAで19、GNU ELPAで18になります。
 
 検査するコマンドはRustで書いていて、必須のルールは [leanfran](https://s.conao3.com/blog/2026/23d62c) を使ってLeanで定義し、Rustのコードにしています。
 GitHubのリポジトリを手元で検査するときは、 `owner/repo` を1行に1つ書いたファイルを渡します。
@@ -126,9 +126,9 @@ $ jq '.results | map_values(.failed)' checks.json
 }
 ```
 
-flylintはテストを補うファイル `flylint-tests-flylint.el` に `provide` が無く、最後の行が `;;; flylint-tests.el ends here` になっているので、2つの必須のルールで落ちました。
+flylintはテストで使うファイル `flylint-tests-flylint.el` に `provide` が無く、最後の行が `;;; flylint-tests.el ends here` になっているので、2つの必須のルールで落ちました。
 
-leaf.elは必須のルールをすべて通っています。
+GitHubのleaf.elは必須のルールをすべて通っています。
 著作権をFSFに譲渡したGNU ELPAのパッケージなので、著作権の表示にmelpazoidの「Have you done the paperwork to assign this copyright?」の助言が付きます。
 
 [Vercel Boardで組んだソフトウェア工場](https://s.conao3.com/blog/2026/a80aa6) では、私のEmacsパッケージ20個をこの検査にかける仕事を、パッケージごとのタスク20件に分けて動かしました。

@@ -36496,7 +36496,7 @@ melpazoidのほかの検査84個は助言として並べ、点数には入れま
 同じパッケージでも載っている場所ごとに検査します。
 leafはMELPAのバージョン20261122.915が19個のルールをすべて通していて、GNU ELPAのバージョン4.5.5は関数名を =#'= で渡すルールで落ちています。
 
-リポジトリでしか確かめられないルールは場所ごとに飛ばすので、通ったルールの数の分母はMELPAで19、GNU ELPAで18になります。
+GitHubのリポジトリだけで確かめるルールが3つと、MELPAのバージョンだけで確かめるルールが1つあるので、通ったルールの数の分母はMELPAで19、GNU ELPAで18になります。
 
 検査するコマンドはRustで書いていて、必須のルールは [[https://s.conao3.com/blog/2026/23d62c][leanfran]] を使ってLeanで定義し、Rustのコードにしています。
 GitHubのリポジトリを手元で検査するときは、 =owner/repo= を1行に1つ書いたファイルを渡します。
@@ -36518,9 +36518,9 @@ $ jq '.results | map_values(.failed)' checks.json
 }
 #+end_src
 
-flylintはテストを補うファイル =flylint-tests-flylint.el= に =provide= が無く、最後の行が =;;; flylint-tests.el ends here= になっているので、2つの必須のルールで落ちました。
+flylintはテストで使うファイル =flylint-tests-flylint.el= に =provide= が無く、最後の行が =;;; flylint-tests.el ends here= になっているので、2つの必須のルールで落ちました。
 
-leaf.elは必須のルールをすべて通っています。
+GitHubのleaf.elは必須のルールをすべて通っています。
 著作権をFSFに譲渡したGNU ELPAのパッケージなので、著作権の表示にmelpazoidの「Have you done the paperwork to assign this copyright?」の助言が付きます。
 
 [[https://s.conao3.com/blog/2026/a80aa6][Vercel Boardで組んだソフトウェア工場]] では、私のEmacsパッケージ20個をこの検査にかける仕事を、パッケージごとのタスク20件に分けて動かしました。
@@ -36644,7 +36644,7 @@ The checks only read the package files and do not run them in Emacs, so they lea
 Elispore checks a package once for each source that lists it.
 For leaf, the MELPA version 20261122.915 passes all 19 rules, and the GNU ELPA version 4.5.5 fails the rule about passing function names with =#'=.
 
-Elispore skips the rules that only a repository can answer for some sources, so the count is out of 19 for MELPA and out of 18 for GNU ELPA.
+Elispore runs three rules only on GitHub repositories and one rule only on MELPA versions, so the count is out of 19 for MELPA and out of 18 for GNU ELPA.
 
 The checker is a command written in Rust, and I defined its required rules in Lean and turned them into Rust code with [[https://s.conao3.com/blog/2026/21ebbd][leanfran]].
 To check GitHub repositories on your machine, pass it a file with one =owner/repo= per line.
@@ -36668,7 +36668,7 @@ $ jq '.results | map_values(.failed)' checks.json
 
 flylint fails two required rules because its test helper file =flylint-tests-flylint.el= has no =provide= and its last line reads =;;; flylint-tests.el ends here=.
 
-leaf.el passes all the required rules.
+The leaf.el repository on GitHub passes all the required rules.
 It is a GNU ELPA package whose copyright belongs to the FSF, so its copyright notice gets melpazoid's advice "Have you done the paperwork to assign this copyright?"
 
 In the [[https://s.conao3.com/blog/2026/048a8b][software factory I built on Vercel Board]], I ran 20 of my Emacs packages through these checks as 20 tasks, one per package.
