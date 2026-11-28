@@ -21864,10 +21864,10 @@ A macro name is an identifier followed by =!= with no space between them, and a 
 [[https://peps.python.org/pep-0638/#statement-form][Statement macros]] take this form.
 
 #+begin_src text
-name! [引数] [import NAME] [as NAME] [: ブロック]
+name! [arguments] [import NAME] [as NAME] [: block]
 #+end_src
 
-An expression macro takes the form =name!(引数)=, but [[https://peps.python.org/pep-0638/#resolving-ambiguity][the statement form takes precedence at the start of a line]].
+An expression macro takes the form =name!(arguments)=, but [[https://peps.python.org/pep-0638/#resolving-ambiguity][the statement form takes precedence at the start of a line]].
 Inside an f-string, I kept the =!= in =f"{x!r}"= as the conversion specifier.
 
 There are three [[https://peps.python.org/pep-0638/#defining-macro-processors][kinds of macro processors]].
@@ -21923,7 +21923,7 @@ A new AST node called =stmt_expr= will be added, combining a statement and an ex
 As a test, I write =debug!=, which prints an expression and its value and then returns the value.
 
 #+begin_src python
-# mymacros.py に足す
+# add to mymacros.py
 @macros.macro_processor(macros.EXPR_MACRO, 1)
 def debug(node):
     tmp = f"$$debug_{node.lineno}_{node.col_offset}"
@@ -26744,12 +26744,12 @@ I use two tools to run workers: [[https://github.com/pingdotgg/t3code][T3 Code]]
 Both run agents such as Claude Code and Codex from a GUI, and both also let you open threads and send follow-ups from the CLI.
 
 ** Putting tasks on the Board
-Tasks go to a =work/<リポジトリ>= channel for each repository I work on, and labels set the PC and the model that run them.
+Tasks go to a =work/<repository>= channel for each repository I work on, and labels set the PC and the model that run them.
 
 #+begin_src bash
-vb tasks create work/rust-sellaite "<依頼>" \
+vb tasks create work/rust-sellaite "<request>" \
   --label host=helios --label model=opus \
-  --label notify=t3@eos:<指揮役のスレッドのID>
+  --label notify=t3@eos:<orchestrator thread ID>
 #+end_src
 
 The =host= label names the PC that runs the task, and the =model= label is one of fable, opus, sonnet, and haiku.
@@ -26782,7 +26782,7 @@ helios also runs the agents on the other PC through the T3 Code and bb CLIs.
 bb can connect another PC and run threads on it, so I connected eos to bb on helios and open threads on eos with =bb thread spawn --machine conao-nixos-eos=.
 
 T3 Code can open a thread on another connected PC from its GUI, so I added =--environment= with a [[https://github.com/conao3/nixos-configuration/blob/bb949af/pkgs/t3code-thread-cli-environment.patch][patch]] so that the CLI's =t3 thread= can name the target PC too.
-Running =t3 thread start --environment <eosの接続先のID>= on helios opens a thread in T3 Code on eos.
+Running =t3 thread start --environment <eos environment ID>= on helios opens a thread in T3 Code on eos.
 
 ** Setting the state at the end of the turn
 The management server adds the following instruction to the end of the request it gives a worker.
@@ -26829,7 +26829,7 @@ If I reply to a completed task, the agent in the same thread answers too.
 Each time a task becomes completed, blocked, or failed, the management server sends the following notification to the thread in the =notify= label.
 
 #+begin_example
-[factory] Board task #435, which you created, is now completed. https://<Boardのホスト>/?thread=435
+[factory] Board task #435, which you created, is now completed. https://<board host>/?thread=435
 #+end_example
 
 If the conductor is in the middle of a turn, the management server sends the notification with steer, a feature that inserts a message into the running turn, and if the conductor is idle, the notification starts a new turn.
