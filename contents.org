@@ -29108,6 +29108,235 @@ These functions control when Clojure realizes a seq, run side effects, or help y
 
 I left out the rest of =clojure.core=, which includes numbers, strings, concurrency, namespaces, macros for control flow and the other parts of Java interop.
 
+* clojure.coreの関数を数式で表したClojureのチートシート
+:properties:
+:export_file_name: generated/contents/blog/2026/76293c
+:export_original: /blog/2026/315a71
+:export_date: 2026-11-27 20:55
+:export_updated: 2026-11-27 20:55
+:export_tags: clojure standard-library
+:export_draft: t
+:end:
+
+Clojureの =clojure.core= のうちseqとコレクションと関数を扱う163個の関数を、1つずつ小さな式で書いたチートシートを作りました。
+記法はDaniel Keepさんの [[https://danielkeep.github.io/itercheat_baked.html][Rust Iterator Cheat Sheet]] (CC BY-SA 4.0) から借りてClojureの構文に移し、seqとベクターとマップとセットをClojureのリテラルで、関数の呼び出しをリストで書いています。
+表の内容はClojure 1.12.7のものです。
+表を書き出す [[https://github.com/conao3/blog-stasis-src/blob/master/bin/315a71-clojure-cheatsheet.clj][スクリプト]] は各行と、その関数をClojureで動かす333個の検査を並べて持っていて、検査がすべて通ったときだけ表を作ります。
+
+** 記法の読み方
+
+図で =take-while= の行を読み、続けて同じ行を =(take-while #(< % 3) (range))= でたどります。
+
+[[./resources/public/img/315a71-reading-a-row.svg]]
+
+- \((a_0\ a_1\ \ldots)\)はseqです。
+  \(a\)と\(b\)は入力のseqで、添字で要素を1つ選びます。
+- \(\texttt{'}(a_0\ a_1\ \ldots)\)はリスト、\([a_0\ a_1\ \ldots]\)はベクター、\(\{k_0\ v_0,\ \ldots\}\)はマップ、\(\#\{a_0\ \ldots\}\)はセットで、Clojureのソースと同じ書き方です。
+  =peek= と =pop= のリストの行には本物のリストが要り、 =map= の結果のようなseqを渡すと =peek= と =pop= は例外を投げます。
+- \((f\ a_0)\)はClojureのソースと同じ書き方で、\(f\)を\(a_0\)で呼ぶことを表します。
+- \(f\)と\(g\)と\(h\)は新しい値を計算する関数で、\(\mathit{keyfn}\)は =sort-by= が受け取るようなキーの関数です。
+- \(p\)と\(q\)は述語です。
+  述語の結果は\(\mathtt{nil}\)でも\(\mathtt{false}\)でもなければ\(\mathtt{true}\)とみなします。
+- \(c\)は =compare= や =>= のような比較関数です。
+- \(f : x\ y \to z\)は\(f\)が引数を2つ取ることを表し、\(\text{bool}\)と\(\text{number}\)は返す値の種類を表します。
+  \(\mathit{acc}\)はreduceする関数の累積値で、\(\mathit{init}\)はその最初の値です。
+- \(\mathit{xf}\)は =(map inc)= のようなトランスデューサーです。
+- \(i\)と\(j\)は位置を表し、 =range= では始まりと終わりの値を表します。
+  \(n\)は渡す個数、\(s\)は刻み幅、\(l\)と\(l'\)は入力のseqの長さです。
+- \(m\)はマップ、\(k\)はキー、\(v\)と\(w\)は値、\(d\)は既定値です。
+- \(x \mapsto (f\ x)\)は関数で、 =(fn [x] (f x))= と同じです。
+  \((x_0\ \ldots) \mapsto \ldots\)は任意の個数の引数を取ります。
+- \([a_0\ \ldots]^{!}\)のように上付きの!を付けたものはtransientです。
+- \(\sigma\)は位置の置換です。
+  図のwh.と表の「ただし」の後には値の定義や条件が続き、ほかの文字は引数に出てくる値か、その行が「ただし」の後で定義する値です。
+- 下線を引いた要素は関数を呼んで結果のseqをすべて消費しても実体化しません。
+  下線の位置はチャンク化されていない遅延seqで測っていて、 =(take-while p a)= は止まる場所を知るために\(a_i\)を見る必要があるので\(a_i\)より後の要素にだけ下線を引いています。
+  ベクターと有限の =range= から作るチャンク化されたseqでは、 =map= や =filter= のような多くの遅延の関数が結果を32個ずつ計算します。
+- 遅延の列に印のある関数は遅延seqを返し、要素を求められたときに計算します。
+- xfの列に印のある関数は、 =(map inc)= のようにコレクションを渡さずに呼ぶと [[https://clojure.org/reference/transducers][トランスデューサー]] を返します。
+- 関数の名前は [[https://clojure.github.io/clojure/clojure.core-api.html][clojure.core API reference]] のその関数の項へリンクしています。
+
+** 関数の分け方
+
+Clojureの [[https://clojure.org/api/cheatsheet][公式のチートシート]] は「Seq in, Seq out」の関数を「Get shorter」「Get longer」「Head-items」「Tail-items」「'Change'」のような見出しで分けています。
+2つの見出しに入っている関数もあり、たとえば =filter= は「Get shorter」と「'Change'」にあります。
+
+私は結果の要素と入力の要素の関係で関数を分けたので、どの関数も1回だけ出てきます。
+- 選ぶ関数の結果は入力の要素を入力の順に持ちます。
+- 変換する関数の結果は、\(f\)が入力の要素から計算した値を持ちます。
+- つなぐ関数の結果はseqに要素を足すか、複数のseqや入れ子のコレクションを1つのseqにつなげたものです。
+- 並べ替える関数の結果は同じ要素を別の順に並べたものです。
+- 分ける関数の結果は入力の要素を組に分けて持ちます。
+- まとめる関数の結果は1つの値です。
+- 集める関数の結果はベクター、セット、マップ、 =into= に渡したコレクションのどれかです。
+
+Rich Hickeyさんは2008年の [[https://groups.google.com/g/clojure/c/iyyNyWs53dc][メーリングリストのスレッド]] で、 =clojure.core= の引数の順を次のように説明しました。
+
+#+begin_quote
+Sequence functions take their sources last and collection functions take their primary operand (collection) first.
+#+end_quote
+
+上の分類の関数のほとんどは引用のsequence functionsに当たるので、seqを最後に取って =->>= で使えます。
+=nth= と =nthrest= と =nthnext= はseqを最初に取り、 =max-key= と =min-key= はseqの代わりに値を取ります。
+
+ベクターやマップやセットを読んだり更新したりする関数はコレクションを最初に取り、 =->= で使えます。
+その後に、コレクションを作る関数、値がどの種類のコレクションかを調べる関数、transientを扱う関数、値を比べる関数が続きます。
+
+** seqを作る
+
+これらの関数は何もないところや1つの値やコレクションからseqを作ります。
+トランスデューサーを渡さないと =sequence= は引数をseqにするだけなので、ベクターからはチャンク化されたseqができ、遅延seqはそのまま返ります。
+
+#+INCLUDE: "generated/include/315a71/ja/making.html" export html
+
+** 位置で選ぶ
+
+これらの関数は個数を数えて要素を残したり捨てたりします。
+=rest= は何も残らないと空のseqを返し、 =next= は\(\mathtt{nil}\)を返します。
+=next= は残りがあるかを知るために、要素をもう1つ実体化する必要があります。
+
+#+INCLUDE: "generated/include/315a71/ja/position.html" export html
+
+** 述語で選ぶ
+
+これらの関数は要素を1つずつ調べるか前の要素と比べて、残すか捨てるかを決めます。
+
+#+INCLUDE: "generated/include/315a71/ja/predicate.html" export html
+
+** 変換する
+
+これらの関数は入力の要素から新しい要素を計算します。
+入力のseqが2つ以上あるとき、 =map= は一番短いseqの終わりで止まります。
+
+#+INCLUDE: "generated/include/315a71/ja/transforming.html" export html
+
+** つなぐ
+
+=interleave= は一番短いseqの終わりで止まります。
+=flatten= はベクターやリストのような入れ子のシーケンシャルなコレクションを、その要素で置き換えます。
+
+#+INCLUDE: "generated/include/315a71/ja/combining.html" export html
+
+** 並べ替える
+
+=sort= と =sort-by= は安定なので、等しい要素は入力の順を保ちます。
+
+#+INCLUDE: "generated/include/315a71/ja/reordering.html" export html
+
+** 分ける
+
+=partition= で始まる関数は組のseqを返し、 =split-at= と =split-with= と =splitv-at= は2つの部分のベクターを返します。
+
+#+INCLUDE: "generated/include/315a71/ja/splitting.html" export html
+
+** 1つの値にまとめる
+
+これらの関数はseqを消費して1つの値を返します。
+=some= と =every?= と =not-every?= と =not-any?= は、答えが決まった最初の要素で止まります。
+
+=transduce= は最後に\(f\)を引数1つで呼び、 =completing= は2引数の関数にそのアリティを足します。
+
+#+INCLUDE: "generated/include/315a71/ja/reducing.html" export html
+
+** コレクションに集める
+
+結果はseqの要素を持つベクター、セット、マップのどれかになります。
+=into= は渡したコレクションにseqの要素を足します。
+
+#+INCLUDE: "generated/include/315a71/ja/collecting.html" export html
+
+** コレクション
+
+これらの関数はコレクションを最初に取ります。
+=conj= はベクターには末尾に、リストには先頭に足します。
+
+=assoc= と =dissoc= と =conj= と =merge= と =empty= はソート済みマップのような最初の引数の型を保ちます。
+=select-keys= と =update-keys= と =update-vals= は普通のマップを返します。
+
+#+INCLUDE: "generated/include/315a71/ja/collections.html" export html
+
+** コレクションを作る
+
+これらの関数は渡した値からコレクションを作ります。
+=array-map= はキーを渡した順に保ちますが、8個より多いエントリーを持つ =array-map= にさらにキーを =assoc= するとハッシュマップになります。
+ソート済みのマップとセットはキーを =compare= か渡した比較関数の順に保ちます。
+
+#+INCLUDE: "generated/include/315a71/ja/constructing.html" export html
+
+** コレクションの述語
+
+どの述語も、値がどの種類のコレクションかを答えます。
+Clojureのマップのエントリーはキーと値のベクターなので、 =vector?= と =sequential?= と =indexed?= はそれに対してtrueを返します。
+
+#+INCLUDE: "generated/include/315a71/ja/predicates.html" export html
+
+** transient
+
+ベクターとハッシュマップとハッシュセットには [[https://clojure.org/reference/transients][transient]] があり、定数時間で作って =!= で終わる関数で変更してから、永続コレクションに戻せます。
+=!= で終わる関数はどれも更新したtransientを返すので、次の変更にはその戻り値を使います。
+
+ソート済みのコレクションとリストのtransientは作れません。
+
+#+INCLUDE: "generated/include/315a71/ja/transients.html" export html
+
+** 値の比較と判定
+
+~=~ は値を比べるので同じ要素を持つベクターとリストは等しくなり、オブジェクトそのものを比べるときは =identical?= を使います。
+整数と浮動小数点数は互いに ~=~ にならないので ~(= 1 1.0)~ はfalseで、 ~(== 1 1.0)~ は数として比べます。
+
+=compare= は =sort= とソート済みのコレクションの既定の順です。
+数は型をまたいで値の順に並べるので、 =(compare 1 1.0)= は0になります。
+
+ベクターはまず長さで、次に要素ごとに並べます。
+リストとセットとマップは =Comparable= を実装していないので、 =compare= に渡すと例外を投げます。
+
+#+INCLUDE: "generated/include/315a71/ja/values.html" export html
+
+** 関数
+
+この節では関数を作るものや、関数を呼んだり包んだりするものを扱います。
+
+#+INCLUDE: "generated/include/315a71/ja/functions.html" export html
+
+** 式を書かなかった関連の関数
+
+これらの関数はClojureがseqを実体化する時を決めるか、副作用を起こすか、トランスデューサーを書くのを助けるので、言葉で説明します。
+
+| 関数             | 説明                                                                                       |
+|------------------+--------------------------------------------------------------------------------------------|
+| =doall=          | 遅延seqを実体化して返します。                                                              |
+| =dorun=          | 遅延seqを副作用のために実体化し、 =nil= を返します。                                       |
+| =run!=           | 副作用のために各要素で関数を呼び、 =nil= を返します。                                      |
+| =doseq=          | =for= と同じ束縛で、要素ごとに本体を実行するマクロです。                                   |
+| =for=            | 遅延seqを返すリスト内包表記のマクロです。                                                  |
+| =realized?=      | 遅延seq、delay、future、promiseが値をもう持っているかを答えます。                          |
+| =lazy-seq=       | seqを返す本体から遅延seqを作るマクロです。                                                 |
+| =lazy-cat=       | 各コレクションの式を必要になったときだけ評価する、マクロ版の =concat= です。              |
+| =iteration=      | APIのページを取ってくるようなステップ関数を繰り返し呼んで、seqableでreducibleな値を作ります。 |
+| =tree-seq=       | 木を深さ優先でたどり、ノードを遅延seqで返します。                                          |
+| =eduction=       | コレクションをreduceするか反復するたびに、トランスデューサーを適用します。                |
+| =cat=            | 受け取ったコレクションを連結するトランスデューサーです。                                   |
+| =halt-when=      | 述語を満たす最初の入力でreduceを止めるトランスデューサーを返します。                       |
+| =completing=     | =transduce= で使えるように、reduceする関数に完了のアリティを足します。                     |
+| =reduced=        | 値を包んで、 =reduce= が止まってその値を返すようにします。                                 |
+| =bounded-count=  | seqの要素を数え、指定した数に達したら止まります。                                          |
+| =reduced?=       | 値が =reduced= で包まれているかを答えます。                                                |
+| =unreduced=      | =reduced= の包みから値を取り出し、ほかの値はそのまま返します。                             |
+| =ensure-reduced= | 値がまだ包まれていなければ =reduced= で包みます。                                          |
+| =seque=          | 別のseqを裏で実体化するキュー付きのseqを作り、消費する側より最大n個先まで進みます。       |
+| =iterator-seq=   | =java.util.Iterator= からseqを作ります。                                                    |
+| =enumeration-seq= | =java.util.Enumeration= からseqを作ります。                                                |
+| =line-seq=       | =java.io.BufferedReader= から読んだ行の遅延seqを作ります。                                 |
+| =file-seq=       | ディレクトリの木をたどり、その =java.io.File= のオブジェクトを遅延seqで返します。         |
+| =xml-seq=        | =clojure.xml/parse= で読んだ木をたどり、要素とテキストのノードを遅延seqで返します。       |
+| =resultset-seq=  | =java.sql.ResultSet= の行からマップの遅延seqを作ります。                                   |
+| =to-array=       | コレクションをJavaの =Object[]= に写します。                                               |
+| =to-array-2d=    | コレクションのコレクションをJavaの =Object[][]= に写します。                               |
+| =into-array=     | seqを、指定した要素の型か最初の要素の型のJavaの配列に写します。                           |
+| =deref=          | atom、delay、future、promiseのような参照の値を読み、 =@x= はその略記です。                |
+| =bean=           | JavaオブジェクトのJavaBeanのプロパティから、読み取り専用のマップのビューを作ります。       |
+
+数と文字列と並行処理と名前空間、制御のためのマクロ、そのほかのJava相互運用といった残りの =clojure.core= の部分は省きました。
 * Lean 4で証明したkernelをRustとPythonとGoのHTTPサーバーにするleangageを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/a886f0
