@@ -33564,6 +33564,113 @@ Cargoのworkspaceに3つのcrateを置いています。
 - =t3-terminal= : GhosttyのVTのモジュールをWebAssemblyとしてwasmtimeで動かす端末のエンジンです。これもUIには依存していません。
 - =t3code-gpui= : 窓とCLIです。
 
+* T3 Code GPUI: use T3 Code in a native Rust and GPUI window instead of Electron
+:properties:
+:export_file_name: generated/contents/blog/2026/b12175
+:export_date: 2026-11-27 23:22
+:export_updated: 2026-11-27 23:22
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/ed26d1
+:export_tags: rust gpui t3-code ai-agent release rust-t3code-gpui
+:end:
+
+I built T3 Code GPUI, an unofficial frontend for T3 Code, the app that drives coding agents.
+It replaces the Electron desktop app with a native window drawn in Rust and GPUI, and connects to an unmodified =t3 serve= over its WebSocket protocol to show the thread list, the reply timeline and the composer.
+
+The repository is [[https://github.com/conao3/rust-t3code-gpui][conao3/rust-t3code-gpui]], under the Apache-2.0 license.
+For this post I ran 0.1.0 at commit =d5cfde1= on Linux with X11.
+
+While an agent streams its reply, the window redraws at most four times a second and re-lays out only the last block of the growing reply.
+
+T3 Code GPUI is an independent, unofficial project with no ties to the T3 Code team, and the team neither endorses nor maintains it.
+
+[[github:conao3/rust-t3code-gpui::Rust][Native GPUI frontend for T3 Code]]
+
+** How it relates to T3 Code
+[[https://t3.codes][T3 Code]] lets you drive coding agents you are already signed in to, such as Claude Code and Codex, from one screen.
+It has a server, =t3 serve=, and the web UI and desktop app that connect to it.
+
+The desktop app is built on Electron, so I rewrote its screen in Rust and kept the upstream server as it is.
+The window is drawn with [[https://github.com/zed-industries/zed/tree/main/crates/gpui][GPUI]], the UI framework of the Zed editor, and the buttons and text fields come from [[https://github.com/longbridge/gpui-kit][gpui-kit]].
+
+In the screenshot below, I connected T3 Code GPUI to a temporary =t3 serve= and sent two messages in a new thread.
+The thread list is on the left, the reply timeline and the composer are in the middle, and the right panel shows the Git branch and changes.
+I painted over the host name and a few other labels.
+
+[[./resources/public/img/ed26d1-window.png]]
+
+I am still porting features from the upstream screens one by one.
+
+** Install and connect
+The repository is a Nix flake, so on Linux this command opens the window:
+
+#+begin_src console
+$ nix run github:conao3/rust-t3code-gpui
+#+end_src
+
+Each server needs a token, so run this on the host where the server is running:
+
+#+begin_src console
+$ t3 auth session issue --ttl 365d --label t3code-gpui --token-only
+#+end_src
+
+Write the token, with the server's URL and a label, to =~/.config/t3code-gpui/environments.json=.
+T3 Code GPUI refuses to read the file when other users can read it, so set its mode to 600.
+
+#+begin_src json
+{
+  "environments": [
+    { "label": "local", "httpBaseUrl": "http://127.0.0.1:39471", "token": "..." }
+  ]
+}
+#+end_src
+
+With several servers listed, buttons at the top of the sidebar filter the threads by server.
+In a project that several servers share, a new thread starts on the first server in the list.
+=check-environment= tells you whether the connection works, and shows =Authenticated= as =true= once the token is accepted.
+
+#+begin_src console
+$ t3code-gpui environment check-environment --label local
+{
+  "Label": "local",
+  "EnvironmentId": "d2347fbc-2c6c-4188-b246-ba58ebb3840a",
+  "ServerVersion": "0.1.12-nightly.20261122.5111",
+  "OrchestrationProtocolVersion": 2,
+  "Authenticated": true
+}
+#+end_src
+
+** Keys
+Type in the composer and press =Ctrl+Enter= to send.
+When you send from the new-thread screen, the thread starts in the background, and you open it from the "Open" button on the toast or from the sidebar.
+
+| Key                             | Action                                                      |
+|---------------------------------+-------------------------------------------------------------|
+| =Ctrl+Enter=                    | Send the composer text, or answer the open question         |
+| =Ctrl+Shift+O=                  | Start a new thread                                          |
+| =Alt+O=                         | Open the next thread that is done or waiting for input      |
+| =Alt+P= / =Alt+N=               | Jump to the previous or next message of yours               |
+| =Ctrl+Shift+]= / =Ctrl+Shift+[= | Open the next or previous thread in the sidebar             |
+
+When an agent finishes a reply or starts waiting for your input, you get a desktop notification, unless that thread is the one you have open.
+
+** Four redraws a second
+While an agent writes a reply, the T3 Code server batches updates that carry the reply text so far and sends them [[https://github.com/pingdotgg/t3code/blob/b72cb0385cc7f682c05c1976d36fa9c712d995e0/apps/server/src/orchestration-v2/ThreadLiveEventCoalescer.ts#L18][every 50 ms]].
+T3 Code GPUI puts each update into its local state right away, but redraws only once every [[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/app.rs#L108][250 ms]], so the screen shows only the latest update from each interval.
+
+T3 Code GPUI [[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][splits the reply at a blank line outside code blocks each time about 1,200 bytes pile up]], and puts each block on its own row of the timeline.
+Finished blocks keep the same text, so while the reply grows, T3 Code GPUI lays out only the last block again.
+
+On X11 I patched GPUI to present frames without waiting for vertical sync, so key presses reach the window without waiting for a frame.
+
+** Layout
+The Cargo workspace has three crates:
+
+- =t3-client= : the server connection, the thread list and thread state, and reconnecting after a dropped connection. It has no UI dependency.
+- =t3-terminal= : a terminal engine that runs the Ghostty VT module as WebAssembly through wasmtime. It has no UI dependency either.
+- =t3code-gpui= : the window and the CLI.
+
 * Dockerなしで6言語のテストの中で動くAWSモックのwasmoを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/22089f
