@@ -37248,6 +37248,105 @@ gogにも =gog config no-send set <アカウント>= でアカウントごとに
 
 どの画面でも =?= でキーの一覧が出て、キーとカスタマイズできる変数は [[https://github.com/conao3/gog.el/blob/b5bc9ed/README.org][README]] にまとめています。
 
+* EmacsでVS Codeと同じLean 4のinfoviewを使えるleaner-ts-modeを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/15007e
+:export_date: 2026-11-28 01:07
+:export_updated: 2026-11-28 01:07
+:export_draft: t
+:export_tags: emacs emacs-lisp lean lsp mathlib tree-sitter release leaner-ts-mode-el
+:end:
+EmacsでLean 4を書くためのメジャーモードleaner-ts-modeを作り、VS Codeの拡張と同じinfoviewをEmacsのバッファに出せるようにしました。
+ゴールやメッセージから部分式の型、trace、 =conv?= や =rw??= のwidgetまでを、JavaScriptを動かさずにEmacsの文字と画像で描きます。
+
+リポジトリは [[https://github.com/conao3/leaner-ts-mode.el][conao3/leaner-ts-mode.el]] で、ライセンスは [[https://github.com/conao3/leaner-ts-mode.el/blob/1965c77/LICENSE][GPL-3.0]] です。
+この記事ではmasterの [[https://github.com/conao3/leaner-ts-mode.el/commit/1965c77][1965c77]] と、Emacs 31.1とLean 4.35.0を使いました。
+
+[[github:conao3/leaner-ts-mode.el::Emacs Lisp][Lean 4 major mode using tree-sitter]]
+
+** leaner-ts-modeでできること
+
+[[./resources/public/img/15007e-infoview.png]]
+
+左がLeanのファイルで、右のinfoviewはカーソルの位置の証明の状態とメッセージを出す画面です。
+Leanで証明を書くときはこの画面を見ながら次のタクティクを決めます。
+
+leaner-ts-modeはinfoviewの項目を [[https://github.com/leanprover/vscode-lean4/blob/9ac77ca57bf7b7ee5907269142a5bef979aa15bf/vscode-lean4/manual/manual.md#L259-L372][VS Codeの拡張のinfoview]] と同じ分け方にしているほか、次のことができます。
+
+- tree-sitterで色を付け、字下げ、宣言の移動、ImenuとOutlineを使う。
+- =\alpha= のような略記で記号を入れる。
+- Eglotか =lsp-mode= でLeanの言語サーバーとつなぐ。
+
+** leaner-ts-modeを入れる
+
+leaner-ts-modeはEmacs 30.1以上で動き、構文の解析にtree-sitterの文法の [[https://github.com/lua-vr/tree-sitter-lean-flat][tree-sitter-lean-flat]] を使います。
+leafなら次の式で入り、 =M-x leaner-ts-install-grammar= がgitとCのコンパイラで文法をビルドして入れます。
+
+#+begin_src emacs-lisp
+(leaf leaner-ts-mode
+  :vc (:url "https://github.com/conao3/leaner-ts-mode.el"))
+#+end_src
+
+空の =user-emacs-directory= を使うEmacs 31.1にMELPAからleafを入れてこの式を評価し、 =M-x leaner-ts-install-grammar= で文法まで入ることを確かめました。
+
+Leanのファイルを開いたら =C-c C-e= でEglotを使って言語サーバーを起動し、 =C-c C-g= でinfoviewを開きます。
+Emacs 30ではGNU ELPAからEglot 1.20以上を入れておきます。
+
+** infoviewでゴールとメッセージを見る
+
+Tactic stateにはゴールの数とゴールごとの =case= の見出しが出て、各ゴールには仮定と =⊢= の後の命題が並びます。
+Expected typeには項の中で期待される型が、Messagesにはカーソルの行のエラーや警告が出ます。
+
+All messagesにはファイル全体のメッセージがカーソルに近い順に並びます。
+見出しはOutlineで畳めて、表示を更新してもそのまま残ります。
+
+仮定や命題の中の項にカーソルを置くと、その部分式全体に色を付けてElDocに =And p q : Prop= のような式と型と説明を出し、 =RET= でその項の定義に飛べます。
+メッセージの見出しの =Demo.lean:4:4= のようなボタンでは、そのメッセージが出たソースの場所に飛べます。
+
+=exact?= や =simp?= が出す提案には =[apply]= のボタンが付き、押すと元のタクティクが提案に置き換わります。
+
+traceの付いたメッセージの上で =s= を押して検索すると、一致した箇所に色を付けて、一致を含むtraceを開きます。
+
+** widgetで次のタクティクを作る
+
+[[./resources/public/img/15007e-conv.png]]
+
+widgetはLeanのコードがinfoviewに足す画面です。
+Mathlibにはゴールの部分式を選ぶと次に打つタクティクを作ってくれるwidgetがあり、画像はLean 4.35.0向けのMathlibのv4.35.0で撮った =conv?= です。
+
+ゴールの =(b + a)= にカーソルを置いて =m= を押すと、その部分式が選ばれてパネルに =Generate conv= のリンクが出ます。
+リンクを押すと =conv?= が次のタクティクに置き換わり、 =skip= が選ばれた状態になります。
+
+#+begin_src lean4
+  conv =>
+    enter [2, 2]
+    skip
+#+end_src
+
+=rw??= でも部分式を選ぶと書き換えの候補が並び、候補を押すと =rw [Nat.add_comm a b]= のようなタクティクが入ります。
+
+部分式は =S-mouse-1= でも選べて、 =U= で選択を外せます。
+
+=#html= で出したHTMLもinfoviewに描き、SVGはGUIのEmacsでは画像として出します。
+
+** JavaScriptを動かさずにwidgetを描く仕組み
+
+VS Codeのinfoviewはwebのページなので、widgetのJavaScriptを読み込んで描きます。
+leaner-ts-modeはJavaScriptを動かさない代わりに、widgetがLeanの言語サーバーに問い合わせる処理をEmacs Lispで行い、返ってきたHTMLをEmacsで描いています。
+
+infoviewの中身はLeanの言語サーバーのRPCで届き、 =$/lean/rpc/connect= でセッションを張って =$/lean/rpc/call= で =Lean.Widget.getInteractiveGoals= などの関数を呼ぶ仕組みです。
+関数の一覧はLeanの [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Server/ProtocolOverview.lean#L422-L511][ProtocolOverview.lean]] にあり、そのうちの =Lean.Widget.getWidgets= はカーソルの位置に出すwidgetを返します。
+
+Mathlibの [[https://github.com/leanprover-community/mathlib4/blob/v4.35.0/Mathlib/Tactic/Widget/Conv.lean#L263-L272][conv?のwidget]] は、JavaScriptの雛形にLeanのRPCの関数名を書き込んだモジュールを作るProofWidgetsの [[https://github.com/leanprover-community/ProofWidgets4/blob/df72b022e558978a1c50264cfc4d7fec86fa8e04/ProofWidgets/Component/OfRpcMethod.lean#L63-L90][mk_rpc_widget%]] で作られています。
+そこでleaner-ts-modeは =Lean.Widget.getWidgetSource= で取ったwidgetのJavaScriptから関数名を探し、選んだ部分式を渡して呼び出します。
+
+返ってくるのはProofWidgetsのHTMLの木なので、段落やリストや太字を文字で、SVGを画像で描き、ソースを書き換えるリンクをボタンにしています。
+
+** Eglotでもlsp-modeでも同じinfoviewを使う
+
+infoviewはEglotにも =lsp-mode= にも依存しない作りにしているので、どちらでつないでも同じinfoviewが出ます。
+=lsp-mode= で使うときは =M-x leaner-ts-lsp-mode-ensure= で言語サーバーを起動し、 =C-c C-g= で起動するときのために =leaner-ts-infoview-start-function= を =leaner-ts-lsp-mode-ensure= にしておきます。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
