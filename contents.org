@@ -2144,7 +2144,7 @@ Elispの場合、C言語で実装されている関数はすべてスペシャ�
 [fn:4] Harold Abelson他著、和田 栄一訳 - [[https://sicp.iijlab.net/fulltext/xcont.html][計算機プログラムの構造と解釈]]
 [fn:5] Richard Stallman他著、Ayatakesi訳 - [[https://ayatakesi.github.io/lispref/24.5/elisp.html#Evaluation][GNU Emacs Lisp Reference Manual]]
 
-* COMMENT続・leaf.elを使おう
+* COMMENT 続・leaf.elを使おう
 :properties:
 :export_file_name: generated/contents/blog/2019/69b273
 :export_date: 2019-05-31
@@ -3874,7 +3874,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 
 MELPAで公開されたので導入のハードルも極めて低くなりました。ぜひ =leaf= を使って、整然として編集しやすいinit.elを書きましょう!
 
-* COMMENTそうは言ってもちょっと気になる人のための、ゆるやかなEmacs再入門
+* COMMENT そうは言ってもちょっと気になる人のための、ゆるやかなEmacs再入門
 :properties:
 :export_file_name: generated/contents/blog/2019/3f8b40
 :export_date: 2019-06-17
@@ -6313,7 +6313,7 @@ $$\sin(\frac{a}{b})$$
 
 $$a \between b$$
 
-* COMMENT競技プログラミングのためのC++リファレンス
+* COMMENT 競技プログラミングのためのC++リファレンス
 :properties:
 :export_file_name: generated/contents/blog/2020/5afd3d
 :export_date: 2020-01-01
@@ -6324,7 +6324,7 @@ cppは得意ではありませんが、競技プログラミングにおいて�
 特にClangの最適化の恩恵を得られることは大きいです。
 コンテスト中にあちこちを見て回るのは時間の無駄なので、過去問演習中に必要だった情報をまとめておきます。
 
-* COMMENTスクリーンショットコマンドscrot(1)のオプションと使い方
+* COMMENT スクリーンショットコマンドscrot(1)のオプションと使い方
 :properties:
 :export_file_name: generated/contents/blog/2020/5c7232
 :export_date: 2020-01-01
@@ -12280,7 +12280,7 @@ docker-compose up
 
 postgresもlocaleでソート順が変わるという[[https://www.postgresql.jp/document/14/html/locale.html][罠挙動がある]]ので、それを確かめたいときなどはDockerfileを書けると便利。
 
-* COMMENTオイラーの公式から三角関数の世界を再構築できるか
+* COMMENT オイラーの公式から三角関数の世界を再構築できるか
 :properties:
 :export_file_name: generated/contents/blog/2023/145870
 :export_date: 2023-04-01
@@ -12378,7 +12378,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 
 これは三角関数の加法定理である。
 
-* COMMENTキ◯トーンが作りたい/その1: 要件
+* COMMENT キ◯トーンが作りたい/その1: 要件
 :properties:
 :export_file_name: generated/contents/blog/2023/9709e5
 :export_date: 2023-04-02
@@ -12419,7 +12419,7 @@ e^{i(\alpha \pm \beta)} = \cos(\alpha + \beta) \pm i \sin(\alpha + \beta)
 
 こんなものですかね。では次回から作っていきたいと思います。
 
-* COMMENTキ◯トーンが作りたい/その2: ドラッグアンドドロップでの並び換え
+* COMMENT キ◯トーンが作りたい/その2: ドラッグアンドドロップでの並び換え
 :properties:
 :export_file_name: generated/contents/blog/2023/abe9ab
 :export_date: 2023-04-03
