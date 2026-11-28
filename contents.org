@@ -33514,10 +33514,9 @@ With =plamo-tr= translating text, =plamo-tr-po= translating the entries of PO fi
 
 HonoのアプリでApollo Server 5のGraphQLを動かすライブラリとして、apollo-server-integration-honoを作りました。
 関数 =startServerAndCreateHonoHandler= 1つで =ApolloServer= をHonoのハンドラーにできます。
-
 =@defer= を使った問い合わせでは、Apollo Serverが部分ごとに返す =multipart/mixed= の応答を、できた順にそのまま流します。
-リポジトリは[[https://github.com/conao3/ts-apollo-server-integration-hono][conao3/ts-apollo-server-integration-hono]]、ライセンスはApache-2.0で、npmに[[https://www.npmjs.com/package/@conao3/apollo-server-integration-hono][@conao3/apollo-server-integration-hono]]として公開しています。
 
+リポジトリは[[https://github.com/conao3/ts-apollo-server-integration-hono][conao3/ts-apollo-server-integration-hono]]、ライセンスはApache-2.0で、npmに[[https://www.npmjs.com/package/@conao3/apollo-server-integration-hono][@conao3/apollo-server-integration-hono]]として公開しています。
 この記事は0.1.3と、この記事を書いた時点のmasterの[[https://github.com/conao3/ts-apollo-server-integration-hono/tree/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f][b3a486e]]をもとに、Apollo Server 5.5.2とHono 4.13.23とNode.js 26.13.1で動かして書いています。
 
 本体は[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/src/index.ts][src/index.ts]]の112行で、Honoが受けたリクエストをApollo Serverの形に直して渡し、返ってきた本文をWeb標準の =Response= にしています。
@@ -33604,7 +33603,7 @@ $ curl -s http://localhost:4000/api/graphql \
 ** @deferの応答を流す
 =@defer= は、問い合わせの一部を後から返してよいとサーバーに伝えるGraphQLのディレクティブです。
 
-[[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Serverのドキュメント]]によると、Apollo Server 5はgraphqlのパッケージがちょうど =17.0.0-alpha.9= のときだけ =@defer= の部分を後から返すので、graphqlをこの版に入れ替えます。
+[[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Serverのドキュメント]]によると、Apollo Server 5.1以降はgraphqlのパッケージがちょうど =17.0.0-alpha.9= のときだけ =@defer= の部分を後から返すので、graphqlをこの版に入れ替えます。
 
 #+begin_src shell
 pnpm add graphql@17.0.0-alpha.9
@@ -33755,7 +33754,6 @@ Tests:       270 passed, 270 total
 
 I built apollo-server-integration-hono, a library that runs an Apollo Server 5 GraphQL API inside a Hono app.
 One function, =startServerAndCreateHonoHandler=, turns an =ApolloServer= into a Hono handler.
-
 For a query with =@defer=, Apollo Server returns a =multipart/mixed= response in parts, and the handler streams each part as soon as Apollo Server produces it.
 
 The repository is [[https://github.com/conao3/ts-apollo-server-integration-hono][conao3/ts-apollo-server-integration-hono]], under the Apache-2.0 license, and the package is on npm as [[https://www.npmjs.com/package/@conao3/apollo-server-integration-hono][@conao3/apollo-server-integration-hono]].
@@ -33847,7 +33845,7 @@ Headers that middleware such as =hono/cors= sets on the Hono context stay on the
 ** Stream @defer responses
 =@defer= is a GraphQL directive that lets the server send part of the result later.
 
-The [[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Server docs]] say that Apollo Server 5 sends the deferred part later only when the graphql package is exactly =17.0.0-alpha.9=, so switch graphql to that version.
+The [[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Server docs]] say that Apollo Server 5.1 and later send the deferred part later only when the graphql package is exactly =17.0.0-alpha.9=, so switch graphql to that version.
 
 #+begin_src shell
 pnpm add graphql@17.0.0-alpha.9
@@ -33933,7 +33931,7 @@ The handler reads a body with a JSON =content-type= with =JSON.parse= and answer
 It passes =c= to the =context= function, so your resolvers can read the values that Hono middleware set.
 
 On the response side, the handler looks at the kind of body Apollo Server returns.
-When =body.kind= is ="complete"=, it puts the string into the =Response=, and when it is ="chunked"=, it wraps the async iterator of the body in a =ReadableStream=.
+If =body.kind= is ="complete"=, it puts the string into the =Response=, and when it is ="chunked"=, it wraps the async iterator of the body in a =ReadableStream=.
 
 #+begin_src typescript
 const encoder = new TextEncoder()
@@ -33954,9 +33952,9 @@ return new ReadableStream<Uint8Array>({
 #+end_src
 
 The stream calls =pull= each time the reader asks for the next part, and =pull= takes one part from the iterator and enqueues it.
-That is why the =hello= part in the previous section arrived without waiting for =slow= to resolve.
+As a result, the =hello= part in the previous section reached =curl= before =slow= resolved.
 
-When the client disconnects in the middle, =cancel= calls =return= on the iterator.
+If the client disconnects in the middle, =cancel= calls =return= on the iterator.
 
 ** Apollo Server integration test suite
 Apollo Server publishes [[https://github.com/apollographql/apollo-server/tree/main/packages/integration-testsuite][@apollo/server-integration-testsuite]], a test suite for integration packages.
