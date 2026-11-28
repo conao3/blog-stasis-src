@@ -21891,7 +21891,7 @@ SyntaxError: macro quote! is not defined
 ** The layer that expands macros
 CPython parses the source into an AST and builds the symbol table and the bytecode from that AST, so I put macro expansion at the point where the compiler starts turning the AST into bytecode.
 
-[[./resources/public/img/f4154e-pipeline.svg]]
+[[./resources/public/img/2e46f5-pipeline.svg]]
 
 The parser keeps each macro in the tree as an =ast.MacroStmt= or =ast.MacroExpr= node, and the compiler walks the tree in C to look for macros.
 If it finds one, it converts the tree into Python objects and passes them to =macros._expand()=, which calls the processors from the outermost macro inward and expands the trees those processors return as well.
