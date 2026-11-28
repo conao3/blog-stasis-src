@@ -33636,7 +33636,7 @@ S3の通知は =PutObject= の呼び出しの中で届くので、 =put_object= 
 wasmoはモックが次のリクエストを受け付けられる状態で登録した関数を呼ぶので、関数の中から同じモックにリクエストを送れます。
 同じ流れをAWS SDK for JavaScript v3と =@conao3/wasmo= で書いても、 =GetItem= は同じ項目を返しました。
 
-Intel Core Ultra 5 225Uの手元のPCでは、プロセスの最初のリクエストはモジュールのコンパイルを含むので0.6〜1.0秒かかりました。
+Intel Core Ultra 5 225Uの手元のPCでPythonのパッケージを測ると、プロセスの最初のリクエストはモジュールのコンパイルを含むので0.6〜1.0秒かかりました。
 
 2回目からは1回あたり2ms以下でした。
 モックを新しく作って最初の応答を受けるまでは9msなので、テストごとにモックを作り直せます。
@@ -33703,14 +33703,14 @@ AWS CLIやTerraformから使いたいときと状態をダッシュボードで�
 - 監視: CloudWatch、CloudWatch Logs
 - 関数とAPI: Lambda、Step Functions、API GatewayのREST APIとHTTP API
 
-サービスの間の配信もモックの中で動き、次の向きに届きます。
+サービスの間の配信もモックの中で動き、たとえば次の向きに届きます。
 
 - SNSからSQSとLambdaへ
 - EventBridgeからSQSとSNSとLambdaとStep Functionsへ
 - S3の通知からSQSとSNSとEventBridgeとLambdaへ
 
 Step Functionsはステートマシンの定義をモックの中で解釈し、Lambdaを呼ぶタスクは登録した関数が返るまで待つので、 =StartSyncExecution= は関数を動かしたあとの出力を返します。
-サービスごとに対応している操作は[[https://github.com/conao3/wasm-wasmo#coverage][READMEのCoverageの節]]にあります。
+サービスごとに対応している操作と配信の向きの一覧は[[https://github.com/conao3/wasm-wasmo#coverage][READMEのCoverageの節]]にあります。
 
 READMEではまだ開発の初期の段階としています。
 リポジトリのテストではGoのアダプターが各サービスを細かく試し、ほかの5言語はサービスごとに1つ以上の通しのシナリオをSDKから試しています。
@@ -33749,7 +33749,7 @@ Every package runs the same WebAssembly module, written in Rust, so the mock ans
 The repository is [[https://github.com/conao3/wasm-wasmo][conao3/wasm-wasmo]], under the Apache-2.0 license.
 This post uses 0.1.1, the version on each language's registry.
 
-[[https://s.conao3.com/blog/2026/2653f0][bunsai]] is another AWS mock I wrote, and it listens on port 4566 as a separate server process, while wasmo runs inside the test process.
+Another AWS mock I wrote, [[https://s.conao3.com/blog/2026/2653f0][bunsai]], listens on port 4566 as a separate server process, while wasmo runs inside the test process.
 
 [[github:conao3/wasm-wasmo::Rust][Stateful in-process AWS mock for every language, powered by a single WebAssembly module]]
 
@@ -33817,7 +33817,7 @@ S3 delivers the notification during the =PutObject= call, so the item is in Dyna
 wasmo calls your registered function at a point where the mock can take the next request, so the function can send requests to the same mock.
 I wrote the same flow with the AWS SDK for JavaScript v3 and =@conao3/wasmo=, and =GetItem= returned the same item.
 
-On my PC with an Intel Core Ultra 5 225U, the first request of a process took 0.6 to 1.0 seconds because it includes compiling the module.
+On my PC with an Intel Core Ultra 5 225U, I measured the Python package: the first request of a process took 0.6 to 1.0 seconds because it includes compiling the module.
 
 Later requests took 2ms or less each.
 Creating a new mock and getting its first response took 9ms, so you can create a fresh mock for each test.
@@ -33884,14 +33884,14 @@ Use bunsai when you want the AWS CLI or Terraform or want to see the state on a 
 - Monitoring: CloudWatch, CloudWatch Logs
 - Functions and APIs: Lambda, Step Functions, API Gateway REST APIs and HTTP APIs
 
-Services also deliver to each other inside the mock, along these routes.
+Services also deliver to each other inside the mock, along routes such as these.
 
 - SNS to SQS and Lambda
 - EventBridge to SQS, SNS, Lambda, and Step Functions
 - S3 notifications to SQS, SNS, EventBridge, and Lambda
 
 Step Functions interprets the state machine definition inside the mock, and a task that calls Lambda waits for your registered function to return, so =StartSyncExecution= returns the output after your function has run.
-The [[https://github.com/conao3/wasm-wasmo#coverage][Coverage section of the README]] lists the operations each service supports.
+The [[https://github.com/conao3/wasm-wasmo#coverage][Coverage section of the README]] lists the operations each service supports and all the delivery routes.
 
 The README marks the project as early development.
 In the repository's tests, the Go adapter covers each service in depth, and the other five languages run at least one end-to-end scenario per service through their SDKs.
