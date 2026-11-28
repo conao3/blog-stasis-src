@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="250" viewBox="0 40 1100 250" font-family="sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+  </defs>
+  <rect y="40" width="1100" height="250" fill="#ffffff"/>
+  <g font-size="15" font-weight="bold" fill="#222" text-anchor="middle">
+    <rect x="14" y="60" width="168" height="70" rx="8" fill="#f4f4f4" stroke="#888"/>
+    <text x="98" y="100">Lean source</text>
+    <rect x="240" y="60" width="168" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="324" y="90">Lean adapter</text>
+    <rect x="466" y="60" width="168" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="550" y="90">Rust renderer</text>
+    <rect x="692" y="60" width="168" height="70" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+    <text x="776" y="90">Re-parse and check</text>
+    <rect x="918" y="60" width="168" height="70" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+    <text x="1002" y="100">Formatted result</text>
+    <rect x="596" y="205" width="360" height="70" rx="8" fill="#fbf0e6" stroke="#c08850"/>
+    <text x="776" y="235">Leave that command as it was</text>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="324" y="112">Lean's own parser</text>
+    <text x="324" y="126">and formatter</text>
+    <text x="550" y="112">layout by style rules</text>
+    <text x="550" y="126">and line width</text>
+    <text x="776" y="112">syntax tree, comments,</text>
+    <text x="776" y="126">and a second pass</text>
+    <text x="776" y="258">keep the original line breaks → leave it as it was</text>
+  </g>
+  <g stroke="#555" stroke-width="1.6" fill="none" marker-end="url(#a)">
+    <line x1="182" y1="95" x2="238" y2="95"/>
+    <line x1="408" y1="95" x2="464" y2="95"/>
+    <line x1="634" y1="95" x2="690" y2="95"/>
+    <line x1="860" y1="95" x2="916" y2="95"/>
+    <line x1="776" y1="130" x2="776" y2="203" stroke-dasharray="5 4"/>
+    <path d="M956,240 L1030,240 L1030,132" stroke-dasharray="5 4"/>
+  </g>
+  <g font-size="12" fill="#444" text-anchor="middle">
+    <text x="437" y="86">document</text>
+    <text x="889" y="86">match</text>
+    <text x="806" y="172" text-anchor="start">mismatch</text>
+  </g>
+</svg>
