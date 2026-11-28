@@ -30860,6 +30860,431 @@ Pythonのクラス =Store= のメソッド =put= の中にポイントがあり�
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] を有効にすると、字下げされたコードをコピーしたときに、先頭の字下げを外してキルリングに入れます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] より後ろに置いたモードラインの項目は、右に寄せて表示されます。
 
+* Seven fun new features in Emacs 30, shown in screenshots
+:properties:
+:export_file_name: generated/contents/blog/2026/516114
+:export_date: 2026-11-27 22:40
+:export_updated: 2026-11-27 22:40
+:export_tags: emacs release-notes
+:export_lang: en
+:export_original: /blog/2026/771a69
+:export_draft: t
+:end:
+I picked seven new features from the Emacs 30 NEWS that you notice the moment you use them, and this post shows each one in a screenshot of Emacs 30.2.
+Most of them work without installing a package, such as which-key, now part of Emacs, and =completion-preview-mode=, which shows a faint completion while you type.
+
+The NEWS lives in [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30][etc/NEWS.30]] and runs to 2,859 lines.
+I took every screenshot in Emacs 30.2 started with =emacs -Q=, and I include the code for each feature that needs a setting.
+
+** List the keys that can follow a prefix with which-key
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1927][which-key]] has moved from GNU ELPA into Emacs.
+Turn on =which-key-mode=, press a prefix key such as =C-x=, and wait a moment: the minibuffer grows into a table of the keys and commands that can follow.
+
+#+begin_src emacs-lisp
+(which-key-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-which-key.png]]
+
+The keys after =C-x= do not fit on one screen, so the table has 6 pages.
+Press =C-h= to see how to turn the pages.
+
+When you forget the key for a command, press the prefix, wait, and find the command by name.
+
+** See a faint completion as you type
+
+With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1935][completion-preview-mode]] on, a completion for the symbol you are typing appears in faint text after the cursor.
+TAB accepts it, and =M-i= completes up to the longest common prefix of the candidates.
+
+#+begin_src emacs-lisp
+(global-completion-preview-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-completion-preview.png]]
+
+The preview appears once you have typed three characters of a symbol.
+In the screenshot I typed =(with-cur= in an Emacs Lisp buffer, and the rest, =rent-buffer=, shows in faint text.
+
+** Indent wrapped lines as if =M-q= had filled them
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L607][visual-wrap-prefix-mode]], the adaptive-wrap package from GNU ELPA brought into Emacs, indents each continuation line to match the line it continues.
+Unlike =M-q=, it changes only the display and leaves the buffer text alone.
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'text-mode-hook #'visual-wrap-prefix-mode)
+#+end_src
+
+[[./resources/public/img/771a69-visual-wrap.png]]
+
+The left buffer has =visual-wrap-prefix-mode= on, and the right buffer holds the same text with the mode off.
+On the left, wrapped bullet items line up after the bullet, and the wrapped comment lines up after the comment starter.
+
+** Eight Modus themes
+
+Emacs 28 shipped the light =modus-operandi= and the dark =modus-vivendi=, and Emacs 30 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1968][adds six more]].
+Each comes in a light and a dark version: =-tinted= for easier reading, =-deuteranopia= for red-green color deficiency, and =-tritanopia= for blue-yellow color deficiency.
+
+#+begin_src emacs-lisp
+(load-theme 'modus-vivendi-tinted t)
+#+end_src
+
+[[./resources/public/img/771a69-modus.png]]
+
+The left shot is =modus-vivendi-tinted= and the right shot is =modus-operandi-deuteranopia=.
+You switch between all eight with =load-theme=.
+
+** Show Flymake diagnostics at the end of the line
+
+Set [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1477][flymake-show-diagnostics-at-end-of-line]] to =t=, and Flymake puts each diagnostic in a box at the end of its line.
+You read the message where it is, without hovering the mouse or opening another buffer.
+
+#+begin_src emacs-lisp
+(setopt flymake-show-diagnostics-at-end-of-line t)
+#+end_src
+
+[[./resources/public/img/771a69-flymake-eol.png]]
+
+I wrote =my-broken=, which uses an undefined function and an undefined variable, in an Emacs Lisp file and turned on =flymake-mode=.
+The byte-compiler warnings appear at the end of two lines, and the mode line shows a warning count of 2.
+
+In Emacs 30, the Emacs Lisp backend runs only in files covered by [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L194][trusted-content]].
+To try it, mark the files you trust, for example with =(setopt trusted-content :all)=.
+
+** Show the current function in the header line
+
+Set [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1208][which-func-display]] to =header=, and =which-function-mode= shows the name of the function at point in the header line at the top of the window.
+The default, =mode=, shows it in the mode line, and =mode-and-header= shows it in both.
+
+#+begin_src emacs-lisp
+(setopt which-func-display 'header)
+(which-function-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-which-func.png]]
+
+Point is inside the method =put= of the Python class =Store=, and the header line reads =Store.put= even though the =class Store:= line has scrolled off the screen.
+When you scroll through a long method, the header line still tells you which function you are in.
+
+** Group grep results by file
+
+Set [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L864][grep-use-headings]] to =t=, and =M-x grep= groups its results by file, with the matching lines under a heading for each file name.
+It looks like =--heading= in =git grep= and =rg=.
+
+#+begin_src emacs-lisp
+(setopt grep-use-headings t)
+#+end_src
+
+[[./resources/public/img/771a69-grep-headings.png]]
+
+Line numbers and matching lines sit under the green file names, so a file with many matches no longer repeats its name on every line.
+
+** Other changes worth a look
+
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L25][Native compilation]] is on by default in =configure= when libgccjit is available.
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L641][replace-regexp-as-diff]] shows a regexp replacement as a diff, which you can then apply as a patch.
+- With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] on, copying indented code removes the leading indentation before the text goes into the kill ring.
+- Mode line items placed after [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] are aligned to the right.
+
+* Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/43487f
+:export_date: 2026-11-27 22:50
+:export_updated: 2026-11-27 22:50
+:export_tags: emacs release-notes
+:export_draft: t
+:end:
+Emacs 29のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 29.4の実際の画面と一緒に紹介します。
+tree-sitterとEglotとuse-packageが本体に入った版なのでまずこの3つを動かし、そのあとに絵文字の一覧やSQLiteのブラウザのような小さな楽しみを並べました。
+
+NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29][etc/NEWS.29]] にあり、4,395行あります。
+画面はすべて =emacs -Q= で起動したEmacs 29.4で撮っていて、設定が要るものはその式を添えています。
+
+** tree-sitterで構文木を見ながら色を付ける
+
+Emacs 29は [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L96][tree-sitterのライブラリと一緒にビルドできて]] 、 =python-ts-mode= のような [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2976][tree-sitterを使うメジャーモード]] が入りました。
+このモードは構文解析の結果を使って色を付けたり字下げしたりするので、関数の引数のように正規表現では拾いにくいものにも色が付きます。
+
+言語ごとの文法のライブラリは別に要ります。
+=M-x treesit-install-language-grammar= で取ってきてビルドするか =treesit-extra-load-path= に置いたライブラリを読ませます。
+
+#+begin_src emacs-lisp
+(setopt treesit-font-lock-level 4)
+(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+#+end_src
+
+[[./resources/public/img/43487f-treesit.png]]
+
+上が =python-ts-mode= で開いたapp.pyで =path= のような引数にも色が付いています。
+下は =M-x treesit-explore-mode= で出した構文木で、 =module= の下に =function_definition= や =parameters= が並んでいます。
+
+** Eglotで言語サーバーにつなぐ
+
+LSPのクライアントの [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2918][Eglot]] が本体に入り、言語サーバーがあれば補完やドキュメントの表示やエラーの検出を言語サーバーの情報で行えます。
+Pythonのファイルで =M-x eglot= を実行すると =pylsp= のような言語サーバーを探して起動します。
+
+#+begin_src emacs-lisp
+(add-hook 'python-mode-hook #'eglot-ensure)
+#+end_src
+
+[[./resources/public/img/43487f-eglot.png]]
+
+モードラインに =[eglot:src]= が出ていて、 =json.load= の上にポイントを置くと言語サーバーが返した引数の型と説明がエコーエリアに出ています。
+
+** use-packageで設定をまとめる
+
+パッケージの設定をまとめて書くマクロの [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2929][use-package]] も本体に入ったので、パッケージマネージャーを入れなくても =init.el= を =use-package= で書けます。
+
+#+begin_src emacs-lisp
+(use-package dired
+  :custom (dired-listing-switches "-alh")
+  :bind ("C-c d" . dired-jump))
+#+end_src
+
+この式を評価すると =dired-listing-switches= が ="-alh"= になり、 =C-c d= に =dired-jump= が割り当てられます。
+
+** 絵文字を一覧から選ぶ
+
+絵文字を入れるコマンドが [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L952][C-x 8 e]] の下にまとまり、 =C-x 8 e l= の =emoji-list= は絵文字を分類ごとに並べたバッファを出して選んだ絵文字を元のバッファに入れます。
+
+[[./resources/public/img/43487f-emoji.png]]
+
+ほかに名前で探す =C-x 8 e s= があります。
+分類をたどって選ぶ =C-x 8 e e= や最近使った絵文字から選ぶ =C-x 8 e r= もあります。
+
+** SQLiteのファイルを開いて表を見る
+
+EmacsからSQLiteを扱う関数が入り、 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L802][sqlite-mode-open-file]] でデータベースのファイルを開けます。
+表の一覧が出て表の行で =RET= を押すとその表の行が並びます。
+
+[[./resources/public/img/43487f-sqlite.png]]
+
+画面は =sqlite-open= と =sqlite-execute= で作った =todo= の表を開いたところで、日本語の値もそのまま出ています。
+
+** よく使うキーの早見表を出す
+
+=C-h C-q= の [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L1062][help-quick]] はよく使うキーを並べた早見表を画面の下に出します。
+ファイルやバッファやウィンドウやマークやプロジェクトのキーが並んでいて、もう一度 =C-h C-q= を押すと閉じます。
+
+[[./resources/public/img/43487f-help-quick.png]]
+
+Emacsを使い始めた人の隣に出しておくと、 =C-x 0= と =C-x 1= の違いのような最初に迷うキーをその場で確かめられます。
+
+** 全部のバッファの文字を一度に大きくする
+
+=C-x C-+= は今のバッファだけの文字を大きくしますが、 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L643][C-x C-M-+]] はすべてのバッファとモードラインとエコーエリアの文字も大きくします。
+=C-x C-M--= で小さくして =C-x C-M-0= で元に戻します。
+
+[[./resources/public/img/43487f-global-scale.png]]
+
+左右のウィンドウに別のバッファを開いて =C-x C-M-+= を押すと両方の本文とモードラインが同じだけ大きくなりました。
+画面を共有して説明するときに、全部の文字をまとめて大きくできます。
+
+** ほかに目についたもの
+
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L681][duplicate-line]] は今の行を複製し、 =duplicate-dwim= はリージョンがあればリージョンを複製します。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L894][pixel-scroll-precision-mode]] を有効にすると、マウスのホイールやタッチパッドでピクセル単位でスクロールできます。
+
+* Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/664e4a
+:export_date: 2026-11-27 22:55
+:export_updated: 2026-11-27 22:55
+:export_tags: emacs release-notes
+:export_draft: t
+:end:
+Emacs 28のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 28.2の実際の画面と一緒に紹介します。
+ミニバッファの補完が縦に並ぶ =fido-vertical-mode= や =C-x o o o= のように同じキーを押し続けられる =repeat-mode= のように、 =emacs -Q= のままでも操作が楽になるものを中心にしました。
+
+NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28][etc/NEWS.28]] にあり、3,981行あります。
+画面はすべて =emacs -Q= で起動したEmacs 28.2で撮っていて、設定が要るものはその式を添えています。
+
+** ミニバッファの補完を縦に並べる
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L1587][fido-vertical-mode]] を有効にすると、ミニバッファの補完の候補が入力の下に縦に並びます。
+打った文字を順に含む候補を拾うので、 =list-b= で =list-abbrevs= も候補に入ります。
+
+#+begin_src emacs-lisp
+(fido-vertical-mode 1)
+#+end_src
+
+[[./resources/public/img/664e4a-fido-vertical.png]]
+
+先頭の =1/7= は7つの候補の1つ目を選んでいることを示しています。
+=list-buffers= の横の =(C-x C-b)= のように [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L218][M-x の補完にはキーバインドが出る]] のでよく使うコマンドのキーをここで覚えられます。
+
+** 補完の候補に、種類と説明の1行目を添える
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L224][completions-detailed]] を =t= にすると、 =C-h o= のようなコマンドの補完の一覧に候補の種類と説明の1行目が出ます。
+
+#+begin_src emacs-lisp
+(setq completions-detailed t)
+#+end_src
+
+[[./resources/public/img/664e4a-completions-detailed.png]]
+
+画面は =C-h o find-file- TAB= の一覧です。
+左の =c= と =f= と =u= はそれぞれコマンドと関数とユーザーオプションを表しているので、 =find-file-text= や =find-file-literally= の違いを説明を開かずに一覧で比べられます。
+
+** 同じキーを、プレフィックスなしで押し続ける
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2818][repeat-mode]] を有効にすると、 =C-x o C-x o= を =C-x o o= と、 =C-x u C-x u= を =C-x u u= と打てます。
+
+#+begin_src emacs-lisp
+(repeat-mode 1)
+#+end_src
+
+[[./resources/public/img/664e4a-repeat.png]]
+
+画面は左右に分けたウィンドウで =C-x { { { {= と打って、右のウィンドウを4回狭めたところです。
+エコーエリアの =Repeat with ^, }, {, v= は続けて押せるキーを示していて、ほかのキーを押すと元に戻ります。
+
+** 関数の早見表を、例と結果つきで見る
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L236][shortdoc]] は文字列やリストのような分類ごとに関数と使い方の例と結果を並べた早見表で、 =M-x shortdoc-display-group= で分類を選ぶか =*Help*= バッファのボタンから開きます。
+
+[[./resources/public/img/664e4a-shortdoc.png]]
+
+画面は =string= の分類です。
+=(string-pad "foo" 5)= が ="foo  "= になるように例と結果が並んでいるので、名前を思い出せない関数をやりたいことの分類から探せます。
+
+** キルリングから選んで貼る
+
+貼り付けの直後でないときに =M-y= を押すと [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L953][キルリングの中身をミニバッファで補完しながら選べます]] 。
+
+[[./resources/public/img/664e4a-m-y.png]]
+
+画面は4つの文字列をキルリングに入れてから =M-y TAB= と打ったところで、 =*Completions*= バッファに4つの文字列が並んでいます。
+
+** Emacs Lispをネイティブコードにコンパイルする
+
+libgccjitと一緒にビルドするとEmacs Lispを [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65][ネイティブコードにコンパイルできます]]。
+Emacs本体のLispもネイティブコードになり、パッケージも読み込んだときに裏でコンパイルされます。
+
+[[./resources/public/img/664e4a-native.png]]
+
+=C-h f find-file= の説明には =native-compiled Lisp function= と出ていて、このEmacsではネイティブコードの =find-file= が動いています。
+使えるかどうかは =(native-comp-available-p)= で確かめられます。
+
+** 右クリックでメニューを出す
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L242][context-menu-mode]] を有効にすると、バッファの中で右クリックしたときにクリックした場所に合わせたメニューが出ます。
+
+#+begin_src emacs-lisp
+(context-menu-mode 1)
+#+end_src
+
+[[./resources/public/img/664e4a-context-menu.png]]
+
+Pythonのファイルでは貼り付けや選択に加えて =Find Definition= と =Find References= と =Python= のメニューが出ています。
+
+** ほかに目についたもの
+
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176][絵文字の表示]] が改善されて、肌の色や国旗のような絵文字の組み合わせも1文字として表示されます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843][modus-operandi と modus-vivendi]] のテーマが入りました。
+
+* Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/92689a
+:export_date: 2026-11-27 23:00
+:export_updated: 2026-11-27 23:00
+:export_tags: emacs release-notes
+:export_draft: t
+:end:
+Emacs 27のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 27.2の実際の画面と一緒に紹介します。
+ウィンドウの配置をタブで切り替える =tab-bar-mode= や検索の何件目かを出す =isearch-lazy-count= のように、今も毎日使われている機能が多く入った版です。
+
+NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27][etc/NEWS.27]] にあり、3,251行あります。
+画面はすべて =emacs -Q= で起動したEmacs 27.2で撮っていて、設定が要るものはその式を添えています。
+
+** ウィンドウの配置をタブで切り替える
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L2336][tab-bar-mode]] は、フレームの上にタブを並べてタブごとにウィンドウの配置を持たせます。
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L2364][global-tab-line-mode]] は、ウィンドウごとにそのウィンドウで開いたバッファをタブで並べます。
+
+#+begin_src emacs-lisp
+(tab-bar-mode 1)
+(global-tab-line-mode 1)
+#+end_src
+
+[[./resources/public/img/92689a-tabs.png]]
+
+上の段のタブバーには =app.py= と =tab-rename= で名前を付けた =notes= の2つのタブがあり、下の段のタブラインにはこのウィンドウで開いた3つのバッファが並んでいます。
+タブバーのコマンドは =C-x t= の下にあり、 =C-x t 2= で新しいタブを作って =C-x t 0= で今のタブを閉じます。
+
+** fill-columnの位置に縦線を引く
+
+=fill-column= の桁に縦線を引く [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L526][display-fill-column-indicator-mode]] は、NEWSによるとパッケージのfill-column-indicatorと同じことをより速く行います。
+
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+#+end_src
+
+[[./resources/public/img/92689a-fci.png]]
+
+画面では見やすいように =fill-column= を40にしていて、縦線より右にはみ出した行がすぐに分かります。
+
+** 検索で何件目かを出す
+
+=C-s= の検索のプロンプトに今の一致が何件目かと全部で何件あるかが出るようにするには [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L1589][isearch-lazy-count]] を =t= にします。
+
+#+begin_src emacs-lisp
+(setq isearch-lazy-count t)
+#+end_src
+
+[[./resources/public/img/92689a-lazy-count.png]]
+
+app.pyで =self= を探して =C-s= をもう1回押したところでプロンプトに =2/9= と出ていて、件数が分かるとあと何回 =C-s= を押せば終わるかの見当がつきます。
+
+** 絵文字をカラーで表示して、文字の名前を出す
+
+Cairoで描くEmacsではNoto Color Emojiのような [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L523][多色のフォントを表示できます]]。
+Emacs 27ではフォントの割り当てを自分で書くので、記号の文字にNoto Color Emojiを使うように指定しました。
+
+#+begin_src emacs-lisp
+(set-fontset-font t 'symbol "Noto Color Emoji" nil 'prepend)
+(setq what-cursor-show-names t)
+#+end_src
+
+[[./resources/public/img/92689a-emoji.png]]
+
+=C-x == でポイントの文字を調べたときに文字の名前も出るように [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L341][what-cursor-show-names]] を =t= にしています。
+画面では🍣の上で =C-x == を押していて、エコーエリアに =SUSHI= と出ています。
+
+** 関数がどの版から入ったかを、ヘルプで見る
+
+=C-h f= や =C-h v= の説明に [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L1549][その関数や変数が入った版の見当]] が出ます。
+
+[[./resources/public/img/92689a-introduced.png]]
+
+=electric-pair-mode= の説明には「Probably introduced at or before Emacs version 24.1.」と出ていて24.1はリンクになっています。
+この版は過去のNEWSの記述から推定していて、文の頭の =Probably= はそのことを表しています。
+
+** diffの行の中で、変わった語に色を付ける
+
+=diff-mode= は [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L1050][hunkの中で変わった語に、開いた時点で色を付けます]]。
+2つのバッファを比べる [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L1046][diff-buffers]] も入りました。
+
+[[./resources/public/img/92689a-diff-refine.png]]
+
+画面はapp.pyとそれを書き換えたバッファを =diff-buffers= で比べたところです。
+=TODO= が =FIXME= に変わったところと =indent=2= が =indent=4= に変わった部分だけが濃い色になっています。
+
+** Fidoで、ミニバッファの補完をidoのように使う
+
+Icompleteを元にしたidoに似た [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L1325][fido-mode]] は、ミニバッファに候補を横に並べて打つたびに絞り込みます。
+名前は「Fake Ido」の略です。
+
+#+begin_src emacs-lisp
+(fido-mode 1)
+#+end_src
+
+[[./resources/public/img/92689a-fido.png]]
+
+=M-x tab-bar= と打ったところで =tab-bar-mode= を先頭にしてタブバーのコマンドが =¦= で区切られて並んでいます。
+=RET= で先頭の候補を選べます。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
