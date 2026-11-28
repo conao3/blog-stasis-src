@@ -31,5 +31,5 @@
 <text x="160" y="417" font-size="19" text-anchor="middle" fill="#222">all comparisons pass</text>
 <line x1="660" y1="395" x2="622" y2="395" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <line x1="340" y1="395" x2="302" y2="395" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
-<text x="20" y="510" font-size="19" fill="#555">If a version needs no porting, the PR can be merged as is once the comparisons pass</text>
+<text x="20" y="510" font-size="19" fill="#555">If a version needs no porting, the workflow merges the PR and starts Release once the comparisons pass</text>
 </svg>
