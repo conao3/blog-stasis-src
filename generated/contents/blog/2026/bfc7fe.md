@@ -4,8 +4,8 @@ Updated: 2026-11-04 14:43
 Tags: lean paper formal-verification ai-agent lean-ritsuryo
 
 
-[Leanで書く証明付きの日付と税計算](https://s.conao3.com/blog/2026/5499a8)で紹介したlean-ritsuryoについて、英語の論文を書いてaiXivに投稿しました。
-論文は[aiXiv:2611.00464](https://aixiv.online/abs/2611.00464)で読めて、ページにはタイトルと著者のほか、AIの関与の区分のAI-derivedなどが出ます。
+[Leanで書く証明付きの日付と税計算](https://s.conao3.com/blog/2026/5499a8) で紹介したlean-ritsuryoについて、英語の論文を書いてaiXivに投稿しました。
+論文は [aiXiv:2611.00464](https://aixiv.online/abs/2611.00464) で読めて、ページにはタイトルと著者のほか、AIの関与の区分のAI-derivedなどが出ます。
 
 ![img](../../../../resources/public/img/bfc7fe-aixiv-abs.png)
 
@@ -22,10 +22,10 @@ Tags: lean paper formal-verification ai-agent lean-ritsuryo
 
 # aiXivとは
 
-[aiXiv](https://aixiv.online)はAIを使った数学の研究を載せるオープンアーカイブで、Manifold AI Inc.が運営しています。
+[aiXiv](https://aixiv.online) はAIを使った数学の研究を載せるオープンアーカイブで、Manifold AI Inc.が運営しています。
 名前は似ていますが、arXivとは関係がありません。
 
-[規約](https://aixiv.online/terms)と[投稿の案内](https://aixiv.online/llms.txt)には、次のことが書かれています。
+[規約](https://aixiv.online/terms) と [投稿の案内](https://aixiv.online/llms.txt) には、次のことが書かれています。
 
 -   載せるのは `math.*` の数学と、理論・数理物理の研究だけ
 -   論文は必須で、公開リポジトリ、エージェントのセッションの記録、AIを使った工程のメモを添えられる
@@ -33,7 +33,7 @@ Tags: lean paper formal-verification ai-agent lean-ritsuryo
 -   一覧に載るのは審査を通ってからで、審査は研究としての寄与、主張の論証、参考文献の実在などを見る
 
 lean-ritsuryoは法令の計算をLean 4で書いたもので、数学の研究とは言いにくい内容です。
-それでも、Lean 4で検証した[実行可能なチェッカーの論文](https://aixiv.online/abs/2610.03288)が数理論理学の `math.LO` に載っていたので、同じ分野で出すことにしました。
+それでも、Lean 4で検証した [実行可能なチェッカーの論文](https://aixiv.online/abs/2610.03288) が数理論理学の `math.LO` に載っていたので、同じ分野で出すことにしました。
 
 
 # 送るもの
@@ -96,5 +96,5 @@ CLIのv0.4.1では、 `publish` に `--new-version` を付けると、 `--dry-ru
 # おわりに
 
 aiXivでは、投稿した論文に時刻とハッシュの付いた記録が残り、審査の結果には具体的な直し候補が付きます。
-Claude Codeと書いた[論文](https://aixiv.online/abs/2611.00464)と[lean-ritsuryoのリポジトリ](https://github.com/conao3/lean-ritsuryo)のように、AIを使って書いたコードと証明をまとめる先として使えました。
+Claude Codeと書いた [論文](https://aixiv.online/abs/2611.00464) と [lean-ritsuryoのリポジトリ](https://github.com/conao3/lean-ritsuryo) のように、AIを使って書いたコードと証明をまとめる先として使えました。
 

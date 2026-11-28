@@ -12,7 +12,7 @@ Tags: rust macro tutorial advent-calendar
 
 RustでTUIアプリケーションを作りたいなーっと思っていろいろ探しているとdioxus-tuiというライブラリを見つけたので、使ってみた記事を書きます。
 
-今回の記事で作ったレポジトリは[conao3/rust-dioxus-tui-sample](https://github.com/conao3/rust-dioxus-tui-sample)に置いてあります。
+今回の記事で作ったレポジトリは [conao3/rust-dioxus-tui-sample](https://github.com/conao3/rust-dioxus-tui-sample) に置いてあります。
 
 
 # dioxusとは
@@ -336,7 +336,7 @@ dioxusという意欲的なプロジェクトを見つけたのでちょっと�
 
 TUIのレンダラはまだまだ発展途上のようですが、React文化をTUIに持ってくるのは普通に便利だと思うので期待してます。
 
-(ユーザーとしては素直にnodeの[ink](https://github.com/vadimdemedes/ink)を使った方がいいかもしれない。ただ俺はRustでTUIを作りたいんだ。。!)
+(ユーザーとしては素直にnodeの [ink](https://github.com/vadimdemedes/ink) を使った方がいいかもしれない。ただ俺はRustでTUIを作りたいんだ。。!)
 
 v1がリリースされたらまたチャレンジしてみようかなと思います。
 

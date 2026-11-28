@@ -10,7 +10,7 @@ Koukyosyumeiさんの「[著名なRust製OSSをLean 4で形式検証してみた
 Clojureの永続データ構造も1.0のころから多くの人に使われていて、不具合はもう残っていないだろうと思っていました。
 それでもLeanで調べれば何か見つかるのではないかと思い、試してみたくなりました。
 
-ちょうど小さな関数をLean 4に写して全入力で確かめる手順が[hirosassa/lean-verify](https://github.com/hirosassa/lean-verify)にまとまっていたので、これをClojure本体のJavaで書かれた層に当てました。
+ちょうど小さな関数をLean 4に写して全入力で確かめる手順が [hirosassa/lean-verify](https://github.com/hirosassa/lean-verify) にまとまっていたので、これをClojure本体のJavaで書かれた層に当てました。
 
 整数とビットの計算はLeanに写して反例を探しました。
 コレクションは `java.util` のコレクションと結果を比べる差分テストにかけ、Javaとの相互運用は同じ呼び出しを型ヒントの有無で比べました。
@@ -21,7 +21,7 @@ Clojureの永続データ構造も1.0のころから多くの人に使われて�
 一方でHAMTの本体には300万回の操作の差分テストでも食い違いが出ず、vectorの木の本体にも境界の前後の差分テストで食い違いが出ませんでした。
 不具合は木の外側にある別の実装や、 `=` とハッシュの関係のように2つの仕組みが組み合わさるところに残っていました。
 
-調べたのは2026-11-18に出たClojure 1.12.7とJDK 21で、ソースへのリンクは[clojure-1.12.7](https://github.com/clojure/clojure/tree/clojure-1.12.7)のタグを指します。
+調べたのは2026-11-18に出たClojure 1.12.7とJDK 21で、ソースへのリンクは [clojure-1.12.7](https://github.com/clojure/clojure/tree/clojure-1.12.7) のタグを指します。
 
 
 # 調べ方
@@ -59,7 +59,7 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 ;; => 2145419760
 ```
 
-原因はseqの `reduce` が次の32件の塊の先頭を求める[gvec.clj の79行目](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/clj/clojure/gvec.clj#L79)です。
+原因はseqの `reduce` が次の32件の塊の先頭を求める [gvec.clj の79行目](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/clj/clojure/gvec.clj#L79) です。
 
 ```clojure
 (recur result (bit-and 0xffe0 (+ aidx 32)))
@@ -71,7 +71,7 @@ JIRAはREST APIで、ask.clojure.orgはウェブ検索とサイト内検索で�
 
 ![img](../../../../resources/public/img/8bda7e-mask.svg)
 
-この `0xffe0` のマスクは `internal-reduce` を入れた[2010年のコミット](https://github.com/clojure/clojure/commit/5b281880)からそのまま残っています。
+この `0xffe0` のマスクは `internal-reduce` を入れた [2010年のコミット](https://github.com/clojure/clojure/commit/5b281880) からそのまま残っています。
 Leanでは32の倍数の位置 `a` から次の塊の先頭が `a + 32` になる性質を書きました。
 
 ```lean
@@ -97,7 +97,7 @@ theorem fix_ok (a : BitVec 64) (h32 : a &&& 0x1f = 0) (hlt : a < 0x7fffffe0) :
 Clojureのhash-mapはHAMTで、キーのハッシュを5bitずつ区切って木をたどります。
 32bitのハッシュがまったく同じキーどうしは木の末端の `HashCollisionNode` に並べて持ち、その中では `=` でキーを探します。
 
-キーを1つ除いた新しいノードは[HashCollisionNode.without](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/PersistentHashMap.java#L964-L971)が作ります。
+キーを1つ除いた新しいノードは [HashCollisionNode.without](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/PersistentHashMap.java#L964-L971) が作ります。
 このときノードのハッシュには自分のフィールドの `this.hash` を使うべきところで、引数の `hash` を使っています。
 
 ```java
@@ -108,7 +108,7 @@ return new HashCollisionNode(null, hash, count - 1, removePair(array, idx/2));
 保存されているキーと `=` になるのにハッシュが違うキーで `dissoc` すると、ノードに違うハッシュが記録されます。
 
 ClojureではJavaの `ArrayList` と同じ要素のvectorは `=` になるのにハッシュが違います。
-この食い違いは[CLJ-1372](https://clojure.atlassian.net/browse/CLJ-1372)で知られています。
+この食い違いは [CLJ-1372](https://clojure.atlassian.net/browse/CLJ-1372) で知られています。
 
 次の例の `a` と `b` は、 `ArrayList` のハッシュがどちらも1003になるように選んだキーです。
 
@@ -142,11 +142,11 @@ hash-setの `disj` でも同じことが起きて、transientの `dissoc!` を�
 # 型ヒントの有無でremoveIfの結果が変わる
 
 Clojure 1.12では、Javaのメソッドが関数型インターフェースを受け取るところにClojureの関数をそのまま渡せるようになりました。
-このとき関数の返り値をClojureの真偽値として読む処理は、[CLJ-2864](https://clojure.atlassian.net/browse/CLJ-2864)で外されています。
+このとき関数の返り値をClojureの真偽値として読む処理は、[CLJ-2864](https://clojure.atlassian.net/browse/CLJ-2864) で外されています。
 
 > In prior alphas, the FI adapter returns inserted Clojure truthy return logic when adapting a Clojure function to an FI with boolean return.
 
-コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは[Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/Reflector.java#L579-L591)を使います。
+コンパイラは型の分かる呼び出しにはこのとおりのコードを作りますが、型ヒントが無くてリフレクションを通る呼び出しは [Reflector.coerceAdapterReturn](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/Reflector.java#L579-L591) を使います。
 そこでは `boolean` の返り値に `RT.booleanCast` を当てたままなので、同じ `.removeIf` の呼び出しが型ヒントの有無で別の結果になります。
 
 ```clojure
@@ -170,7 +170,7 @@ setを関数として渡すと要素そのものを返すので、型の分か�
 
 1.12には `drop` を速くした `IDrop` の実装があります。
 そのうち文字列とvectorのseqの実装は、今の位置と `n` をintのまま足してから長さと比べています。
-文字列のseqの[StringSeq.drop](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/StringSeq.java#L61-L68)もその1つです。
+文字列のseqの [StringSeq.drop](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/StringSeq.java#L61-L68) もその1つです。
 
 ```clojure
 (drop Integer/MAX_VALUE (next (seq "abc")))
@@ -184,7 +184,7 @@ Leanに写すと `i = 2147483646` と `n = 2147483647` の反例が出ました�
 
 ![img](../../../../resources/public/img/8bda7e-drop.svg)
 
-`subvec` の結果への `assoc` では、[SubVector.assocN](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/APersistentVector.java#L661-L667)が負の添字を確かめていません。
+`subvec` の結果への `assoc` では、[SubVector.assocN](https://github.com/clojure/clojure/blob/clojure-1.12.7/src/jvm/clojure/lang/APersistentVector.java#L661-L667) が負の添字を確かめていません。
 
 ```clojure
 (assoc [2 3] -1 :x)
@@ -195,7 +195,7 @@ Leanに写すと `i = 2147483646` と `n = 2147483647` の反例が出ました�
 ```
 
 subvecの外にある元のvectorの要素が書き換わって、見かけは変わらないsubvecが返ります。
-`nth` の同じ不具合は[CLJ-962](https://clojure.atlassian.net/browse/CLJ-962)で直っているのですが、 `assoc` の側は直っていませんでした。
+`nth` の同じ不具合は [CLJ-962](https://clojure.atlassian.net/browse/CLJ-962) で直っているのですが、 `assoc` の側は直っていませんでした。
 
 ![img](../../../../resources/public/img/8bda7e-subvec.svg)
 

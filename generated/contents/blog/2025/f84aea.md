@@ -4,9 +4,9 @@ Updated: 2025-12-02
 Tags: emacs org-mode nix advent-calendar tutorial
 
 
-この記事は[Emacs Advent Calendar 2025](https://qiita.com/advent-calendar/2025/emacs)の4日目の記事です。
+この記事は [Emacs Advent Calendar 2025](https://qiita.com/advent-calendar/2025/emacs) の4日目の記事です。
 
-[org-mode](https://orgmode.org/)は言わずと知れたEmacsのキラーフィーチャーですが、Emacsの学習曲線もさることながら、org-modeの学習曲線も同様に急峻であるため入門したくても踏み切れないという初心者の方がたくさん居るという声を聞きます。
+[org-mode](https://orgmode.org/) は言わずと知れたEmacsのキラーフィーチャーですが、Emacsの学習曲線もさることながら、org-modeの学習曲線も同様に急峻であるため入門したくても踏み切れないという初心者の方がたくさん居るという声を聞きます。
 しかし、タイトルにもありますが、日本語レポートから始めるorg-modeでゆるやかにorg-mode、ひいてはEmacsに入門するのは私がとてもおすすめしている入門経路で、実は私もこの経路でorg-modeとEmacsに入門しています。
 
 ぜひ怖がらずに入門してみましょう。
@@ -14,7 +14,7 @@ Tags: emacs org-mode nix advent-calendar tutorial
 
 # 日本語レポートの題材
 
-なんでも良いのですが、[東工大のC言語入門](https://tcs.c.titech.ac.jp/csbook/c_lang/chap1.html)を見つけたのでこれを使わせてもらうことにします。
+なんでも良いのですが、[東工大のC言語入門](https://tcs.c.titech.ac.jp/csbook/c_lang/chap1.html) を見つけたのでこれを使わせてもらうことにします。
 
 
 # Emacsの起動とファイルの準備
@@ -51,7 +51,7 @@ emacs
 
 # org-modeの文法
 
-[features](https://orgmode.org/features.html)のページがざっと全体像になっています。
+[features](https://orgmode.org/features.html) のページがざっと全体像になっています。
 レポートを書くという目的ではheadingの作り方といくつかの文字装飾の方法を学んでおくと良いでしょう。
 markdownとの対応で記述します。
 
@@ -119,7 +119,7 @@ markdownでは `[link text](link)` と表現するところ、org-modeでは `[[
 
 もしくは `link text` と書いて選択した後、 `C-c C-l (org-insert-link)` を実行することで、対話的にリンクを作ることができます。
 
-[org-mode](https://orgmode.org/)へのリンクです。
+[org-mode](https://orgmode.org/) へのリンクです。
 
 
 ## テーブル
@@ -210,7 +210,7 @@ org文書に対してタイトルなどを指定することができます。
 #+date: 2025-12-02
 ```
 
-設定できる項目の一覧は[ドキュメント](https://orgmode.org/manual/Export-Settings.html )にあります。
+設定できる項目の一覧は [ドキュメント](https://orgmode.org/manual/Export-Settings.html ) にあります。
 設定できてもエクスポートに利用する形式でサポートされていないと単に無視されることもあります。
 
 
@@ -310,12 +310,12 @@ int main() {
 残念ながらorg-modeの形式では教授は受け取ってくれません。
 しかし、org-modeから種々のフォーマットに変換することでその問題を解決することができます。
 
-テキストフォーマットはもちろん、markdownやhtml、man形式やLaTeX形式など様々なフォーマットが[org-mode本体によりサポート](https://orgmode.org/manual/Exporting.html)されています。
+テキストフォーマットはもちろん、markdownやhtml、man形式やLaTeX形式など様々なフォーマットが [org-mode本体によりサポート](https://orgmode.org/manual/Exporting.html) されています。
 なお、筆者はこの機能でLaTeXにエクスポートし卒論を書きました。
 
 さらにはコミュニティにより他にも様々なフォーマットへの変換がサポートされています。
-エクスポートパッケージは `ox`- を付けることが慣習のため、[MELPAでこのクエリを入れて検索](https://melpa.org/#/?q=ox-)すると追加で実に40種ほどのエクスポート先を利用することができます。
-その中には私が作成した[ox-zenn](https://s.conao3.com/blog/2020/6dae6b)もあります。
+エクスポートパッケージは `ox`- を付けることが慣習のため、[MELPAでこのクエリを入れて検索](https://melpa.org/#/?q=ox-) すると追加で実に40種ほどのエクスポート先を利用することができます。
+その中には私が作成した [ox-zenn](https://s.conao3.com/blog/2020/6dae6b) もあります。
 
 今回は簡単にテキストフォーマットのエクスポートを試してみましょう。
 org-modeの文書を開いた状態で、 `C-c C-t (org-export-dispatch)` を実行します。

@@ -7,12 +7,12 @@ Tags: lean python formal-verification code-generation property-based-testing pyd
 Lean 4で書いて証明した関数をPythonから呼べるようにする、lean-pyを作りました。
 Leanのstructureと帰納型はpydanticのmodelになるのでFastAPIのリクエストの型にもそのまま使えますし、逆向きに、Pythonで書いた関数をLeanに訳してその性質をLeanで証明することもできます。
 
-リポジトリは[conao3/lean-py](https://github.com/conao3/lean-py)で、ライセンスはApache-2.0です。
+リポジトリは [conao3/lean-py](https://github.com/conao3/lean-py) で、ライセンスはApache-2.0です。
 PyPIには `lean-python` の名前で公開していて、この記事は0.2.0で動かした結果をもとに書いています。
-lean-pyは現在[leanfran](https://s.conao3.com/blog/2026/23d62c)のPythonのバックエンドになっていて、リポジトリは[conao3/lean-leanfranのlangs/Python/](https://github.com/conao3/lean-leanfran/tree/master/langs/Python)、パッケージの名前は `leanfran` です。
+lean-pyは現在 [leanfran](https://s.conao3.com/blog/2026/23d62c) のPythonのバックエンドになっていて、リポジトリは [conao3/lean-leanfranのlangs/Python/](https://github.com/conao3/lean-leanfran/tree/master/langs/Python)、パッケージの名前は `leanfran` です。
 
 lean-pyはLeanのコンパイラの中間表現をPythonのソースに変換していて、生成したPythonは `lean-python` のパッケージとpydanticだけで動くので、実行するときにLeanは要りません。
-[lean-clj](https://s.conao3.com/blog/2026/4e5aa2)と[lean-rs](https://s.conao3.com/blog/2026/b43a06)はLeanの関数をClojureとRustから呼ぶもので、lean-pyは同じ仕組みをPythonに移したものです。
+[lean-clj](https://s.conao3.com/blog/2026/4e5aa2) と [lean-rs](https://s.conao3.com/blog/2026/b43a06) はLeanの関数をClojureとRustから呼ぶもので、lean-pyは同じ仕組みをPythonに移したものです。
 
 <div class="github-card" data-repo="conao3/lean-py"><a href="https://github.com/conao3/lean-py"><span class="github-card-name"><svg class="github-card-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>conao3/<strong>lean-py</strong></span></span><span class="github-card-description">Run Lean 4 as Python: a backend from Lean's IR, Lean blocks in Python files, pydantic models for Lean types, and Python functions verified in Lean</span><span class="github-card-footer"><span class="github-card-language"><span class="github-card-language-color"></span>Python</span><span class="github-card-star"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>Star</span><span class="github-card-star-count" hidden></span></span></span></a></div>
 
@@ -63,7 +63,7 @@ def Range.width (r : Range) : Nat := r.hi - r.lo
 """)
 ```
 
-`double_eq` は、 `double` の定義を展開してから、自然数と整数の線形算術を解くタクティクの[omega](https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#omega)で等式を示しています。
+`double_eq` は、 `double` の定義を展開してから、自然数と整数の線形算術を解くタクティクの [omega](https://lean-lang.org/doc/reference/latest/Tactic-Proofs/Tactic-Reference/#omega) で等式を示しています。
 `lean-py sync` はパッケージのmoduleを読み込んで `lean(...)` のブロックを集め、 `lake build` で証明を検査して、検査が通ればブロックのLeanのコードをPythonに変換して `demo/_lean/` に書き出します。
 
 ```console
@@ -217,7 +217,7 @@ structure LeanPythonModels.pricing.models.LineItem where
 `Field` の制約は証明を持つフィールドになるので、Leanの証明の中で `1 ≤ qty` を前提として使えます。
 また、下限が0以上の `int` はLeanの `Nat` になります。
 
-次の例は、 `LineItem` とLeanの帰納型 `Discount` をFastAPIのリクエストの型にしたもので、サンプルの[pricing-api](https://github.com/conao3/lean-py/tree/master/samples/pricing-api)から抜き出しています。
+次の例は、 `LineItem` とLeanの帰納型 `Discount` をFastAPIのリクエストの型にしたもので、サンプルの [pricing-api](https://github.com/conao3/lean-py/tree/master/samples/pricing-api) から抜き出しています。
 
 ```python
 pricing = lean("pricing", r"""
@@ -372,14 +372,14 @@ lean-pyは、Leanのコンパイラが最後に作る中間表現を読んで、
 
 Pythonの実行時のライブラリにも参照カウントを持たせて、配列への追加や更新は参照が1つのときにその場で行うようにしたので、 `Array` に要素を足していくループは、Cにコンパイルしたときと同じく要素数に比例する時間で終わります。
 
-Leanの組み込みの関数は、LeanのCのruntimeの[lean.h](https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h)に合わせて、同じ振る舞いをPythonで書いています。
+Leanの組み込みの関数は、LeanのCのruntimeの [lean.h](https://github.com/leanprover/lean4/blob/v4.35.0/src/include/lean/lean.h) に合わせて、同じ振る舞いをPythonで書いています。
 同じLeanのプログラムをCにコンパイルして動かしたときと、Pythonに変換して動かしたときの出力を比べるテストがあり、標準出力と標準エラー出力が1文字の違いもなく一致しています。
 
-速さはCにコンパイルしたものより数倍から百倍ほど遅く、計測した値は[READMEのPerformance](https://github.com/conao3/lean-py/tree/v0.2.0#performance)に載せています。
+速さはCにコンパイルしたものより数倍から百倍ほど遅く、計測した値は [READMEのPerformance](https://github.com/conao3/lean-py/tree/v0.2.0#performance) に載せています。
 
 
 # おわりに
 
 LeanでPythonの関数を書けるようにして、Leanの型をpydanticのmodelにし、Pythonの関数をLeanで証明できるようにしました。
-使い方を1つずつ試せるサンプルは[samples](https://github.com/conao3/lean-py/tree/master/samples)にあります。
+使い方を1つずつ試せるサンプルは [samples](https://github.com/conao3/lean-py/tree/master/samples) にあります。
 

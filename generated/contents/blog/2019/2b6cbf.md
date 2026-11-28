@@ -4,7 +4,7 @@ Updated: 2019-06-15
 Tags: emacs use-package package-management release leaf-el leaf-keywords-el
 
 
-私は去年の[8月](https://github.com/conao3/dotfiles/commit/fd06cea5dd040ec1fb34225a3f3202200e00801e)から.emacs.d/init.elの大改革を行っており、その副産物としての成果物を[Emacs Advent Calendar 2018](https://qiita.com/advent-calendar/2018/emacs)や[東京Emacs勉強会 端午の節句](https://tokyo-emacs.connpass.com/event/128038/)などで共有させて頂いていました。
+私は去年の [8月](https://github.com/conao3/dotfiles/commit/fd06cea5dd040ec1fb34225a3f3202200e00801e) から.emacs.d/init.elの大改革を行っており、その副産物としての成果物を [Emacs Advent Calendar 2018](https://qiita.com/advent-calendar/2018/emacs) や [東京Emacs勉強会 端午の節句](https://tokyo-emacs.connpass.com/event/128038/) などで共有させて頂いていました。
 
 私の関わっているパッケージは多数ありますが、一番力を入れている `leaf.el` がやっとMELPAに仲間入りすることができたので、ダイレクトマーケティング記事を書く次第です。
 
@@ -16,7 +16,7 @@ GitHubへのリンクはこちら
 
 # 背景
 
-Emacsを使っている方ならば、自分のinit.elに採用するかはさておき、jwiegleyさんの[use-package](https://github.com/jwiegley/use-package)というパッケージの存在を知っていらっしゃると思います。
+Emacsを使っている方ならば、自分のinit.elに採用するかはさておき、jwiegleyさんの [use-package](https://github.com/jwiegley/use-package) というパッケージの存在を知っていらっしゃると思います。
 
 Qiitaでは @kai2nenobuさんの「[use-packageで可読性の高いinit.elを書く](https://qiita.com/kai2nenobu/items/5dfae3767514584f5220)」というとても分かりやすい記事がありますし、るびきちさんも「[use-package.el: Emacsの世界的権威が行っている最先端ラクラクinit.el整理術](http://emacs.rubikitch.com/use-package-2/)」という記事を書いていらっしゃいます。
 
@@ -65,12 +65,12 @@ Qiitaでは @kai2nenobuさんの「[use-packageで可読性の高いinit.elを�
 
 # use-packageの問題点
 
-`use-package` を使っていて、ストレスだった点をつらつら書きます。[年末のAdvent Calendar](https://s.conao3.com/blog/2018/8aa938)にも少し書いたのですが、それに加えて、話の流れとしてもう少し書きます。
+`use-package` を使っていて、ストレスだった点をつらつら書きます。[年末のAdvent Calendar](https://s.conao3.com/blog/2018/8aa938) にも少し書いたのですが、それに加えて、話の流れとしてもう少し書きます。
 
 
 ## use-packageが想定していなかった使い方
 
-`use-package` は「パッケージ設定」のためのパッケージです。そのため、「パッケージのインストールとその設定」を考えるel-getとは一線を画しています。そのため「el-getでは。。」という[issueは1レスで閉じられ](https://github.com/jwiegley/use-package/issues/470)ます。もちろんjwiegleyさんの方針は理解できます。OSSでは風見鶏な運営をするとすぐ破綻してしまうので、ばっさり閉じられたことに意見はありません。
+`use-package` は「パッケージ設定」のためのパッケージです。そのため、「パッケージのインストールとその設定」を考えるel-getとは一線を画しています。そのため「el-getでは。。」という [issueは1レスで閉じられ](https://github.com/jwiegley/use-package/issues/470) ます。もちろんjwiegleyさんの方針は理解できます。OSSでは風見鶏な運営をするとすぐ破綻してしまうので、ばっさり閉じられたことに意見はありません。
 
 さて、 `leaf` は一体どういう方針なのかというと、 `leaf` は「パッケージ設定フォルダ」を提供するためのパッケージです。
 
@@ -78,7 +78,7 @@ Qiitaでは @kai2nenobuさんの「[use-packageで可読性の高いinit.elを�
 
 Spacemacsは使っていないのですが、言語毎、目的毎に `Layer` が管理されており、それを有効にするか無効にするかによって典型的な設定を行うという薄い知識があります。 `leaf` はひとつの「葉」に複数のパッケージの設定を内包することが出来ることから、Spacemacsのそれと同様な使い方が可能です。
 
-なぜ一つの `use-package` に複数のパッケージの設定を書くようになったのかというと、その書き方がS式の折り畳みをするパッケージとの相性がとても良いからです。その話については年末のAdvent Calendarで[leafの記事の一部](https://s.conao3.com/blog/2018/8aa938)として書いています。
+なぜ一つの `use-package` に複数のパッケージの設定を書くようになったのかというと、その書き方がS式の折り畳みをするパッケージとの相性がとても良いからです。その話については年末のAdvent Calendarで [leafの記事の一部](https://s.conao3.com/blog/2018/8aa938) として書いています。
 
 また条件分岐キーワードとの相性もとても良くなります。例えば `:disabled` や `:when` キーワードで、ある親パッケージを無効にすると、そのパッケージに依存する子パッケージも同時に無効にすることができます。
 
@@ -538,13 +538,13 @@ Yet another use-packageです。スクラッチから書きなおし、内部構
 
 ## 使い方
 
-leafの[README](https://github.com/conao3/leaf.el)は `leaf` のtestファイルから参考になるテストケースを抜き出したものです。「テストファイルを見た方が早い」というのは私の持論ですがテストケースであるがゆえに全ての受理形式が書かれているので、かえってどう書けばいいのか困惑するかもしれません。
+leafの [README](https://github.com/conao3/leaf.el) は `leaf` のtestファイルから参考になるテストケースを抜き出したものです。「テストファイルを見た方が早い」というのは私の持論ですがテストケースであるがゆえに全ての受理形式が書かれているので、かえってどう書けばいいのか困惑するかもしれません。
 
 `leaf` がいろいろな形式の引数を受け取れるとはいえ、経験から言える一定の「型」のようなものは存在します。
 
 この記事ではその典型的な引数の形式について書きます。
 
-しかし、例示にはやはりテストケースを使います。拙作の[テストフレームワーク](https://github.com/conao3/cort-test.el)が受理する以下の形式を使います。マクロ展開の結果、 `FORM` に書かれたS式が `EXPECT` の位置に書かれたS式と一致することを期待します。
+しかし、例示にはやはりテストケースを使います。拙作の [テストフレームワーク](https://github.com/conao3/cort-test.el) が受理する以下の形式を使います。マクロ展開の結果、 `FORM` に書かれたS式が `EXPECT` の位置に書かれたS式と一致することを期待します。
 
 ```emacs-lisp
 (cort-deftest-with-macroexpand TESTCASE-NAME
@@ -1643,14 +1643,14 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 
 ## 困ったことについて
 
-なにかバグや改善すべきことがあれば、気軽にGitHubでissueを開いてもらえればと思います。しかし、「そもそもissueを開く問題なのか」が分からなかったり、「もっと気軽に相談したい」ということがあれば[専用のSlack](https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE)を用意しているので、そちらで連絡をとれればと思います。
+なにかバグや改善すべきことがあれば、気軽にGitHubでissueを開いてもらえればと思います。しかし、「そもそもissueを開く問題なのか」が分からなかったり、「もっと気軽に相談したい」ということがあれば [専用のSlack](https://conao3-support.slack.com/join/shared_invite/enQtNjUzMDMxODcyMjE1LWUwMjhiNTU3Yjk3ODIwNzAxMTgwOTkxNmJiN2M4OTZkMWY0NjI4ZTg4MTVlNzcwNDY2ZjVjYmRiZmJjZDU4MDE) を用意しているので、そちらで連絡をとれればと思います。
 
 これが日本人が作っているパッケージの強みでもあるので、ぜひ初心者の方でも気軽に `leaf` を使ってもらえればと思います。
 
 
 ## 寄付について
 
-日本で、こういう宣伝は卑しく受け止められるとは思ってはいますが、私は大学生で収入もほとんど無く、新しくオライリーの本を買うにも躊躇することが多々あります。このleafを面白いと思っていただけたり、他にも様々なEmacs関連パッケージを作っている私を金銭的にサポートしてあげてもいいと思ってもらえる人がいれば、ぜひ[Patreon](https://www.patreon.com/conao3)になって頂ければと思います。
+日本で、こういう宣伝は卑しく受け止められるとは思ってはいますが、私は大学生で収入もほとんど無く、新しくオライリーの本を買うにも躊躇することが多々あります。このleafを面白いと思っていただけたり、他にも様々なEmacs関連パッケージを作っている私を金銭的にサポートしてあげてもいいと思ってもらえる人がいれば、ぜひ [Patreon](https://www.patreon.com/conao3) になって頂ければと思います。
 
 私が関わったものは全てGitHubで公開しており、代表的なものは以下のものです。
 
@@ -1672,7 +1672,7 @@ leafはEmacs標準添付を目指しているので、PRを採用する際には
 
 ![img](../../../../resources/public/img/2b6cbf-Capture-2019-06-15-22.40.06.png)
 
-これらのパッケージにこれからも関われるように、そして更なる新しいパッケージを作るために、ぜひ[Patreonでサポート](https://www.patreon.com/conao3)をお願いします。
+これらのパッケージにこれからも関われるように、そして更なる新しいパッケージを作るために、ぜひ [Patreonでサポート](https://www.patreon.com/conao3) をお願いします。
 
 
 ## まとめ

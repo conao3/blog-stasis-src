@@ -36,7 +36,7 @@ Remark/Rehypeの関係は掴み辛いですが、「[Introduction to unified](ht
 
 # remark-math / rehype-katexの導入
 
-[remark-math](https://unifiedjs.com/explore/package/remark-math/)と[rehype-katex](https://unifiedjs.com/explore/package/rehype-katex/)を導入します。
+[remark-math](https://unifiedjs.com/explore/package/remark-math/) と [rehype-katex](https://unifiedjs.com/explore/package/rehype-katex/) を導入します。
 
 `remark-math` がマークダウン中の `$C_L$` のような数式をmdast上で変換し、
 `rehype-katex` がhast上でKaTeXを使うように変換します。
@@ -95,7 +95,7 @@ Astroから使えるようにするには `astro.config.mjs` に以下のよう�
 
 ## CSSの追加
 
-[KaTeXのページ](https://katex.org/docs/browser.html)からCSSのタグをコピーして良い感じのところに貼り付けます。
+[KaTeXのページ](https://katex.org/docs/browser.html) からCSSのタグをコピーして良い感じのところに貼り付けます。
 私はいろいろ面倒だったので、 `src/component/BaseHeader.astro` に貼り付けて全ページで読み込まれるようにしました。
 
 ```html

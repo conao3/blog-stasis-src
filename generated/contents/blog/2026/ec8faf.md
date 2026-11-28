@@ -7,12 +7,12 @@ Tags: lean php formal-verification code-generation release lean-leanfran
 Lean 4で書いて証明した関数をPHPのクラスから呼べるようにするleanfranのPHP版を作りました。
 Leanのstructureと帰納型は値を作るときにLeanの条件で検査するPHPのクラスになりますし、逆向きにPHPで書いた関数をLeanに訳してその性質をLeanで証明することもできます。
 
-リポジトリは[conao3/lean-leanfranのlangs/PHP/](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP)で、ライセンスはApache-2.0です。
-Packagistには[conao3/leanfran](https://packagist.org/packages/conao3/leanfran)の名前で公開していて、この記事は0.7.0で動かした結果をもとに書いています。
+リポジトリは [conao3/lean-leanfranのlangs/PHP/](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP) で、ライセンスはApache-2.0です。
+Packagistには [conao3/leanfran](https://packagist.org/packages/conao3/leanfran) の名前で公開していて、この記事は0.7.0で動かした結果をもとに書いています。
 
 leanfranはLeanのコンパイラの中間表現をPHPのソースに変換するもので、生成したPHPはComposerのパッケージだけで動き、実行するときにLeanは要りません。
 
-Rust・Python・TypeScript・Clojureの4つは[leanfranを紹介した記事](https://s.conao3.com/blog/2026/23d62c)で取り上げていて、PHPもそれらと同じリポジトリから同じ版で出しています。
+Rust・Python・TypeScript・Clojureの4つは [leanfranを紹介した記事](https://s.conao3.com/blog/2026/23d62c) で取り上げていて、PHPもそれらと同じリポジトリから同じ版で出しています。
 
 <div class="github-card" data-repo="conao3/lean-leanfran"><a href="https://github.com/conao3/lean-leanfran"><span class="github-card-name"><svg class="github-card-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>conao3/<strong>lean-leanfran</strong></span></span><span class="github-card-description">Write and prove functions in Lean 4, run them as Rust, Python, TypeScript and Clojure</span><span class="github-card-footer"><span class="github-card-language"><span class="github-card-language-color"></span>Lean</span><span class="github-card-star"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>Star</span><span class="github-card-star-count" hidden></span></span></span></a></div>
 
@@ -189,7 +189,7 @@ Range.ok: lo ≤ hi
 コンストラクタは `lo ≤ hi` の判定をLeanからコンパイルしたコードで実行するので、 `lo` が `hi` より大きい値は `ValidationError` になります。
 
 JSON Schemaでは2つのフィールドにまたがる `lo ≤ hi` を表せないので、schemaに出るのは `Nat` の下限だけです。
-この条件はコンストラクタが検査していて、配列から値を作るときや、[Valinor](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#valinor)のマッパーに生成したクラスを渡したときにも同じ検査が働きます。
+この条件はコンストラクタが検査していて、配列から値を作るときや、[Valinor](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#valinor) のマッパーに生成したクラスを渡したときにも同じ検査が働きます。
 
 `#[Lean(...)]` の `models` にPHPで書いた `readonly` のクラスを渡すとLeanのstructureとして取り込めて、そのクラスのPHPDocに書いた `int<0, 100>` のような範囲は証明のフィールドになります。
 
@@ -235,7 +235,7 @@ final class Calc
 この例では `lo ≤ hi` のときに `clamp` が `clampSpec` と同じ値を返すことと、戻り値が `lo` 以上 `hi` 以下になることが証明の義務になります。
 
 `vendor/bin/leanfran check` はPHPの構文木を読んで関数をLeanの `do` 記法の関数に訳し、 `clamp.obligation.refines` のような名前で義務の命題を作ります。
-証明は `composer.json` の隣の `lean/Proofs/` に書き、ここでは[verified-clampのサンプルの証明](https://github.com/conao3/lean-leanfran/blob/v0.7.0/langs/PHP/samples/verified-clamp/lean/Proofs/Calc.lean)をそのまま使っています。
+証明は `composer.json` の隣の `lean/Proofs/` に書き、ここでは [verified-clampのサンプルの証明](https://github.com/conao3/lean-leanfran/blob/v0.7.0/langs/PHP/samples/verified-clamp/lean/Proofs/Calc.lean) をそのまま使っています。
 
 ```lean
 import LeanPhpModel.App.Calc
@@ -336,7 +336,7 @@ PHPの整数の演算は64ビットの範囲で検査していて、あふれて
 `#[Model(...)]` を付けた関数では、引数のPHPDocに書いた `int<0, 100>` のような範囲は証明の前提にならないので、証明に使う条件は `requires` に書きます。
 
 訳せるのはPHPの一部で、 `foreach` や `match` 、リストの添字、 `readonly` のクラスと `enum` は扱えますが、参照渡し、 `??` 、入出力を含む関数は対象外です。
-対応する構文の一覧は[PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#php-subset)にあります。
+対応する構文の一覧は [PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md#php-subset) にあります。
 
 生成するPHPのほうは、LeanのCバックエンドで動かした結果と比べるテストで確かめています。
 
@@ -346,8 +346,8 @@ Float32の超越関数などの65件は、浮動小数点数の最小の刻み1�
 
 # おわりに
 
-この記事の例のほかにも、[PHPのサンプル](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples)には価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
+この記事の例のほかにも、[PHPのサンプル](https://github.com/conao3/lean-leanfran/tree/v0.7.0/langs/PHP/samples) には価格と個数の上限を前提にして合計のループを証明するverified-cartと、2つのブロックで型を共有するembed-ordersを置いてあります。
 Leanの `IO` の関数をPHPのコマンドとして動かすgreet-cliもあります。
 
-導入の手順は[PHPのREADME](https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md)、型の対応やCLIの詳細は[PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md)にあります。
+導入の手順は [PHPのREADME](https://github.com/conao3/lean-leanfran/blob/master/langs/PHP/README.md)、型の対応やCLIの詳細は [PHPのガイド](https://github.com/conao3/lean-leanfran/blob/v0.7.0/docs/php-guide.md) にあります。
 

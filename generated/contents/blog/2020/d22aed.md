@@ -7,7 +7,7 @@ Tags: emacs tutorial package-management leaf-el leaf-convert-el leaf-tree-el
 
 # 背景
 
-[leaf.el](https://github.com/conao3/leaf.el)の日本語情報は比較的充実していると思いますが、やはり多少の背後情報が必要です。Emacsの設定はどのファイルで行なうのか、マクロとは、バイトコンパイルとは、、、
+[leaf.el](https://github.com/conao3/leaf.el) の日本語情報は比較的充実していると思いますが、やはり多少の背後情報が必要です。Emacsの設定はどのファイルで行なうのか、マクロとは、バイトコンパイルとは、、、
 leafが設定の簡略化をしてくれるとはいえ、基本的なEmacsのしくみについて知っておく必要があります。
 
 この記事では初期状態のEmacsからleaf.elの導入と利用までを解説します。この記事を読んだ後なら、下記のleafの記事をスムーズに読むことができ、Emacsの動作をあなたの好きなようにカスタマイズできるようになると思います。
@@ -17,7 +17,7 @@ leafが設定の簡略化をしてくれるとはいえ、基本的なEmacsの�
 -   リリース記事: [[正式リリース]leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする](https://s.conao3.com/blog/2019/2b6cbf)
 -   2019年アップデート記事: [[2019年アップデート] leaf.elで雑然としたEmacs設定ファイル「init.el」をクリーンにする](https://s.conao3.com/blog/2019/3279ec)
 
-また、leafも一定の知名度を得てきたようで、レポジトリは[記念すべき100スター](https://github.com/conao3/leaf.el)を達成し、[MELPAでは3万ダウンロード](https://melpa.org/#/?q=conao3&sort=downloads&asc=false)を達成しました!
+また、leafも一定の知名度を得てきたようで、レポジトリは [記念すべき100スター](https://github.com/conao3/leaf.el) を達成し、[MELPAでは3万ダウンロード](https://melpa.org/#/?q=conao3&sort=downloads&asc=false) を達成しました!
 
 気に入ってもらえればレポジトリのスターとleafのダウンロードをしていただければ泣いて喜びます!
 
@@ -28,7 +28,7 @@ leafが設定の簡略化をしてくれるとはいえ、基本的なEmacsの�
 
 まずEmacs-26.3をどうにかしてインストールします。もしEmacs-22とかいう化石を使っている場合はすぐEmacs-26.3に移行してください。(自戒)
 
-leaf.elは24.4から動きますが、とても便利な[leaf-convert.el](https://github.com/conao3/leaf-convert.el)はEmacs-26.1を要求します。
+leaf.elは24.4から動きますが、とても便利な [leaf-convert.el](https://github.com/conao3/leaf-convert.el) はEmacs-26.1を要求します。
 
 Emacs-26.1とEmacs-26.2はELPAからのダウンロードに問題があります。結局Emacs-26.3を使うしか選択肢がありません。
 
@@ -44,7 +44,7 @@ under the terms of the GNU General Public License.
 For more information about these matters, see the file named COPYING.
 ```
 
-もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味か分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
+もし `M-x leaf-available-keywords` と記事に書かれていたときにどういう意味か分からない場合は、ここでEmacsに慣れておいた方が良いかもしれません。少し鬼軍曹<span class="footnote"><sup><button type="button" id="fnr.1" class="footref" popovertarget="fnr.1-body">1</button></sup><span class="footnote-body" id="fnr.1-body" popover>: 実際に [鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。</span></span>な気はありますが、「[Emacs教習所に行ってきた(チートシート付き) - Qiita](https://qiita.com/namn1125/items/5cd6a9cbbf17fb85c740)」が参考になるかもしれません。
 
 
 # Emacs設定ファイル
@@ -52,7 +52,7 @@ For more information about these matters, see the file named COPYING.
 
 ## init.elの作成
 
-Emacsの設定ファイルは `~/.emacs.d/init.el` です。既にディレクトリがある場合は `~/.emacs.d/` を `~/.emacs.d.old` などにリネームした上で新しくディレクトリを作成してください。 `~/.emacs.d/init.el` にファイルを作成し、その先頭にleafの[インストールコード](https://github.com/conao3/leaf.el#install)を貼り付けます<span class="footnote"><sup><button type="button" id="fnr.2" class="footref" popovertarget="fnr.2-body">2</button></sup><span class="footnote-body" id="fnr.2-body" popover>: leafのインストールコードには書いてませんが、別途 `user-emacs-directory` の設定を加えました。理由はコメントのような起動方法ができるからです。参考ブログ: [Emacsでお試しinit.elの指針 - peccu.hatenablog](http://peccu.hatenablog.com/entry/20130218/trial_init)</span></span>。
+Emacsの設定ファイルは `~/.emacs.d/init.el` です。既にディレクトリがある場合は `~/.emacs.d/` を `~/.emacs.d.old` などにリネームした上で新しくディレクトリを作成してください。 `~/.emacs.d/init.el` にファイルを作成し、その先頭にleafの [インストールコード](https://github.com/conao3/leaf.el#install) を貼り付けます<span class="footnote"><sup><button type="button" id="fnr.2" class="footref" popovertarget="fnr.2-body">2</button></sup><span class="footnote-body" id="fnr.2-body" popover>: leafのインストールコードには書いてませんが、別途 `user-emacs-directory` の設定を加えました。理由はコメントのような起動方法ができるからです。参考ブログ: [Emacsでお試しinit.elの指針 - peccu.hatenablog](http://peccu.hatenablog.com/entry/20130218/trial_init)</span></span>。
 
 なお、現在では `leaf` のimenuインテグレーションのおかげでファイル分割しないinit.el管理がトレンドです。
 
@@ -404,7 +404,7 @@ leafには与えられたS式をそのまま展開するキーワードがあり
 
 ## leaf-convertについて
 
-leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば[Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula)を参考にして、下記のuse-package設定例があるとします。
+leaf-convertを手に入れたおかげで、use-packageの設定例があればleafに変換できるようになりました。例えば [Emacsモダン化計画 -かわEmacs編- - コードが読みやすいテーマ](https://qiita.com/Ladicle/items/feb5f9dce9adf89652cf#%E3%82%B3%E3%83%BC%E3%83%89%E3%81%8C%E8%AA%AD%E3%81%BF%E3%82%84%E3%81%99%E3%81%84%E3%83%86%E3%83%BC%E3%83%9E----doom-emacs-themesdoom-dracula) を参考にして、下記のuse-package設定例があるとします。
 
 ```emacs-lisp
 (use-package doom-themes
@@ -463,13 +463,13 @@ use-packageが作られた当時はきちんとautoloadをパッケージ開発�
 
 最後にpatreonの宣伝をします。
 
-私はleaf.elやleaf-keywords、leaf-tree、leaf-convertといったleaf関連のEmacsパッケージ、他にもseml-modeやpppといったEmacsパッケージを書いています。作成した全てのパッケージと管理を手伝っているパッケージとリンクについては[Emacswikiのページ](https://www.emacswiki.org/emacs/Conao3)、アクティビティに関しては[GitHubのユーザーページ](https://github.com/conao3)を参照して頂ければと思います。
+私はleaf.elやleaf-keywords、leaf-tree、leaf-convertといったleaf関連のEmacsパッケージ、他にもseml-modeやpppといったEmacsパッケージを書いています。作成した全てのパッケージと管理を手伝っているパッケージとリンクについては [Emacswikiのページ](https://www.emacswiki.org/emacs/Conao3)、アクティビティに関しては [GitHubのユーザーページ](https://github.com/conao3) を参照して頂ければと思います。
 
 ![img](../../../../resources/public/img/d22aed-Screenshot_2020-04-16_05-42-42.png)
 
 支援を頂くことで、これまでよりも気軽にオライリーの本をポチることができ、バイトの時間を減らしコーディングの時間を増やすことができます。
 
-また、去年から先週までpatreonになることのメリットが全くなかった;;のですが、さすがに申し訳なくなってしまったので、これまでGitHubの[conao3/dotfiles](https://github.com/conao3/dotfiles)で公開していたdotfilesをプライベートに設定し、patreon限定でダウンロードできるようにしました。
+また、去年から先週までpatreonになることのメリットが全くなかった;;のですが、さすがに申し訳なくなってしまったので、これまでGitHubの [conao3/dotfiles](https://github.com/conao3/dotfiles) で公開していたdotfilesをプライベートに設定し、patreon限定でダウンロードできるようにしました。
 
 ぜひ下記URLからご支援いただければと思います。よろしくお願いします!
 
@@ -478,6 +478,6 @@ use-packageが作られた当時はきちんとautoloadをパッケージ開発�
 
 # Footnotes
 
-<sup><a id="fn.1" href="#fnr.1">1</a></sup> : 実際に[鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。
+<sup><a id="fn.1" href="#fnr.1">1</a></sup> : 実際に [鬼軍曹.elというパッケージがあり](https://qiita.com/zonkyy/items/c090d0733ec6ccab4724)、インストールすることで軍曹の指導を受けることができる。
 
 <sup><a id="fn.2" href="#fnr.2">2</a></sup> : leafのインストールコードには書いてませんが、別途 `user-emacs-directory` の設定を加えました。理由はコメントのような起動方法ができるからです。参考ブログ: [Emacsでお試しinit.elの指針 - peccu.hatenablog](http://peccu.hatenablog.com/entry/20130218/trial_init)

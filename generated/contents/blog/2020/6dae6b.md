@@ -7,7 +7,7 @@ Tags: emacs emacs-lisp org-mode blog release ox-zenn-el
 
 # tl;dr
 
--   [ox-zenn](https://github.com/conao3/ox-zenn.el)というorgからZenn flavored markdownを生成するパッケージを書きました。
+-   [ox-zenn](https://github.com/conao3/ox-zenn.el) というorgからZenn flavored markdownを生成するパッケージを書きました。
 -   Zennマークダウンは独自記法があるので、orgファイルとの対応について少し注意することがある。
 
 <div class="github-card" data-repo="conao3/ox-zenn.el"><a href="https://github.com/conao3/ox-zenn.el"><span class="github-card-name"><svg class="github-card-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>conao3/<strong>ox-zenn.el</strong></span></span><span class="github-card-footer"><span class="github-card-language"><span class="github-card-language-color" style="background-color: #c065db"></span>Emacs Lisp</span><span class="github-card-star"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>Star</span><span class="github-card-star-count" hidden></span></span></span></a></div>
@@ -18,9 +18,9 @@ Tags: emacs emacs-lisp org-mode blog release ox-zenn-el
 
 ## 概要
 
-「[org-mode](https://orgmode.org/)とはEmacsのメジャーモードのひとつです」という説明は正しいのですが、org-modeの力を説明するには全く言葉が足りません。
+「[org-mode](https://orgmode.org/) とはEmacsのメジャーモードのひとつです」という説明は正しいのですが、org-modeの力を説明するには全く言葉が足りません。
 
-[org-modeの日本語プロジェクトページ](https://orgmode.org/ja/)には
+[org-modeの日本語プロジェクトページ](https://orgmode.org/ja/) には
 
 > Org-mode はノートの保存、TODOリストの管理、プロジェクト計画、文書編集のためのモードです。高速で効率的なプレーンテキストのシステムを使ってファイルを編集します。
 
@@ -63,10 +63,10 @@ ox-zennの作り方については別の記事にするとして、この記事�
 
 ## org-modeとox-zennのインストール
 
-[leaf](https://github.com/conao3/leaf.el)を使ってインストールします。
+[leaf](https://github.com/conao3/leaf.el) を使ってインストールします。
 また、orgはEmacsに標準添付されているのですが、upstreamがとても活発に改善されているので、この手順に従い、最新版を入れることをおすすめします。
 
-現状、ox-zennがまだ[celpa](http://celpa.conao3.com/)にしか入っていないので、celpaのURLを `package-archives` に追加する必要があることに注意する必要があります。
+現状、ox-zennがまだ [celpa](http://celpa.conao3.com/) にしか入っていないので、celpaのURLを `package-archives` に追加する必要があることに注意する必要があります。
 
 ```elisp
 (eval-and-compile
@@ -101,14 +101,14 @@ ox-zennの作り方については別の記事にするとして、この記事�
 
 ## 基本のorg記法
 
-orgのプロジェクトページに[org-syntax](https://orgmode.org/worg/dev/org-syntax.html)のページがあるので参照して頂ければと。
+orgのプロジェクトページに [org-syntax](https://orgmode.org/worg/dev/org-syntax.html) のページがあるので参照して頂ければと。
 
 
 ## ox-zenn拡張記法
 
-Zenn公式による[Markdownの解説記事](https://zenn.dev/zenn/articles/markdown-guide)があります。
-Zennは基本的に今時のマークダウン、つまり[GFM(GitHub Flavored Markdown)](https://github.github.com/gfm/)を受け取るように見えます。
-さらにZenn独自の記法として[独自拡張のブロック要素](https://zenn.dev/zenn/articles/markdown-guide#zenn%E7%8B%AC%E8%87%AA%E3%81%AE%E8%A8%98%E6%B3%95)と[コンテンツ埋め込み用のショートコード](https://zenn.dev/zenn/articles/markdown-guide#%E5%A4%96%E9%83%A8%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%81%AE%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BF)をサポートしています。
+Zenn公式による [Markdownの解説記事](https://zenn.dev/zenn/articles/markdown-guide) があります。
+Zennは基本的に今時のマークダウン、つまり [GFM(GitHub Flavored Markdown)](https://github.github.com/gfm/) を受け取るように見えます。
+さらにZenn独自の記法として [独自拡張のブロック要素](https://zenn.dev/zenn/articles/markdown-guide#zenn%E7%8B%AC%E8%87%AA%E3%81%AE%E8%A8%98%E6%B3%95) と [コンテンツ埋め込み用のショートコード](https://zenn.dev/zenn/articles/markdown-guide#%E5%A4%96%E9%83%A8%E3%82%B3%E3%83%B3%E3%83%86%E3%83%B3%E3%83%84%E3%81%AE%E5%9F%8B%E3%82%81%E8%BE%BC%E3%81%BF) をサポートしています。
 
 残念ながらorgには対応している記法が存在しないのでox-zennが特別に解釈する文法を追加しました。
 もちろん、他のバックエンドは解釈しないのでドキュメントの可搬性が落ちることに留意する必要があります。
@@ -291,7 +291,7 @@ orgドキュメントの上の方に `#+options: broken-links:mark` と記述し
 
 orgにおいて、画像を表示するにはdescriptionなしのリンクで表現します。
 
-さらにZennは独自の記法により[画像の横幅を指定](https://zenn.dev/zenn/articles/markdown-guide#%E7%94%BB%E5%83%8F)できるようになっています。
+さらにZennは独自の記法により [画像の横幅を指定](https://zenn.dev/zenn/articles/markdown-guide#%E7%94%BB%E5%83%8F) できるようになっています。
 この機能については `#+attr_html` で `alt` 属性と `width` 属性を指定すると適切に出力するようにしました。
 
 つまりこのorgフォーマットは
@@ -469,7 +469,7 @@ main.orgは次のような形です。
 ox-zennを使うことでorgドキュメントからZenn拡張の含まれたマークダウンを出力できるようになりました。
 ぜひみなさんもこのバックエンドを使ってorgからZennの記事を書いてもらえればと思います。
 
-気に入ってもらえたら、ぜひzennか[patreon](https://www.patreon.com/conao3)でサポートを頂ければと思います!
+気に入ってもらえたら、ぜひzennか [patreon](https://www.patreon.com/conao3) でサポートを頂ければと思います!
 
 
 # Footnotes
