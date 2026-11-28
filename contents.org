@@ -33839,7 +33839,7 @@ T3 Code GPUIは届いた更新をすぐ手元の状態に入れますが、描�
 返答の本文は[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][1,200バイトほどたまるごとにコードブロックの外の空行で区切り]]、区切った塊をタイムラインの別の行にしています。
 書き終わった塊は中身が変わらないので、返答が伸びている間に組み直すのは末尾の塊だけになります。
 
-X11では画面の垂直同期を待たずにフレームを出すようにGPUIに手を入れてあり、描画の間もキー入力が遅れません。
+X11では垂直同期を待たずにフレームを出すようにGPUIに手を入れて、キー入力の処理がフレームの表示を待たないようにしています。
 
 ** 構成
 Cargoのworkspaceに3つのcrateを置いています。
@@ -33875,8 +33875,8 @@ T3 Code GPUI is an independent, unofficial project with no ties to the T3 Code t
 [[https://t3.codes][T3 Code]] lets you drive coding agents you are already signed in to, such as Claude Code and Codex, from one screen.
 It has a server, =t3 serve=, and the web UI and desktop app that connect to it.
 
-The desktop app is built on Electron, so I rewrote its screen in Rust and kept the upstream server as it is.
-The window is drawn with [[https://github.com/zed-industries/zed/tree/main/crates/gpui][GPUI]], the UI framework of the Zed editor, and the buttons and text fields come from [[https://github.com/longbridge/gpui-kit][gpui-kit]].
+The T3 Code team built the desktop app on Electron, so I rewrote its screen in Rust and kept the upstream server as it is.
+T3 Code GPUI draws its window with [[https://github.com/zed-industries/zed/tree/main/crates/gpui][GPUI]], the UI framework of the Zed editor, and the buttons and text fields come from [[https://github.com/longbridge/gpui-kit][gpui-kit]].
 
 In the screenshot below, I connected T3 Code GPUI to a temporary =t3 serve= and sent two messages in a new thread.
 The thread list is on the left, the reply timeline and the composer are in the middle, and the right panel shows the Git branch and changes.
@@ -33912,7 +33912,7 @@ T3 Code GPUI refuses to read the file when other users can read it, so set its m
 
 With several servers listed, buttons at the top of the sidebar filter the threads by server.
 In a project that several servers share, a new thread starts on the first server in the list.
-=check-environment= tells you whether the connection works, and shows =Authenticated= as =true= once the token is accepted.
+=check-environment= tells you whether the connection works, and shows =Authenticated= as =true= once the server accepts the token.
 
 #+begin_src console
 $ t3code-gpui environment check-environment --label local
@@ -33946,7 +33946,7 @@ T3 Code GPUI puts each update into its local state right away, but redraws only 
 T3 Code GPUI [[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][splits the reply at a blank line outside code blocks each time about 1,200 bytes pile up]], and puts each block on its own row of the timeline.
 Finished blocks keep the same text, so while the reply grows, T3 Code GPUI lays out only the last block again.
 
-On X11 I patched GPUI to present frames without waiting for vertical sync, so key presses reach the window without waiting for a frame.
+On X11 I patched GPUI to present frames without waiting for vertical sync, so that key handling does not wait for a frame to be shown.
 
 ** Layout
 The Cargo workspace has three crates:
