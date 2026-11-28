@@ -20210,7 +20210,7 @@ lean-rs compiles the intermediate representation of the Lean compiler to Rust so
 ** Three ways to use it
 lean-rs supports three uses.
 
-[[./resources/public/img/b43a06-uses.svg]]
+[[./resources/public/img/1ff994-uses.svg]]
 
 1. Write functions and theorems in Lean inside a Rust file with the =lean!= macro, and call them from Rust.
 2. Compile an existing project of lake, the Lean build tool, to a set of Rust modules with the CLI.
