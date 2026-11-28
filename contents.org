@@ -31679,170 +31679,6 @@ I wrote one post in the same format for each Emacs release from 27 to 31.
 - [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
 - [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
 
-* 書かれた行番号どおりにだけパッチを当てるLean 4のunified diffライブラリleanspliceを作った
-:properties:
-:export_file_name: generated/contents/blog/2026/cecb99
-:export_date: 2026-11-27 23:07
-:export_updated: 2026-11-27 23:07
-:export_tags: lean diff git differential-testing release lean-leansplice
-:export_draft: t
-:end:
-
-Lean 4でunified diffを生成し、パッチに書かれた行番号どおりにだけ適用するライブラリとCLIとして、leanspliceを作りました。
-=git apply= は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチをエラーにして、何も出力せずに終わります。
-
-リポジトリは [[https://github.com/conao3/lean-leansplice][conao3/lean-leansplice]] 、ライセンスはApache-2.0で、Lean 4.36.0の標準ライブラリだけを使っています。
-タグはまだ無いので、この記事はmainブランチのcommit [[https://github.com/conao3/lean-leansplice/commit/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb][86bef90]] をもとに書いています。
-
-[[github:conao3/lean-leansplice::Lean][Unified diff parse, render, strict apply and diff generation for Lean 4]]
-
-** CLIでdiffを作って当てる
-CLIはNixで動かせて、READMEの冒頭にも =nix run= の例を載せています。
-
-[[./resources/public/img/cecb99-readme.png]]
-
-=nix shell= でleanspliceを =PATH= に入れて、2つのファイルからパッチを作ります。
-
-#+begin_src console
-$ nix shell github:conao3/lean-leansplice
-$ printf 'apple\nbanana\ncherry\n' > old.txt
-$ printf 'apple\nblueberry\ncherry\n' > new.txt
-$ leansplice diff old.txt new.txt > change.patch
-$ cat change.patch
---- a/file
-+++ b/file
-@@ -1,3 +1,3 @@
- apple
--banana
-+blueberry
- cherry
-#+end_src
-
-=diff= はファイルの名前にかかわらずラベルを =a/file= と =b/file= にして、変更の前後に3行ずつ文脈を付けます。
-=apply= はパッチと元のファイルを受け取って当てた結果を標準出力に書き、元のファイルはそのまま残ります。
-
-#+begin_src console
-$ leansplice apply change.patch old.txt
-apple
-blueberry
-cherry
-#+end_src
-
-** 行がずれたパッチは当てない
-1から10までの行の =6= を =six= に変えるパッチを作り、先頭に =0= の行を足したファイルに当ててみます。
-
-#+begin_src console
-$ seq 1 10 > a.txt
-$ sed 's/^6$/six/' a.txt > b.txt
-$ leansplice diff a.txt b.txt > six.patch
-$ cat six.patch
---- a/file
-+++ b/file
-@@ -3,7 +3,7 @@
- 3
- 4
- 5
--6
-+six
- 7
- 8
- 9
-$ { echo 0; cat a.txt; } > file
-$ leansplice apply six.patch file; echo $?
-leansplice: hunk 1: source line 3 does not match
-1
-#+end_src
-
-hunkは3行目が =3= だと書いていますが、ファイルの3行目は =2= なので、leanspliceは終了コード1で終わります。
-同じパッチを =git apply= に渡すと、hunkを1行下で見つけて当てます。
-
-#+begin_src console
-$ git apply -v six.patch
-Checking patch file...
-Hunk #1 succeeded at 4 (offset 1 line).
-Applied patch file cleanly.
-#+end_src
-
-leanspliceの [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L210-L255][apply]] は、hunkの古い側と新しい側の行番号、文脈と削除の行の中身、それぞれの行末の改行の有無を確かめて、1つでも合わなければエラーを返します。
-hunkはパッチに書かれた位置でだけ照合するので、同じ行の並びがファイルの別の位置にあっても、そこには当てません。
-
-** Leanのライブラリとして使う
-Lakeのプロジェクトから使うときは、 =lakefile.toml= にleanspliceを足して、Leanのバージョンをleanspliceと同じ4.36.0にします。
-
-#+begin_src toml
-[[require]]
-name = "leansplice"
-git = "https://github.com/conao3/lean-leansplice.git"
-rev = "main"
-#+end_src
-
-=Leansplice.diff= でパッチを作って =render= で文字列にし、 =parse= で読み戻してから =apply= で当てます。
-
-#+begin_src lean
-import Leansplice
-
-def patchText := Leansplice.render (Leansplice.diff "old\n" "new\n")
-
-def result : Except Leansplice.Error String := do
-  let patch ← Leansplice.parse patchText
-  Leansplice.apply patch "old\n"
-
-#eval result -- Except.ok "new\n"
-#+end_src
-
-=lake build= を実行すると、 =#eval= の結果として =Except.ok "new\n"= が出ます。
-ライブラリはファイルを読み書きせずに文字列を受け取り、結果の文字列か =Leansplice.Error= を返します。
-
-=diff= には省略できる引数 =oldFile= 、 =newFile= 、 =context= があり、ラベルと文脈の行数を変えられます。
-近い変更は1つのhunkにまとめます。
-
-** 扱えるパッチ
-leanspliceが扱うのは1つのテキストファイルに対するパッチで、次の形を読めます。
-
-- =---= と =+++= のヘッダーとunifiedのhunk。前にGitの =diff --git= などの行が付いていても読む。
-- ファイル名の後にタブで続くタイムスタンプ。読むときに外す。
-- 行数が1のときに数を省いた範囲 ( =@@ -1 +1 @@= )。
-- Gitの =\ No newline at end of file= の印と、行の中のCR。
-- =/dev/null= を相手にするGitの作成と削除のパッチ。空のテキストに当てる、または空のテキストを作る。
-
-バイナリ、複数のファイル、名前の変更、モードの変更だけのパッチは範囲の外で、hunkの位置を探して当てる機能と3-way mergeも持っていません。
-
-** Gitと両方向に確かめる
-=make check= は =lake build= と =lake test= に続けて [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/scripts/git-differential.sh][scripts/git-differential.sh]] を実行します。
-このスクリプトは、 =git diff --no-index= が作ったパッチをleanspliceで当てる向きと、leanspliceが作ったパッチを =git apply= で当てる向きの両方で、結果を期待するファイルと =cmp= で比べます。
-
-#+begin_src console
-$ nix develop --command make check 2>&1 | grep -E '^(Leansplice|Git|CLI)'
-Leansplice golden and round-trip tests passed.
-Git interoperability: replacement
-Git interoperability: both-no-final-lf
-Git interoperability: add-final-lf
-Git interoperability: remove-final-lf
-Git interoperability: unterminated-context
-Git interoperability: blank-and-unicode
-Git interoperability: crlf
-Git interoperability: multiple-hunks
-Git interoperability: empty-source
-Git interoperability: empty-target
-Git interoperability: creation and deletion headers
-CLI reports stdout failure: diff
-CLI reports stdout failure: apply
-#+end_src
-
-比べる組は、1行の置き換え、末尾の改行の有無の変化、空行とUnicodeの文字、CRLF、複数のhunk、空のファイルからの作成と空のファイルへの削除などです。
-[[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Tests.lean][Tests.lean]] は期待する出力との比較に加えて、乱数で作った80組のテキストで、 =diff= のパッチを =render= と =parse= で往復させてから当てると新しいテキストになることを確かめています。
-
-leanspliceの動作は、これらのテストとGitとの差分テストで確かめています。
-
-** diffの作り方
-=diff= が使う [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L351-L387][editScript]] は、2つのテキストの先頭と末尾で一致する行を除いて、残った行の間でMyersの方法により最短の編集スクリプトを探します。
-追加と削除が合わせて64行を超えると探索をやめ、同じ行の出現を前から順に対にして、両側で順序が保たれる最長の対の列を残します。
-
-この方法は同じ行が何度も現れるテキストで比較を繰り返さずに済みますが、最短の編集スクリプトより大きいパッチを作ることがあります。
-テストでは、どちらの方法で作ったパッチも =apply= で元のテキストに当てると新しいテキストになることを確かめています。
-
-IssueやPRは大歓迎です。
-
 * Lean 4の警告についた修正をまとめて当てて、警告が減るものだけを残すlinterのLeankeelを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/488048
@@ -32642,6 +32478,371 @@ All the theorems in this post are about leanclove's Lean definitions, and I have
 
 In the post where I checked Clojure's core with Lean and differential testing, I copied small functions from Clojure's Java layer into Lean.
 leanclove takes the names and ideas of clojure.core and writes them as Lean functions, and it does not model Clojure's implementation.
+
+* 書かれた行番号どおりにだけパッチを当てるLean 4のunified diffライブラリleanspliceを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/cecb99
+:export_date: 2026-11-27 23:07
+:export_updated: 2026-11-27 23:07
+:export_tags: lean diff git differential-testing release lean-leansplice
+:export_draft: t
+:end:
+
+Lean 4でunified diffを生成し、パッチに書かれた行番号どおりにだけ適用するライブラリとCLIのleanspliceを作りました。
+=git apply= は行がずれたファイルでもhunkの位置を探して当てますが、leanspliceは行番号と中身が合わないパッチでは何も出力せずにエラーで終わります。
+
+リポジトリは [[https://github.com/conao3/lean-leansplice][conao3/lean-leansplice]] で、ライセンスはApache-2.0です。
+Lean 4.36.0の標準ライブラリだけで書いています。
+
+この記事はmainブランチのcommit [[https://github.com/conao3/lean-leansplice/commit/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb][86bef90]] をもとにしています。
+
+[[github:conao3/lean-leansplice::Lean][Unified diff parse, render, strict apply and diff generation for Lean 4]]
+
+** CLIでdiffを作って当てる
+CLIはNixで動かせて、READMEの冒頭にも =nix run= の例を載せています。
+
+[[./resources/public/img/cecb99-readme.png]]
+
+=nix shell= でleanspliceを =PATH= に入れて2つのファイルからパッチを作ります。
+
+#+begin_src console
+$ nix shell github:conao3/lean-leansplice
+$ printf 'apple\nbanana\ncherry\n' > old.txt
+$ printf 'apple\nblueberry\ncherry\n' > new.txt
+$ leansplice diff old.txt new.txt > change.patch
+$ cat change.patch
+--- a/file
++++ b/file
+@@ -1,3 +1,3 @@
+ apple
+-banana
++blueberry
+ cherry
+#+end_src
+
+=diff= はファイルの名前にかかわらずラベルを =a/file= と =b/file= にして、変更の前後に3行ずつ文脈を付けます。
+=apply= はパッチと元のファイルを受け取って当てた結果を標準出力に書き、元のファイルは書き換えません。
+
+#+begin_src console
+$ leansplice apply change.patch old.txt
+apple
+blueberry
+cherry
+#+end_src
+
+** 行がずれたパッチは当てない
+1から10までの行の =6= を =six= に変えるパッチを作り、先頭に =0= の行を足したファイルに当ててみます。
+
+#+begin_src console
+$ seq 1 10 > a.txt
+$ sed 's/^6$/six/' a.txt > b.txt
+$ leansplice diff a.txt b.txt > six.patch
+$ cat six.patch
+--- a/file
++++ b/file
+@@ -3,7 +3,7 @@
+ 3
+ 4
+ 5
+-6
++six
+ 7
+ 8
+ 9
+$ { echo 0; cat a.txt; } > file
+$ leansplice apply six.patch file; echo $?
+leansplice: hunk 1: source line 3 does not match
+1
+#+end_src
+
+パッチのhunkでは3行目が =3= になっていますが、ファイルの3行目は =2= なのでleanspliceは終了コード1で終わります。
+同じパッチを =git apply= に渡すと1行下でhunkを見つけて当てます。
+
+#+begin_src console
+$ git apply -v six.patch
+Checking patch file...
+Hunk #1 succeeded at 4 (offset 1 line).
+Applied patch file cleanly.
+#+end_src
+
+leanspliceの [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L210-L255][apply]] はhunkの古い側と新しい側の行番号、文脈と削除の行の中身、それぞれの行末に改行があるかを確かめ、1つでも合わなければエラーを返します。
+leanspliceはパッチに書かれた位置でだけhunkを照合するので、同じ行の並びがファイルの別の位置にあってもそこには当てません。
+
+** Leanのライブラリとして使う
+Lakeのプロジェクトから使うときは =lakefile.toml= にleanspliceを足して、Leanのバージョンをleanspliceと同じ4.36.0にします。
+
+#+begin_src toml
+[[require]]
+name = "leansplice"
+git = "https://github.com/conao3/lean-leansplice.git"
+rev = "main"
+#+end_src
+
+=Leansplice.diff= でパッチを作って =render= で文字列にし、 =parse= で読み戻してから =apply= で当てます。
+
+#+begin_src lean
+import Leansplice
+
+def patchText := Leansplice.render (Leansplice.diff "old\n" "new\n")
+
+def result : Except Leansplice.Error String := do
+  let patch ← Leansplice.parse patchText
+  Leansplice.apply patch "old\n"
+
+#eval result -- Except.ok "new\n"
+#+end_src
+
+=lake build= を実行すると =#eval= の結果として =Except.ok "new\n"= が出ます。
+ライブラリはファイルを読み書きせずに文字列を受け取り、結果の文字列か =Leansplice.Error= を返します。
+
+=diff= は近い変更を1つのhunkにまとめ、省略できる引数 =oldFile= 、 =newFile= 、 =context= を渡すとラベルと文脈の行数を変えられます。
+
+** 扱えるパッチ
+leanspliceが扱うのは1つのテキストファイルに対するパッチで、次の形を読めます。
+
+- =---= と =+++= のヘッダーとunifiedのhunk。前にGitの =diff --git= などの行が付いていても読む。
+- ファイル名の後にタブで続くタイムスタンプ。読むときに外す。
+- 行数が1のときに数を省いた =@@ -1 +1 @@= のような範囲。
+- Gitの =\ No newline at end of file= の印と行の中のCR。
+- =/dev/null= を相手にするGitの作成と削除のパッチ。空のテキストに当てる、または空のテキストを作る。
+
+バイナリや複数のファイル、名前の変更、モードの変更だけのパッチは範囲の外で、hunkの位置を探して当てる機能と3-way mergeも持っていません。
+
+** Gitと両方向に確かめる
+=make check= は =lake build= と =lake test= に続けて [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/scripts/git-differential.sh][scripts/git-differential.sh]] を実行します。
+このスクリプトは =git diff --no-index= が作ったパッチをleanspliceで当てる向きと、leanspliceが作ったパッチを =git apply= で当てる向きの両方で、結果を期待するファイルと =cmp= で比べます。
+
+#+begin_src console
+$ nix develop --command make check 2>&1 | grep -E '^(Leansplice|Git|CLI)'
+Leansplice golden and round-trip tests passed.
+Git interoperability: replacement
+Git interoperability: both-no-final-lf
+Git interoperability: add-final-lf
+Git interoperability: remove-final-lf
+Git interoperability: unterminated-context
+Git interoperability: blank-and-unicode
+Git interoperability: crlf
+Git interoperability: multiple-hunks
+Git interoperability: empty-source
+Git interoperability: empty-target
+Git interoperability: creation and deletion headers
+CLI reports stdout failure: diff
+CLI reports stdout failure: apply
+#+end_src
+
+比べる組は1行の置き換えや末尾の改行の有無の変化、空行とUnicodeの文字、CRLF、複数のhunk、空のファイルからの作成と空のファイルへの削除などです。
+
+テストの [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Tests.lean][Tests.lean]] は関数の結果を期待する値と比べ、乱数で作った80組のテキストでは =diff= のパッチを =render= と =parse= で往復させてから当てて、新しいテキストになることを確かめています。
+leanspliceの動作は、このテストとGitとの差分テストで確かめています。
+
+** diffの作り方
+=diff= が使う [[https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L351-L387][editScript]] は2つのテキストの先頭と末尾で一致する行を除いて、残った行についてMyersのアルゴリズムで最短の編集スクリプトを探します。
+追加と削除が合わせて64行を超えると探索をやめ、同じ行の出現を前から順に対にして、両側で順序の保たれる最も長い対の並びを残します。
+
+64行を超えたときの方法は同じ行が何度も現れるテキストで比較を繰り返さずに済みますが、最短の編集スクリプトより大きいパッチを作ることがあります。
+テストではどちらの方法で作ったパッチも =apply= で元のテキストに当てると新しいテキストになることを確かめています。
+
+IssueやPRは大歓迎です。
+
+* PLaMo翻訳でEmacsのマニュアルを日本語に訳すplamo-trとplamo-tr-poとemacs-docを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/29c4d6
+:export_date: 2026-11-27 23:03
+:export_updated: 2026-11-27 23:03
+:export_tags: emacs rust cli llm translation gettext release rust-plamo-tr rust-plamo-tr-po emacs-doc
+:export_draft: t
+:end:
+
+PLaMo翻訳をコマンドラインから呼ぶ =plamo-tr= とgettextのPOファイルをPLaMo翻訳で訳す =plamo-tr-po= を作り、この2つでGNU Emacsのマニュアルを日本語に機械翻訳したサイト[[https://emacs-doc.conao3.com]]を公開しました。
+
+=plamo-tr= が文章を訳し、 =plamo-tr-po= がPOファイルの項目を =plamo-tr= で訳して、emacs-docがEmacsのマニュアルからPOファイルを作って訳文のHTMLを組み立てます。
+このように3つに分けたので、Emacsのマニュアルが更新されたときは変わった段落だけを訳し直せます。
+
+リポジトリは[[https://github.com/conao3/rust-plamo-tr][conao3/rust-plamo-tr]]と[[https://github.com/conao3/rust-plamo-tr-po][conao3/rust-plamo-tr-po]]と[[https://github.com/conao3/emacs-doc][conao3/emacs-doc]]で、2つのコマンドのライセンスはApache-2.0です。
+emacs-docはマニュアルとその訳を原文と同じGFDL 1.3以降で、スクリプトと設定をApache-2.0で配布しています。
+
+どれも個人で作った非公式のツールで、Preferred NetworksやFree Software Foundationとは関係がありません。
+
+[[./resources/public/img/29c4d6-flow.svg]]
+
+[[github:conao3/rust-plamo-tr::Rust][Translate text from the command line with PLaMo Translate (unofficial)]]
+
+[[github:conao3/rust-plamo-tr-po::Rust][Translate gettext PO files with PLaMo Translate (unofficial)]]
+
+[[github:conao3/emacs-doc::Shell][Japanese machine translation of the GNU Emacs manuals with PLaMo Translate, served at emacs-doc.conao3.com]]
+
+** PLaMo翻訳をコマンドラインから呼ぶplamo-tr
+=plamo-tr= は[[https://translate.preferredai.jp/][PLaMo翻訳]]のブラウザ拡張と同じAPIを呼んで、訳文をJSONで出力するコマンドです。
+Nixがあればインストールせずに実行できます。
+
+#+begin_src console
+$ nix run github:conao3/rust-plamo-tr -- text translate-text \
+    --text "Emacs is the extensible, customizable, self-documenting real-time display editor."
+{
+  "TranslatedText": "Emacsは、拡張可能でカスタマイズでき、自己文書化されたリアルタイム表示エディタです。",
+  "SourceLanguageCode": null,
+  "TargetLanguageCode": "ja"
+}
+#+end_src
+
+訳文の言語を指定しなければ日本語の文は英語に訳し、それ以外の言語の文は日本語に訳します。
+標準入力から読むときは =--text file:///dev/stdin= と書き、訳文だけが欲しいときは出力のJSONを =jq= に渡します。
+
+#+begin_src console
+$ echo "Emacsのマニュアルを日本語で読めるようにしました。" \
+    | plamo-tr text translate-text --text file:///dev/stdin | jq -r .TranslatedText
+I've made the Emacs manual available in Japanese.
+#+end_src
+
+ログインにはPLaMo翻訳のWebアプリにログインしたブラウザから取り出したrefresh tokenを使うので、取り出し方と保存する場所を[[https://github.com/conao3/rust-plamo-tr#login][READMEのLogin]]に書いています。
+訳した文字数はプランのブラウザ拡張の枠に数えられます。
+
+コマンドの形は手元でPLaMo 3 Translateを動かす[[/blog/2026/33d2c2][plamo-tr-local]]と同じで、どちらも =text translate-text= に名前付きの引数を渡します。
+
+=plamo-tr= はRustのライブラリとしても使えて、 =plamo-tr-po= はこのライブラリの上に作りました。
+=Translator::translate_batch= は複数の文章を1回のリクエストで送ってHTMLのタグを保ったまま訳し、長く動かしているあいだもIDトークンを更新し直します。
+
+** POファイルを訳すplamo-tr-po
+gettextのPOファイルは原文の =msgid= と訳文の =msgstr= の組を項目として並べたファイルで、原文が変わると =msgmerge= がその項目に =fuzzy= のフラグを付けて訳し直しが要ることを示します。
+=plamo-tr-po= は未訳の項目と前に機械翻訳した =fuzzy= の項目をPLaMo翻訳で訳して、POファイルをその場で書き換えます。
+
+試しに、Emacsのマニュアルに似せた段落2つとコードブロック1つの項目を =msgstr= が空のまま並べた =sample.ja.po= を作って、 =plamo-tr-po= で訳してみました。
+
+#+begin_src console
+$ export PLAMO_AUTH_FILE=~/.config/plamo-tr/auth.json
+$ plamo-tr-po po-file translate-po-files --source-language en --format html \
+    --skip-context "<(pre|style|script)>" --po-files sample.ja.po
+2 distinct msgids in 2 entries to translate; 1 entries skipped by --skip-context; 0 fuzzy entries with a human translation left as is
+{
+  "PoFiles": [
+    "sample.ja.po"
+  ],
+  "DryRun": false,
+  "PendingMsgidCount": 2,
+  "PendingEntryCount": 2,
+  "SkippedEntryCount": 1,
+  "HumanFuzzyEntryCount": 0,
+  "TranslatedMsgidCount": 2,
+  "RejectedMsgidCount": 0
+}
+#+end_src
+
+=sample.ja.po= の3つの項目は次のようになりました。
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Visiting.html
+msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) and use the minibuffer to enter the name of the desired file."
+msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力し、ミニバッファを使用して目的のファイル名を入力してください。"
+
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+
+#. type: Content of: <html><body><pre>
+#: build/html/emacs/Visiting.html
+#, no-wrap
+msgid "C-x C-f test.emacs <kbd class=\"key\">RET</kbd>\n"
+msgstr ""
+#+end_src
+
+訳した項目には =# Machine-translated by PLaMo Translate.= のコメントが付き、 =<kbd>= と =<code>= の中身は英語のままです。
+=--format html= を付けると =code= や =kbd= などの要素を =<x-N/>= の形の文字列に置き換えて送り、訳文が返ってきてから元に戻すからです。
+
+そのほかのタグの組が原文と変わった訳は捨ててその項目だけを1件ずつ訳し直し、それでも変わるときは未訳のまま残します。
+=<pre>= から取り出した3つ目の項目は =#.= のコメントが =--skip-context= の正規表現に合ったので訳していません。
+
+** 原文が変わった項目と手で直した訳
+=fuzzy= になった項目のうち =plamo-tr-po= が訳し直すのは =# Machine-translated by PLaMo Translate.= のコメントがあるものだけです。
+コメントの無い =fuzzy= の項目は人が書いた訳なので、書き換えずに人の確認を待ちます。
+
+次の =update.ja.po= には原文が変わった項目が2つあり、1つ目は機械翻訳の訳を、2つ目は手で書いた訳を持っています。
+=#|= の行は =msgmerge --previous= が残した前の原文です。
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer."
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は現在のバッファを保存します。"
+
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x s</kbd> saves any buffers."
+msgid "<kbd class=\"kbd\">C-x s</kbd> saves any or all modified buffers."
+msgstr "<kbd class=\"kbd\">C-x s</kbd> でバッファを保存します。"
+#+end_src
+
+#+begin_src console
+$ plamo-tr-po po-file translate-po-files --source-language en --format html \
+    --po-files update.ja.po > /dev/null
+1 distinct msgids in 1 entries to translate; 0 entries skipped by --skip-context; 1 fuzzy entries with a human translation left as is
+#+end_src
+
+訳し直したのは1つ目の項目だけで、 =fuzzy= のフラグと前の原文の行が消えています。
+手で書いた2つ目の項目は =fuzzy= のまま残りました。
+
+#+begin_src po
+# Machine-translated by PLaMo Translate.
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+
+#. type: Content of: <html><body><p>
+#: build/html/emacs/Saving.html
+#, fuzzy
+#| msgid "<kbd class=\"kbd\">C-x s</kbd> saves any buffers."
+msgid "<kbd class=\"kbd\">C-x s</kbd> saves any or all modified buffers."
+msgstr "<kbd class=\"kbd\">C-x s</kbd> でバッファを保存します。"
+#+end_src
+
+機械翻訳の訳を手で直したときは、その項目のコメントの行を消しておくと =plamo-tr-po= がその訳を書き換えません。
+
+** Emacsのマニュアルを日本語に訳すemacs-doc
+emacs-docは[[https://github.com/emacs-mirror/emacs][Emacs]]のmasterブランチにあるマニュアルを日本語に訳して、[[https://emacs-doc.conao3.com]]で公開しています。
+訳しているのはGNU Emacs ManualとGNU Emacs Lisp Reference ManualとAn Introduction to Programming in Emacs Lispの3冊です。
+
+どのページにも機械翻訳であることとgnu.orgの原文のページへのリンクを載せています。
+
+[[./resources/public/img/29c4d6-visiting.png]]
+
+emacs-docは文書の段落をPOファイルに取り出して訳文の文書を作り直す[[https://po4a.org/][po4a]]でマニュアルを扱っています。
+サイトは =make= のターゲットを次の順に実行して作ります。
+
+1. =make fetch-latest= でEmacsのmasterの =doc= ディレクトリを取り出し、そのcommitを =EMACS_REVISION= に書きます。
+2. =make html= で =makeinfo --html= がマニュアルを、ノードごとのページと1冊を1ページにまとめたページの2通りのHTMLにします。
+3. =make pot= でpo4aがHTMLの段落を =po/<マニュアル>.ja.po= に取り出し、 =msgmerge --previous= で前のPOファイルと合わせます。原文が変わった段落は =fuzzy= に、新しい段落は未訳になります。
+4. =make translate= で =plamo-tr-po= が未訳の項目と機械翻訳の =fuzzy= の項目を訳します。
+5. =make site= でpo4aが =--keep 0= で訳文のHTMLを書き出し、各ページに原文へのリンクを足します。訳の無い段落は英語のまま表示されます。
+
+この記事を書いた時点ではEmacsの[[https://github.com/emacs-mirror/emacs/commit/e9429a2db33d5ef8c1195956d80639a1ae490435][e9429a2db3]]のマニュアルを訳していて、 =make stats= で数えた項目の数は次のとおりです。
+
+#+begin_src console
+$ make -s stats
+emacs: 38083 translated messages, 4 fuzzy translations, 491 untranslated messages.
+elisp: 52191 translated messages, 6 fuzzy translations, 2377 untranslated messages.
+eintr: 6808 translated messages, 1 fuzzy translation, 784 untranslated messages.
+#+end_src
+
+未訳の項目のうちemacsの445件とelispの2,278件とeintrの769件は =<pre>= などから取り出したコードの項目で、 =--skip-context= で訳さないようにしています。
+残りの未訳はemacsが46件、elispが99件、eintrが15件です。
+
+GitHub Actionsの =Update= のworkflowを手で起動すると、Emacsのmasterを取り込んでPOファイルを合わせてサイトを作り直します。
+新しい段落と原文が変わった段落は手元で =make translate= を実行してPOファイルをpushし、 =Update= をもう一度起動するまで英語のまま表示されます。
+
+デプロイはCloudflareのWorkers Buildsがmasterへのpushのたびに行うので、リポジトリにはCloudflareのAPIトークンを置いていません。
+仕組みは[[/blog/2026/12e5f6][APIトークンを持たずにGitHub ActionsのビルドをCloudflare Workersへデプロイする]]の記事に書きました。
+
+** おわりに
+=plamo-tr= で文章を訳し、 =plamo-tr-po= でPOファイルの項目を訳して、emacs-docでマニュアルとPOファイルを行き来するように分けたので、Emacsのmasterが進んでも変わった段落だけをPLaMo翻訳に送れます。
+訳を手で直した項目は =plamo-tr-po= が書き換えないので、機械翻訳の訳を少しずつ人の訳に置き換えていけます。
 
 * COMMENT Local variables
 # Local Variables:

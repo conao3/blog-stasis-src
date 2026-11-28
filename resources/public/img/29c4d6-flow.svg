@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="390" viewBox="0 0 1080 390" font-family="'Noto Sans JP', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1080" height="390" rx="16" fill="#fff"/>
+  <rect x="6" y="12" width="1068" height="196" rx="12" fill="#f4f6f8" stroke="#8a96a3" stroke-dasharray="6 4"/>
+  <text x="22" y="44" font-size="21" font-weight="bold" fill="#333">emacs-doc</text>
+  <rect x="16" y="78" width="180" height="100" rx="10" fill="#fdf5e8" stroke="#c48a2c"/>
+  <text x="106.0" y="122.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">Emacsのmaster</text>
+  <text x="106.0" y="152.0" font-size="17" fill="#333" text-anchor="middle">Texinfo</text>
+  <rect x="233" y="78" width="180" height="100" rx="10" fill="#fff" stroke="#8a96a3"/>
+  <text x="323.0" y="122.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">makeinfo</text>
+  <text x="323.0" y="152.0" font-size="17" fill="#333" text-anchor="middle">HTML</text>
+  <rect x="450" y="78" width="180" height="100" rx="10" fill="#eef3fb" stroke="#5b7fb8"/>
+  <text x="540.0" y="122.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">po4a</text>
+  <text x="540.0" y="152.0" font-size="17" fill="#333" text-anchor="middle">po/*.ja.po</text>
+  <rect x="667" y="78" width="180" height="100" rx="10" fill="#fff" stroke="#8a96a3"/>
+  <text x="757.0" y="122.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">po4a --keep 0</text>
+  <text x="757.0" y="152.0" font-size="17" fill="#333" text-anchor="middle">訳文のHTML</text>
+  <rect x="884" y="78" width="180" height="100" rx="10" fill="#eef8f1" stroke="#4f9a68"/>
+  <text x="974.0" y="122.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">サイト</text>
+  <text x="974.0" y="152.0" font-size="17" fill="#333" text-anchor="middle">Workers</text>
+  <line x1="196" y1="128" x2="229" y2="128" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="413" y1="128" x2="446" y2="128" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="630" y1="128" x2="663" y2="128" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="847" y1="128" x2="880" y2="128" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="450" y="270" width="180" height="100" rx="10" fill="#eef3fb" stroke="#5b7fb8"/>
+  <text x="540.0" y="314.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">plamo-tr-po</text>
+  <text x="540.0" y="344.0" font-size="17" fill="#333" text-anchor="middle">POの項目を訳す</text>
+  <rect x="667" y="270" width="180" height="100" rx="10" fill="#eef3fb" stroke="#5b7fb8"/>
+  <text x="757.0" y="314.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">plamo-tr</text>
+  <text x="757.0" y="344.0" font-size="17" fill="#333" text-anchor="middle">ライブラリ</text>
+  <rect x="884" y="270" width="180" height="100" rx="10" fill="#fdf5e8" stroke="#c48a2c"/>
+  <text x="974.0" y="314.0" font-size="19" font-weight="bold" fill="#333" text-anchor="middle">PLaMo翻訳</text>
+  <text x="974.0" y="344.0" font-size="17" fill="#333" text-anchor="middle">API</text>
+  <line x1="634" y1="320" x2="663" y2="320" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="851" y1="320" x2="880" y2="320" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500.0" y1="178" x2="500.0" y2="266" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="580.0" y1="270" x2="580.0" y2="182" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="490.0" y="244.0" font-size="17" fill="#333" text-anchor="end">未訳とfuzzyの項目</text>
+  <text x="590.0" y="244.0" font-size="17" fill="#333">訳文</text>
+</svg>
