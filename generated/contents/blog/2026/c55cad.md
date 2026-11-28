@@ -75,7 +75,7 @@ READMEの表は関数を6つの分野に分けて、それぞれで証明して�
 
 ![img](../../../../resources/public/img/c55cad-functions.png)
 
-公開している定理は50個で、 `rfl` で済むものが10個、Leanの標準ライブラリの補題を言い換えたものが25個、短い `simp` で済むものが6個です。
+公開している定理は50個で、 `rfl` で済むものが10個、Leanの標準ライブラリの補題を言い換えたものが25個、数行のタクティクで済むものが6個です。
 `flatten_partitionAll` 、 `length_interleave` 、 `nodup_distinct` 、 `dedupe_sublist` 、 `length_iterate` 、 `get_selectKeys` 、 `getD_groupBy` 、 `getD_frequencies` 、 `sum_frequencies` の9個を帰納法などでleancloveの中で証明しています。
 
 ```lean
@@ -92,7 +92,9 @@ theorem sum_frequencies [LawfulBEq α] (xs : List α) :
 ```
 
 チートシートでは `distinct` の結果を「後ろの要素が前の要素と等しくない列」、 `group-by` の値を「 `f` の値が同じ要素の列」、 `frequencies` の値を「その要素が現れる回数」として式で書きました。
-leancloveの `nodup_distinct` と `getD_groupBy` と `getD_frequencies` は同じ関係をLeanの定理として証明していて、 `getD_groupBy` はグループの中の順序が元のリストと同じであることまで言っています。
+leancloveの `getD_groupBy` と `getD_frequencies` は、 `group-by` と `frequencies` の行と同じ関係をLeanの定理として証明していて、 `getD_groupBy` はグループの中の順序が元のリストと同じであることまで言っています。
+
+`distinct` については、結果に重複が無いことを `nodup_distinct` で、元のリストと同じ要素を持つことを `mem_distinct` で証明していて、どの出現を残すかと順序は定理に入っていません。
 
 
 # Clojureとの違い
