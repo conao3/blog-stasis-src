@@ -33474,13 +33474,13 @@ T3 Code GPUIはT3 Codeの開発元とは関係のない非公式のプロジェ�
 デスクトップアプリはElectronで作られているので、T3 Code GPUIではその画面をRustで書き、サーバーは本家のものをそのまま使うことにしました。
 画面はZedエディタのUIフレームワークの[[https://github.com/zed-industries/zed/tree/main/crates/gpui][GPUI]]で描いていて、ボタンや入力欄などの部品には[[https://github.com/longbridge/gpui-kit][gpui-kit]]を使っています。
 
-下の画像は、一時的に立てた =t3 serve= にT3 Code GPUIでつなぎ、新しいスレッドで2回話しかけたところです。
+下の画像は一時的に立てた =t3 serve= にT3 Code GPUIでつなぎ、新しいスレッドで2回話しかけたところです。
 左がスレッドの一覧、中央が返答のタイムラインと送信欄、右がGitのブランチや変更を示すパネルです。
 ホスト名などの表示は塗りつぶしています。
 
 [[./resources/public/img/ed26d1-window.png]]
 
-本家の画面にある機能は、順に移している途中です。
+本家の画面にある機能は順に移している途中です。
 
 ** 入れ方とつなぎ方
 Nixのflakeにしてあるので、Linuxでは次のコマンドで窓が開きます。
@@ -33495,7 +33495,7 @@ $ nix run github:conao3/rust-t3code-gpui
 $ t3 auth session issue --ttl 365d --label t3code-gpui --token-only
 #+end_src
 
-発行したトークンは、サーバーのURLと名前と一緒に =~/.config/t3code-gpui/environments.json= に書きます。
+発行したトークンはサーバーのURLと名前と一緒に =~/.config/t3code-gpui/environments.json= に書きます。
 このファイルは自分以外のユーザーが読める権限だとT3 Code GPUIが読み込みを断るので、modeを600にしておきます。
 
 #+begin_src json
@@ -33540,7 +33540,7 @@ T3 Codeのサーバーは、エージェントが返答を書いている間、�
 T3 Code GPUIは届いた更新をすぐ手元の状態に入れますが、描き直しは[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/app.rs#L108][250ミリ秒]]に1回にまとめます。
 その間に届いた更新は最新のものだけが画面に出ます。
 
-返答の本文は、[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][1,200バイトほどたまるごとにコードブロックの外の空行で区切り]]、区切った塊をタイムラインの別の行にしています。
+返答の本文は[[https://github.com/conao3/rust-t3code-gpui/blob/d5cfde166d3b47a036a587e88ef74b29ee783747/crates/t3code-gpui/src/timeline.rs#L203-L224][1,200バイトほどたまるごとにコードブロックの外の空行で区切り]]、区切った塊をタイムラインの別の行にしています。
 書き終わった塊は中身が変わらないので、返答が伸びている間に組み直すのは末尾の塊だけになります。
 
 X11では画面の垂直同期を待たずにフレームを出すようにGPUIに手を入れてあり、描画の間もキー入力が遅れません。
