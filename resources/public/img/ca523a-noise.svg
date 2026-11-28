@@ -64,7 +64,7 @@
 <circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
 <circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
 <circle cx="890.2" cy="380" r="9" fill="#4a7fb5" fill-opacity="0.6" stroke="#4a7fb5" stroke-width="1.2"/>
-<text x="910.2" y="386" font-size="15" fill="#222">113,455 in all 8 runs</text>
+<text x="870.2" y="386" font-size="15" fill="#222" text-anchor="end">113,455 in all 8 runs</text>
 <text x="234" y="431" font-size="15" fill="#444" text-anchor="end">With load</text>
 <circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
 <circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
@@ -74,5 +74,5 @@
 <circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
 <circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
 <circle cx="890.2" cy="425" r="9" fill="#d9622b" fill-opacity="0.6" stroke="#d9622b" stroke-width="1.2"/>
-<text x="910.2" y="431" font-size="15" fill="#222">113,455 in all 8 runs</text>
+<text x="870.2" y="431" font-size="15" fill="#222" text-anchor="end">113,455 in all 8 runs</text>
 </svg>

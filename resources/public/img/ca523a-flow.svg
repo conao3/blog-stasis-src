@@ -25,5 +25,5 @@
 <text x="915.0" y="362" font-size="15" fill="#444" text-anchor="middle">Position, runs, and share</text>
 <line x1="260" y1="356.0" x2="328" y2="356.0" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
 <line x1="670" y1="356.0" x2="758" y2="356.0" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M915,190 V228 H145 V294" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M915,190 V228 H175 V294" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
 </svg>
