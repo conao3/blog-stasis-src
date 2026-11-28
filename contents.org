@@ -26629,17 +26629,17 @@ The laptop sleeps while I carry it around, so the management server resends unde
 The management server claims the tasks for a PC that was asleep together once it wakes up.
 
 ** Restarting the management server
-The management server is installed as part of the NixOS configuration of helios, so applying a configuration change also restarts it.
+I install the management server as part of the NixOS configuration of helios, so applying a configuration change also restarts it.
 It writes a file for each task that records which thread runs the task, and when it starts, it reads these files and goes back to waiting for the running threads' turns to end.
 
 The worker threads run in T3 Code and bb processes separate from the management server, so the work goes on while the management server is down.
 That means I can apply the NixOS configuration at any time, even while tasks are running.
 
 ** Using it
-In the two days up to the time of writing, I put 78 tasks on the Board, and 67 of them were completed.
+In a little under two days up to the time of writing, I put 78 tasks on the Board, and 67 of them were completed.
 
 In one job, I ran 20 of my Emacs packages through the checks of [[https://github.com/conao3/ts-elispore][ts-elispore]], which tests whether a package follows the rules of the MELPA package archive, and the conductor put 20 tasks on the Board, one per package, in 76 seconds.
-With at most 4 tasks running at once, all of them were completed 54 minutes after the first task went on the Board.
+With at most 4 tasks running at once, all of them finished 54 minutes after the first task went on the Board.
 
 The work times of the tasks added up to 105 minutes, and because they ran in parallel, the job finished in about half that time.
 
@@ -27319,7 +27319,7 @@ App\Calc\clamp [refines] failed (seed=1, input=[0, 0, 0]): implementation return
 The Lean theorems guarantee properties of the functions written in Lean and of the Lean models translated from PHP.
 For those properties to hold when the generated PHP or the original PHP runs, the converter, the runtime, and the model of PHP's operations must be correct, and I check these parts with tests.
 
-Integer operations in PHP are checked within the 64-bit range, and a calculation that overflows into a float fails in the model too.
+leanfran checks integer operations in PHP within the 64-bit range, and a calculation that overflows into a float fails in the model too.
 In a function with =#[Model(...)]=, ranges such as =int<0, 100>= in the PHPDoc of the arguments are not assumptions for the proof, so write the conditions the proof uses in =requires=.
 
 leanfran can translate a subset of PHP: it handles =foreach=, =match=, list indexing, =readonly= classes, and =enum=, but not pass-by-reference, =??=, or functions that do input and output.
