@@ -3,12 +3,12 @@
     {
       "ja": "Lean と形式検証",
       "en": "Lean and formal verification",
-      "nodes": ["lean-leanfran", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-leanassay", "rust-leanwisp", "lean-todo-app"]
+      "nodes": ["lean-leanfran", "lean-ritsuryo", "rust-ritsuryo", "rust-leansail", "rust-lsp-touchstone", "lean-leanassay", "rust-leanwisp", "lean-todo-app", "rust-ritsulint", "rust-leanwake", "rust-leankeel", "lean-leangage", "lean-leanclove", "lean-leansplice", "lean-abcbound"]
     },
     {
       "ja": "Emacs",
       "en": "Emacs",
-      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "feather.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el"]
+      "nodes": ["leaf.el", "leaf-keywords.el", "leaf-tree.el", "leaf-convert.el", "feather.el", "keg.el", "leaner-ts-mode.el", "cort.el", "ppp.el", "ts-elispore", "eglot-lsp-settings.el", "vow.el"]
     },
     {
       "ja": "翻訳と文書",
@@ -18,12 +18,12 @@
     {
       "ja": "AWS とサーバー",
       "en": "AWS and servers",
-      "nodes": ["wasm-wasmo", "bun-bunsai", "rust-awscli", "rust-sqs-poller", "ts-apollo-server-integration-hono", "lambda-helper.ts"]
+      "nodes": ["wasm-wasmo", "bun-bunsai", "rust-awscli", "rust-sqs-poller", "ts-apollo-server-integration-hono", "lambda-helper.ts", "rust-rusuna"]
     },
     {
       "ja": "エージェントと開発環境",
       "en": "Agents and development environments",
-      "nodes": ["nix-sel4", "nix-sel4-example", "nix-agents", "rust-relaykit", "rust-inspect-jsonl", "rust-outbound-manifest", "rust-document-packet", "rust-devo"]
+      "nodes": ["nix-sel4", "nix-sel4-example", "nix-agents", "rust-relaykit", "rust-inspect-jsonl", "rust-outbound-manifest", "rust-document-packet", "rust-devo", "rust-sellaite", "rust-vug", "gh-lookout", "ts-payproof"]
     }
   ],
   "nodes": {
@@ -67,7 +67,20 @@
     "rust-inspect-jsonl": ["Claude と Codex のセッションログを調べる", "Inspect Claude and Codex session logs"],
     "rust-outbound-manifest": ["送信前のメッセージと添付を承認と照らして検査", "Check outbound messages against sealed approvals"],
     "rust-document-packet": ["PDF の検査・重ね書き・生成を JSON で再現", "Reproducible PDF checks, overlays and rendering"],
-    "rust-devo": ["小さな DSL から tmux の開発環境を起動", "Run tmux development workflows from a small DSL"]
+    "rust-devo": ["小さな DSL から tmux の開発環境を起動", "Run tmux development workflows from a small DSL"],
+    "rust-ritsulint": ["日本の法令の文面の食い違いを見つける linter", "Linter for Japanese statutes from e-Gov law XML"],
+    "rust-leanwake": ["Lean の遅い証明と時間を使う tactic を探す", "Find slow Lean proofs and the tactics behind them"],
+    "rust-leankeel": ["Lean が出す修正案を適用して確かめる linter", "Lean linter that applies Lean's suggested fixes"],
+    "lean-leangage": ["Lean で証明した関数を中核に Web サービスを作る", "Web services built on a kernel proved in Lean"],
+    "lean-leanclove": ["clojure.core 相当の関数を証明付きで Lean 4 に", "clojure.core functions for Lean 4, with proofs"],
+    "lean-leansplice": ["unified diff を解析・適用する Lean のライブラリ", "Parse, apply and generate unified diffs in Lean"],
+    "lean-abcbound": ["abc 予想を Mathlib の上で Lean 4 に記述", "The abc conjecture stated in Lean 4 with Mathlib"],
+    "vow.el": ["Emacs Lisp の Promise と async/await", "Promises/A+ and async/await for Emacs Lisp"],
+    "rust-rusuna": ["GraphQL を 1 本の SQL にする Rust のライブラリ", "Hasura-style GraphQL engine as a Rust library"],
+    "rust-sellaite": ["AI エージェントに専用のデスクトップとカーソルを渡す", "Own desktop and cursor for computer-use agents"],
+    "rust-vug": ["TOML の宣言で組むパッケージマネージャー", "Declarative package manager and system builder"],
+    "gh-lookout": ["GitHub の webhook で CI を待つエージェントを起こす", "Wake agents waiting for CI with GitHub webhooks"],
+    "ts-payproof": ["監査できる建設業向けの請求書処理エージェント", "Auditable invoice agent for construction businesses"]
   },
   "edges": [
     ["rust-ritsuryo", "lean-leanfran", "Rust の生成に利用", "generates Rust with"],
@@ -84,6 +97,10 @@
     ["leaner-ts-mode.el", "keg.el", "開発に利用", "develops with"],
     ["rust-plamo-tr-po", "rust-plamo-tr", "翻訳に利用", "translates with"],
     ["emacs-doc", "rust-plamo-tr-po", "マニュアルの翻訳に利用", "translates the manuals with"],
-    ["nix-sel4-example", "nix-sel4", "ビルドに利用", "builds with"]
+    ["nix-sel4-example", "nix-sel4", "ビルドに利用", "builds with"],
+    ["rust-ritsulint", "lean-leanfran", "Rust の生成に利用", "generates Rust with"],
+    ["rust-leankeel", "lean-leanfran", "規則の生成に利用", "generates rules with"],
+    ["lean-leangage", "lean-leanfran", "コードの生成に利用", "generates code with"],
+    ["vow.el", "keg.el", "開発に利用", "develops with"]
   ]
 }

@@ -1,6 +1,6 @@
 # Portfolio project map
 
-The English and Japanese portfolio pages include a map of 41 open-source projects and 15 relationships, placed after the open-source list. It adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
+The English and Japanese portfolio pages include a map of 54 open-source projects and 19 relationships, placed after the open-source list. It adds published projects beyond the resume's selected highlights; it does not change employment or personal information.
 
 ## Data and layout
 
