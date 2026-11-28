@@ -35723,7 +35723,7 @@ abc予想は整数論の未解決の予想で、その主張をLean 4とMathlib�
 予想そのものはまだ証明されていないので、lean-abcboundにあるのは予想の命題 =Abc.ABCConjecture= と、命題の書き方について述べた定理です。
 
 Leanのカーネルが確かめるのは証明が命題の証明になっていることだけなので、命題が予想を正しく写しているかは人が読んで判断します。
-lean-abcboundの定理は命題の仮定を外すと偽になることや別の書き方の命題と同値になることを示していて、この判断の材料になります。
+lean-abcboundの定理は、命題から互いに素の仮定を外すと偽になることと、命題が別の書き方の命題と同値になることを示していて、この判断の材料になります。
 
 ライセンスはApache-2.0で、LeanとMathlibはどちらもv4.35.0を使います。
 この記事のコードと出力は、この記事を書いた時点のmasterの [[https://github.com/conao3/lean-abcbound/commit/8ed08da1fac8268b64014e155874b91263acbad3][8ed08da]] のものです。
@@ -35736,8 +35736,7 @@ abc予想は $a + b = c$ を満たす互いに素な正の整数について $c$
 
 [[./resources/public/img/2f5c9f-banner.png]]
 
-このように $c$ が $\mathrm{rad}(abc)$ より大きくなる組はいくらでもあります。
-予想はどんな $\varepsilon > 0$ にも定数 $K$ があってすべての組で $c < K \cdot \mathrm{rad}(abc)^{1+\varepsilon}$ が成り立つと述べていて、lean-abcboundではこの主張を [[https://github.com/conao3/lean-abcbound/blob/8ed08da1fac8268b64014e155874b91263acbad3/Abc/Statement.lean#L12-L18][Abc/Statement.lean]] に次のように書いています。
+どんな $\varepsilon > 0$ にも定数 $K$ があってすべての組で $c < K \cdot \mathrm{rad}(abc)^{1+\varepsilon}$ が成り立つというのが予想の主張で、lean-abcboundでは [[https://github.com/conao3/lean-abcbound/blob/8ed08da1fac8268b64014e155874b91263acbad3/Abc/Statement.lean#L12-L18][Abc/Statement.lean]] に次のように書いています。
 
 #+begin_src lean
 def rad (n : ℕ) : ℕ := ∏ p ∈ n.primeFactors, p
@@ -35859,7 +35858,7 @@ The abc conjecture is an open problem in number theory, and I made [[https://git
 Since the conjecture is still open, lean-abcbound holds the proposition =Abc.ABCConjecture= and theorems about how that proposition is written.
 
 Lean's kernel checks only that a proof is a proof of the proposition it claims, so whether the proposition matches the conjecture is something people decide by reading it.
-The theorems in lean-abcbound show that the proposition becomes false when you drop one of its hypotheses and that it is equivalent to the conjecture written in other forms, and they are the material for that decision.
+The theorems in lean-abcbound show that the proposition becomes false when you drop its coprimality hypothesis and that it is equivalent to the conjecture written in other forms, and they are the material for that decision.
 
 The license is Apache-2.0, and the repository uses Lean v4.35.0 and Mathlib v4.35.0.
 The code and output in this post come from [[https://github.com/conao3/lean-abcbound/commit/8ed08da1fac8268b64014e155874b91263acbad3][8ed08da]], the master branch at the time of writing.
@@ -35872,7 +35871,6 @@ The abc conjecture compares $c$ with $\mathrm{rad}(abc)$ for coprime positive in
 
 [[./resources/public/img/2f5c9f-banner.png]]
 
-There are infinitely many triples like this one where $c$ is larger than $\mathrm{rad}(abc)$.
 The conjecture says that for every $\varepsilon > 0$ there is a constant $K$ such that $c < K \cdot \mathrm{rad}(abc)^{1+\varepsilon}$ holds for every triple, and lean-abcbound writes this statement in [[https://github.com/conao3/lean-abcbound/blob/8ed08da1fac8268b64014e155874b91263acbad3/Abc/Statement.lean#L12-L18][Abc/Statement.lean]] as follows.
 
 #+begin_src lean
