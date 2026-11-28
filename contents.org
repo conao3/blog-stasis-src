@@ -22667,7 +22667,7 @@ I left out leanwisp's =key=, which builds cache keys, because =fields=, the func
 I left out leanwisp's four constants for the exit codes and the minimum and maximum line width as well, since a theorem about one of them would restate its value.
 
 ritsuryo's =describe=, which returns the list of commands, has no theorems.
-In ritsulint, =analyze=, which finds the provisions that the read-as clauses of a statute name, and =relativeRefs=, which finds references by position, have no theorems either, and I check the output of these three with tests.
+In ritsulint, =analyze=, which finds the provisions each read-as clause refers to, and =relativeRefs=, which finds references by position, have no theorems either, and I check the output of these three with tests.
 
 Before the audit, leanwisp had 17 holes and leansail had 39, and no theorem mentioned 7 of the audited functions in ritsulint, 5 in ritsuryo, 3 in leanwisp, and 1 in leankeel.
 
