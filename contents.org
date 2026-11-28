@@ -24237,6 +24237,200 @@ leanwisp --output text source format-source --source file:///dev/stdin
 Mathlibで確かめたのは31ファイルで、残りのファイルには掛けていません。
 対応しているのはLean 4.35.0です。
 
+* leanwisp: a Lean 4 formatter that reads your code with Lean's own parser
+:properties:
+:export_file_name: generated/contents/blog/2026/184d80
+:export_date: 2026-11-27 19:28
+:export_updated: 2026-11-27 19:28
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/d60a7d
+:export_tags: lean rust mathlib parser release rust-leanwisp
+:end:
+
+I wrote leanwisp, a code formatter for Lean 4.
+It reads your code with Lean's own parser and lays out the document that Lean's formatter builds in the shape I chose from the Lean standard library and Mathlib style guides.
+
+leanwisp parses the formatted result with Lean again and checks, command by command, that the syntax tree and the comments match the original and that a second pass changes nothing.
+I ran it on 31 files from Mathlib, and every file still compiled after formatting, with Mathlib's own style linter reporting 0 warnings before and after.
+
+The repository is [[https://github.com/conao3/rust-leanwisp][conao3/rust-leanwisp]], under the Apache-2.0 license.
+I got the results in this post with Lean 4.35.0 and leanwisp 0.3.0.
+
+[[github:conao3/rust-leanwisp::Rust][A parser-aware Lean 4 source formatter with a Rust layout engine]]
+
+** A formatting example
+Here is an example with messy spaces and line breaks.
+
+#+begin_src lean
+@[simp]
+theorem double_eq(n:Nat):2*n=n+n:=by
+     omega
+structure Point where
+  x : Nat
+  y : Nat
+instance:Add Point where add a b:={x:=a.x+b.x,y:=a.y+b.y}
+def sumTo (n : Nat) : Nat := Id.run do
+    let mut acc := 0
+    for i in [0:n+1] do
+        acc := acc + i
+    return acc
+#+end_src
+
+=leanwisp source format-source= turns it into this.
+
+#+begin_src lean
+@[simp] theorem double_eq (n : Nat) : 2 * n = n + n := by omega
+structure Point where
+  x : Nat
+  y : Nat
+instance : Add Point where
+  add a b := { x := a.x + b.x, y := a.y + b.y }
+def sumTo (n : Nat) : Nat := Id.run do
+  let mut acc := 0
+  for i in [0:n + 1] do
+    acc := acc + i
+  return acc
+#+end_src
+
+leanwisp put spaces around =:= and the operators, and the theorem fits on one line, so it shares that line with its attribute.
+The =instance= field moved to the line after =where=, and the =do= block sits two columns in from the start of the declaration.
+
+For a command that passes the checks, the syntax and the line width alone decide the output, so different line breaks in the input give the same result.
+The input still decides two things: whether declarations have zero or one blank line between them, and the output for commands that fail the checks I describe later.
+
+** Why leanwisp uses Lean's own parser
+A Lean file can add new notation, and code later in the file can use notation added with =notation=, =syntax=, or =macro= right away.
+Modules you =import= can add notation too.
+
+Most of Mathlib is written in such notation, so a separate parser with a fixed grammar misreads that code.
+
+leanwisp reads one command at a time with Lean's own parser.
+It elaborates only the commands that add notation, so Lean can read the following commands with that notation, and it doesn't run proofs or =#eval=.
+
+#+begin_src lean
+infixl:65 " +++ " => Nat.add
+#eval (3: Nat)+++4
+#+end_src
+
+In this example, leanwisp loads the notation on the first line before it formats the second, which becomes =#eval (3 : Nat) +++ 4=.
+
+[[./resources/public/img/d60a7d-pipeline.svg]]
+
+Two layers do the formatting: a Lean adapter and a Rust renderer.
+The adapter, written in Lean, calls the formatter that Lean registers for each syntax and builds a document of line-break candidates and indentation, and the Rust renderer lays that document out to fit the line width.
+
+** The layout I chose from the style guides
+If you lay out the document from Lean's formatter as it is, some places differ from the code in Mathlib; for example, the document always breaks the line after =:==, even in a short definition.
+leanwisp replaces line-break candidates in the document to follow Lean's [[https://github.com/leanprover/lean4/blob/master/doc/std/style.md][standard library style guide]] and the [[https://mathlib.org/contribute/style.html][Mathlib style guide]] before it lays the document out.
+
+- A line holds [[https://mathlib.org/contribute/style.html#line-length][at most 100 characters]].
+- When a declaration's signature doesn't fit, =:= goes at the end of the line and [[https://mathlib.org/contribute/style.html#structuring-definitions-and-theorems][the continuation lines get 4 columns of indentation]].
+- The body goes on the =:== line when it fits, and on the next line with 2 columns of indentation when it doesn't.
+- =by= and =do= go at the end of the line, and the block sits 2 columns in from the start of the declaration.
+- The [[https://mathlib.org/contribute/style.html#instances][fields of an instance]] in =instance ... where= go one per line on the following lines.
+
+Where both guides allow either style, I picked one.
+An attribute goes on the same line when the whole declaration fits on one line and on its own line otherwise, and leanwisp keeps zero or one blank line between declarations and turns two or more into one.
+
+** Checks that keep formatting from breaking code
+Indentation and line breaks change meaning in Lean, so moving one line break can make Lean read the code as a different term or fail to parse it.
+
+leanwisp parses the formatted result with Lean again and checks that the syntax tree matches the original, that the comments match the original in content and order, and that formatting again gives the same result.
+
+If any check fails, leanwisp finds the command that doesn't match and first tries keeping the original line breaks while it fixes the spaces and indentation inside each line.
+If that still fails, it leaves that one command as it was and keeps the rest of the file formatted.
+
+For syntax that has no formatter in Lean, leanwisp also leaves the command as it was.
+
+#+begin_src lean
+syntax "twice! " term : term
+macro_rules
+  | `(twice! $x) => `($x + $x)
+def four:Nat:=twice! 2
+#+end_src
+
+Lean has no formatter for the =$x= inside =macro_rules=, so the =macro_rules= command stays as it was, and leanwisp formats the following =def four= into =def four : Nat := twice! 2=.
+For each kept command, leanwisp prints the line number and the reason.
+
+#+begin_src text
+Twice.lean:2: kept source: Unknown constant `term.pseudo.antiquot`
+#+end_src
+
+** Results on Mathlib
+From [[https://github.com/leanprover-community/mathlib4/tree/56a005855ea17e0b0958f73ec801ae140b0a1679][Mathlib at 56a0058]], I picked the main =Basic= files and the smallest and the median-sized file from each of 10 areas, 31 files with 9,998 lines in total, and formatted them.
+I compiled the files before and after formatting with Mathlib's style linters turned on.
+
+| Check | Result |
+|---|---|
+| Compiles after formatting | 31/31 |
+| Unchanged by a second pass | 31/31 |
+| Style linter warnings | 0 before, 0 after |
+| Changed lines | 3,351 of 9,998 |
+| Commands not put in the leanwisp layout | 10 in 7 files |
+| Formatting time | 6.9 seconds for 31 files on 6 cores |
+
+Most changed lines went from another style that the guides allow to the one leanwisp picked, for example a signature that fits on one line put on one line, a short tactic block joined to the =by= line, or two blank lines in a row turned into one.
+
+Of the 10 commands that leanwisp didn't put in its layout, 3 use syntax that has no formatter in Lean.
+In the other 7, the leanwisp layout either failed to parse or changed the syntax tree.
+For 3 of them leanwisp kept the original line breaks and fixed only the spaces and indentation, and it left the other 4 as they were.
+
+Under the same conditions, [[https://github.com/jcreinhold/lean-fmt][lean-fmt]], a formatter for Lean 4.35.0, took 33.3 seconds on the same 31 files.
+leanwisp caches the result for unchanged files, so its second run finished in 0.09 seconds.
+
+The repository's [[https://github.com/conao3/rust-leanwisp/blob/master/docs/mathlib-evaluation.md][Mathlib evaluation record]] has the procedure, the result for each file, and the diffs.
+
+** Where the formatting time goes
+[[./resources/public/img/d60a7d-workers.svg]]
+
+When you pass several files with =--paths=, leanwisp starts one worker per CPU and sends files that =import= the same modules to the same worker.
+Each worker starts one Lean process and formats its files in turn.
+
+For each file, the Lean process first builds an environment from the file's =import= lines, with the table of constants from the imported modules and the registered notation and formatters.
+The process reads each =.olean= file, which holds a module's data, the first time it needs it, and reuses it for the next files.
+
+With the environment ready, Lean parses the file and builds the document, Rust lays it out to the line width, and Lean parses the result again to compare it with the original.
+
+[[./resources/public/img/d60a7d-timeline.svg]]
+
+This chart shows how each of 6 workers spent its time while formatting the 31 Mathlib files, and this run took 6.5 seconds in total.
+Of the 39.0 seconds across the 6 workers, building environments took 22.8 seconds, parsing and comparing in Lean took 11.1 seconds, layout and comparing in Rust took 2.7 seconds, and starting Lean processes took 1.2 seconds.
+
+The other 1.1 seconds is time that workers which had finished spent waiting for the rest.
+
+Building environments takes long because Mathlib's modules are large; for example, =NumberTheory/ModularForms/LevelOne.lean= imports more than 330,000 constants.
+
+Building that file's environment from scratch takes about 0.5 seconds to read the =.olean= files, about 0.4 seconds for the constant table, and about 0.5 seconds for the notation and other registrations.
+Lean gets its notation from the modules you =import=, so leanwisp needs this environment before it can start formatting.
+
+** How to use leanwisp
+With Nix, you can run it straight from the repository.
+
+#+begin_src sh
+nix run github:conao3/rust-leanwisp -- \
+  source format-source --file Example.lean --write
+#+end_src
+
+=check-source= exits with code 254 when formatting would change a file, so you can use it in CI, and when you pass a directory to =--paths=, leanwisp formats every =.lean= file in it.
+
+From your editor, you can call it as a filter that formats standard input and writes the result to standard output.
+
+#+begin_src sh
+leanwisp --output text source format-source --source file:///dev/stdin
+#+end_src
+
+For a file with =import= lines, leanwisp looks for a Lake project in the parent directories and loads that project's modules to format the file.
+Build those modules with =lake build= first.
+
+You can set the line width with =line-width= in the project's =leanwisp.toml=, and you can keep a range out of formatting by putting it between =-- leanwisp: off= and =-- leanwisp: on= lines.
+
+** What the checks don't cover
+A matching syntax tree doesn't guarantee that elaboration gives the same result, so formatting can change the meaning of a macro whose behavior depends on source positions.
+
+I checked 31 files of Mathlib and haven't run leanwisp on the rest.
+leanwisp supports Lean 4.35.0.
+
 * Lean本体と応答が同じで最大730倍速い言語サーバーLeansailを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/060bea
@@ -24386,6 +24580,159 @@ hoverと =plainGoal= は本体より0.1 msほど遅くなっていて、メモ�
 FileWorkerの管理をRustに移す案も考えたのですが、3つのファイルを同時に解析させて測ってみると効果が小さかったので、見送りました。
 
 計測の条件、全部の表、再現の手順は[[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]]にあります。
+
+* Leansail: a Lean 4 language server with the same responses as Lean's own and up to 730 times the speed
+:properties:
+:export_file_name: generated/contents/blog/2026/7fdcef
+:export_date: 2026-11-27 19:28
+:export_updated: 2026-11-27 19:28
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/060bea
+:export_tags: lean rust lsp mathlib performance formal-verification release rust-leansail lean-leanfran rust-lsp-touchstone
+:end:
+
+I wrote Leansail, a language server for Lean 4.
+It embeds =Lean.Server=, the language server that ships with Lean, and changes only the parts that I measured as slow on Mathlib.
+I compared its responses with those of Lean's own server on the 59 kinds of messages that server handles and on 8 kinds of requests to 3 Mathlib files, and the contents matched.
+
+Highlighting showed the largest gap: when you put the cursor on an identifier, the editor highlights its other occurrences with the LSP [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentHighlight][textDocument/documentHighlight]] request.
+Lean's server [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Server/FileWorker/RequestHandling.lean#L270][rebuilds the document's reference index on every one of these requests]], which took 672 ms per request on a 78 KB Mathlib file, and Leansail reuses the index it built for the same document version, so from the second request it answers in 0.92 ms, about 730 times faster.
+
+The first highlight also got 5.7 times faster, completion 4.6 times, and =workspace/symbol= 9.7 times.
+All the changes are in the Lean parts, and the Rust parts only relay messages to and from the editor and run rules proved in Lean.
+
+The repository is [[https://github.com/conao3/rust-leansail][conao3/rust-leansail]], under the Apache-2.0 license.
+I wrote this post from results with Lean 4.35.0 and Leansail 0.1.0.
+
+[[github:conao3/rust-leansail::Rust][A Lean language server with a Rust host and Lean-verified lifecycle rules]]
+
+** Architecture
+Leansail runs as two processes: a host written in Rust and a backend written in Lean.
+
+[[./resources/public/img/060bea-architecture.svg]]
+
+The host speaks LSP with the editor and relays the messages it receives to the backend.
+The backend is an executable that embeds [[https://github.com/leanprover/lean4/tree/master/src/Lean/Server][Lean.Server]], and as in Lean's own server, the Watchdog holds the index of the whole project and starts a FileWorker for each open file to process it.
+
+Hover, the goal view, widgets, and the other features of Lean's language server use Lean's own implementation as it is.
+
+The host decides one thing itself: whether it may relay a message.
+I wrote those rules in Lean, proved them, and turned them into Rust functions with [[https://s.conao3.com/blog/2026/21ebbd][leanfran]], and they decide how the host handles requests that arrive before or after initialization or after shutdown, how it stops requests for features the client hasn't declared support for, and how it restarts a FileWorker that crashed.
+
+** How to use Leansail
+Run the following command at the root of a Lean 4.35.0 project to start a language server that talks over standard input and output.
+The Nix package includes the backend and the matching Lean.
+
+#+begin_src shell
+nix run github:conao3/rust-leansail -- server run-server
+#+end_src
+
+With =leansail= on your PATH, set up Eglot in Emacs like this.
+In a project with dependencies, change the command to =lake env leansail server run-server=.
+
+#+begin_src emacs-lisp
+(require 'eglot)
+(define-derived-mode leansail-lean-mode prog-mode "Lean")
+(add-to-list 'auto-mode-alist '("\\.lean\\'" . leansail-lean-mode))
+(add-to-list 'eglot-server-programs
+             '(leansail-lean-mode . ("leansail" "server" "run-server")))
+(add-hook 'leansail-lean-mode-hook #'eglot-ensure)
+(add-hook 'kill-emacs-hook #'eglot-shutdown-all)
+#+end_src
+
+The [[https://github.com/conao3/rust-leansail#editor-setup][README]] has the Neovim setup and the command that shows the goal.
+
+** How I check that Leansail returns the same responses as Lean's own server
+A faster server is no use if its responses change, so I built tests that start =lean --server= from the same Lean 4.35.0 next to Leansail and compare the results of the same operations.
+
+- The tests compare responses for the 59 kinds of messages that Lean's server handles: 34 requests, 10 client notifications, 3 server requests, 2 server notifications, and 10 widget calls. The count and order of the notifications that arrive during processing change from run to run, so the tests compare the final state.
+- They check that a request cancelled during an edit gets the =-32800= [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#errorCodes][error]] and a request that an edit made stale gets =-32801=.
+- They kill the FileWorker process and check that the next request brings it back with the same content.
+- They start Eglot in Emacs and the built-in LSP client in Neovim headless, and compare diagnostics, hover, jump to definition, completion, the goal view, and closing and reopening a file with Lean's own server.
+
+I check that the traffic follows the specification with [[https://s.conao3.com/blog/2026/45f8b5][lsp-touchstone]], which I wrote earlier.
+The first run showed that the backend from Lean's server sent requests such as [[https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#semanticTokens_refreshRequest][workspace/semanticTokens/refresh]], which the client hadn't declared support for, so in Leansail the host doesn't forward this request to the client and answers the backend with =null= instead.
+
+CI runs all of these tests.
+
+** The rules written in Lean
+The rule for whether the host passes a server request to the client, given what the client declared, [[https://github.com/conao3/rust-leansail/blob/67d191376c7025d718c3c0f902d05056a184cc60/src/capabilities.rs#L8-L40][looks like this]], with the definition of =refreshCapability= and the other theorems left out.
+
+#+begin_src lean
+inductive Decision where
+  | forward | acknowledge | unsupported
+  deriving DecidableEq, Repr
+
+def decide (method : String) (declared registrationsAllowed : Bool) : Decision :=
+  if method == "client/registerCapability" then
+    if registrationsAllowed then .forward else .unsupported
+  else
+    match refreshCapability method with
+    | some _ => if declared then .forward else .acknowledge
+    | none => .forward
+
+theorem refresh_requires_support (declared registrationsAllowed : Bool) :
+    (decide "workspace/semanticTokens/refresh" declared registrationsAllowed = .forward ↔ declared = true) ∧
+    (decide "workspace/inlayHint/refresh" declared registrationsAllowed = .forward ↔ declared = true) ∧
+    (decide "workspace/codeLens/refresh" declared registrationsAllowed = .forward ↔ declared = true) ∧
+    (decide "workspace/inlineValue/refresh" declared registrationsAllowed = .forward ↔ declared = true) ∧
+    (decide "workspace/diagnostic/refresh" declared registrationsAllowed = .forward ↔ declared = true) ∧
+    (decide "workspace/foldingRange/refresh" declared registrationsAllowed = .forward ↔ declared = true) := by
+  cases declared <;> simp [decide, refreshCapability]
+#+end_src
+
+=refresh_requires_support= states that the host passes a refresh request to the client only when the client has declared support for it.
+This code sits inside =leanfran::lean!= in the Rust source, Lean checks the proofs at build time, and leanfran turns the code into Rust functions.
+
+The lifecycle, the checks for cancelled and stale requests, and FileWorker restarts follow the same pattern, with 29 theorems in total.
+Three of them are propositions with no variables, which check the result for fixed inputs.
+The host reads the JSON, takes out whether the client declared the feature, and relays the message according to the result of this function.
+
+** What I found by measuring on Mathlib
+For the measurements, I opened and edited 3 files from Mathlib v4.35.0.
+The largest is the 78 KB =IntegralEqImproper.lean=, and the other two are =FiniteDimension.lean= and =Mathlib/Tactic.lean=, which imports 397 files.
+
+On a 6-core machine, I kept only runs with low load from other processes, 5 runs for each condition.
+
+I first used perf to see where the language server spends its time: FileWorker took 78.7% of the CPU time, Watchdog 17.7%, and the Rust host 0.15%.
+FileWorker spends most of its time checking proofs and inferring type class instances, and a faster relay in Rust would save almost nothing, so I looked for the parts where the language server does its own computation and fixed those.
+
+The chart and table below show medians on =IntegralEqImproper.lean=, measured by running Lean's own server and Leansail in turn within the same measurement run.
+
+[[./resources/public/img/060bea-speed.svg]]
+
+| Operation                              | Lean's server | Leansail |  Ratio |
+|----------------------------------------+---------------+----------+--------|
+| Highlight (first)                      |        674 ms |   118 ms |   5.7x |
+| Highlight (second and later)           |        672 ms |  0.92 ms |   730x |
+| Semantic tokens (second and later)     |         75 ms |   4.0 ms |    19x |
+| Completion (second and later)          |        322 ms |    70 ms |   4.6x |
+| =workspace/symbol=                     |        851 ms |    87 ms |   9.7x |
+| References                             |         21 ms |    13 ms |   1.6x |
+| Definition                             |         21 ms |    13 ms |   1.6x |
+| Hover                                  |        1.4 ms |   1.4 ms |  0.94x |
+| =plainGoal=                            |        1.4 ms |   1.6 ms |  0.92x |
+| Preparing the project index            |        21.4 s |    5.5 s |   3.9x |
+| Memory right after processing 3 files  |      3596 MiB | 2526 MiB |   1.4x |
+
+Hover and =plainGoal= are about 0.1 ms slower than in Lean's own server, and the memory figure is the sum of PSS over all processes.
+
+- For highlighting, Lean's server [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Server/References.lean#L234-L237][rebuilt the array of imported module names for each identifier]]. Leansail looks the names up without building the array and reuses the index it built for the same document version.
+- For semantic tokens, Leansail reuses the response it built for the same document version.
+- For completion, Leansail reuses the candidates it found among the imported constants while the namespace and the =open= declarations stay the same.
+- For =workspace/symbol= and the index, Lean's server built the index from about 12,000 =.ilean= files from Mathlib and Lean every time, and Leansail saves that index and loads it on the next start.
+
+Lean theorems show that the highlight index built without the array equals the index from Lean's own server, and that the results Leansail reuses for completion and =workspace/symbol= equal the results computed each time.
+The theorems don't cover reusing the highlight index and the semantic tokens response for the same document version, or loading the saved index, and I check those parts by comparing responses with Lean's own server.
+The response contents matched Lean's own server for all 8 kinds of requests on all 3 files.
+
+From opening a file to the first diagnostic, Lean's own server took 6.9 seconds and Leansail 7.0 seconds, almost the same, and that time goes to Lake setup, imports, and processing the file, all outside the language server.
+
+None of my measurements found an operation that got faster when I moved it to Rust.
+I also considered moving FileWorker management to Rust, but when I measured with 3 files processed at once, the gain was small, so I dropped the idea.
+
+The measurement conditions, the full tables, and the steps to reproduce them are in [[https://github.com/conao3/rust-leansail/blob/master/docs/mathlib-benchmark.md][docs/mathlib-benchmark.md]].
 
 * HasuraがGraphQLのクエリを1本のSQLにする仕組み
 :properties:
