@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="320" viewBox="0 0 1000 320" font-family="sans-serif" role="img" aria-labelledby="title desc">
+  <title id="title">vugがレコードとseedからストアとシステムを作る流れ</title>
+  <desc id="desc">TOMLのレコードとBusyBoxとzigのseedをサンドボックスに渡してビルドし、出力を中身のハッシュの名前でストアに置きます。システムはストアのパスを集めて世代にし、QEMUで起動します。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker>
+  </defs>
+  <rect width="1000" height="320" rx="16" fill="#fff"/>
+  <rect x="30" y="30" width="190" height="120" rx="10" fill="#e8eef7" stroke="#0f4c81" stroke-width="2"/>
+  <text x="125.0" y="62" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">レコード</text>
+  <text x="125.0" y="94" text-anchor="middle" font-size="16" fill="#333">package.toml</text>
+  <text x="125.0" y="120" text-anchor="middle" font-size="16" fill="#333">versions/*.toml</text>
+  <rect x="30" y="170" width="190" height="120" rx="10" fill="#fdf1e3" stroke="#b5651d" stroke-width="2"/>
+  <text x="125.0" y="202" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">seed</text>
+  <text x="125.0" y="234" text-anchor="middle" font-size="16" fill="#333">BusyBox 1.35.0</text>
+  <text x="125.0" y="260" text-anchor="middle" font-size="16" fill="#333">zig 0.17.1</text>
+  <rect x="275" y="85" width="195" height="150" rx="10" fill="#f2f4f7" stroke="#687585" stroke-width="2"/>
+  <text x="372.5" y="117" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">サンドボックス</text>
+  <text x="372.5" y="149" text-anchor="middle" font-size="16" fill="#333">bwrap</text>
+  <text x="372.5" y="175" text-anchor="middle" font-size="16" fill="#333">ネットワークなし</text>
+  <text x="372.5" y="201" text-anchor="middle" font-size="16" fill="#333">cc = zig cc</text>
+  <rect x="525" y="85" width="205" height="150" rx="10" fill="#e3f4f8" stroke="#007d9c" stroke-width="2"/>
+  <text x="627.5" y="117" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">ストア</text>
+  <text x="627.5" y="149" text-anchor="middle" font-size="16" fill="#333">/vug/store/&lt;id&gt;</text>
+  <text x="627.5" y="175" text-anchor="middle" font-size="16" fill="#333">&lt;id&gt;は出力のハッシュ</text>
+  <text x="627.5" y="201" text-anchor="middle" font-size="16" fill="#333">hello, clang, rustc</text>
+  <rect x="785" y="85" width="185" height="150" rx="10" fill="#eaf5ea" stroke="#2e7d32" stroke-width="2"/>
+  <text x="877.5" y="117" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">システム</text>
+  <text x="877.5" y="149" text-anchor="middle" font-size="16" fill="#333">世代 1, 2, …</text>
+  <text x="877.5" y="175" text-anchor="middle" font-size="16" fill="#333">切り替えと戻し</text>
+  <text x="877.5" y="201" text-anchor="middle" font-size="16" fill="#333">QEMUで起動</text>
+  <g stroke="#333" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+    <line x1="220" y1="90" x2="272" y2="130"/>
+    <line x1="220" y1="230" x2="272" y2="190"/>
+    <line x1="470" y1="160" x2="522" y2="160"/>
+    <line x1="730" y1="160" x2="782" y2="160"/>
+  </g>
+</svg>
