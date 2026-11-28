@@ -28480,7 +28480,7 @@ The Go version ships from the same repository at the same version.
 ** Four ways to use it
 There are four ways to use leanfran from Go.
 
-[[./resources/public/img/ad14a8-uses.svg]]
+[[./resources/public/img/3b66b5-uses.svg]]
 
 1. Write Lean functions and theorems as the argument of =leanfran.Lean(...)= in a Go package, and call the functions that =go tool leanfran sync= generates from Go.
 2. Use Lean structures and inductive types as Go types that come with value checks and JSON conversion.
@@ -28737,7 +28737,7 @@ I passed the same slice to =Record= on each call, and kept passing =Handle.Recor
 
 The figure and the table show calls per second, computed from the median of 11 runs pinned to one CPU, and higher is better.
 
-[[./resources/public/img/ad14a8-record.svg]]
+[[./resources/public/img/3b66b5-record.svg]]
 
 | Array size | =Record= (calls/s) | =Handle.Record= (calls/s) |
 |---+---+---|
