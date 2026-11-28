@@ -11,7 +11,7 @@ Lean 4でunified diffを生成し、パッチに書かれた行番号どおり�
 リポジトリは [conao3/lean-leansplice](https://github.com/conao3/lean-leansplice) で、ライセンスはApache-2.0です。
 Lean 4.36.0の標準ライブラリだけで書いています。
 
-この記事はmainブランチのcommit [86bef90](https://github.com/conao3/lean-leansplice/commit/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb) をもとにしています。
+この記事はmainブランチのcommit [b4fa6cb](https://github.com/conao3/lean-leansplice/commit/b4fa6cb1026dc1d7b9bdc849a627a2d7833330c0) をもとにしています。
 
 <div class="github-card" data-repo="conao3/lean-leansplice"><a href="https://github.com/conao3/lean-leansplice"><span class="github-card-name"><svg class="github-card-mark" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>conao3/<strong>lean-leansplice</strong></span></span><span class="github-card-description">Unified diff parse, render, strict apply and diff generation for Lean 4</span><span class="github-card-footer"><span class="github-card-language"><span class="github-card-language-color"></span>Lean</span><span class="github-card-star"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/></svg><span>Star</span><span class="github-card-star-count" hidden></span></span></span></a></div>
 
@@ -86,7 +86,7 @@ Hunk #1 succeeded at 4 (offset 1 line).
 Applied patch file cleanly.
 ```
 
-leanspliceの [apply](https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L210-L255) はhunkの古い側と新しい側の行番号、文脈と削除の行の中身、それぞれの行末に改行があるかを確かめ、1つでも合わなければエラーを返します。
+leanspliceの [apply](https://github.com/conao3/lean-leansplice/blob/b4fa6cb1026dc1d7b9bdc849a627a2d7833330c0/Leansplice.lean#L210-L255) はhunkの古い側と新しい側の行番号、文脈と削除の行の中身、それぞれの行末に改行があるかを確かめ、1つでも合わなければエラーを返します。
 leanspliceはパッチに書かれた位置でだけhunkを照合するので、同じ行の並びがファイルの別の位置にあってもそこには当てません。
 
 
@@ -136,7 +136,7 @@ leanspliceが扱うのは1つのテキストファイルに対するパッチで
 
 # Gitと両方向に確かめる
 
-`make check` は `lake build` と `lake test` に続けて [scripts/git-differential.sh](https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/scripts/git-differential.sh) を実行します。
+`make check` は `lake build` と `lake test` に続けて [scripts/git-differential.sh](https://github.com/conao3/lean-leansplice/blob/b4fa6cb1026dc1d7b9bdc849a627a2d7833330c0/scripts/git-differential.sh) を実行します。
 このスクリプトは `git diff --no-index` が作ったパッチをleanspliceで当てる向きと、leanspliceが作ったパッチを `git apply` で当てる向きの両方で、結果を期待するファイルと `cmp` で比べます。
 
 ```console
@@ -159,13 +159,13 @@ CLI reports stdout failure: apply
 
 比べる組は1行の置き換えや末尾の改行の有無の変化、空行とUnicodeの文字、CRLF、複数のhunk、空のファイルからの作成と空のファイルへの削除などです。
 
-テストの [Tests.lean](https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Tests.lean) は関数の結果を期待する値と比べ、乱数で作った80組のテキストでは `diff` のパッチを `render` と `parse` で往復させてから当てて、新しいテキストになることを確かめています。
+テストの [Tests.lean](https://github.com/conao3/lean-leansplice/blob/b4fa6cb1026dc1d7b9bdc849a627a2d7833330c0/Tests.lean) は関数の結果を期待する値と比べ、乱数で作った80組のテキストでは `diff` のパッチを `render` と `parse` で往復させてから当てて、新しいテキストになることを確かめています。
 leanspliceの動作は、このテストとGitとの差分テストで確かめています。
 
 
 # diffの作り方
 
-`diff` が使う [editScript](https://github.com/conao3/lean-leansplice/blob/86bef90837c08a8fcf5662e7015e5cbfbcc7acbb/Leansplice.lean#L351-L387) は2つのテキストの先頭と末尾で一致する行を除いて、残った行についてMyersのアルゴリズムで最短の編集スクリプトを探します。
+`diff` が使う [editScript](https://github.com/conao3/lean-leansplice/blob/b4fa6cb1026dc1d7b9bdc849a627a2d7833330c0/Leansplice.lean#L351-L387) は2つのテキストの先頭と末尾で一致する行を除いて、残った行についてMyersのアルゴリズムで最短の編集スクリプトを探します。
 追加と削除が合わせて64行を超えると探索をやめ、同じ行の出現を前から順に対にして、両側で順序の保たれる最も長い対の並びを残します。
 
 64行を超えたときの方法は同じ行が何度も現れるテキストで比較を繰り返さずに済みますが、最短の編集スクリプトより大きいパッチを作ることがあります。
