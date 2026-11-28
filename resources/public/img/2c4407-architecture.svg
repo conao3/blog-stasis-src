@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="584" viewBox="-10 -10 980 520" font-family="Noto Sans JP, sans-serif">
+<style>
+.t{fill:#1f2328;font-size:14px;font-weight:600}
+.s{fill:#59636e;font-size:12px}
+.l{fill:#1f2328;font-size:12px}
+.box{fill:#ddf4ff;stroke:#0969da;stroke-width:1.5}
+.db{fill:#dafbe1;stroke:#1a7f37;stroke-width:1.5}
+.opt{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 3}
+.ext{fill:#fff;stroke:#818b98;stroke-width:1.5}
+.frame{fill:none;stroke:#0969da;stroke-width:1.5;stroke-dasharray:6 4}
+.frame-db{fill:none;stroke:#1a7f37;stroke-width:1.5;stroke-dasharray:6 4}
+.life{stroke:#818b98;stroke-width:1;stroke-dasharray:4 4}
+.a{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.a2{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah);marker-start:url(#ahs)}
+.ar{stroke:#0969da;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ah)}
+.ao{stroke:#818b98;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#aho)}
+.ag{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg)}
+.agr{stroke:#1a7f37;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ahg)}
+.ag2{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg);marker-start:url(#ahgs)}
+.mh{fill:#0969da}.mho{fill:#818b98}.mhg{fill:#1a7f37}
+.panel{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1}
+.head{fill:#59636e;font-size:12px;font-weight:600}
+.rule{stroke:#d1d9e0;stroke-width:1}
+.code{fill:#1f2328;font-size:12px}
+.c-root{fill:#b6e3ff}.c-col{fill:#fae17d}.c-obj{fill:#aceebb}.c-arr{fill:#ecd8ff}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M10,0 L0,5 L10,10 z"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mho" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahgs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M10,0 L0,5 L10,10 z"/></marker>
+</defs>
+<rect x="-10" y="-10" width="980" height="520" rx="14" fill="#fff"/>
+<rect class="opt" x="16" y="48" width="180" height="56" rx="6"/>
+<text class="t" x="106" y="72" text-anchor="middle">Authentication service</text>
+<text class="s" x="106" y="92" text-anchor="middle">JWT or webhook</text>
+
+<rect class="ext" x="16" y="130" width="180" height="56" rx="6"/>
+<text class="t" x="106" y="154" text-anchor="middle">Client</text>
+<text class="s" x="106" y="174" text-anchor="middle">Web, mobile, servers</text>
+
+<rect class="ext" x="16" y="212" width="180" height="56" rx="6"/>
+<text class="t" x="106" y="236" text-anchor="middle">Admin</text>
+<text class="s" x="106" y="256" text-anchor="middle">Console, CLI, curl</text>
+
+<rect class="frame" x="300" y="24" width="380" height="252" rx="8"/>
+<text class="t" x="316" y="48">Hasura GraphQL Engine</text>
+<text class="s" x="664" y="48" text-anchor="end">One container</text>
+
+<rect class="box" x="318" y="64" width="170" height="52" rx="6"/>
+<text class="t" x="403" y="86" text-anchor="middle">Permissions</text>
+<text class="s" x="403" y="105" text-anchor="middle">Role and session variables</text>
+
+<rect class="box" x="318" y="132" width="170" height="52" rx="6"/>
+<text class="t" x="403" y="154" text-anchor="middle">GraphQL schema</text>
+<text class="s" x="403" y="173" text-anchor="middle">Generated from metadata</text>
+
+<rect class="box" x="318" y="200" width="170" height="52" rx="6"/>
+<text class="t" x="403" y="222" text-anchor="middle">Compiler</text>
+<text class="s" x="403" y="241" text-anchor="middle">Translates GraphQL to SQL</text>
+
+<rect class="opt" x="506" y="64" width="156" height="52" rx="6"/>
+<text class="t" x="584" y="86" text-anchor="middle">Subscriptions</text>
+<text class="s" x="584" y="105" text-anchor="middle">Reruns every second</text>
+
+<rect class="opt" x="506" y="132" width="156" height="52" rx="6"/>
+<text class="t" x="584" y="154" text-anchor="middle">External APIs</text>
+<text class="s" x="584" y="173" text-anchor="middle">Actions, Remote Schemas</text>
+
+<rect class="opt" x="506" y="200" width="156" height="52" rx="6"/>
+<text class="t" x="584" y="222" text-anchor="middle">Event Triggers</text>
+<text class="s" x="584" y="241" text-anchor="middle">Row changes to a webhook</text>
+
+<rect class="frame-db" x="300" y="356" width="380" height="120" rx="8"/>
+<text class="t" x="316" y="380">PostgreSQL</text>
+<rect class="db" x="318" y="400" width="170" height="56" rx="6"/>
+<text class="t" x="403" y="424" text-anchor="middle">App tables</text>
+<text class="s" x="403" y="444" text-anchor="middle">public.article and others</text>
+<rect class="db" x="506" y="400" width="156" height="56" rx="6"/>
+<text class="t" x="584" y="424" text-anchor="middle">hdb_catalog</text>
+<text class="s" x="584" y="444" text-anchor="middle">Metadata as JSON</text>
+
+<rect class="opt" x="770" y="132" width="174" height="52" rx="6"/>
+<text class="t" x="857" y="154" text-anchor="middle">External REST, GraphQL</text>
+<text class="s" x="857" y="173" text-anchor="middle">Your own API servers</text>
+
+<rect class="opt" x="770" y="200" width="174" height="52" rx="6"/>
+<text class="t" x="857" y="222" text-anchor="middle">Webhook</text>
+<text class="s" x="857" y="241" text-anchor="middle">Event Trigger target</text>
+
+<rect class="opt" x="770" y="400" width="174" height="56" rx="6"/>
+<text class="t" x="857" y="424" text-anchor="middle">MySQL, Oracle, others</text>
+<text class="s" x="857" y="444" text-anchor="middle">Via data connector agent</text>
+
+<path class="ao" d="M106,104 V130"/>
+<text class="s" x="114" y="122">JWT</text>
+<path class="ao" d="M318,76 H196"/>
+<text class="s" x="248" y="68" text-anchor="middle">With a webhook,</text>
+<text class="s" x="248" y="92" text-anchor="middle">asks per request</text>
+
+<path class="a" d="M196,150 H300"/>
+<text class="l" x="248" y="143" text-anchor="middle">GraphQL</text>
+<path class="ar" d="M300,170 H196"/>
+<text class="l" x="248" y="186" text-anchor="middle">JSON</text>
+
+<path class="a" d="M196,240 H300"/>
+<text class="l" x="248" y="232" text-anchor="middle">Metadata API</text>
+<text class="s" x="248" y="256" text-anchor="middle">/v1/metadata</text>
+
+<path class="a" d="M424,252 V400"/>
+<text class="l" x="416" y="312" text-anchor="end">One SQL query</text>
+<text class="l" x="416" y="330" text-anchor="end">per root field</text>
+<path class="agr" d="M460,400 V252"/>
+<text class="l" x="468" y="312">Built</text>
+<text class="l" x="468" y="330">JSON</text>
+<path class="ag2" d="M584,400 V276"/>
+<text class="l" x="592" y="321">metadata</text>
+
+<path class="ao" d="M662,158 H770"/>
+<text class="s" x="725" y="150" text-anchor="middle">HTTP</text>
+<path class="ao" d="M662,226 H770"/>
+<text class="s" x="725" y="218" text-anchor="middle">HTTP</text>
+<path class="ao" d="M680,266 H857 V400"/>
+<text class="s" x="865" y="332">REST</text>
+</svg>

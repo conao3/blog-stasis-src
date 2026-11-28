@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="382" viewBox="-10 -10 980 340" font-family="Noto Sans JP, sans-serif">
+<style>
+.t{fill:#1f2328;font-size:14px;font-weight:600}
+.s{fill:#59636e;font-size:12px}
+.l{fill:#1f2328;font-size:12px}
+.box{fill:#ddf4ff;stroke:#0969da;stroke-width:1.5}
+.db{fill:#dafbe1;stroke:#1a7f37;stroke-width:1.5}
+.opt{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 3}
+.ext{fill:#fff;stroke:#818b98;stroke-width:1.5}
+.frame{fill:none;stroke:#0969da;stroke-width:1.5;stroke-dasharray:6 4}
+.frame-db{fill:none;stroke:#1a7f37;stroke-width:1.5;stroke-dasharray:6 4}
+.life{stroke:#818b98;stroke-width:1;stroke-dasharray:4 4}
+.a{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.a2{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah);marker-start:url(#ahs)}
+.ar{stroke:#0969da;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ah)}
+.ao{stroke:#818b98;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#aho)}
+.ag{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg)}
+.agr{stroke:#1a7f37;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ahg)}
+.ag2{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg);marker-start:url(#ahgs)}
+.mh{fill:#0969da}.mho{fill:#818b98}.mhg{fill:#1a7f37}
+.panel{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1}
+.head{fill:#59636e;font-size:12px;font-weight:600}
+.rule{stroke:#d1d9e0;stroke-width:1}
+.code{fill:#1f2328;font-size:12px}
+.c-root{fill:#b6e3ff}.c-col{fill:#fae17d}.c-obj{fill:#aceebb}.c-arr{fill:#ecd8ff}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M10,0 L0,5 L10,10 z"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mho" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahgs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M10,0 L0,5 L10,10 z"/></marker>
+</defs>
+<rect x="-10" y="-10" width="980" height="340" rx="14" fill="#fff"/>
+<rect class="ext" x="16" y="30" width="200" height="52" rx="6"/>
+<text class="t" x="116" y="52" text-anchor="middle">Client 1</text>
+<text class="s" x="116" y="71" text-anchor="middle">Subscribes to the row with id = 1</text>
+<rect class="ext" x="16" y="100" width="200" height="52" rx="6"/>
+<text class="t" x="116" y="122" text-anchor="middle">Client 2</text>
+<text class="s" x="116" y="141" text-anchor="middle">Subscribes to the row with id = 2</text>
+<text class="t" x="116" y="178" text-anchor="middle">⋮</text>
+<rect class="ext" x="16" y="196" width="200" height="52" rx="6"/>
+<text class="t" x="116" y="218" text-anchor="middle">Client N</text>
+<text class="s" x="116" y="237" text-anchor="middle">Subscribes to the row with id = N</text>
+
+<rect class="frame" x="320" y="16" width="320" height="288" rx="8"/>
+<text class="t" x="336" y="40">Hasura</text>
+<rect class="box" x="340" y="54" width="280" height="56" rx="6"/>
+<text class="t" x="480" y="78" text-anchor="middle">Combines</text>
+<text class="s" x="480" y="98" text-anchor="middle">Groups queries with the same role and shape</text>
+<rect class="box" x="340" y="134" width="280" height="56" rx="6"/>
+<text class="t" x="480" y="158" text-anchor="middle">Reruns every second</text>
+<text class="s" x="480" y="178" text-anchor="middle">Up to 100 subscriptions in one SQL query</text>
+<rect class="box" x="340" y="214" width="280" height="56" rx="6"/>
+<text class="t" x="480" y="238" text-anchor="middle">Compares with the last result</text>
+<text class="s" x="480" y="258" text-anchor="middle">Sends only to changed subscriptions</text>
+
+<rect class="db" x="744" y="134" width="200" height="56" rx="6"/>
+<text class="t" x="844" y="158" text-anchor="middle">PostgreSQL</text>
+<text class="s" x="844" y="178" text-anchor="middle">One result row per subscription</text>
+
+<path class="a" d="M216,56 L340,72"/>
+<path class="a" d="M216,126 L340,84"/>
+<path class="a" d="M216,208 L340,96"/>
+<text class="l" x="268" y="44" text-anchor="middle">WebSocket</text>
+<path class="a" d="M480,110 V134"/>
+<path class="a" d="M480,190 V214"/>
+<path class="a" d="M620,152 H744"/>
+<text class="l" x="682" y="144" text-anchor="middle">SQL</text>
+<path class="agr" d="M744,172 H620"/>
+<text class="l" x="682" y="188" text-anchor="middle">JSON rows</text>
+<path class="ar" d="M340,244 L216,232"/>
+<text class="l" x="276" y="268" text-anchor="middle">New result</text>
+</svg>

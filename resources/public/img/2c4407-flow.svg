@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="550" viewBox="-10 -10 980 490" font-family="Noto Sans JP, sans-serif">
+<style>
+.t{fill:#1f2328;font-size:14px;font-weight:600}
+.s{fill:#59636e;font-size:12px}
+.l{fill:#1f2328;font-size:12px}
+.box{fill:#ddf4ff;stroke:#0969da;stroke-width:1.5}
+.db{fill:#dafbe1;stroke:#1a7f37;stroke-width:1.5}
+.opt{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 3}
+.ext{fill:#fff;stroke:#818b98;stroke-width:1.5}
+.frame{fill:none;stroke:#0969da;stroke-width:1.5;stroke-dasharray:6 4}
+.frame-db{fill:none;stroke:#1a7f37;stroke-width:1.5;stroke-dasharray:6 4}
+.life{stroke:#818b98;stroke-width:1;stroke-dasharray:4 4}
+.a{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah)}
+.a2{stroke:#0969da;stroke-width:1.5;fill:none;marker-end:url(#ah);marker-start:url(#ahs)}
+.ar{stroke:#0969da;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ah)}
+.ao{stroke:#818b98;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#aho)}
+.ag{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg)}
+.agr{stroke:#1a7f37;stroke-width:1.5;fill:none;stroke-dasharray:5 3;marker-end:url(#ahg)}
+.ag2{stroke:#1a7f37;stroke-width:1.5;fill:none;marker-end:url(#ahg);marker-start:url(#ahgs)}
+.mh{fill:#0969da}.mho{fill:#818b98}.mhg{fill:#1a7f37}
+.panel{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1}
+.head{fill:#59636e;font-size:12px;font-weight:600}
+.rule{stroke:#d1d9e0;stroke-width:1}
+.code{fill:#1f2328;font-size:12px}
+.c-root{fill:#b6e3ff}.c-col{fill:#fae17d}.c-obj{fill:#aceebb}.c-arr{fill:#ecd8ff}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mh" d="M10,0 L0,5 L10,10 z"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mho" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M0,0 L10,5 L0,10 z"/></marker>
+<marker id="ahgs" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mhg" d="M10,0 L0,5 L10,10 z"/></marker>
+</defs>
+<rect x="-10" y="-10" width="980" height="490" rx="14" fill="#fff"/>
+<rect class="ext" x="20" y="10" width="180" height="36" rx="6"/>
+<text class="t" x="110" y="33" text-anchor="middle">Client</text>
+<rect class="box" x="390" y="10" width="180" height="36" rx="6"/>
+<text class="t" x="480" y="33" text-anchor="middle">Hasura</text>
+<rect class="db" x="760" y="10" width="180" height="36" rx="6"/>
+<text class="t" x="850" y="33" text-anchor="middle">PostgreSQL</text>
+<line class="life" x1="110" y1="46" x2="110" y2="460"/>
+<line class="life" x1="480" y1="46" x2="480" y2="460"/>
+<line class="life" x1="850" y1="46" x2="850" y2="460"/>
+
+<path class="a" d="M110,84 H480"/>
+<text class="l" x="295" y="76" text-anchor="middle">① POST /v1/graphql (query and JWT)</text>
+
+<rect class="box" x="340" y="102" width="280" height="34" rx="6"/>
+<text class="l" x="480" y="124" text-anchor="middle">② Takes out the role and session variables</text>
+<rect class="box" x="340" y="146" width="280" height="34" rx="6"/>
+<text class="l" x="480" y="168" text-anchor="middle">③ Parses the query into a GraphQL AST</text>
+<rect class="box" x="340" y="190" width="280" height="34" rx="6"/>
+<text class="l" x="480" y="212" text-anchor="middle">④ Adds permission expressions to the AST</text>
+<rect class="box" x="340" y="234" width="280" height="34" rx="6"/>
+<text class="l" x="480" y="256" text-anchor="middle">⑤ Turns it into an SQL AST, then one SQL query</text>
+
+<path class="a" d="M480,298 H850"/>
+<text class="l" x="690" y="290" text-anchor="middle">⑥ Runs the SQL</text>
+
+<rect class="db" x="740" y="314" width="204" height="52" rx="6"/>
+<text class="l" x="842" y="336" text-anchor="middle">⑦ Joins rows and builds the JSON</text>
+<text class="s" x="842" y="354" text-anchor="middle">json_agg, row_to_json</text>
+
+<path class="agr" d="M850,394 H480"/>
+<text class="l" x="665" y="386" text-anchor="middle">⑧ Returns the JSON as a single value</text>
+
+<path class="ar" d="M480,434 H110"/>
+<text class="l" x="295" y="426" text-anchor="middle">⑨ Wraps it in {"data": {...}} and returns it</text>
+</svg>

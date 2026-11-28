@@ -25160,7 +25160,7 @@ Queries that fetch one page of data finished in the same time as hand-written SQ
 This post covers v2 of the Hasura GraphQL Engine, and Hasura v2.51.6 connected to PostgreSQL 17.11 generated all the SQL shown here.
 
 ** Architecture
-[[./resources/public/img/360ae9-architecture.svg]]
+[[./resources/public/img/2c4407-architecture.svg]]
 
 Every setup runs the Hasura container and PostgreSQL, and every request goes through permission checks, GraphQL schema generation, and translation from GraphQL to SQL (the blue parts of the diagram).
 
@@ -25174,7 +25174,7 @@ Actions and Remote Schemas add external APIs to the schema, and Event Triggers s
 Hasura connects to MySQL, Oracle, and other databases through a service called a [[https://hasura.io/docs/2.0/databases/data-connectors/][data connector agent]].
 
 ** The path of one query
-[[./resources/public/img/360ae9-flow.svg]]
+[[./resources/public/img/2c4407-flow.svg]]
 
 For each query a client sends, Hasura builds the SQL in steps ② to ⑤ of the diagram.
 Hasura's [[https://github.com/hasura/graphql-engine/blob/master/architecture/live-queries.md][design document]] describes these steps: ② takes out the role and session variables, ③ parses the query into a GraphQL AST, ④ adds each role's permission expressions to the AST, and ⑤ turns that AST into an SQL AST and then into an SQL string.
@@ -25201,7 +25201,7 @@ To test this, I created three tables: authors, articles, and comments.
 I sent a query that fetches the 20 newest articles by publication date, with each author's name and the first 5 comments, to the [[https://hasura.io/docs/2.0/api-reference/explain/][Explain API]], which returns the SQL that Hasura generates.
 In the next figure, the query I sent is at the top and the SQL that came back is at the bottom, and I added the line breaks and indentation to the SQL.
 
-[[./resources/public/img/360ae9-mapping.svg]]
+[[./resources/public/img/2c4407-mapping.svg]]
 
 Each level of nesting in GraphQL becomes one subquery in SQL.
 =LATERAL= joins the subqueries.
@@ -25243,7 +25243,7 @@ FROM (SELECT * FROM "public"."comment"
 Hasura puts a permission expression into each subquery that reads a table, and when I counted articles with this role, it saw 20 of the 200,000.
 
 ** Subscriptions
-[[./resources/public/img/360ae9-subscription.svg]]
+[[./resources/public/img/2c4407-subscription.svg]]
 
 Subscriptions run on the same mechanism of compiling to one SQL query.
 This section covers the kind of Hasura subscription called a live query, and according to the [[https://hasura.io/docs/2.0/subscriptions/postgres/livequery/execution/][official documentation]], Hasura reruns each subscribed query at a fixed interval (1 second by default) and sends a new result only to the subscriptions whose result changed since the last run.
