@@ -1,7 +1,6 @@
 Title: Leansail: a Lean 4 language server with the same responses as Lean's own and up to 730 times the speed
 Date: 2026-11-27 19:28
 Updated: 2026-11-27 19:28
-Draft: true
 Lang: en
 Original: /blog/2026/060bea
 Tags: lean rust lsp mathlib performance formal-verification release rust-leansail lean-leanfran rust-lsp-touchstone

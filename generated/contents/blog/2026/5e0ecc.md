@@ -1,7 +1,6 @@
 Title: AI software factories: how far parallel coding agents have come
 Date: 2026-11-27 19:50
 Updated: 2026-11-27 19:50
-Draft: true
 Lang: en
 Original: /blog/2026/bab1ba
 Tags: ai-agent history vercel-board

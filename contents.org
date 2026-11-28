@@ -16170,7 +16170,6 @@ emacsclientに興味がありながらも上手く設定できずに悩んでい
 :export_file_name: generated/contents/blog/2026/7d3afe
 :export_date: 2026-11-27 19:03
 :export_updated: 2026-11-27 19:03
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/26583e
 :export_tags: emacs nix tutorial
@@ -17004,7 +17003,6 @@ Nixを使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行で
 :export_file_name: generated/contents/blog/2026/232531
 :export_date: 2026-11-27 18:04
 :export_updated: 2026-11-27 18:04
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/5499a8
 :export_tags: lean formal-verification cli tax release lean-ritsuryo
@@ -17550,7 +17548,6 @@ Each command output in this post comes from a real run, pasted as is.
 :export_date: 2026-11-27 20:30
 :export_updated: 2026-11-27 20:30
 :export_original: /blog/2026/1e0718
-:export_draft: t
 :export_tags: git security ai-agent release minsky-git
 :end:
 
@@ -17855,7 +17852,6 @@ Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https
 :export_file_name: generated/contents/blog/2026/bec1c0
 :export_date: 2026-11-27 18:04
 :export_updated: 2026-11-27 18:04
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/bfc7fe
 :export_tags: lean paper formal-verification ai-agent lean-ritsuryo
@@ -18081,7 +18077,6 @@ Workersの静的アセットで配りたいけれど、Cloudflareのトークン
 :export_file_name: generated/contents/blog/2026/881c64
 :export_date: 2026-11-27 17:50
 :export_updated: 2026-11-27 17:50
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/12e5f6
 :export_tags: github-actions cloudflare ci deployment security emacs-doc
@@ -18434,7 +18429,6 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_MのGGUFを動かし、temperature
 :export_file_name: generated/contents/blog/2026/c5f673
 :export_date: 2026-11-27 18:30
 :export_updated: 2026-11-27 18:30
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/33d2c2
 :export_tags: rust cargo nix llm cli release rust-plamo-tr-local
@@ -19789,7 +19783,6 @@ PRのブランチにmasterをmergeし、その上に移植のcommitを積んで�
 :export_file_name: generated/contents/blog/2026/0fe13b
 :export_date: 2026-11-27 18:26
 :export_updated: 2026-11-27 18:26
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/7fe084
 :export_tags: rust aws aws-cli github-actions nix ci differential-testing rust-awscli
@@ -20197,7 +20190,6 @@ Issue / PR大歓迎です。
 :export_file_name: generated/contents/blog/2026/1ff994
 :export_date: 2026-11-27 18:40
 :export_updated: 2026-11-27 18:40
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/b43a06
 :export_tags: lean rust formal-verification code-generation property-based-testing cargo release lean-rs
@@ -20580,7 +20572,6 @@ Rustのコードを作るときはlean-ritsuryoの証明も含めてLeanのパ�
 :export_file_name: generated/contents/blog/2026/c37a82
 :export_date: 2026-11-27 18:40
 :export_updated: 2026-11-27 18:40
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/c4f11a
 :export_tags: lean rust formal-verification tax release rust-ritsuryo lean-ritsuryo lean-rs
@@ -20989,7 +20980,6 @@ LeanでPythonの関数を書けるようにして、Leanの型をpydanticのmode
 :export_file_name: generated/contents/blog/2026/f29ae0
 :export_date: 2026-11-27 18:50
 :export_updated: 2026-11-27 18:50
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/dc65bb
 :export_tags: lean python formal-verification code-generation property-based-testing pydantic fastapi release lean-py
@@ -21444,7 +21434,6 @@ lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の
 :export_file_name: generated/contents/blog/2026/45f8b5
 :export_date: 2026-11-27 18:50
 :export_updated: 2026-11-27 18:50
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/ccc5ed
 :export_tags: lean rust lsp formal-verification testing release rust-lsp-touchstone
@@ -21805,7 +21794,6 @@ $ ./python -m test test_macros
 :export_file_name: generated/contents/blog/2026/2e46f5
 :export_date: 2026-11-27 19:02
 :export_updated: 2026-11-27 19:02
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/f4154e
 :export_tags: python cpython pep macro ast compiler release cpython-pep638
@@ -22523,7 +22511,6 @@ leanassayは、実行できる定理しか確かめられません。
 :export_file_name: generated/contents/blog/2026/e3d3ca
 :export_date: 2026-11-27 19:13
 :export_updated: 2026-11-27 19:13
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/51d6b7
 :export_tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint
@@ -23229,7 +23216,6 @@ Leanの型と仕様を、複数の言語で使う共通語にしたいと考え�
 :export_file_name: generated/contents/blog/2026/21ebbd
 :export_date: 2026-11-27 19:13
 :export_updated: 2026-11-27 19:13
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/23d62c
 :export_tags: lean rust python typescript clojure formal-verification code-generation release lean-leanfran
@@ -24477,7 +24463,6 @@ Mathlibで確かめたのは31ファイルで、残りのファイルには掛�
 :export_file_name: generated/contents/blog/2026/184d80
 :export_date: 2026-11-27 19:28
 :export_updated: 2026-11-27 19:28
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/d60a7d
 :export_tags: lean rust mathlib parser release rust-leanwisp
@@ -24821,7 +24806,6 @@ FileWorkerの管理をRustに移す案も考えたのですが、3つのファ�
 :export_file_name: generated/contents/blog/2026/7fdcef
 :export_date: 2026-11-27 19:28
 :export_updated: 2026-11-27 19:28
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/060bea
 :export_tags: lean rust lsp mathlib performance formal-verification release rust-leansail lean-leanfran rust-lsp-touchstone
@@ -25159,7 +25143,6 @@ HasuraにHTTPでクエリを送って15回測った時間の中央値は、次�
 :export_file_name: generated/contents/blog/2026/2c4407
 :export_date: 2026-11-27 19:38
 :export_updated: 2026-11-27 19:38
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/360ae9
 :export_tags: hasura graphql postgresql performance
@@ -25543,7 +25526,6 @@ XMLから条文を取り出す処理や項を句に分ける処理、LeanからR
 :export_file_name: generated/contents/blog/2026/28ac3e
 :export_date: 2026-11-27 19:38
 :export_updated: 2026-11-27 19:38
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/2a0865
 :export_tags: rust lean japanese-law linter formal-verification release rust-ritsulint lean-leanfran
@@ -25937,7 +25919,6 @@ Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanpr
 :export_file_name: generated/contents/blog/2026/ca523a
 :export_date: 2026-11-27 19:50
 :export_updated: 2026-11-27 19:50
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/d8ac45
 :export_tags: lean rust performance profiler formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
@@ -26348,7 +26329,6 @@ Symphonyがタスクごとに用意する作業場や冒頭のポストの図に
 :export_file_name: generated/contents/blog/2026/5e0ecc
 :export_date: 2026-11-27 19:50
 :export_updated: 2026-11-27 19:50
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/bab1ba
 :export_tags: ai-agent history vercel-board
@@ -26725,7 +26705,6 @@ crates.ioへの公開のように取り消せない操作ではワーカーが�
 :export_file_name: generated/contents/blog/2026/048a8b
 :export_date: 2026-11-27 20:06
 :export_updated: 2026-11-27 20:06
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/a80aa6
 :export_tags: ai-agent vercel-board t3-code nix
@@ -27231,7 +27210,6 @@ Leanの =IO= の関数をPHPのコマンドとして動かすgreet-cliもあり�
 :export_file_name: generated/contents/blog/2026/88e5f5
 :export_date: 2026-11-27 20:06
 :export_updated: 2026-11-27 20:06
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/ec8faf
 :export_tags: lean php formal-verification code-generation release lean-leanfran
@@ -28479,7 +28457,6 @@ GoをLeanに訳すときには、Goの整数を同じ幅のLeanの整数にし�
 :export_file_name: generated/contents/blog/2026/3b66b5
 :export_date: 2026-11-27 20:22
 :export_updated: 2026-11-27 20:22
-:export_draft: t
 :export_lang: en
 :export_original: /blog/2026/ad14a8
 :export_tags: lean go formal-verification code-generation release lean-leanfran
@@ -29132,7 +29109,6 @@ I left out the rest of =clojure.core=, which includes numbers, strings, concurre
 :export_date: 2026-11-27 20:55
 :export_updated: 2026-11-27 20:55
 :export_tags: clojure standard-library
-:export_draft: t
 :end:
 
 Clojureの =clojure.core= のうちseqとコレクションと関数を扱う163個の関数を、1つずつ小さな式で書いたチートシートを作りました。

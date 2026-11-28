@@ -1,7 +1,6 @@
 Title: emacsclient on NixOS: run Emacs as a server with services.emacs
 Date: 2026-11-27 19:03
 Updated: 2026-11-27 19:03
-Draft: true
 Lang: en
 Original: /blog/2026/26583e
 Tags: emacs nix tutorial

@@ -1,7 +1,6 @@
 Title: leanassay: mutation testing for Lean 4 theorems, to measure how much they pin down the implementation
 Date: 2026-11-27 19:13
 Updated: 2026-11-27 19:13
-Draft: true
 Lang: en
 Original: /blog/2026/51d6b7
 Tags: lean formal-verification testing release lean-leanassay rust-lsp-touchstone lean-leanfran rust-leanwisp rust-leansail rust-leankeel rust-leanwake rust-ritsuryo rust-ritsulint

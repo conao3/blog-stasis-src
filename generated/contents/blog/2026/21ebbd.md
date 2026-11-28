@@ -1,7 +1,6 @@
 Title: leanfran: call Lean 4 functions from Rust, Python, TypeScript and Clojure, and prove their functions in Lean
 Date: 2026-11-27 19:13
 Updated: 2026-11-27 19:13
-Draft: true
 Lang: en
 Original: /blog/2026/23d62c
 Tags: lean rust python typescript clojure formal-verification code-generation release lean-leanfran

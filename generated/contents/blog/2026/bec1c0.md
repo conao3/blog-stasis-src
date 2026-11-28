@@ -1,7 +1,6 @@
 Title: Publishing a Lean 4 paper on aiXiv
 Date: 2026-11-27 18:04
 Updated: 2026-11-27 18:04
-Draft: true
 Lang: en
 Original: /blog/2026/bfc7fe
 Tags: lean paper formal-verification ai-agent lean-ritsuryo
