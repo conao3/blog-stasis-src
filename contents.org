@@ -31826,7 +31826,7 @@ MMXXVI
 
 ** ほかに目についたもの
 
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] の画像は、画素の配列を書き換えて =canvas-refresh= で描き直す、速い描き直しのための画像です。caf462dのビルドでは、X11とpgtkのどちらでも渡した配列の色が描かれなかったので、直ったら節にします。
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] の画像は、画素の配列を書き換えて =canvas-refresh= で描き直す、速い描き直しのための画像です。CairoでビルドしたEmacsでは、2026-11-21に入った [[https://github.com/emacs-mirror/emacs/commit/c9f0656d47520cf3bee6e75b244806ed510e256e][c9f0656d47]] から色が描かれず黒か崩れた模様になり、caf462dのビルドもX11とpgtkのどちらでもそうなりました。この件は [[https://debbugs.gnu.org/79204][Bug#79204]] に [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2026-11/msg01286.html][報告していて]]、直ったら節にします。
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] はUUIDを作ったり読んだりするライブラリです。
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]] に対応しました。
 
@@ -31981,7 +31981,7 @@ MMXXVI
 
 ** Other changes worth a look
 
-- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] images are made for fast redraws: you rewrite the pixel data and call =canvas-refresh=. In the caf462d build, neither the X11 nor the pgtk version drew the colors I passed in, so I will add a section once that works.
+- [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L731][canvas]] images are made for fast redraws: you rewrite the pixel data and call =canvas-refresh=. On Cairo builds they have been drawn black or as broken patterns since [[https://github.com/emacs-mirror/emacs/commit/c9f0656d47520cf3bee6e75b244806ed510e256e][c9f0656d47]] landed on 2026-11-21, and the caf462d build shows this in both the X11 and the pgtk version. I [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2026-11/msg01286.html][reported it]] in [[https://debbugs.gnu.org/79204][Bug#79204]], and I will add a section once it is fixed.
 - [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L660][uuid]] is a library that generates and parses UUIDs.
 - Emacs supports [[https://github.com/emacs-mirror/emacs/blob/caf462d7415cdd1ba4bcf23df69be3455165accc/etc/NEWS#L42][Unicode 18.0]].
 
