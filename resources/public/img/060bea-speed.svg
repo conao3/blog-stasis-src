@@ -40,12 +40,12 @@
 <text x="373.2" y="643" font-size="19" fill="#222">21ms</text>
 <text x="334" y="704" font-size="19" text-anchor="end" font-family="monospace" fill="#222">hover</text>
 <rect x="350" y="672" width="3.0" height="24" fill="#d9622b"/>
-<text x="361.0" y="691" font-size="19" fill="#222">1.4ms</text>
+<text x="361.0" y="691" font-size="19" fill="#222">1.44ms</text>
 <rect x="350" y="702" width="3.0" height="24" fill="#9a9a9a"/>
-<text x="361.0" y="721" font-size="19" fill="#222">1.4ms</text>
+<text x="361.0" y="721" font-size="19" fill="#222">1.36ms</text>
 <text x="334" y="782" font-size="19" text-anchor="end" font-family="monospace" fill="#222">plainGoal</text>
 <rect x="350" y="750" width="3.0" height="24" fill="#d9622b"/>
-<text x="361.0" y="769" font-size="19" fill="#222">1.6ms</text>
+<text x="361.0" y="769" font-size="19" fill="#222">1.57ms</text>
 <rect x="350" y="780" width="3.0" height="24" fill="#9a9a9a"/>
-<text x="361.0" y="799" font-size="19" fill="#222">1.4ms</text>
+<text x="361.0" y="799" font-size="19" fill="#222">1.45ms</text>
 </svg>
