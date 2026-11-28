@@ -22355,7 +22355,9 @@ AIが証明を書いてくれるようになってきた今、気にするべき
 
 Leanは定理も実装も実行できるので、Mutation TestをLeanに持ち込んで定理に出てくる関数をわざと壊したバージョンでも定理が成り立ってしまうかを実際に走らせて確かめる道具を作りました。
 試しに自分で証明を書いたlsp-touchstoneの定理に当ててみたところ、仕様に反する状態機械やUTF-16の幅を間違えた変換でもすべての定理が成り立ってしまうことが分かりました。
-Leanで書いた関数をRustに変換して使っている自作のツール6つにも当ててみると2つのツールで合わせて56の穴が見つかったので、定理を足してすべて塞いであります。
+
+Leanで書いた関数をRustに変換して使っている自作のツール6つにも当ててみると2つのツールの監査した関数に合わせて56の穴が見つかったので、定理を足してすべて塞いであります。
+いま残っている穴は監査から外したleanwispの =fields= の2つです。
 
 作った道具のleanassayは[[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]]に置いていて、ライセンスはApache-2.0です。
 この記事の結果は、Lean 4.35.0とleanassay 0.2.0で動かしたものです。
@@ -22531,7 +22533,9 @@ In a project that mapped Julia to Lean, [[https://discourse.julialang.org/t/form
 
 Lean can run both theorems and implementations, so I brought mutation testing into Lean: the tool breaks the functions that a theorem mentions and runs the theorem to see whether it still holds.
 I tried it on the theorems I had proved myself for lsp-touchstone, and every theorem still held for a state machine that broke the spec and for a conversion with the wrong UTF-16 width.
-I also ran it on six of my tools that turn Lean functions into Rust, found 56 holes in two of them, and added theorems that close all of them.
+
+I also ran it on six of my tools that turn Lean functions into Rust, and in the functions I audited it found 56 holes in two of the tools, so I added theorems that close all 56.
+Two holes remain, in leanwisp's =fields=, which I left out of the audit.
 
 The tool, leanassay, is at [[https://github.com/conao3/lean-leanassay][conao3/lean-leanassay]] under the Apache-2.0 license.
 The results in this post come from Lean 4.35.0 and leanassay 0.2.0.

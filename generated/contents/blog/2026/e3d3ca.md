@@ -17,7 +17,9 @@ In a project that mapped Julia to Lean, [128 of 130 "proved" bounds checks](http
 
 Lean can run both theorems and implementations, so I brought mutation testing into Lean: the tool breaks the functions that a theorem mentions and runs the theorem to see whether it still holds.
 I tried it on the theorems I had proved myself for lsp-touchstone, and every theorem still held for a state machine that broke the spec and for a conversion with the wrong UTF-16 width.
-I also ran it on six of my tools that turn Lean functions into Rust, found 56 holes in two of them, and added theorems that close all of them.
+
+I also ran it on six of my tools that turn Lean functions into Rust, and in the functions I audited it found 56 holes in two of the tools, so I added theorems that close all 56.
+Two holes remain, in leanwisp's `fields`, which I left out of the audit.
 
 The tool, leanassay, is at [conao3/lean-leanassay](https://github.com/conao3/lean-leanassay) under the Apache-2.0 license.
 The results in this post come from Lean 4.35.0 and leanassay 0.2.0.
