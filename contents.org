@@ -37460,7 +37460,6 @@ The infoview depends on neither Eglot nor =lsp-mode=, so you get the same infovi
 :export_file_name: generated/contents/blog/2026/b3e7d9
 :export_date: 2026-11-28 04:01
 :export_updated: 2026-11-28 04:01
-:export_draft: t
 :export_tags: emacs emacs-lisp ai-agent claude-code codex bb vow-el release bb-agent-el ts-bb-events
 :end:
 Claude CodeやCodexをスレッドとして動かすbbを、EmacsからbbのGUIと同じ使い方で操作できるbb-agent.elというパッケージを作りました。
@@ -37469,8 +37468,8 @@ Claude CodeやCodexをスレッドとして動かすbbを、EmacsからbbのGUI�
 操作はすべてbbのCLIを呼んで行い、サーバーで起きた変化は私が作った [[https://github.com/conao3/ts-bb-events][bb-events]] で受け取っています。
 スレッドはbbのサーバーで動くのでEmacsを閉じても止まらず、同じスレッドをbbのデスクトップアプリとブラウザからも開けます。
 
-リポジトリは [[https://github.com/conao3/bb-agent.el][conao3/bb-agent.el]] で、ライセンスは [[https://github.com/conao3/bb-agent.el/blob/0a65ad1484b2b40d087f0190a635dd661887c713/LICENSE][GPL-3.0]] です。
-この記事ではmasterの [[https://github.com/conao3/bb-agent.el/commit/0a65ad1484b2b40d087f0190a635dd661887c713][0a65ad1]] と、bb 0.49.0とbb-events 0.4.0を使いました。
+リポジトリは [[https://github.com/conao3/bb-agent.el][conao3/bb-agent.el]] で、ライセンスは [[https://github.com/conao3/bb-agent.el/blob/v0.1.0/LICENSE][GPL-3.0]] です。
+この記事では [[https://github.com/conao3/bb-agent.el/releases/tag/v0.1.0][bb-agent.el 0.1.0]] と、bb 0.49.0とbb-events 0.4.0を使いました。
 
 [[github:conao3/bb-agent.el::Emacs Lisp][Emacs frontend that follows and drives bb agent threads]]
 
@@ -37595,6 +37594,148 @@ GUIのside chatとバックグラウンドで動く作業を1つだけ止める�
 
 サーバーはGUIに渡す表示のデータを作るときに、コマンドの種類から「Listed files in .」のような見出しを付けます。
 この見出しはイベントに入っていないので、bb-agent.elには出ません。
+
+* bb-agent.el: Claude Code and Codex threads in Emacs, the way the bb GUI shows them
+:properties:
+:export_file_name: generated/contents/blog/2026/3c93a5
+:export_date: 2026-11-28 04:25
+:export_updated: 2026-11-28 04:25
+:export_lang: en
+:export_original: /blog/2026/b3e7d9
+:export_tags: emacs emacs-lisp ai-agent claude-code codex bb vow-el release bb-agent-el ts-bb-events
+:end:
+I made bb-agent.el, an Emacs package that drives bb, the tool that runs Claude Code and Codex as threads, the way bb's own GUI does.
+You get the thread list, a conversation that grows as the agent works, buttons for approvals and questions, and a composer where you pick the model and the permission mode, all in Emacs buffers.
+
+bb-agent.el calls bb's CLI for every action, and it learns about changes on the server through [[https://github.com/conao3/ts-bb-events][bb-events]], another tool I wrote.
+The threads run on the bb server, so they keep running after you close Emacs, and you can open the same threads in the bb desktop app or a browser.
+
+The repository is [[https://github.com/conao3/bb-agent.el][conao3/bb-agent.el]], under the [[https://github.com/conao3/bb-agent.el/blob/v0.1.0/LICENSE][GPL-3.0]].
+For this post I used [[https://github.com/conao3/bb-agent.el/releases/tag/v0.1.0][bb-agent.el 0.1.0]], bb 0.49.0 and bb-events 0.4.0.
+
+[[github:conao3/bb-agent.el::Emacs Lisp][Emacs frontend that follows and drives bb agent threads]]
+
+** What bb is
+
+bb runs coding agents such as Claude Code and Codex in units called threads.
+bb's [[https://github.com/get-bb/bb/blob/b0ddaad731565d7e4de68d824120d802fc78f7d5/README.md?plain=1#L17-L19][README]] describes it like this:
+
+#+begin_quote
+Every surface — the desktop app, web app, CLI, and HTTP API — is a first-class way to drive bb. Work runs in threads you can follow live, steer at any point, or hand off to another agent.
+#+end_quote
+
+Besides the desktop app and the browser UI, bb has the =bb= CLI, and every command of it can print JSON.
+So I use bb as a component without a screen, and I build the screen in Emacs.
+
+** What bb-agent.el does
+
+[[./resources/public/img/b3e7d9-thread-list.png]]
+
+=M-x bb-agent= lists the threads on the bb server.
+I took the screenshots with a script that returns made-up data in place of the bb CLI and bb-events.
+
+- See the thread list and its state changes as they happen.
+- Open a thread and watch the agent's replies and command output arrive.
+- Answer approvals, questions and plans with buttons.
+- Pick the model, reasoning level, permission mode, plan mode and attachments, and send a follow-up or start a new thread.
+
+** Installing bb-agent.el
+
+bb-agent.el needs Emacs 31.1 and [[https://s.conao3.com/blog/2026/7d9eba][vow]], my library for asynchronous code.
+You also need the =bb= CLI connected to a bb server, and bb-events.
+
+You can install bb-events with Nix.
+
+#+begin_src sh
+nix profile add github:conao3/ts-bb-events
+#+end_src
+
+With leaf, these forms install vow and bb-agent.el.
+
+#+begin_src emacs-lisp
+(leaf vow
+  :vc (:url "https://github.com/conao3/vow.el"))
+
+(leaf bb-agent
+  :vc (:url "https://github.com/conao3/bb-agent.el"))
+#+end_src
+
+I installed leaf from MELPA into Emacs 31.1 with an empty =user-emacs-directory=, evaluated the two forms, and checked that =bb-agent= loads.
+If =bb= on your =PATH= is Clojure's babashka, set =bb-agent-cli-command= to the path of bb's CLI.
+
+** The thread list
+
+The mark at the start of each row shows the thread's state, in the same priority order as the sidebar of the bb GUI.
+=?= means the thread waits for an approval or an answer, =●= means it works, =•= means unread, and =!= means an unread error.
+
+=N= jumps to the next thread that waits for you, and =a= answers its approval from the list.
+Mark several threads with =m= to pin or archive them at once.
+
+You can group the list by project, by machine, or by sections you name yourself.
+The GUI moves a thread into a section and sets its parent by drag and drop, and bb-agent.el does both with the =>= and =<= keys.
+
+** The thread buffer
+
+[[./resources/public/img/b3e7d9-thread.png]]
+
+When you open a thread, the work between your request and the agent's reply folds into one line such as =Edited 2 files, ran 1 command=.
+I read the GUI's [[https://github.com/get-bb/bb/blob/b0ddaad731565d7e4de68d824120d802fc78f7d5/packages/thread-view/src/timeline-view.ts][source]] and matched its grouping and word order.
+
+=TAB= unfolds that line, and you can see the files the agent read, the commands it ran and their output.
+While the agent works, its text and the command output appear in the order they arrive.
+
+A command approval shows up as a card, and you answer it by pressing a button such as =[Allow once]= with =RET=.
+While the agent keeps a todo list, a card shows its progress too.
+
+** Collapsing finished turns
+
+[[./resources/public/img/b3e7d9-collapsed-turns.png]]
+
+A turn runs from the moment the agent takes a request until it finishes its reply.
+The bb GUI has a per-provider setting for Claude Code and Codex that either lists the work of a finished turn row by row or folds it into one =Worked for= line.
+
+bb-agent.el reads that setting with =bb settings completed-turns= and shows finished turns the way the GUI does.
+
+The screenshot shows a Codex thread with both turns folded into =Worked for=, and I unfolded the first one with =TAB=.
+
+A =NEW= line marks the replies that arrived since you last read the thread.
+The card below it shows the state of the thread's pull request, with buttons.
+
+** The composer
+
+[[./resources/public/img/b3e7d9-composer.png]]
+
+The composer is a buffer that opens below the thread, and =C-c C-c= sends what you wrote.
+If the agent is still working, your message goes into the queue and becomes the next turn, as in the GUI.
+
+The header shows the model, the reasoning level and the permission mode, and =C-c C-m= and =C-c C-p= change them.
+=@= completes paths in the thread's working directory, =/= at the start of a line completes commands, and =/handoff= hands the thread off to a new thread.
+
+The screenshot shows the composer of a new thread, opened with =+= in the list, where you also pick the project, the machine and how to set up the working tree.
+
+** Building the GUI on the CLI and bb-events
+
+For each action, such as starting a thread, sending a follow-up or answering an approval, bb-agent.el runs the =bb= CLI with =--json= asynchronously.
+The CLI returns a result and exits on each call, so with the CLI alone you would have to call it again and again to keep the list and the conversation current.
+
+The bb desktop app gets a notice over a WebSocket connection to the server whenever a thread changes.
+bb's documentation does not cover that WebSocket connection, so I wrote bb-events, a CLI that keeps printing those notices as JSON lines.
+
+The list fetches the threads again on each line from =bb-events changes follow-changes=, and the thread buffer adds items for each event that =bb-events threads follow-events= prints.
+I proposed the same feature for the bb CLI in [[https://github.com/get-bb/bb/issues/8300][get-bb/bb#8300]].
+
+** How close it is to the GUI
+
+I connected Emacs to a real bb server, pressed the keys and buttons, and checked bb-agent.el's features on both the server state and the Emacs screen.
+I also put the same threads next to the bb web UI and checked that the number of folded rows and their headings match.
+
+I wrote the actions that change state, such as merging a pull request and updating bb itself, but I have not run them against the real server.
+My Claude Code and Codex did not use their planning tools, so I checked the todo card only with tests.
+
+bb-agent.el has no side chat, and it cannot stop just one of several background tasks.
+
+When the server builds the display data for the GUI, it adds headings such as "Listed files in ." from the kind of command.
+Those headings are not part of the events, so bb-agent.el does not show them.
 
 * COMMENT Local variables
 # Local Variables:
