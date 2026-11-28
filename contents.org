@@ -16165,6 +16165,260 @@ fi
 NixOSの =services.emacs= を利用することで、emacsclientの環境を簡単に構築できます。
 emacsclientに興味がありながらも上手く設定できずに悩んでいた人におすすめです。
 
+* emacsclient on NixOS: run Emacs as a server with services.emacs
+:properties:
+:export_file_name: generated/contents/blog/2026/7d3afe
+:export_date: 2026-11-28 09:03
+:export_updated: 2026-11-28 09:03
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/26583e
+:export_tags: emacs nix tutorial
+:end:
+
+As an Emacs user, you sometimes want to edit a file from the shell in the Emacs instance that is already running, and emacsclient lets you do that.
+This post sets up emacsclient on NixOS with services.emacs.
+
+You keep Emacs running as a server, and emacsclient connects to it as a client and opens the file at once.
+
+ref: [[https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/editors/emacs.md][nixpkgs/nixos/modules/services/editors/emacs.md at master / NixOS/nixpkgs / GitHub]]
+
+** How emacsclient works
+Emacs supports a server/client model.
+Started the usual way, Emacs runs as a standalone process, but in server mode it stays resident in the background.
+
+The emacsclient command then connects to the running Emacs server and opens files in a new frame or buffer.
+
+** Test environment
+So that you can try this without NixOS, I set up a Nix flake that boots a NixOS VM on QEMU.
+If you already use NixOS, add the settings to your own =configuration.nix= instead.
+
+The VM has a minimal Xfce desktop, which is enough to try the server and client features of Emacs.
+
+flake.nix
+#+begin_src nix
+{
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+  outputs = { self, nixpkgs }: {
+    nixosConfigurations.minimal-vm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [ ./configuration.nix ];
+    };
+
+    packages.x86_64-linux.default = self.nixosConfigurations.minimal-vm.config.system.build.vm;
+  };
+}
+#+end_src
+
+configuration.nix
+#+begin_src nix
+{ modulesPath, pkgs, ... }: {
+  imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
+
+  system.stateVersion = "24.11";
+
+  users.users.demo = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ];
+    initialPassword = "demo";
+  };
+
+  services.xserver.enable = true;
+  services.xserver.desktopManager.xfce.enable = true;
+  services.xserver.desktopManager.xfce.enableScreensaver = false;
+
+  environment.systemPackages = with pkgs; [ git ];
+}
+#+end_src
+
+With these two files in place, this command boots the VM.
+
+#+begin_src shell
+QEMU_OPTS="-m 8192 -smp 4" nix run
+#+end_src
+
+
+#+DOWNLOADED: screenshot @ 2026-01-24 14:40:56
+[[file:resources/public/img/42afe4e0-4c5c-0b43-1d32-56bbbcc695ab.png]]
+
+From here on, you make your changes in configuration.nix.
+
+** Configuration
+Enabling =services.emacs= starts the Emacs server when the user logs in.
+
+configuration.nix
+#+begin_src nix
+{
+  services.emacs = {
+    enable = true;
+    defaultEditor = true;
+  };
+}
+#+end_src
+
+With this setting, emacsclient starts together with the OS.
+
+Setting =defaultEditor= as well points =EDITOR= at emacsclient, so programs that use =EDITOR= open files in emacsclient without any setup of their own.
+
+The option only sets an environment variable, so if you let =e= run =EDITOR=, =e something.txt= opens the file.
+
+#+begin_src nix
+{
+  environment.shellAliases = {
+    e = "$EDITOR";
+  };
+}
+#+end_src
+
+*** services.emacs options
+=services.emacs= has a few more useful options.
+
+**** package
+This option selects the Emacs package to use.
+The default is =pkgs.emacs=, and you can also set emacs-nox, emacs-pgtk, or an Emacs package you customized yourself.
+
+#+begin_src nix
+{
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs-pgtk;
+  };
+}
+#+end_src
+
+** Usage
+*** After boot
+emacsclient starts when the OS boots, so you can open a new frame right away.
+Earlier you made =e= an alias for =$EDITOR=, so running =e= alone opens a new frame.
+Add =&= so the command doesn't block the shell.
+
+#+begin_src shell
+e &
+#+end_src
+
+You can also run =emacsclient -c= yourself.
+
+#+begin_src shell
+emacsclient -c &
+#+end_src
+
+#+DOWNLOADED: screenshot @ 2026-01-25 10:51:15
+[[file:resources/public/img/471b70d6-8461-e881-8367-ce86c4246ad3.png]]
+
+*** Opening a file
+In the same way, =e something.txt= opens a file.
+To give control back to the shell, press =C-x #= and tell Emacs you have finished editing.
+
+#+begin_src shell
+e something.txt
+#+end_src
+
+*** Main emacsclient options
+**** -c (=--create-frame=)
+Creates a new frame and opens the file in it.
+
+#+begin_src shell
+e -c file.txt
+#+end_src
+
+**** -t (=--tty=)
+Opens Emacs inside the terminal.
+
+#+begin_src shell
+e -t file.txt
+#+end_src
+
+**** -n (=--no-wait=)
+Gives control back to the shell as soon as the file opens.
+By default emacsclient waits until you finish editing, and with this option it opens the file in the background.
+
+#+begin_src shell
+e -n file.txt
+#+end_src
+
+*** Checking the server status
+Use =systemctl= to check that the Emacs server is running.
+
+#+begin_src shell
+systemctl --user status emacs
+#+end_src
+
+To restart the server by hand:
+
+#+begin_src shell
+systemctl --user restart emacs
+#+end_src
+
+*** Troubleshooting
+**** The server doesn't start
+Check the log first.
+
+#+begin_src shell
+journalctl --user -u emacs
+#+end_src
+
+In most cases, an error in your Emacs init file (init.el) causes this.
+Start Emacs the usual way, fix the configuration, and then restart the server.
+
+**** Several servers are running
+If several Emacs servers end up running for some reason, these commands stop all of them.
+
+#+begin_src shell
+systemctl --user stop emacs
+pkill -u $USER emacs
+#+end_src
+
+Then start the server again.
+
+#+begin_src shell
+systemctl --user start emacs
+#+end_src
+
+**** Sharing the clipboard
+To use text you copied in the QEMU VM on the host as well, use the GTK backend of QEMU.
+
+Add =-display gtk= to QEMU_OPTS when you boot the VM:
+
+#+begin_src shell
+QEMU_OPTS="-m 8192 -smp 4 -display gtk" nix run
+#+end_src
+
+Text you copy inside the VM then shows up in the clipboard of the host.
+
+**** tips
+It's fun to look at what this configuration sets up.
+
+Check the systemd unit file:
+
+#+begin_src shell
+systemctl --user cat emacs
+#+end_src
+
+Check the value of the EDITOR environment variable:
+
+#+begin_src shell
+$ echo $EDITOR
+emacseditor
+
+$ which $EDITOR
+/run/current-system/sw/bin/emacseditor
+
+$ cat $(which $EDITOR)
+#!/nix/store/lw117lsr8d585xs63kx5k233impyrq7q-bash-5.3p3/bin/bash
+if [ -z "$1" ]; then
+  exec /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacsclient --create-frame --alternate-editor /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacs
+else
+  exec /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacsclient --alternate-editor /nix/store/3gh804i02baai4yvn4vz99hs4ncvxjdd-emacs-30.2/bin/emacs "$@"
+fi
+#+end_src
+
+You can see that =EDITOR= runs =emacseditor=, a small shell script that wraps =emacsclient=.
+
+** Summary
+With =services.emacs= on NixOS, setting up emacsclient takes little effort.
+If you have wanted to use emacsclient but couldn't get the setup to work, give this a try.
+
 * Emacs posframe入門
 :properties:
 :export_file_name: generated/contents/blog/2025/ba3a31
@@ -21326,6 +21580,241 @@ $ ./python -m test test_macros
 =test_macros= の32のテストはすべて通り、CPythonのテスト全体でも、子プロセスの実行ファイルの名前を調べる =test_profiling= の1つがNixの環境で失敗するほかは通っています。
 
 どこに何を足したかは、リポジトリの[[https://github.com/conao3/cpython-pep638#where-the-implementation-lives][READMEのWhere the implementation lives]]にまとめてあります。
+
+* cpython-pep638: PEP 638 syntactic macros for Python, implemented in CPython 3.15.2
+:properties:
+:export_file_name: generated/contents/blog/2026/2e46f5
+:export_date: 2026-11-28 09:02
+:export_updated: 2026-11-28 09:02
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/f4154e
+:export_tags: python cpython pep macro ast compiler release cpython-pep638
+:end:
+
+[[https://peps.python.org/pep-0638/][PEP 638]] proposes syntactic macros for Python.
+You write a macro in the form =name!=, and at compile time a function written in Python expands it and rewrites the AST.
+
+I implemented this PEP in CPython 3.15.2.
+I added rules to the parser and one layer that hands the AST to a Python function before compilation, and with those two changes macros run in CPython itself.
+
+The repository is [[https://github.com/conao3/cpython-pep638][conao3/cpython-pep638]], and it stacks the implementation commits on the [[https://github.com/python/cpython/tree/v3.15.2][v3.15.2]] tag of python/cpython.
+It derives from CPython, so it uses the same license, the PSF License Version 2, but it is my own experiment and has no connection to the CPython project.
+
+[[github:conao3/cpython-pep638::Python][CPython 3.15.2 with PEP 638 syntactic macros]]
+
+** Writing and using a macro
+A macro processor is a Python function that you mark with a decorator from the =macros= module.
+It receives the AST of the macro and returns the AST that replaces it.
+
+#+begin_src python
+# mymacros.py
+import ast
+import macros
+
+@macros.macro_processor(macros.STMT_MACRO, 1, "finally")
+def try_(node, finally_):
+    return ast.Try(body=node.body, handlers=[], orelse=[],
+                   finalbody=finally_.body)
+
+@macros.macro_processor(macros.EXPR_MACRO, 1)
+def quote(node):
+    return ast.Constant(ast.unparse(node.args[0]))
+#+end_src
+
+=try_= is a statement macro that takes the =finally!:= clause after it as its second argument, and =quote= is an expression macro that turns its argument expression into a source string.
+
+In the code that uses the macros, =from!= imports the processors.
+
+#+begin_src python
+# main.py
+from! mymacros import try_
+from! mymacros import quote
+
+def read(log):
+    try_!:
+        return quote!(a + b * c)
+    finally!:
+        log.append("closed")
+
+log = []
+print(read(log), log)
+#+end_src
+
+I run this with the =python= built from this repository.
+
+#+begin_src console
+$ ./python main.py
+a + b * c ['closed']
+#+end_src
+
+=quote!(a + b * c)= became the string ='a + b * c'=, and =try_!= became a =try= statement with a =finally= clause.
+Neither =a= nor =b= is defined, but the macro replaces the expression with a string before Python can evaluate it, so you get no error.
+
+** Macro syntax
+A macro name is an identifier followed by =!= with no space between them, and a keyword followed by =!=, such as =from!= or =finally!=, is also a macro name.
+
+[[https://peps.python.org/pep-0638/#statement-form][Statement macros]] take this form.
+
+#+begin_src text
+name! [引数] [import NAME] [as NAME] [: ブロック]
+#+end_src
+
+An expression macro takes the form =name!(引数)=, but [[https://peps.python.org/pep-0638/#resolving-ambiguity][the statement form takes precedence at the start of a line]].
+Inside an f-string, I kept the =!= in =f"{x!r}"= as the conversion specifier.
+
+There are three [[https://peps.python.org/pep-0638/#defining-macro-processors][kinds of macro processors]].
+
+- =STMT_MACRO= :: A statement macro. It receives the indented block as =body=.
+- =SIBLING_MACRO= :: A statement macro without a block. It receives the next statement in the same block as =body=.
+- =EXPR_MACRO= :: An expression macro.
+
+If you use a macro you haven't imported, compilation fails with a =SyntaxError=.
+
+#+begin_src console
+$ cat undefined.py
+print(quote!(a + b))
+$ ./python undefined.py
+  File "/path/to/undefined.py", line 1
+    print(quote!(a + b))
+          ^^^^^^^^^^^^^
+SyntaxError: macro quote! is not defined
+#+end_src
+
+** The layer that expands macros
+CPython parses the source into an AST and builds the symbol table and the bytecode from that AST, so I put macro expansion at the point where the compiler starts turning the AST into bytecode.
+
+[[./resources/public/img/f4154e-pipeline.svg]]
+
+The parser keeps each macro in the tree as an =ast.MacroStmt= or =ast.MacroExpr= node, and the compiler walks the tree in C to look for macros.
+If it finds one, it converts the tree into Python objects and passes them to =macros._expand()=, which calls the processors from the outermost macro inward and expands the trees those processors return as well.
+
+The compiler converts the expanded tree back into C structs, validates it, and passes it on to the symbol table and bytecode generation.
+
+Expansion runs on every compilation, so macros work through =import=, =exec()=, and =compile()= alike, and since =ast.parse()= returns the tree before expansion, you can inspect the macro nodes as the parser left them.
+
+#+begin_src console
+$ ./python -c 'import ast; print(ast.dump(ast.parse("quote!(a)").body[0]))'
+MacroStmt(name='quote', args=[Name(id='a')])
+#+end_src
+
+=quote!(a)= sits at the start of the line, so the parser reads it as a statement macro.
+
+A layer in front of the parser decides how to treat keywords.
+CPython's parser receives =finally= as a keyword token and can't read =finally!= as a name, so when the next character is =!=, I made that layer skip the keyword check and keep the token as a name.
+
+If =!== follows, as in =x!=y=, the parser reads it as the comparison operator.
+
+** StmtExpr: running a statement inside an expression
+Some expression macros need to run a statement before they compute their value.
+The [[https://peps.python.org/pep-0638/#ast-extensions][PEP]] defines a =stmt_expr= node for this, and this implementation provides it as =ast.StmtExpr(stmt, value)=, which runs =stmt=, then evaluates =value= and uses that as the value of the expression.
+
+#+begin_quote
+A new AST node called =stmt_expr= will be added, combining a statement and an expression. This new ast node will be a subtype of =expr=, but include a statement to allow side effects. It will be compiled to bytecode by compiling the statement, then compiling the value.
+#+end_quote
+
+As a test, I write =debug!=, which prints an expression and its value and then returns the value.
+
+#+begin_src python
+# mymacros.py に足す
+@macros.macro_processor(macros.EXPR_MACRO, 1)
+def debug(node):
+    tmp = f"$$debug_{node.lineno}_{node.col_offset}"
+    label = ast.unparse(node.args[0]) + " ="
+    show = ast.If(ast.Constant(True), [
+        ast.Assign([ast.Name(tmp, ast.Store())], node.args[0]),
+        ast.Expr(ast.Call(ast.Name("print", ast.Load()),
+                          [ast.Constant(label), ast.Name(tmp, ast.Load())],
+                          [])),
+    ], [])
+    return ast.StmtExpr(show, ast.Name(tmp, ast.Load()))
+#+end_src
+
+For the =debug!= on line 3 of =debug.py=, the variable name becomes =$$debug_3_11=.
+This follows [[https://peps.python.org/pep-0638/#hygiene-and-debugging][the naming that the PEP recommends to avoid collisions]], and you can't write such a name in source code, so it can't clash with your variables.
+
+#+begin_quote
+- All generated variable names should start with a =$=
+- Purely artificial variable names should start =$$mname= where =mname= is the name of the macro.
+- Variables derived from real variables should start =$vname= where =vname= is the name of the variable.
+- All variable names should include the line number and the column offset, separated by an underscore.
+#+end_quote
+
+#+begin_src python
+# debug.py
+from! mymacros import debug
+
+squares = [debug!(x * x) for x in range(3)]
+print(squares)
+print(True or debug!(1 / 0))
+#+end_src
+
+#+begin_src console
+$ ./python debug.py
+x * x = 0
+x * x = 1
+x * x = 4
+[0, 1, 4]
+True
+#+end_src
+
+Python evaluates =debug!= where it sits, both inside the comprehension and on the right of =or=, and it skips the right side of =True or ...=, so =1 / 0= doesn't run and stop the program.
+The compiler translates =StmtExpr= into bytecode itself, so the statement runs where you place the macro, in Python's evaluation order.
+
+If a =break=, =continue=, or =return= inside =stmt= leaves the =StmtExpr=, control jumps out in the middle of an expression and leaves values on the stack, so the compiler rejects such a tree with a =SyntaxError=.
+
+#+begin_src python
+# escape.py
+import ast
+
+tree = ast.parse("for x in y:\n    f(E)\n")
+call = tree.body[0].body[0].value
+call.args[0] = ast.StmtExpr(ast.Break(), ast.Constant(None))
+ast.fix_missing_locations(tree)
+compile(tree, "<ast>", "exec")
+#+end_src
+
+#+begin_src console
+$ ./python escape.py
+Traceback (most recent call last):
+  File "/path/to/escape.py", line 7, in <module>
+    compile(tree, "<ast>", "exec")
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "<ast>", line 2
+SyntaxError: 'break', 'continue' and 'return' cannot leave a statement expression
+#+end_src
+
+** Differences from the PEP
+This implementation differs from the text of the PEP in these ways.
+
+- The AST class names follow CPython's naming: =MacroStmt=, =MacroExpr=, and =StmtExpr=.
+- The parser reads the block of a statement macro as Python statements. A line such as ="red" = 1= in the PEP's [[https://peps.python.org/pep-0638/#compile-time-checked-data-structures][bijection! example]] is a syntax error.
+- The [[https://peps.python.org/pep-0638/#lexical-analysis][PEP]] specifies the macro name as a single =MACRO_NAME= token, but =tokenize= returns it as two tokens, =NAME= and =!=.
+- The [[https://peps.python.org/pep-0638/#defining-macro-processors][PEP]] defines the =version= of a processor as the number that lets Python rebuild cached bytecode correctly. This implementation checks that =version= is an integer, but it doesn't rebuild cached bytecode when you change a processor.
+
+The =bijection!= example in the PEP looks like this.
+
+#+begin_src python
+bijection! color_to_code, code_to_color:
+    "red" = 1
+    "blue" = 2
+    "green" = 3
+#+end_src
+
+** Trying it
+You build it the same way as CPython, and with Nix, =nix develop nixpkgs#python315= gives you everything the build needs.
+
+#+begin_src console
+$ git clone https://github.com/conao3/cpython-pep638
+$ cd cpython-pep638
+$ ./configure --with-pydebug
+$ make -j
+$ ./python -m test test_macros
+#+end_src
+
+All 32 tests in =test_macros= pass, and the full CPython test suite passes as well, except for one test in =test_profiling= that checks the executable name of a child process and fails in the Nix environment.
+
+The [[https://github.com/conao3/cpython-pep638#where-the-implementation-lives][Where the implementation lives]] section of the repository README lists what I added and where.
 
 * Clojure標準ライブラリ概観
 :properties:
