@@ -30,6 +30,10 @@ A static blog built with [Stasis](https://github.com/magnars/stasis), a simple a
 
 4. Open http://localhost:8080 in your browser.
 
+![Top page with links and the list of posts](images/top.png)
+
+The screenshots in this README show sample data.
+
 ## Project Structure
 
 ```
@@ -52,6 +56,10 @@ A static blog built with [Stasis](https://github.com/magnars/stasis), a simple a
 ```
 
 ## Writing Articles
+
+![Post page with a language switch, tags and highlighted code](images/post.png)
+
+![Tag index with the number of posts for each tag](images/tags.png)
 
 1. Add a new top-level heading in `contents.org`
 2. Set the required properties:
