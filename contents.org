@@ -37253,7 +37253,6 @@ gogにも =gog config no-send set <アカウント>= でアカウントごとに
 :export_file_name: generated/contents/blog/2026/15007e
 :export_date: 2026-11-28 01:07
 :export_updated: 2026-11-28 01:07
-:export_draft: t
 :export_tags: emacs emacs-lisp lean lsp mathlib tree-sitter release leaner-ts-mode-el
 :end:
 EmacsでLean 4を書くためのメジャーモードleaner-ts-modeを作り、VS Codeの拡張と同じinfoviewをEmacsのバッファに出せるようにしました。
@@ -37359,6 +37358,120 @@ Mathlibの [[https://github.com/leanprover-community/mathlib4/blob/v4.35.0/Mathl
 ** Eglotでもlsp-modeでも同じinfoviewを使う
 
 infoviewはEglotにも =lsp-mode= にも依存しない作りにしているので、どちらでつないでも同じinfoviewが出ます。
+
+* leaner-ts-mode: the VS Code Lean 4 infoview in Emacs
+:properties:
+:export_file_name: generated/contents/blog/2026/7a84c4
+:export_date: 2026-11-28 01:40
+:export_updated: 2026-11-28 01:40
+:export_lang: en
+:export_original: /blog/2026/15007e
+:export_tags: emacs emacs-lisp lean lsp mathlib tree-sitter release leaner-ts-mode-el
+:end:
+I wrote leaner-ts-mode, an Emacs major mode for Lean 4 that shows the same infoview as the VS Code extension in an Emacs buffer.
+It draws goals, messages, the types of subexpressions, traces and widgets such as =conv?= and =rw??= with Emacs text and images, without running JavaScript.
+
+The repository is [[https://github.com/conao3/leaner-ts-mode.el][conao3/leaner-ts-mode.el]] and the license is [[https://github.com/conao3/leaner-ts-mode.el/blob/1965c77/LICENSE][GPL-3.0]].
+For this post I used commit [[https://github.com/conao3/leaner-ts-mode.el/commit/1965c77][1965c77]] on master with Emacs 31.1 and Lean 4.35.0.
+
+[[github:conao3/leaner-ts-mode.el::Emacs Lisp][Lean 4 major mode using tree-sitter]]
+
+** What leaner-ts-mode does
+
+[[./resources/public/img/15007e-infoview.png]]
+
+The Lean file is on the left and the infoview is on the right.
+The infoview shows the proof state and the messages at the cursor, and you read it to decide which tactic to write next.
+
+leaner-ts-mode splits the infoview into the same parts as the [[https://github.com/leanprover/vscode-lean4/blob/9ac77ca57bf7b7ee5907269142a5bef979aa15bf/vscode-lean4/manual/manual.md#L259-L372][infoview of the VS Code extension]], and it also does the following.
+
+- Highlight with tree-sitter, indent, move between declarations, and use Imenu and Outline.
+- Type symbols with abbreviations such as =\alpha=.
+- Connect to the Lean language server through Eglot or =lsp-mode=.
+
+** Install leaner-ts-mode
+
+leaner-ts-mode runs on Emacs 30.1 or later and parses Lean with the tree-sitter grammar [[https://github.com/lua-vr/tree-sitter-lean-flat][tree-sitter-lean-flat]].
+After you install it, a =.lean= file opens in leaner-ts-mode, and before the first use you run =M-x leaner-ts-install-grammar=, which builds and installs the grammar with Git and a C compiler.
+
+If you use Eglot, write the following with leaf and Eglot starts the language server when you open a Lean file.
+
+#+begin_src emacs-lisp
+(leaf leaner-ts-mode
+  :vc (:url "https://github.com/conao3/leaner-ts-mode.el")
+  :hook (leaner-ts-mode-hook . leaner-ts-eglot-ensure))
+#+end_src
+
+On Emacs 30, install Eglot 1.20 or later from GNU ELPA.
+
+If you use =lsp-mode=, set both the start on opening a file and the start from =C-c C-g= to =leaner-ts-lsp-mode-ensure=.
+
+#+begin_src emacs-lisp
+(leaf leaner-ts-mode
+  :vc (:url "https://github.com/conao3/leaner-ts-mode.el")
+  :custom ((leaner-ts-infoview-start-function . #'leaner-ts-lsp-mode-ensure))
+  :hook (leaner-ts-mode-hook . leaner-ts-lsp-mode-ensure))
+#+end_src
+
+I installed leaf from MELPA into Emacs 31.1 with an empty =user-emacs-directory= and evaluated each form.
+In both cases =M-x leaner-ts-install-grammar= installed the grammar, and opening a Lean file started leaner-ts-mode and connected to the language server.
+
+To start the language server by hand, use =C-c C-e= for Eglot or =M-x leaner-ts-lsp-mode-ensure= for =lsp-mode=.
+=C-c C-g= opens the infoview.
+
+** Read goals and messages in the infoview
+
+Tactic state shows the number of goals and a =case= heading for each goal, followed by its hypotheses and the proposition after =⊢=.
+Expected type shows the type expected inside a term, and Messages shows the errors and warnings on the cursor line.
+
+All messages lists the messages of the whole file, nearest to the cursor first.
+You can fold the headings with Outline, and they stay folded when the view refreshes.
+
+Put the cursor on a term in a hypothesis or a proposition and leaner-ts-mode highlights the whole subexpression and shows the expression, its type and its documentation in ElDoc, such as =And p q : Prop=, and =RET= jumps to the definition of the term.
+A button such as =Demo.lean:4:4= in the heading of a message jumps to the place in the source where Lean reported it.
+
+The suggestions from =exact?= and =simp?= come with an =[apply]= button, which replaces the original tactic with the suggestion.
+
+Press =s= on a message with a trace to search it, and leaner-ts-mode colors the matches and opens the traces that contain them.
+
+** Build the next tactic with a widget
+
+[[./resources/public/img/15007e-conv.png]]
+
+A widget is a view that Lean code adds to the infoview.
+Mathlib has widgets that build the next tactic from a subexpression you select in the goal, and the image shows =conv?= with Mathlib v4.35.0 for Lean 4.35.0.
+
+Put the cursor on =(b + a)= in the goal and press =m= to select it, and the panel shows a =Generate conv= link.
+Clicking the link replaces =conv?= with the following tactic and selects =skip=.
+
+#+begin_src lean4
+  conv =>
+    enter [2, 2]
+    skip
+#+end_src
+
+With =rw??=, selecting a subexpression lists rewrite candidates, and clicking one inserts a tactic such as =rw [Nat.add_comm a b]=.
+
+You can also select a subexpression with =S-mouse-1=, and =U= clears the selection.
+
+The infoview also draws the HTML from =#html=, and GUI Emacs shows SVG as images.
+
+** How leaner-ts-mode draws widgets without JavaScript
+
+The VS Code infoview is a web page, so it loads the JavaScript of a widget and runs it.
+leaner-ts-mode runs no JavaScript: it sends the requests that a widget makes to the Lean language server from Emacs Lisp and draws the HTML that comes back.
+
+The contents of the infoview arrive over the RPC of the Lean language server: =$/lean/rpc/connect= opens a session and =$/lean/rpc/call= calls functions such as =Lean.Widget.getInteractiveGoals=.
+Lean lists the functions in [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Server/ProtocolOverview.lean#L422-L511][ProtocolOverview.lean]], and =Lean.Widget.getWidgets= returns the widgets to show at the cursor.
+
+Mathlib builds its [[https://github.com/leanprover-community/mathlib4/blob/v4.35.0/Mathlib/Tactic/Widget/Conv.lean#L263-L272][conv? widget]] with [[https://github.com/leanprover-community/ProofWidgets4/blob/df72b022e558978a1c50264cfc4d7fec86fa8e04/ProofWidgets/Component/OfRpcMethod.lean#L63-L90][mk_rpc_widget%]] of ProofWidgets, which writes the name of a Lean RPC function into a JavaScript template.
+leaner-ts-mode fetches that JavaScript with =Lean.Widget.getWidgetSource=, finds the function name in it and calls the function with the selected subexpressions.
+
+The function returns a tree of ProofWidgets HTML, and leaner-ts-mode draws paragraphs, lists and bold text as text, SVG as images, and links that edit the source as buttons.
+
+** Use the same infoview with Eglot or lsp-mode
+
+The infoview depends on neither Eglot nor =lsp-mode=, so you get the same infoview with either client.
 
 * COMMENT Local variables
 # Local Variables:
