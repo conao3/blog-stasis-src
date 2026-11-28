@@ -21000,7 +21000,7 @@ lean-py compiles the intermediate representation of the Lean compiler to Python 
 ** Three ways to use it
 lean-py supports three uses.
 
-[[./resources/public/img/dc65bb-uses.svg]]
+[[./resources/public/img/f29ae0-uses.svg]]
 
 1. Write functions and theorems in Lean inside a Python file, and call them from Python. This use takes =lean(...)= and =lean-py sync=.
 2. Pass Lean structures and inductive types around as pydantic models. You can also use pydantic models you wrote yourself from Lean.
