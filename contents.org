@@ -26732,7 +26732,7 @@ The Board calls starting a task "claiming" it: only one agent can claim a task, 
 
 I run this Board with =vb serve= on helios, my desktop that runs all the time, and my laptop eos reads and writes the same Board over the Tailscale network.
 
-[[./resources/public/img/a80aa6-factory.svg]]
+[[./resources/public/img/048a8b-factory.svg]]
 
 The one I talk to is the conductor thread at the bottom left of the figure.
 I call the span from an agent receiving a request to finishing its reply a turn, and the conductor splits the work into pieces that a worker can finish in one turn before putting them on the Board.
