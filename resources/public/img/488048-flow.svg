@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="480" viewBox="0 0 1100 480" font-family="'Noto Sans CJK JP', 'Hiragino Sans', sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+<rect width="1100" height="480" rx="16" fill="#ffffff"/>
+<rect x="30" y="40" width="300" height="120" rx="8" fill="#f4f4f4" stroke="#888"/>
+<text x="180.0" y="86" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">elaborateする</text>
+<text x="180.0" y="118" font-size="15" fill="#444" text-anchor="middle">メッセージから修正の候補を読む</text>
+<rect x="400" y="40" width="300" height="120" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+<text x="550.0" y="86" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">修正をまとめて当てる</text>
+<text x="550.0" y="118" font-size="15" fill="#444" text-anchor="middle">重ならないものをソースの順に</text>
+<rect x="770" y="40" width="300" height="120" rx="8" fill="#e8f0fb" stroke="#5b7fb8"/>
+<text x="920.0" y="86" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">elaborateし直す</text>
+<text x="920.0" y="118" font-size="15" fill="#444" text-anchor="middle">警告が減って新しい警告が無いか</text>
+<rect x="400" y="260" width="300" height="120" rx="8" fill="#fbeee6" stroke="#c07a4f"/>
+<text x="550.0" y="306" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">修正を1つずつ試す</text>
+<text x="550.0" y="338" font-size="15" fill="#444" text-anchor="middle">通らない修正はRejectedに入れる</text>
+<rect x="770" y="260" width="300" height="120" rx="8" fill="#eaf6ea" stroke="#5c9a5c"/>
+<text x="920.0" y="306" font-size="19" font-weight="bold" fill="#222" text-anchor="middle">変更を残す</text>
+<text x="920.0" y="338" font-size="15" fill="#444" text-anchor="middle">次の周は残したファイルから</text>
+<path d="M330,90 H398" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M700,90 H768" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1000,160 V258" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M840,160 V210 H550 V258" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1012" y="215" font-size="15" fill="#2f6f2f">通る</text>
+<text x="700" y="200" font-size="15" fill="#9a4f22" text-anchor="middle">通らない</text>
+<path d="M920,380 V420 H365 V130 H398" fill="none" stroke="#555" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M550,380 V420" fill="none" stroke="#555" stroke-width="1.6"/>
+<text x="640" y="446" font-size="15" fill="#444" text-anchor="middle">当てる修正が無くなるまで繰り返す</text>
+</svg>

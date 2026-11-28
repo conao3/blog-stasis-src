@@ -31843,6 +31843,568 @@ leanspliceの動作は、これらのテストとGitとの差分テストで確�
 
 IssueやPRは大歓迎です。
 
+* Lean 4の警告についた修正をまとめて当てて、警告が減るものだけを残すlinterのLeankeelを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/488048
+:export_date: 2026-11-27 22:58
+:export_updated: 2026-11-27 22:58
+:export_draft: t
+:export_tags: lean rust linter formal-verification code-generation release rust-leankeel lean-leanfran lean-leanassay mathlib
+:end:
+Lean 4の警告についている修正の候補を、コマンドラインからまとめて当てるlinterのLeankeelを作りました。
+Leanとlinterの警告には、使っていない変数なら =_y= 、非推奨の名前なら置き換え先の名前のように直し方が付いています。
+
+Leankeelはそれを集めてファイルに当てたあと、ファイルをelaborateし直して、警告が減って新しい警告が出ていないときだけ変更を残します。
+
+Mathlibの全8,624ファイルを、tacticの証明の中の使っていない変数も警告にする設定で測ったところ、使っていない変数の修正2,198件のうち97.91%にあたる2,152件を当てて、残りの46件は戻していました。
+
+リポジトリは[[https://github.com/conao3/rust-leankeel][conao3/rust-leankeel]]で、ライセンスはApache-2.0です。
+この記事の結果はLean 4.35.0とLeankeel 0.1.0のコミット =b55c84a= で動かしたものです。
+
+[[github:conao3/rust-leankeel::Rust][A Lean 4 linter that applies Lean's own suggested fixes and verifies every change]]
+
+** 警告を出して直す
+リポジトリの =tests/fixtures/Sample.lean= には警告が3つ出るファイルが入っています。
+
+#+begin_src lean
+def unusedArg (x y : Nat) : Nat :=
+  x + 1
+
+@[deprecated Nat.add_comm (since := "2026-01-01")]
+theorem oldAddComm (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+example (a b : Nat) : a + b = b + a := oldAddComm a b
+
+example (xs : List Nat) : xs ++ [] = xs := by
+  simp [List.append_nil, Nat.add_comm]
+#+end_src
+
+=check-source= で警告を出してみます。
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --file Sample.lean
+#+end_src
+
+#+begin_src text
+Sample.lean:1:17: warn [linter.unusedVariables] Variable name `y` is not explicitly referenced.
+Sample.lean:7:39: warn [Lean.Linter.deprecatedAttr] `oldAddComm` has been deprecated: Use `Nat.add_comm` instead
+Sample.lean:10:25: warn [linter.unusedSimpArgs] This simp argument is unused: Nat.add_comm
+#+end_src
+
+上から、使っていない引数 =y= 、非推奨にした =oldAddComm= の使用、 =simp= に渡したのに使われていない =Nat.add_comm= の警告です。
+角括弧の中はLeanがメッセージに付けている種類の名前で、Leankeelはこれをそのまま規則の名前にしています。
+
+=fix-source= に =--write= を付けると、修正を当ててファイルを書き換えます。
+出力はJSONなので、ここでは =jq= で件数だけを出しています。
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- \
+  source fix-source --file Sample.lean --write | jq -c .Summary
+#+end_src
+
+#+begin_src text
+{"Applied":3,"Deny":0,"Fixable":0,"Rejected":0,"Warn":0}
+#+end_src
+
+3件の修正を当てて、残った警告は0件でした。
+書き換えたファイルの差分は次のとおりで、どれもLeanが警告に付けていた直し方のとおりです。
+
+#+begin_src diff
+-def unusedArg (x y : Nat) : Nat :=
++def unusedArg (x _y : Nat) : Nat :=
+   x + 1
+
+ @[deprecated Nat.add_comm (since := "2026-01-01")]
+ theorem oldAddComm (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+-example (a b : Nat) : a + b = b + a := oldAddComm a b
++example (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+ example (xs : List Nat) : xs ++ [] = xs := by
+-  simp [List.append_nil, Nat.add_comm]
++  simp [List.append_nil]
+#+end_src
+
+** elaborateし直して確かめる
+[[./resources/public/img/488048-flow.svg]]
+
+Leankeelはまずファイルをelaborateして、各メッセージに埋め込まれた修正の候補を読みます。
+選んだ規則の修正のうち、範囲の重ならないものをソースの順にまとめて当てて、もう一度elaborateします。
+
+警告の数が減っていて、出ている警告がどれも前からあったものなら、その変更を残します。
+直す前と後の警告は規則と重大度とメッセージの文で比べていて、修正の候補の文は比べません。
+
+まとめて当てて通らなかったときは修正を1つずつ試し、それでも通らない修正は =Rejected= に入れて二度と試しません。
+
+当てる修正が無くなるまでこれを繰り返すので、1つの =simp= に使っていない引数が2つあるときのように範囲が重なる修正も、1周に1つずつ当たります。
+
+たとえば次のようなファイルでは修正が戻されます。
+
+#+begin_src lean
+def area (width height : Nat) : Nat :=
+  width * width
+
+example : area 3 (height := 4) = 9 := rfl
+
+example (xs : List Nat) : (xs ++ []).length = xs.length := by
+  simp?
+#+end_src
+
+=area= の本体は =height= を使っていないので警告が出るのですが、4行目は =(height := 4)= と名前を付けて引数を渡しています。
+
+=simp?= のように自分の書き換えを提案するtacticの修正には =lean.tryThis= という規則が付きます。
+この規則は既定では当てないので、 =--rules= で選びます。
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source fix-source --file Named.lean \
+  --rules linter.unusedVariables lean.tryThis
+#+end_src
+
+#+begin_src text
+def area (width height : Nat) : Nat :=
+  width * width
+
+example : area 3 (height := 4) = 9 := rfl
+
+example (xs : List Nat) : (xs ++ []).length = xs.length := by
+  simp only [List.append_nil]
+Named.lean:1:16: warn [linter.unusedVariables] Variable name `height` is not explicitly referenced.
+#+end_src
+
+=--output text= では直したあとのファイルと、残った警告が出ます。
+
+=simp?= が提案した =simp only [List.append_nil]= は当たって、 =height= の警告は残りました。
+=height= を =_height= にすると4行目が =Invalid argument name `height` for function `area`= のエラーになるので、Leankeelはこの修正を戻しています。
+
+JSONの出力では =Rejected= に理由が付きます。
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- \
+  source fix-source --file Named.lean \
+  --rules linter.unusedVariables lean.tryThis \
+  | jq -c '.Rejected[] | {Title, Reason}'
+#+end_src
+
+#+begin_src text
+{"Title":"Try this: _height","Reason":"the file gains a diagnostic or keeps as many as before when this fix is applied"}
+#+end_src
+
+** 規則とレベル
+規則はLeanがメッセージに付けている種類なので、ライブラリのlinterやプロジェクトが自分で定義したlinterの警告も、Leankeelが知らなくても規則として扱えます。
+種類の無いメッセージは =lean.error= 、 =lean.warning= 、 =lean.info= になります。
+
+既定のレベルを持つ規則は =rule list-rules= で出せます。
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output table \
+  rule list-rules | cut -f1-4 | column -t -s $'\t'
+#+end_src
+
+#+begin_src text
+Rule                        DefaultLevel  Fix      LeanOption
+linter.unusedVariables      warn          default  linter.unusedVariables
+linter.unusedSimpArgs       warn          default  linter.unusedSimpArgs
+linter.unnecessarySimpa     warn          default  linter.unnecessarySimpa
+Lean.Linter.deprecatedAttr  warn          default  linter.deprecated
+hasSorry                    warn          none     -
+lean.tryThis                warn          opt-in   -
+lean.error                  deny          none     -
+lean.warning                warn          none     -
+lean.info                   allow         none     -
+#+end_src
+
+=fix-source= は =--rules= を指定しなくても =Fix= が =default= の規則を直し、 =opt-in= の規則は =--rules= か設定で選んだときだけ直します。
+
+エラーはいつも =deny= で、ほかの規則のレベルは親ディレクトリをたどって見つかる =leankeel.toml= で変えられます。
+=sorry= の残った定理で止めたいときは =hasSorry= を =deny= にします。
+
+#+begin_src toml
+[rules]
+hasSorry = "deny"
+#+end_src
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --file Todo.lean
+echo $?
+#+end_src
+
+#+begin_src text
+Todo.lean:1:8: deny [hasSorry] declaration uses `sorry`
+254
+#+end_src
+
+=deny= の警告が1つでもあると終了コードが254になるので、CIに入れればそこで止まります。
+
+Lakeのプロジェクトの中ではそのプロジェクトのimportと =leanOptions= でelaborateします。
+リポジトリの =tests/fixtures/project= は =lakefile.toml= でdocstringの無い定義を警告する =linter.missingDocs= を有効にしているので、その警告も規則として出ます。
+
+#+begin_src toml
+[leanOptions]
+weak.linter.missingDocs = true
+#+end_src
+
+#+begin_src sh
+cd tests/fixtures/project
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --paths .
+#+end_src
+
+#+begin_src text
+./Keel/Basic.lean:7:4: warn [linter.missingDocs] missing doc string for public def depth
+./Keel/Use.lean:4:15: warn [linter.unusedVariables] Variable name `m` is not explicitly referenced.
+./Keel/Use.lean:4:33: warn [Lean.Linter.deprecatedAttr] `Keel.depth` has been deprecated: Use `Keel.draft` instead
+#+end_src
+
+** Mathlibで測った
+リポジトリの =scripts/mathlib/= は、Mathlib v4.35.0のすべての =Mathlib/**/*.lean= に =--write= なしで =fix-source= を実行して、当てた修正と戻した修正を数えます。
+Mathlibはビルドで警告を出さないように保たれているので、Mathlibのビルドと同じ設定では8,624ファイルのどれにも警告がありませんでした。
+
+そこで =linter.unusedVariables.analyzeTactics= を有効にして、tacticの証明の中の使っていない変数も警告にして測りました。
+この設定では1,007ファイルで =linter.unusedVariables= の修正が2,198件出て、そのうち2,152件を当てて46件を戻しています。
+
+戻した46件は当てると新しい警告が出るか警告の数が減らなかったものなので、34ファイルに警告のまま残っています。
+[[https://github.com/conao3/rust-leankeel/blob/b55c84a/results/mathlib/analyze-tactics/summary.md][計測の結果]]と[[https://github.com/conao3/rust-leankeel/blob/b55c84a/results/mathlib/default/summary.md][Mathlibの設定のままの結果]]はリポジトリに置いてあります。
+
+** Leanで証明した判定
+当てる修正や残す変更の選び方と、規則のレベルや終了コードの決め方は、Leanの定義と定理としてRustのソースの =leanfran::lean!= の中に書いています。
+ビルドのときにLeanが証明を検査して[[https://s.conao3.com/blog/2026/23d62c][leanfran]]がRustの関数にします。
+
+変更を残すかどうかは次の =accept= で決めていて、ここではほかの2つの定理を省いています。
+
+#+begin_src lean
+def noNew (before after : List String) : Bool :=
+  after.all fun key => after.count key ≤ before.count key
+
+def accept (before after : List String) : Bool :=
+  after.length < before.length && noNew before after
+
+theorem accept_shrinks (before after : List String) (h : accept before after = true) :
+    after.length < before.length := by
+  simp [accept] at h
+  exact h.1
+
+theorem accept_no_new (before after : List String) (h : accept before after = true) (key : String) :
+    after.count key ≤ before.count key := by
+  simp [accept, noNew] at h
+  by_cases hk : key ∈ after
+  · exact h.2 key hk
+  · simp [List.count_eq_zero_of_not_mem hk]
+#+end_src
+
+=before= と =after= は直す前と後の警告の一覧で、警告1件を規則と重大度とメッセージの文をつないだ文字列にしています。
+
+=accept_no_new= は残した変更ではどの警告も前より多く出ていないことを示しています。
+ほかにも次の性質を証明しました。
+
+- 残すソースの範囲はどれもファイルの中にあって、ソースの順に重ならずに並ぶ。
+- 残すバイト数と消すバイト数を足すと、ファイルのバイト数になる。
+- 挿入する編集は選んだ編集とちょうど同じになる。
+- 戻した修正の範囲は当てた編集の分だけずれ、当てた編集が範囲に重なった修正は戻した一覧から外れる。
+- エラーはいつも =deny= で、 =allow= の規則は直さない。
+- 終了コードが0になるのは、 =deny= の警告が1つも無いときだけ。
+
+定理は全部で25件あり、Rustから呼んでいる7つの関数は[[https://s.conao3.com/blog/2026/51d6b7][leanassay]]で監査しています。
+=make check= は定理が触れていない箇所があるときと、出力を変える書き換えを定理が弾けなかったとき、仮定が満たされない定理があるときに失敗します。
+
+Leanのfrontendを動かしてメッセージを取り出す =native/Main.lean= のadapterと、Rustの側でファイルを読み書きして警告を文字列にする部分、それにleanfranの変換は証明の外にあります。
+
+** 確かめているファイルの外
+確かめるのは直しているファイルだけです。
+上の =height= を =_height= にする修正は、 =(height := 4)= で呼んでいるのがほかのファイルだけなら当たってしまうので、直したあとはプロジェクトをビルドします。
+
+Leankeelは自分ではチェックを足さず、elaborateの間にLeanが出すメッセージだけを扱います。
+Mathlibの =#lint= のような環境のlinterや、テキストを見るstyle linter、 =lake shake= はそれぞれのコマンドで動かします。
+
+独自の規則を持つフォーマッタとlinterには[[https://github.com/jcreinhold/lean-fmt][lean-fmt]]があります。
+Mathlibの =scripts/fix_deprecations.py= と =scripts/fix_unused_simp_args.py= はビルドのログの警告の文からソースを書き換えます。
+
+対応しているのはLean 4.35.0です。
+
+* Leankeel: a Lean 4 linter that applies the fixes in Lean's warnings and keeps only the ones that reduce them
+:properties:
+:export_file_name: generated/contents/blog/2026/c91575
+:export_date: 2026-11-27 23:16
+:export_updated: 2026-11-27 23:16
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/488048
+:export_tags: lean rust linter formal-verification code-generation release rust-leankeel lean-leanfran lean-leanassay mathlib
+:end:
+I wrote Leankeel, a Lean 4 linter that applies the suggested fixes in Lean's warnings from the command line, all at once.
+The warnings of Lean and its linters carry a fix, such as =_y= for an unused variable or the replacement name for a deprecated one.
+
+Leankeel collects those fixes, applies them to the file, and elaborates the file again, and it keeps the change only when the warnings went down and no new warning showed up.
+
+I measured all 8,624 files of Mathlib with an option that also reports unused variables inside tactic proofs, and Leankeel applied 2,152 of the 2,198 fixes for unused variables, 97.91%, and reverted the other 46.
+
+The repository is [[https://github.com/conao3/rust-leankeel][conao3/rust-leankeel]], under the Apache-2.0 license.
+I ran the results in this post with Lean 4.35.0 and Leankeel 0.1.0 at commit =b55c84a=.
+
+[[github:conao3/rust-leankeel::Rust][A Lean 4 linter that applies Lean's own suggested fixes and verifies every change]]
+
+** Reporting warnings and fixing them
+=tests/fixtures/Sample.lean= in the repository is a file with three warnings.
+
+#+begin_src lean
+def unusedArg (x y : Nat) : Nat :=
+  x + 1
+
+@[deprecated Nat.add_comm (since := "2026-01-01")]
+theorem oldAddComm (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+example (a b : Nat) : a + b = b + a := oldAddComm a b
+
+example (xs : List Nat) : xs ++ [] = xs := by
+  simp [List.append_nil, Nat.add_comm]
+#+end_src
+
+Run =check-source= to list them.
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --file Sample.lean
+#+end_src
+
+#+begin_src text
+Sample.lean:1:17: warn [linter.unusedVariables] Variable name `y` is not explicitly referenced.
+Sample.lean:7:39: warn [Lean.Linter.deprecatedAttr] `oldAddComm` has been deprecated: Use `Nat.add_comm` instead
+Sample.lean:10:25: warn [linter.unusedSimpArgs] This simp argument is unused: Nat.add_comm
+#+end_src
+
+From the top, the warnings are the unused argument =y=, a use of the deprecated =oldAddComm=, and =Nat.add_comm=, which the file passes to =simp= but =simp= doesn't use.
+The name in square brackets is the kind that Lean attaches to the message, and Leankeel uses it as the rule name.
+
+=fix-source= with =--write= applies the fixes and writes the file back.
+The output is JSON, so I print only the counts with =jq= here.
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- \
+  source fix-source --file Sample.lean --write | jq -c .Summary
+#+end_src
+
+#+begin_src text
+{"Applied":3,"Deny":0,"Fixable":0,"Rejected":0,"Warn":0}
+#+end_src
+
+Leankeel applied 3 fixes and left 0 warnings.
+The diff of the file follows, and each change is the fix that Lean attached to the warning.
+
+#+begin_src diff
+-def unusedArg (x y : Nat) : Nat :=
++def unusedArg (x _y : Nat) : Nat :=
+   x + 1
+
+ @[deprecated Nat.add_comm (since := "2026-01-01")]
+ theorem oldAddComm (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+-example (a b : Nat) : a + b = b + a := oldAddComm a b
++example (a b : Nat) : a + b = b + a := Nat.add_comm a b
+
+ example (xs : List Nat) : xs ++ [] = xs := by
+-  simp [List.append_nil, Nat.add_comm]
++  simp [List.append_nil]
+#+end_src
+
+** Elaborating again to check each change
+[[./resources/public/img/c91575-flow.svg]]
+
+Leankeel first elaborates the file and reads the fixes embedded in each message.
+It applies the fixes of the selected rules whose ranges don't overlap, in source order, and elaborates the file again.
+
+When the warnings went down and every warning left was there before, Leankeel keeps the change.
+It compares the warnings before and after by rule, severity and message text, and leaves the text of the fix out of the comparison.
+
+When the batch fails, Leankeel tries each fix alone, and it puts a fix that still fails into =Rejected= and never tries it again.
+
+Leankeel repeats this until no fix is left, so it applies overlapping fixes, such as two unused arguments of one =simp=, one per round.
+
+Here is a file where Leankeel reverts a fix.
+
+#+begin_src lean
+def area (width height : Nat) : Nat :=
+  width * width
+
+example : area 3 (height := 4) = 9 := rfl
+
+example (xs : List Nat) : (xs ++ []).length = xs.length := by
+  simp?
+#+end_src
+
+The body of =area= doesn't use =height=, so Lean warns about it, but line 4 passes the argument by name as =(height := 4)=.
+
+A tactic such as =simp?= suggests a replacement for itself, and its fix belongs to the rule =lean.tryThis=.
+Leankeel doesn't apply that rule by default, so select it with =--rules=.
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source fix-source --file Named.lean \
+  --rules linter.unusedVariables lean.tryThis
+#+end_src
+
+#+begin_src text
+def area (width height : Nat) : Nat :=
+  width * width
+
+example : area 3 (height := 4) = 9 := rfl
+
+example (xs : List Nat) : (xs ++ []).length = xs.length := by
+  simp only [List.append_nil]
+Named.lean:1:16: warn [linter.unusedVariables] Variable name `height` is not explicitly referenced.
+#+end_src
+
+With =--output text=, Leankeel prints the fixed file and the warnings left.
+
+The =simp only [List.append_nil]= that =simp?= suggested went in, and the warning on =height= stayed.
+Renaming =height= to =_height= turns line 4 into the error =Invalid argument name `height` for function `area`=, so Leankeel reverted that fix.
+
+The JSON output gives the reason under =Rejected=.
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- \
+  source fix-source --file Named.lean \
+  --rules linter.unusedVariables lean.tryThis \
+  | jq -c '.Rejected[] | {Title, Reason}'
+#+end_src
+
+#+begin_src text
+{"Title":"Try this: _height","Reason":"the file gains a diagnostic or keeps as many as before when this fix is applied"}
+#+end_src
+
+** Rules and levels
+A rule is the kind that Lean attaches to a message, so Leankeel handles the warnings of a library's linter or of a linter the project defines itself as rules without knowing about them.
+Messages without a kind become =lean.error=, =lean.warning= and =lean.info=.
+
+=rule list-rules= prints the rules that have a default level.
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output table \
+  rule list-rules | cut -f1-4 | column -t -s $'\t'
+#+end_src
+
+#+begin_src text
+Rule                        DefaultLevel  Fix      LeanOption
+linter.unusedVariables      warn          default  linter.unusedVariables
+linter.unusedSimpArgs       warn          default  linter.unusedSimpArgs
+linter.unnecessarySimpa     warn          default  linter.unnecessarySimpa
+Lean.Linter.deprecatedAttr  warn          default  linter.deprecated
+hasSorry                    warn          none     -
+lean.tryThis                warn          opt-in   -
+lean.error                  deny          none     -
+lean.warning                warn          none     -
+lean.info                   allow         none     -
+#+end_src
+
+=fix-source= fixes the rules whose =Fix= is =default= without =--rules=, and fixes an =opt-in= rule only when you select it with =--rules= or in the configuration.
+
+Errors are always =deny=, and you set the level of the other rules in the nearest =leankeel.toml= above the file.
+To stop on a theorem that still uses =sorry=, set =hasSorry= to =deny=.
+
+#+begin_src toml
+[rules]
+hasSorry = "deny"
+#+end_src
+
+#+begin_src sh
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --file Todo.lean
+echo $?
+#+end_src
+
+#+begin_src text
+Todo.lean:1:8: deny [hasSorry] declaration uses `sorry`
+254
+#+end_src
+
+A single =deny= warning makes the exit status 254, so a CI job stops there.
+
+Inside a Lake project, Leankeel elaborates with the imports and =leanOptions= of that project.
+=tests/fixtures/project= in the repository turns on =linter.missingDocs=, which warns about definitions without a docstring, in its =lakefile.toml=, so that warning shows up as a rule too.
+
+#+begin_src toml
+[leanOptions]
+weak.linter.missingDocs = true
+#+end_src
+
+#+begin_src sh
+cd tests/fixtures/project
+nix run github:conao3/rust-leankeel -- --output text \
+  source check-source --paths .
+#+end_src
+
+#+begin_src text
+./Keel/Basic.lean:7:4: warn [linter.missingDocs] missing doc string for public def depth
+./Keel/Use.lean:4:15: warn [linter.unusedVariables] Variable name `m` is not explicitly referenced.
+./Keel/Use.lean:4:33: warn [Lean.Linter.deprecatedAttr] `Keel.depth` has been deprecated: Use `Keel.draft` instead
+#+end_src
+
+** Measuring on Mathlib
+=scripts/mathlib/= in the repository runs =fix-source= without =--write= on every =Mathlib/**/*.lean= of Mathlib v4.35.0 and counts the applied and reverted fixes.
+Mathlib keeps its build free of warnings, so with the options of Mathlib's own build none of the 8,624 files had a warning.
+
+So I turned on =linter.unusedVariables.analyzeTactics=, which also reports unused variables in tactic proofs.
+With that option, 1,007 files had 2,198 fixes for =linter.unusedVariables=, and Leankeel applied 2,152 and reverted 46.
+
+Each of the 46 reverted fixes either added a new warning or didn't reduce the count, so their warnings stay in 34 files.
+The repository holds [[https://github.com/conao3/rust-leankeel/blob/b55c84a/results/mathlib/analyze-tactics/summary.md][the measurement]] and [[https://github.com/conao3/rust-leankeel/blob/b55c84a/results/mathlib/default/summary.md][the run with Mathlib's own options]].
+
+** Decisions proved in Lean
+The choice of which fixes to apply and which changes to keep, and the rule levels and exit status, are Lean definitions and theorems that I wrote inside =leanfran::lean!= in the Rust source.
+At build time Lean checks the proofs and [[https://s.conao3.com/blog/2026/21ebbd][leanfran]] turns the definitions into Rust functions.
+
+The =accept= below decides whether to keep a change, and I left out two other theorems here.
+
+#+begin_src lean
+def noNew (before after : List String) : Bool :=
+  after.all fun key => after.count key ≤ before.count key
+
+def accept (before after : List String) : Bool :=
+  after.length < before.length && noNew before after
+
+theorem accept_shrinks (before after : List String) (h : accept before after = true) :
+    after.length < before.length := by
+  simp [accept] at h
+  exact h.1
+
+theorem accept_no_new (before after : List String) (h : accept before after = true) (key : String) :
+    after.count key ≤ before.count key := by
+  simp [accept, noNew] at h
+  by_cases hk : key ∈ after
+  · exact h.2 key hk
+  · simp [List.count_eq_zero_of_not_mem hk]
+#+end_src
+
+=before= and =after= are the lists of warnings before and after the fix, and each warning is a string that joins the rule, the severity and the message text.
+
+=accept_no_new= states that no warning occurs more often after a kept change than before it.
+I also proved the following properties.
+
+- Every kept range of the source lies inside the file, and the ranges follow source order without overlap.
+- The kept bytes and the removed bytes add up to the bytes of the file.
+- The inserted edits are exactly the selected edits.
+- The range of a rejected fix moves by the size of the applied edits, and a rejected fix whose range an applied edit overlaps leaves the rejected list.
+- Errors are always =deny=, and Leankeel never fixes an =allow= rule.
+- The exit status is 0 only when no warning is =deny=.
+
+There are 25 theorems in all, and I audit the seven functions that Rust calls with [[https://s.conao3.com/blog/2026/e3d3ca][leanassay]].
+=make check= fails when a part has no theorem that covers it, when no theorem catches a rewrite that changes the output, or when a theorem has a hypothesis that nothing satisfies.
+
+The adapter =native/Main.lean=, which runs the Lean frontend and extracts the messages, the Rust code that reads and writes files and turns warnings into strings, and the leanfran translation all sit outside the proofs.
+
+** Outside the file being fixed
+Leankeel checks only the file it fixes.
+If only other files pass =(height := 4)=, the fix that renames =height= to =_height= above goes in, so build the project after fixing.
+
+Leankeel adds no checks of its own and handles only the messages that Lean emits during elaboration.
+Environment linters such as Mathlib's =#lint=, style linters that read the text, and =lake shake= keep their own commands.
+
+[[https://github.com/jcreinhold/lean-fmt][lean-fmt]] is a formatter and linter with its own rules.
+Mathlib's =scripts/fix_deprecations.py= and =scripts/fix_unused_simp_args.py= rewrite the source from the warning text in a build log.
+
+Leankeel supports Lean 4.35.0.
+
 * clojure.coreの46個の関数を性質の定理つきでLean 4から使えるleancloveを作った
 :properties:
 :export_file_name: generated/contents/blog/2026/c55cad
