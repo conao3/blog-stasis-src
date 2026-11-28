@@ -1,7 +1,6 @@
 Title: Seven fun new features in Emacs 28, shown in screenshots
 Date: 2026-11-27 22:55
 Updated: 2026-11-27 22:55
-Draft: true
 Lang: en
 Original: /blog/2026/664e4a
 Tags: emacs release-notes
@@ -79,7 +78,7 @@ I put four strings into the kill ring and typed `M-y TAB`, and the `*Completions
 
 # Compile Emacs Lisp to native code
 
-When Emacs is built with libgccjit, it can [compile Emacs Lisp to native code](https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65).
+When Emacs is configured with `--with-native-compilation`, it uses libgccjit to [compile Emacs Lisp to native code](https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65).
 The Lisp code of Emacs itself becomes native code, and packages are compiled in the background after they are loaded.
 
 ![img](../../../../resources/public/img/664e4a-native.png)
@@ -105,4 +104,14 @@ In a Python file, the menu has `Find Definition`, `Find References` and a `Pytho
 
 -   [Emoji support](https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176) has improved, and emoji sequences such as skin tones and flags display as one glyph.
 -   The themes [modus-operandi and modus-vivendi](https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843) are now part of Emacs.
+
+
+# New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+-   [Seven fun new features in Emacs 31, shown in screenshots](https://s.conao3.com/blog/2026/26ed0f)
+-   [Seven fun new features in Emacs 30, shown in screenshots](https://s.conao3.com/blog/2026/516114)
+-   [Seven fun new features in Emacs 29, shown in screenshots](https://s.conao3.com/blog/2026/9e936f)
+-   [Seven fun new features in Emacs 27, shown in screenshots](https://s.conao3.com/blog/2026/5265b1)
 

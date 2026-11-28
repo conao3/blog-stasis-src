@@ -30440,7 +30440,6 @@ Edebug steps through that code, so give vow a try the next time you wait for a p
 :export_date: 2026-11-27 22:23
 :export_updated: 2026-11-27 22:23
 :export_tags: emacs release-notes
-:export_draft: t
 :end:
 Emacs 31.1のNEWSから、動かしてすぐに違いが分かる新機能を7つ選び、実際の画面と一緒に紹介します。
 補完の候補が打つそばから絞り込まれる機能や、grepの結果を書き換えて元のファイルに反映する機能のように、毎日の編集で手間が減るものを中心にしました。
@@ -30503,7 +30502,7 @@ NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS][etc/NE
 上のutil.elのバッファにも =DONE= が入り、モードラインに未保存の印の =**= が付いています。
 変更はバッファに入るだけなのでファイルへの保存は =C-x s= で行います。
 
-Occurモードの =e= と同じ操作で、パッケージのwgrepを入れたときと同じことができます。
+Occurモードの =e= と同じ操作で、grepの結果からまとめて直せます。
 
 ** 置換する前に、置換した後のdiffを見る
 
@@ -30574,7 +30573,7 @@ NEWSによると、新しいバージョンのPosframeとCorfuは端末で子フ
 [[./resources/public/img/a0c17f-tty-child.png]]
 
 子フレームは罫線の枠付きで本文の上に重なり、重なった部分のコードだけが隠れています。
-Corfuを入れていればsshの先の =emacs -nw= でも補完の候補がポップアップで出ます。
+sshの先のEmacs 31.1に新しいバージョンのCorfuを入れていれば、 =emacs -nw= でも補完の候補がポップアップで出ます。
 
 ** ほかに目についたもの
 
@@ -30584,6 +30583,15 @@ Corfuを入れていればsshの先の =emacs -nw= でも補完の候補がポ�
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] はtree-sitterのモードを開いたときに文法のライブラリが無ければ入れるかを決めます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] は使い始めた人に向けて既定では有効にしない設定をまとめたテーマです。
 
+** Emacs 27から31までの新機能
+
+Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/92689a][Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+
 * Seven fun new features in Emacs 31, shown in screenshots
 :properties:
 :export_file_name: generated/contents/blog/2026/26ed0f
@@ -30592,7 +30600,6 @@ Corfuを入れていればsshの先の =emacs -nw= でも補完の候補がポ�
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/a0c17f
-:export_draft: t
 :end:
 I picked seven new features from the Emacs 31.1 NEWS that you notice the moment you use them, and this post shows each one in a screenshot.
 They cut small chores out of daily editing: completion candidates narrow as you type, and you can edit grep results and send the edits back to the files.
@@ -30656,7 +30663,7 @@ In the screenshot, I searched for =TODO=, then used =M-%= on the four result lin
 The util.el buffer at the top now has =DONE= too, and its mode line shows =**= for unsaved changes.
 The edits stay in the buffers, so you save the files as usual with =C-x s=.
 
-It works like =e= in Occur mode, and it does the job of the wgrep package.
+It works like =e= in Occur mode, so you can fix many matches right from the grep results.
 
 ** See the diff of a replacement before you make it
 
@@ -30727,7 +30734,7 @@ The screenshot shows =emacs -nw= running in foot after I evaluated this code.
 [[./resources/public/img/a0c17f-tty-child.png]]
 
 The child frame sits on top of the code with a line border, and it hides only the code under it.
-With Corfu installed, completion candidates pop up even in =emacs -nw= over SSH.
+With Emacs 31.1 and a recent Corfu on the remote host, completion candidates pop up even in =emacs -nw= over SSH.
 
 ** Other changes worth a look
 
@@ -30737,13 +30744,21 @@ With Corfu installed, completion candidates pop up even in =emacs -nw= over SSH.
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] controls whether a tree-sitter mode installs a missing grammar library when it starts.
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] is a theme that collects settings for new users that are too invasive to turn on by default.
 
+** New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+- [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5265b1][Seven fun new features in Emacs 27, shown in screenshots]]
+
 * Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する
 :properties:
 :export_file_name: generated/contents/blog/2026/771a69
 :export_date: 2026-11-27 22:40
 :export_updated: 2026-11-27 22:40
 :export_tags: emacs release-notes
-:export_draft: t
 :end:
 Emacs 30のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 30.2の実際の画面と一緒に紹介します。
 本体に入ったwhich-keyや、コードを打つと補完の候補が薄く出る =completion-preview-mode= のように、パッケージを入れずに手に入るものを中心にしました。
@@ -30823,7 +30838,7 @@ Emacs 28から入っている明るい =modus-operandi= と暗い =modus-vivendi
 Emacs Lispのファイルに未定義の関数と変数を使う =my-broken= を書いて =flymake-mode= を有効にした画面では、バイトコンパイルの警告が2行の末尾に出て、モードラインにも警告の数の2が出ています。
 
 Emacs 30ではEmacs Lispのバックエンドが [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L194][trusted-content]] に入っているファイルでだけ動きます。
-試すときは =(setopt trusted-content :all)= のように信頼するファイルを指定します。
+試すときは =(setopt trusted-content '("~/project/"))= のように信頼するディレクトリを指定します。
 
 ** 今いる関数の名前をヘッダー行に出す
 
@@ -30860,6 +30875,15 @@ Pythonのクラス =Store= のメソッド =put= の中にポイントがあり�
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] を有効にすると、字下げされたコードをコピーしたときに、先頭の字下げを外してキルリングに入れます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] より後ろに置いたモードラインの項目は、右に寄せて表示されます。
 
+** Emacs 27から31までの新機能
+
+Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/92689a][Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+
 * Seven fun new features in Emacs 30, shown in screenshots
 :properties:
 :export_file_name: generated/contents/blog/2026/516114
@@ -30868,7 +30892,6 @@ Pythonのクラス =Store= のメソッド =put= の中にポイントがあり�
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/771a69
-:export_draft: t
 :end:
 I picked seven new features from the Emacs 30 NEWS that you notice the moment you use them, and this post shows each one in a screenshot of Emacs 30.2.
 Most of them work without installing a package, such as which-key, now part of Emacs, and =completion-preview-mode=, which shows a faint completion while you type.
@@ -30950,7 +30973,7 @@ I wrote =my-broken=, which uses an undefined function and an undefined variable,
 The byte-compiler warnings appear at the end of two lines, and the mode line shows a warning count of 2.
 
 In Emacs 30, the Emacs Lisp backend runs only in files covered by [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L194][trusted-content]].
-To try it, mark the files you trust, for example with =(setopt trusted-content :all)=.
+To try it, list the directories you trust, for example with =(setopt trusted-content '("~/project/"))=.
 
 ** Show the current function in the header line
 
@@ -30987,16 +31010,24 @@ Line numbers and matching lines sit under the green file names, so a file with m
 - With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] on, copying indented code removes the leading indentation before the text goes into the kill ring.
 - Mode line items placed after [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] are aligned to the right.
 
+** New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+- [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5265b1][Seven fun new features in Emacs 27, shown in screenshots]]
+
 * Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する
 :properties:
 :export_file_name: generated/contents/blog/2026/43487f
 :export_date: 2026-11-27 22:50
 :export_updated: 2026-11-27 22:50
 :export_tags: emacs release-notes
-:export_draft: t
 :end:
 Emacs 29のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 29.4の実際の画面と一緒に紹介します。
-tree-sitterとEglotとuse-packageが本体に入った版なのでまずこの3つを動かし、そのあとに絵文字の一覧やSQLiteのブラウザのような小さな楽しみを並べました。
+tree-sitterに対応し、Eglotとuse-packageが本体に入った版なのでまずこの3つを動かし、そのあとに絵文字の一覧やSQLiteのブラウザのような小さな楽しみを並べました。
 
 NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29][etc/NEWS.29]] にあり、4,395行あります。
 画面はすべて =emacs -Q= で起動したEmacs 29.4で撮っていて、設定が要るものはその式を添えています。
@@ -31025,7 +31056,7 @@ LSPのクライアントの [[https://github.com/emacs-mirror/emacs/blob/emacs-3
 Pythonのファイルで =M-x eglot= を実行すると =pylsp= のような言語サーバーを探して起動します。
 
 #+begin_src emacs-lisp
-(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-base-mode-hook #'eglot-ensure)
 #+end_src
 
 [[./resources/public/img/43487f-eglot.png]]
@@ -31034,7 +31065,7 @@ Pythonのファイルで =M-x eglot= を実行すると =pylsp= のような言�
 
 ** use-packageで設定をまとめる
 
-パッケージの設定をまとめて書くマクロの [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2929][use-package]] も本体に入ったので、パッケージマネージャーを入れなくても =init.el= を =use-package= で書けます。
+パッケージの設定をまとめて書くマクロの [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2929][use-package]] も本体に入ったので、use-packageを別に入れなくても =init.el= を =use-package= で書けます。
 
 #+begin_src emacs-lisp
 (use-package dired
@@ -31046,7 +31077,7 @@ Pythonのファイルで =M-x eglot= を実行すると =pylsp= のような言�
 
 ** 絵文字を一覧から選ぶ
 
-絵文字を入れるコマンドが [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L952][C-x 8 e]] の下にまとまり、 =C-x 8 e l= の =emoji-list= は絵文字を分類ごとに並べたバッファを出して選んだ絵文字を元のバッファに入れます。
+絵文字を入れるコマンドが [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L954][C-x 8 e]] の下にまとまり、 =C-x 8 e l= の =emoji-list= は絵文字を分類ごとに並べたバッファを出して選んだ絵文字を元のバッファに入れます。
 
 [[./resources/public/img/43487f-emoji.png]]
 
@@ -31064,8 +31095,8 @@ EmacsからSQLiteを扱う関数が入り、 [[https://github.com/emacs-mirror/e
 
 ** よく使うキーの早見表を出す
 
-=C-h C-q= の [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L1062][help-quick]] はよく使うキーを並べた早見表を画面の下に出します。
-ファイルやバッファやウィンドウやマークやプロジェクトのキーが並んでいて、もう一度 =C-h C-q= を押すと閉じます。
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L1062][help-quick]] はよく使うキーを並べた早見表を画面の下に出し、 =C-h C-q= で表示と非表示を切り替えます。
+早見表にはファイルやバッファやウィンドウやマークやプロジェクトのキーが並んでいます。
 
 [[./resources/public/img/43487f-help-quick.png]]
 
@@ -31086,6 +31117,15 @@ Emacsを使い始めた人の隣に出しておくと、 =C-x 0= と =C-x 1= の
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L681][duplicate-line]] は今の行を複製し、 =duplicate-dwim= はリージョンがあればリージョンを複製します。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L894][pixel-scroll-precision-mode]] を有効にすると、マウスのホイールやタッチパッドでピクセル単位でスクロールできます。
 
+** Emacs 27から31までの新機能
+
+Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/92689a][Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+
 * Seven fun new features in Emacs 29, shown in screenshots
 :properties:
 :export_file_name: generated/contents/blog/2026/9e936f
@@ -31094,10 +31134,9 @@ Emacsを使い始めた人の隣に出しておくと、 =C-x 0= と =C-x 1= の
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/43487f
-:export_draft: t
 :end:
 I picked seven new features from the Emacs 29 NEWS that you notice the moment you use them, and this post shows each one in a screenshot of Emacs 29.4.
-Emacs 29 brought tree-sitter, Eglot and use-package into Emacs, so I start with those three and then move on to smaller treats such as an emoji list and an SQLite browser.
+Emacs 29 added tree-sitter support and brought Eglot and use-package into Emacs, so I start with those three and then move on to smaller treats such as an emoji list and an SQLite browser.
 
 The NEWS lives in [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29][etc/NEWS.29]] and runs to 4,395 lines.
 I took every screenshot in Emacs 29.4 started with =emacs -Q=, and I include the code for each feature that needs a setting.
@@ -31126,7 +31165,7 @@ The LSP client [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.
 Run =M-x eglot= in a Python file, and Eglot finds and starts a language server such as =pylsp=.
 
 #+begin_src emacs-lisp
-(add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-base-mode-hook #'eglot-ensure)
 #+end_src
 
 [[./resources/public/img/43487f-eglot.png]]
@@ -31136,7 +31175,7 @@ The mode line shows =[eglot:src]=, and with point on =json.load=, the echo area 
 ** Organize your configuration with use-package
 
 [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L2929][use-package]], the macro that groups the configuration of a package, is now part of Emacs too.
-You can write your =init.el= with =use-package= without installing anything first.
+You can write your =init.el= with =use-package= without installing use-package first.
 
 #+begin_src emacs-lisp
 (use-package dired
@@ -31148,7 +31187,7 @@ Evaluating this form sets =dired-listing-switches= to ="-alh"= and binds =C-c d=
 
 ** Pick an emoji from a list
 
-The emoji commands now live under [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L952][C-x 8 e]].
+The emoji commands now live under [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L954][C-x 8 e]].
 =C-x 8 e l= runs =emoji-list=, which shows a buffer of emoji grouped by category and inserts the one you choose into the buffer you came from.
 
 [[./resources/public/img/43487f-emoji.png]]
@@ -31166,8 +31205,8 @@ The screenshot shows a =todo= table that I created with =sqlite-open= and =sqlit
 
 ** Show a cheat sheet of common keys
 
-=C-h C-q= runs [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L1062][help-quick]], which shows a cheat sheet of common keys at the bottom of the frame.
-It lists keys for files, buffers, windows, the mark and projects, and another =C-h C-q= closes it.
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L1062][help-quick]] shows a cheat sheet of common keys at the bottom of the frame, and =C-h C-q= toggles it.
+The sheet lists keys for files, buffers, windows, the mark and projects.
 
 [[./resources/public/img/43487f-help-quick.png]]
 
@@ -31188,13 +31227,21 @@ When you share your screen to explain something, one key makes everything readab
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L681][duplicate-line]] duplicates the current line, and =duplicate-dwim= duplicates the region when one is active.
 - With [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.29#L894][pixel-scroll-precision-mode]] on, the mouse wheel or touchpad scrolls by pixels.
 
+** New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+- [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5265b1][Seven fun new features in Emacs 27, shown in screenshots]]
+
 * Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する
 :properties:
 :export_file_name: generated/contents/blog/2026/664e4a
 :export_date: 2026-11-27 22:55
 :export_updated: 2026-11-27 22:55
 :export_tags: emacs release-notes
-:export_draft: t
 :end:
 Emacs 28のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 28.2の実際の画面と一緒に紹介します。
 ミニバッファの補完が縦に並ぶ =fido-vertical-mode= や =C-x o o o= のように同じキーを押し続けられる =repeat-mode= のように、 =emacs -Q= のままでも操作が楽になるものを中心にしました。
@@ -31261,7 +31308,7 @@ NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28][etc
 
 ** Emacs Lispをネイティブコードにコンパイルする
 
-libgccjitと一緒にビルドするとEmacs Lispを [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65][ネイティブコードにコンパイルできます]]。
+=--with-native-compilation= を付けてビルドすると、libgccjitを使ってEmacs Lispを [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65][ネイティブコードにコンパイルできます]]。
 Emacs本体のLispもネイティブコードになり、パッケージも読み込んだときに裏でコンパイルされます。
 
 [[./resources/public/img/664e4a-native.png]]
@@ -31286,6 +31333,15 @@ Pythonのファイルでは貼り付けや選択に加えて =Find Definition= �
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176][絵文字の表示]] が改善されて、肌の色や国旗のような絵文字の組み合わせも1文字として表示されます。
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843][modus-operandi と modus-vivendi]] のテーマが入りました。
 
+** Emacs 27から31までの新機能
+
+Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/92689a][Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+
 * Seven fun new features in Emacs 28, shown in screenshots
 :properties:
 :export_file_name: generated/contents/blog/2026/5e8afb
@@ -31294,7 +31350,6 @@ Pythonのファイルでは貼り付けや選択に加えて =Find Definition= �
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/664e4a
-:export_draft: t
 :end:
 I picked seven new features from the Emacs 28 NEWS that you notice the moment you use them, and this post shows each one in a screenshot of Emacs 28.2.
 Most of them make plain =emacs -Q= easier to drive, such as =fido-vertical-mode=, which lists minibuffer completions vertically, and =repeat-mode=, which lets you type =C-x o o o=.
@@ -31362,7 +31417,7 @@ I put four strings into the kill ring and typed =M-y TAB=, and the =*Completions
 
 ** Compile Emacs Lisp to native code
 
-When Emacs is built with libgccjit, it can [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65][compile Emacs Lisp to native code]].
+When Emacs is configured with =--with-native-compilation=, it uses libgccjit to [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L65][compile Emacs Lisp to native code]].
 The Lisp code of Emacs itself becomes native code, and packages are compiled in the background after they are loaded.
 
 [[./resources/public/img/664e4a-native.png]]
@@ -31387,13 +31442,21 @@ In a Python file, the menu has =Find Definition=, =Find References= and a =Pytho
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L176][Emoji support]] has improved, and emoji sequences such as skin tones and flags display as one glyph.
 - The themes [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.28#L2843][modus-operandi and modus-vivendi]] are now part of Emacs.
 
+** New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+- [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5265b1][Seven fun new features in Emacs 27, shown in screenshots]]
+
 * Emacs 27の新機能から、動かして楽しいものを7つ画面つきで紹介する
 :properties:
 :export_file_name: generated/contents/blog/2026/92689a
 :export_date: 2026-11-27 23:00
 :export_updated: 2026-11-27 23:00
 :export_tags: emacs release-notes
-:export_draft: t
 :end:
 Emacs 27のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 27.2の実際の画面と一緒に紹介します。
 ウィンドウの配置をタブで切り替える =tab-bar-mode= や検索の何件目かを出す =isearch-lazy-count= のように、今も毎日使われている機能が多く入った版です。
@@ -31442,7 +31505,7 @@ app.pyで =self= を探して =C-s= をもう1回押したところでプロン�
 
 ** 絵文字をカラーで表示して、文字の名前を出す
 
-Cairoで描くEmacsではNoto Color Emojiのような [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L523][多色のフォントを表示できます]]。
+Cairo 1.16.0以降で描くEmacsではNoto Color Emojiのような [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L523][多色のフォントを表示できます]]。
 Emacs 27ではフォントの割り当てを自分で書くので、記号の文字にNoto Color Emojiを使うように指定しました。
 
 #+begin_src emacs-lisp
@@ -31472,7 +31535,7 @@ Emacs 27ではフォントの割り当てを自分で書くので、記号の文
 [[./resources/public/img/92689a-diff-refine.png]]
 
 画面はapp.pyとそれを書き換えたバッファを =diff-buffers= で比べたところです。
-=TODO= が =FIXME= に変わったところと =indent=2= が =indent=4= に変わった部分だけが濃い色になっています。
+コメントの変わった語と、 =indent== の後ろの =2= が =4= に変わった数字だけが濃い色になっています。
 
 ** Fidoで、ミニバッファの補完をidoのように使う
 
@@ -31485,8 +31548,17 @@ Icompleteを元にしたidoに似た [[https://github.com/emacs-mirror/emacs/blo
 
 [[./resources/public/img/92689a-fido.png]]
 
-=M-x tab-bar= と打ったところで =tab-bar-mode= を先頭にしてタブバーのコマンドが =¦= で区切られて並んでいます。
+=M-x tab-bar= と打ったところで =tab-bar-mode= を先頭にしてタブバーのコマンドが =|= で区切られて並んでいます。
 =RET= で先頭の候補を選べます。
+
+** Emacs 27から31までの新機能
+
+Emacs 27から31までのNEWSを、1つの版ごとに同じ形で紹介しています。
+
+- [[https://s.conao3.com/blog/2026/a0c17f][Emacs 31の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/771a69][Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/43487f][Emacs 29の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
+- [[https://s.conao3.com/blog/2026/664e4a][Emacs 28の新機能から、動かして楽しいものを7つ画面つきで紹介する]]
 
 * Seven fun new features in Emacs 27, shown in screenshots
 :properties:
@@ -31496,7 +31568,6 @@ Icompleteを元にしたidoに似た [[https://github.com/emacs-mirror/emacs/blo
 :export_tags: emacs release-notes
 :export_lang: en
 :export_original: /blog/2026/92689a
-:export_draft: t
 :end:
 I picked seven new features from the Emacs 27 NEWS that you notice the moment you use them, and this post shows each one in a screenshot of Emacs 27.2.
 Many of them are still in daily use, such as =tab-bar-mode=, which switches window layouts with tabs, and =isearch-lazy-count=, which shows which match you are on.
@@ -31549,7 +31620,7 @@ With the count in view, you know how many more =C-s= presses are left.
 
 ** Show emoji in color and name the character at point
 
-Emacs drawing with Cairo can [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L523][display multicolor fonts]] such as Noto Color Emoji.
+Emacs drawing with Cairo 1.16.0 or later can [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.27#L523][display multicolor fonts]] such as Noto Color Emoji.
 In Emacs 27 you set up the font yourself, so I told Emacs to use Noto Color Emoji for symbol characters.
 
 #+begin_src emacs-lisp
@@ -31579,7 +31650,7 @@ Emacs estimates the version from the old NEWS files, and the word =Probably= at 
 [[./resources/public/img/92689a-diff-refine.png]]
 
 Here =diff-buffers= compares app.py with an edited copy.
-Only the parts where =TODO= became =FIXME= and =indent=2= became =indent=4= get the darker color.
+Only the changed words of the comment and the =2= that became =4= after =indent== get the darker color.
 
 ** Use Fido for ido-style minibuffer completion
 
@@ -31592,8 +31663,17 @@ The name stands for "Fake Ido".
 
 [[./resources/public/img/92689a-fido.png]]
 
-After =M-x tab-bar=, the tab bar commands appear separated by =¦=, with =tab-bar-mode= first.
+After =M-x tab-bar=, the tab bar commands appear separated by =|=, with =tab-bar-mode= first.
 =RET= picks the first candidate.
+
+** New features from Emacs 27 to 31
+
+I wrote one post in the same format for each Emacs release from 27 to 31.
+
+- [[https://s.conao3.com/blog/2026/26ed0f][Seven fun new features in Emacs 31, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/516114][Seven fun new features in Emacs 30, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/9e936f][Seven fun new features in Emacs 29, shown in screenshots]]
+- [[https://s.conao3.com/blog/2026/5e8afb][Seven fun new features in Emacs 28, shown in screenshots]]
 
 * COMMENT Local variables
 # Local Variables:
