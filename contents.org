@@ -25697,6 +25697,203 @@ theorem regression_monotone {b h h' a r : Nat}
 宣言とtacticの時間は[[https://github.com/Vilin97/lean-source-profiler][lean-source-profiler]]と[[https://github.com/unbalancedparentheses/leanprof][leanprof]]でも測れて、Lakeのビルドのジョブごとの時間は[[https://github.com/Kha/lakeprof][lakeprof]]で測れます。
 Lean本体とMathlibはコミットごとの性能を[[https://github.com/leanprover/radar][Radar]]で計測しています。
 
+* Leanwake: a Lean 4 profiler that lists the slowest proofs and the tactics inside them in one command
+:properties:
+:export_file_name: generated/contents/blog/2026/ca523a
+:export_date: 2026-11-27 19:50
+:export_updated: 2026-11-27 19:50
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/d8ac45
+:export_tags: lean rust performance profiler formal-verification release rust-leanwake lean-leanfran lean-ritsuryo
+:end:
+
+I wrote Leanwake, a CLI that profiles a Lean 4 project and lists the slowest proofs from the top with one command.
+For each proof it prints the time and its share of the total, and also the position of the tactic that takes the time inside that proof.
+
+I tried it on [[https://github.com/conao3/lean-ritsuryo][lean-ritsuryo]], which proves calculations of statutory periods and tax amounts in Lean, and 10 declarations out of 893 commands took 64% of the elaboration time.
+In one of those theorems, the =omega= on line 24 took 99.9% of the time.
+
+Measuring the time of each tactic slows the proofs down, so Leanwake measures the ranking and the times without it, then measures only the listed declarations again to get the breakdown.
+
+The repository is [[https://github.com/conao3/rust-leanwake][conao3/rust-leanwake]], under the Apache-2.0 license.
+I ran the results in this post with Lean 4.35.0 and Leanwake 0.2.0.
+
+[[github:conao3/rust-leanwake::Rust][Find the slowest proofs in a Lean 4 Lake project and the tactics that take the time]]
+
+** Listing the slowest proofs
+Run =list-hotspots= in the directory of a Lake project.
+Here I list the top 5 at commit =d79c7f5= of lean-ritsuryo.
+
+#+begin_src sh
+git clone https://github.com/conao3/lean-ritsuryo
+cd lean-ritsuryo
+git checkout d79c7f5
+nix run github:conao3/rust-leanwake -- profile list-hotspots \
+  --project-dir . --jobs 4 --limit 5 --output table
+#+end_src
+
+#+begin_src text
+61.82 s in 893 commands and 54 files; the 5 listed take 52.7%
+Seconds  Share  Location                             Declaration                                           Heartbeats  Inside
+   8.84  14.3%  Ritsuryo/Tax/Proofs/Penalty.lean:14  Ritsuryo.Tax.Penalty.pen1_no_return_tiers              118149453  omega 24:59-24:64 x4 99.9%
+   7.84  12.7%  Ritsuryo/Tax/Proofs/Income.lean:39   Ritsuryo.Tax.Income.quickCents_bounds                  110910269  split 42:52-42:57 x194 69.6%
+   6.13   9.9%  Ritsuryo/Holiday/Check.lean:46       Ritsuryo.Holiday.checkAll                               28404434  decide 50:2-50:16 x1 99.9%
+   5.57   9.0%  Ritsuryo/Tax/Inheritance.lean:79     Ritsuryo.Tax.Inheritance.taxCentsSpec_eq_quickCents     64381705  omega 86:12-86:17 x8 95.6%
+   4.19   6.8%  Ritsuryo/Tax/Income.lean:68          Ritsuryo.Tax.Income.incomeTaxCentsSpec_eq_quickCents    35550693  omega 76:12-76:17 x7 94.6%
+#+end_src
+
+The first line gives the elaboration time of all the measured commands, and the declarations follow from the longest time down.
+From left to right, each row has the time, the share of the total, the file and line, the declaration name, the heartbeats, and the tactic that takes the most time in the declaration.
+
+Heartbeats count the small memory allocations Lean makes during elaboration, the same counter that the [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L30-L33][maxHeartbeats]] limit uses.
+
+On the built project this run took 70 seconds on 4 cores, and 102 seconds right after the clone, including the build of the dependencies.
+=lake build= takes 48 seconds on the same project.
+
+[[./resources/public/img/d8ac45-hotspots.svg]]
+
+Without =--limit= you get the top 10.
+The figure shows the top 10 from another run, where these 10 of the 893 commands took 64% of the total.
+
+** Reading the breakdown
+The first entry, =pen1_no_return_tiers=, is a theorem about the amount of the penalty for not filing a return, and its rightmost column reads =omega 24:59-24:64 x4 99.9%=.
+
+#+begin_src lean
+theorem pen1_no_return_tiers (rate tax tax' prior : Nat) (hr : rate = 10 ∨ rate = 15) :
+    (tax + prior ≤ 3000000 → noReturnCents rate tax prior = noReturnCentsArt2 rate tax prior) ∧
+      (tax ≤ tax' → noReturnCents rate tax prior ≤ noReturnCents rate tax' prior) := by
+  unfold noReturnCents noReturnCentsArt2 tieredCents
+  rcases hr with rfl | rfl <;> constructor <;> intro h <;> omega
+#+end_src
+
+That points to the =omega= from column 59 to column 64 on line 24 of the file, which ran 4 times and took 99.9% of the time of this theorem.
+It runs 4 times because =omega= runs once in each of the 4 goals that =<;>= splits off.
+
+In the second entry, =quickCents_bounds=, the =split= of =repeat' split= ran 194 times and took 69.6%.
+
+#+begin_src lean
+theorem quickCents_bounds (x y : Nat) (h : x ≤ y) :
+    quickCents x + 5 * (y - x) ≤ quickCents y ∧ quickCents y ≤ quickCents x + 45 * (y - x) := by
+  refine ⟨?_, ?_⟩ <;> unfold quickCents <;> repeat' split
+  all_goals omega
+#+end_src
+
+In the third entry, =checkAll=, one run of =decide +kernel= takes 99.9%.
+For definitions without tactics and for proofs written as terms, the column shows the names of Lean's internal steps, such as =addDecl= or =Meta.whnf=, in place of a tactic.
+
+The default output is JSON, which holds every tactic that takes time in each declaration, so you can filter it with =jq=.
+
+** Why Leanwake measures twice
+[[./resources/public/img/d8ac45-flow.svg]]
+
+Leanwake gets the time of each tactic from Lean's [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/Util/Trace.lean#L175-L199][trace.profiler]], but the trace slows the proofs down.
+I measured only the file with =pen1_no_return_tiers=, alternating the two settings, and it took 8.3 to 9.3 seconds without the trace and 24.0 to 24.2 seconds with every trace on.
+
+So Leanwake takes the ranking and the times from a run without the trace, and measures only the listed declarations again with the trace.
+The breakdown uses only the shares from the second run, so the times in the table do not include the cost of the trace.
+
+If you do not need the breakdown, =--detail none= skips the second run, and lean-ritsuryo finishes in 41 seconds.
+
+The =lean= command and the language server elaborate on [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Lean/CoreM.lean#L35-L46][multiple threads]] by default, while Leanwake sets =Elab.async= to =false= and measures the proofs elaborated synchronously inside their command.
+
+** Time and heartbeats
+Two runs in a row on the same commit gave totals of 65.7 seconds and 61.8 seconds, and the order of the top 4 changed while the same 5 declarations stayed at the top.
+The time depends on the load of the machine, so Leanwake prints the share next to the time.
+
+The order by heartbeats does not match the order by time.
+In the table above, =checkAll= has 28.4 million heartbeats and took 6.13 seconds, longer than the 5.57 seconds of =taxCentsSpec_eq_quickCents= with 64.38 million heartbeats, so I chose time as the unit for the ranking.
+
+** Comparing before and after a change
+To see whether a proof got faster after you edit it, record the profile before and after the change with =record-profile= and compare the two with =compare-profiles=.
+The comparison uses heartbeats.
+
+[[./resources/public/img/d8ac45-noise.svg]]
+
+The figure shows the values from recording one theorem 8 times under each of two conditions.
+With a load on the same 4 cores, the mean elapsed time grew from 10 ms to 22 ms, while the heartbeats stayed at 113,455 in all 16 runs, so comparing one recording before and one after shows the change of each declaration.
+
+For example, take =Demo.lean= with 4 declarations, and change the =simp= in this theorem to =simp only=.
+
+#+begin_src diff
+ theorem length_append_swap (xs ys : List Nat) :
+     (xs ++ ys).length = (ys ++ xs).length := by
+-  simp [Nat.add_comm]
++  simp only [List.length_append, Nat.add_comm]
+#+end_src
+
+Record =base.json= before the change and =head.json= after it, then compare the two.
+
+#+begin_src sh
+nix run github:conao3/rust-leanwake -- profile record-profile \
+  --project-dir . --output-file base.json
+nix run github:conao3/rust-leanwake -- profile record-profile \
+  --project-dir . --output-file head.json
+nix run github:conao3/rust-leanwake -- profile compare-profiles \
+  --base-profile file://base.json --head-profile file://head.json \
+  --output table
+#+end_src
+
+#+begin_src text
+Regressed: 0  Improved: 1  Unchanged: 3  Added: 0  Removed: 0
+Heartbeats: 287947 -> 282588; thresholds: > 1000 heartbeats and > 1%
+Status	BaseHeartbeats	HeadHeartbeats	DeltaHeartbeats	Path	Key
+improved	39416	34153	-5263	Demo.lean	length_append_swap
+#+end_src
+
+The heartbeats of this theorem went down 13%, from 39,416 to 34,153.
+=simp= also uses the lemmas tagged =@[simp]=, while =simp only= [[https://github.com/leanprover/lean4/blob/v4.35.0/src/Init/Tactics.lean#L718][uses only the lemmas you list]], which lowers the heartbeats.
+
+Leanwake marks a command as faster or slower when the difference exceeds both 1,000 heartbeats and 1%.
+In a real project, two recordings of the same commit can still differ by a few heartbeats in some commands.
+In lean-ritsuryo, 19 of the 893 commands differed by up to 31, so I set the thresholds above that.
+
+When a declaration gets slower, the exit code is 254, so you can put the comparison in CI, and the [[https://github.com/conao3/rust-leanwake#ci-for-a-lean-project][README]] has an example workflow.
+
+** The comparison rules, proved in Lean
+These Lean definitions decide whether a command got slower, and I left out =classify_regressed= and the other lemmas and theorems here.
+
+#+begin_src lean
+def grows (base head absolute relative : Nat) : Bool :=
+  decide (absolute < head - base ∧ base * relative < (head - base) * 100)
+
+def classify (base head absolute relative : Nat) : Status :=
+  if grows base head absolute relative then .regressed
+  else if grows head base absolute relative then .improved
+  else .unchanged
+
+theorem equal_unchanged (b a r : Nat) : classify b b a r = .unchanged := by
+  simp [classify, grows]
+
+theorem regression_monotone {b h h' a r : Nat}
+    (hyp : classify b h a r = .regressed) (increase : h ≤ h') :
+    classify b h' a r = .regressed := by
+  rw [classify_regressed] at hyp ⊢
+  simp only [grows, decide_eq_true_eq] at hyp ⊢
+  have mul := Nat.mul_le_mul_right 100 (Nat.sub_le_sub_right increase b)
+  omega
+#+end_src
+
+=regression_monotone= states that if a pair is judged slower, it stays slower when the value after the change is larger still.
+I also proved these properties:
+
+- Swapping the values before and after the change swaps slower and faster.
+- Raising the thresholds does not add pairs judged slower.
+- Each command from before and after the change appears exactly once in the matched result.
+- The comparison fails only when one or more commands got slower.
+
+There are 22 theorems in total, and the code lives inside =leanfran::lean!= in the Rust source.
+At build time Lean checks the proofs and [[https://s.conao3.com/blog/2026/21ebbd][leanfran]] turns the definitions into Rust functions, so the Rust side reads the JSON, passes it to these functions, and prints the result.
+
+** What Leanwake cannot tell you
+The shares in the breakdown move between runs, and the =split= in =quickCents_bounds= ranged from 69.6% to 82.6% over 4 runs.
+
+Leanwake measures top-level commands, so a command that defines several declarations gets one value for all of them.
+It supports Lean 4.35.0, and I have not measured Mathlib with it.
+
+You can also measure the time of declarations and tactics with [[https://github.com/Vilin97/lean-source-profiler][lean-source-profiler]] and [[https://github.com/unbalancedparentheses/leanprof][leanprof]], and the time of each Lake build job with [[https://github.com/Kha/lakeprof][lakeprof]].
+The Lean core and Mathlib track their performance per commit with [[https://github.com/leanprover/radar][Radar]].
+
 * AIの「ソフトウェア工場」はいまどこまで来たのか
 :properties:
 :export_file_name: generated/contents/blog/2026/bab1ba
@@ -25910,6 +26107,223 @@ Symphonyがタスクごとに用意する作業場や冒頭のポストの図に
 
 仕事を渡す前の仕様と受け取った成果を確かめる仕組みを、私が用意できるかどうかで結果が変わります。
 次は検査を先に用意してからタスクを切り出す進め方を試すつもりです。
+
+* AI software factories: how far parallel coding agents have come
+:properties:
+:export_file_name: generated/contents/blog/2026/5e0ecc
+:export_date: 2026-11-27 19:50
+:export_updated: 2026-11-27 19:50
+:export_draft: t
+:export_lang: en
+:export_original: /blog/2026/bab1ba
+:export_tags: ai-agent history vercel-board
+:end:
+
+More and more people call it a "software factory" when many coding agents run in parallel and PRs get merged with almost no human looking at them.
+
+[[tweet:happy_ryo/2123942567746375930::America/Toronto::いわまりょう][Orcaとかを使わずに、自前でコーディングエージェントを用いたソフトウェアファクトリーを実装していて、こんな感じの作りにしている。一番気を掛けているのは、窓口になるエージェント1体以外は人間が見なくて良いこと。OSSとして公開してる。]]
+
+After reading this post I wanted to build one myself, so I looked into how these setups came about and how far they work today.
+
+Many of the cases used a similar setup.
+In their reports the human work moved from writing code to preparing specifications and checks, but the people who ran the setups published all the numbers on results themselves, and outside checks of those numbers are still rare.
+
+The second half of the post moves to a different context and shows that people used the words "software factory" in 1968 too.
+
+** 2023 to 2025: from one agent to many in parallel
+The idea of having agents with separate roles develop software goes back to 2023, right after LLMs arrived, and the [[https://arxiv.org/abs/2308.00352][MetaGPT]] paper called its setup, which gives standard procedures to agents with roles, an "assembly line paradigm".
+
+In [[https://arxiv.org/abs/2310.06770][SWE-bench]], a benchmark from the same year, the best model solved 1.96% of real GitHub issues.
+Cognition announced [[https://cognition.com/blog/introducing-devin][Devin]] in March 2024 and reported that the rate reached 13.86% on a random 25% of the dataset.
+
+In February 2025 Anthropic released [[https://www.anthropic.com/news/claude-3-7-sonnet][Claude Code]] as a research preview.
+You can hand it a large task from the terminal, and later in this post Ralph and Anthropic's experiment use Claude Code, while OpenAI's two posts use Codex.
+
+In May 2025 Cursor's [[https://cursor.com/changelog/0-50][background agent]], OpenAI's [[https://openai.com/index/introducing-codex/][Codex]], GitHub Copilot's [[https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/][coding agent]] and the public beta of Google's [[https://blog.google/technology/google-labs/jules/][Jules]] all came out within one week.
+Each of them takes a task, works on it in a remote environment and returns a PR or a diff, and the Codex announcement says it can "work on many tasks in parallel".
+
+At that point products let one person run many agents at the same time.
+
+Two months later Geoffrey Huntley wrote [[https://ghuntley.com/ralph/][Ralph]], the shortest form of running one agent in a loop without stopping.
+
+#+begin_src bash
+while :; do cat PROMPT.md | claude-code ; done
+#+end_src
+
+The agent reads the same prompt again and again and does one piece of work each time, and you feed test and build failures back to it to fix.
+Later [[https://openai.com/index/harness-engineering/][OpenAI]] and [[https://www.anthropic.com/engineering/building-c-compiler][Anthropic]] each compared their own loops to Ralph in their posts.
+
+In the same month METR published an [[https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/][experiment]] where experienced open source developers took 19% longer with AI, while they felt 20% faster.
+Keep that gap between the felt speedup and the measured result in mind when you read the numbers later in this post.
+
+** January and February 2026: two kinds of posts
+In January and February 2026, two kinds of posts came out: posts that called development with agents a "factory", and posts that reported their setups and results in detail without calling them factories.
+
+*** Posts that call it a factory
+In January Steve Yegge released [[https://yegge.ai/gastown][Gas Town]].
+Yegge had released [[https://github.com/gastownhall/beads][Beads]], a tool for tracking work, in October 2025, and he built Gas Town with it.
+
+In Gas Town a mayor coordinates the whole, a watcher checks the work of the workers, and a merger merges it in order, and Yegge later called it "the first-ever software factory".
+
+In the same January Dan Shapiro sorted ways of using AI into levels 0 to 5 in a [[https://www.danshapiro.com/blog/2026/01/the-five-levels-from-spicy-autocomplete-to-the-software-factory/][post]], and called the last level, a black box that takes a specification and puts out software, the "Dark Factory".
+The term comes from manufacturing, for a factory that needs no lights because it needs no people, and Shapiro wrote that he took the name from FANUC's factory where only robots work.
+
+In February StrongDM announced that it runs at that level, and its [[https://factory.strongdm.ai/][Software Factory page]] lists these two rules.
+
+#+begin_quote
+Code must not be written by humans
+
+Code must not be reviewed by humans
+#+end_quote
+
+According to Simon Willison's [[https://simonwillison.net/2026/Feb/7/software-factory/][write-up]], humans do not read the code, and instead they prepare validation scenarios hidden from the agents and check the behavior against copies of external services such as Okta and Slack.
+StrongDM gives a cost guideline: if you are not spending $1,000 on tokens per engineer per day, you have room to improve.
+
+*** Reports on setups and results
+In the same two months three reports came out that do not use the word factory.
+
+In January Cursor published a [[https://cursor.com/blog/scaling-agents][report]] on long-running autonomous coding.
+Cursor first tried a setup where all agents had equal standing and competed for locks, and wrote that 20 agents ran only as fast as 2 or 3.
+
+A setup without a hierarchy did not work either, and in the end Cursor split the agents into planners, workers and a judge and had them build a browser from scratch.
+Cursor also added an integrator to check quality, but removed it because the work piled up there.
+
+In February Anthropic published its [[https://www.anthropic.com/engineering/building-c-compiler][C compiler experiment]].
+
+With no orchestrator, 16 Claude agents divided the work through lock files in a git repository.
+They ran about 2,000 sessions, spent $20,000 on the API, and produced a 100,000-line compiler that can build the Linux kernel.
+
+In the [[https://openai.com/index/harness-engineering/][harness engineering]] post OpenAI published the same February, three engineers reported merging about 1,500 PRs with Codex alone, under the motto "Humans steer. Agents execute."
+Humans set the direction of the dependencies between layers, and lints and structural tests that Codex wrote enforce that direction.
+
+The post also says human QA could not keep up with the rate at which the code grew.
+
+** Where humans talk and where the work queues up
+In its [[https://openai.com/index/open-source-codex-orchestration-symphony/][post on Symphony]] in April 2026, OpenAI wrote that after harness engineering the next limit was how many sessions a human can watch.
+One engineer could watch 3 to 5 sessions without strain, but beyond that the cost of switching lowered their productivity.
+
+People had been building tools to reduce the load of watching many sessions since 2025, before the word factory appeared.
+I think of them in two groups: tools that decide where the work queues up, and tools that decide where humans talk.
+
+*** Where the work queues up
+[[https://github.com/BloopAI/vibe-kanban][Vibe Kanban]] came out in June 2025, and Beads, mentioned above, in October.
+Vibe Kanban plans work as issues on a kanban board and hands them to agents, and Beads records the work of agents.
+
+In my view, [[https://github.com/openai/symphony][Symphony]], whose repository OpenAI opened in March 2026, made the approach of managing work as issues widely known.
+OpenAI published its own operation along with the specification, so anyone could now try what a few people had been using.
+
+#+begin_quote
+For every open task, guarantee that an agent is running in its own workspace.
+#+end_quote
+
+Symphony watches the issues in Linear, prepares one workspace for each open task, and keeps an agent running in it.
+In place of a human watching the sessions, the state of the issue shows how the work is going.
+
+*** Where humans talk
+[[https://github.com/openclaw/openclaw][OpenClaw]], whose repository dates from November 2025, is a personal assistant whose use is not limited to coding.
+You keep it running on your own machine and talk to it from the chat apps you already use, such as Discord and Slack.
+
+At the time of writing it has more than 390,000 stars on GitHub, over twice as many as the Claude Code repository.
+
+In OpenClaw a resident process called the Gateway connects the chats, the sessions and the tools.
+The [[https://docs.openclaw.ai/automation/cron-jobs][scheduler]] starts the agent at set times, and a [[https://docs.openclaw.ai/tools/subagents][sub-agent]] runs in the background and returns its result to the caller.
+
+Even when agents start in the background and move the work forward, a human talks to one agent, the same as the "front desk" in the post at the top.
+
+*** Combining the two
+I see [[https://vercel.com/blog/introducing-vercel-board][Vercel Board]], which Vercel released in November 2026, as a tool that combines the place where the work queues up and the place where humans talk.
+Board is a message board that agents and humans share, a thread there is both a conversation and a task, and the board lends each task to one agent at a time with a time limit.
+
+** Where things stand
+In many of the cases, the setup queues the work, assigns each item to one agent only, gives each agent its own workspace, and checks the results by machine.
+
+[[./resources/public/img/bab1ba-parts.svg]]
+
+In some cases, as with Symphony, a human accepts the work after it passes the checks.
+
+| Case | Work queue | Exclusivity and workspace | Checkpoints and checks |
+|------+------------+---------------------------+------------------------|
+| Cursor's experiment | Tasks that planners create | Each worker takes one task at a time | A judge decides each cycle whether to continue |
+| Anthropic's C compiler | Each agent picks the next problem to fix | Lock files in git and a clone per container | The test suite and comparison with GCC |
+| Symphony | Linear issues | A workspace per issue | A human accepts the work with the CI results attached |
+| Vercel Board | Tasks on the board | Lending with a time limit | Review tasks that open once the fix is done |
+
+In the reports from OpenAI, StrongDM and Anthropic, the work of writing code moved to the agents, and humans prepare the specifications, the checks and the environment.
+
+In a [[https://ai.engineer/code/2026/talks/lauren-tan][talk]], Lauren Tan recommended that when an agent repeats the same mistake, you prevent it with types, lints or tests instead of adding more warnings to the instructions.
+She also reported about 11,000 PRs a month with about 0.5% of them sent back.
+
+The numbers that show what these factories achieve all come from the people who run them.
+Vercel says the v0 factory it rebuilt on Board merges more than 50% of its PRs, but gives neither the denominator, the period, nor the share of PRs sent back.
+
+In a [[https://metr.org/blog/2026-02-24-uplift-update/][follow-up]] in February 2026, METR wrote that the data from its new experiment cannot give a reliable measure of the current effect of AI.
+More developers declined to take part because they did not want to work without AI, which biased the estimate of the speedup from AI downward.
+
+** The "software factory" of 1968
+The present use of "factory" comes from the lights-out factories of manufacturing, and the documents from StrongDM and Vercel say nothing about the early history of software development.
+The words "software factory" themselves are 58 years old, though, and Addy Osmani also wrote in [[https://addyosmani.com/blog/software-factories/][Software Factories, Light and Dark]] that the term goes back to Bob Bemer in 1968.
+
+I found no source saying that today's factories came from the factories of that time, but what people tried under the same words caught my interest, so I describe it here.
+The [[https://web.archive.org/web/2016/http://homepages.cs.ncl.ac.uk/brian.randell/NATO/nato1968.PDF][report]] of the 1968 NATO Software Engineering Conference quotes a working paper by Bemer, then at General Electric, as follows.
+
+#+begin_quote
+By utilizing the machine-controlled production environment, or software factory. Program construction, checkout and usage are done entirely within this environment using the tools it contains. Ideally it should be impossible to produce programs exterior to this environment.
+#+end_quote
+
+The factory Bemer meant is an environment that a machine controls, where people write and check programs entirely inside it.
+
+The next year, in 1969, Hitachi made its software department independent from its Kanagawa Works.
+Hitachi's [[https://www.hitachi.co.jp/Div/soft/history.html][company history]] (in Japanese) calls it "the world's first business site dedicated to software", and Toshiba, NEC and Fujitsu went the same way in the 1970s.
+
+In the United States, System Development Corporation set up a software factory of about 200 people around 1975, and stopped using it within a few years.
+According to a 1991 [[https://www.gregorystrachta.com/resources/Touchstones/swp-3268-23661042.pdf][draft paper]] by Michael Cusumano of MIT, the managers of the projects for each customer wanted to build the software themselves rather than hand the specifications to the factory, and the projects could not reuse each other's tools.
+
+For Toshiba's Fuchu Works, the results remain as numbers.
+According to the same draft, the share of delivered lines that reused existing code rose from 13% in 1979 to 48% in 1985, and Toshiba named reuse as the main reason its productivity and quality went up.
+
+Around the same time, in 1986, Fred Brooks wrote in [[https://www.cs.unc.edu/techreports/86-020.pdf][No Silver Bullet]]:
+
+#+begin_quote
+There is no single development, in either technology or management technique, which by itself promises even one order of magnitude improvement in productivity, in reliability, in simplicity.
+#+end_quote
+
+His point is that the hard part of software lies in specification, design and testing, so making code easier to write does not change the order of magnitude of the improvement.
+
+In 2004 Microsoft tried to put tools into Visual Studio under the name [[https://learn.microsoft.com/en-us/archive/blogs/askburton/moving-to-software-factories-2][Software Factories]], which assemble applications from domain-specific languages and templates.
+The post argues that other industries raised their capacity by moving from craftsmanship to manufacturing that combines parts, an idea close to Toshiba's reuse.
+
+The post also admits that the words software factory call up images of automatons without creativity and cause debate.
+The [[https://learn.microsoft.com/en-us/previous-versions/msp-n-p/ff648577(v=pandp.10)][page]] that describes the tools carries a notice that its content went out of date in November 2011.
+
+The factories of that time organized people and procedures, while today's factories build systems that run agents, but when I compared them I found three similarities.
+
+The workspace Symphony prepares for each task, and the hook in the figure of the post at the top that "stops operations that break the rules before they run", follow an idea close to Bemer's "it should be impossible to produce programs exterior to this environment".
+
+Toshiba named reuse rather than writing faster as the reason for its results, and OpenAI put weight on lints and structural tests in its post.
+Both spent their effort on writing less code and on checking the code they wrote.
+
+Even now that agents write the code, humans still handle the specifications and checks that Brooks called hard, and StrongDM's scenarios look to me like the result of humans spending time on those checks.
+
+** The setup I built at home
+I also run Vercel Board on a desktop that stays on all the time, and share it with my laptop over a Tailscale network.
+
+I talk to only one thread, the one with the orchestrator agent.
+The orchestrator splits the work into units that a worker can finish in one turn and registers them as tasks on Board.
+
+The management server on the desktop takes the tasks that are ready to start and starts a worker agent on the PC that the task's label names.
+One PC takes up to 5 tasks at a time, and when a worker's turn ends, the management server writes the result to the state of the task and notifies the orchestrator.
+
+The configuration and the code are in [[https://github.com/conao3/nixos-configuration/blob/master/home-manager/features/agent-board.nix][agent-board.nix]] and [[https://github.com/conao3/nixos-configuration/blob/master/pkgs/agent-board-server.py][agent-board-server.py]].
+I wrote only the management server, about 500 lines of Python, and left queuing the tasks, keeping one task from going to several workers, and recording the results to Board.
+
+When I reply in the thread of a task, the same worker continues the work, and if the worker is in the middle of a turn, it receives the reply within that turn.
+I can move the work forward by writing a request in the browser and replying.
+
+In the planning stage, when the direction changed every few minutes, talking to an agent directly went faster.
+Work that I can cut out after the direction settles suits the factory.
+
+The results depend on whether I can prepare the specification before handing over the work and a way to check what comes back.
+Next I plan to try preparing the checks first and then cutting out the tasks.
 
 * スレッド1本に話すだけで2台のPCのエージェントが働くソフトウェア工場をVercel Boardで組んだ
 :properties:
