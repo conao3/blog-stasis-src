@@ -32873,7 +32873,7 @@ I've made the Emacs manual available in Japanese.
 コマンドの形は手元でPLaMo 3 Translateを動かす[[/blog/2026/33d2c2][plamo-tr-local]]と同じで、どちらも =text translate-text= に名前付きの引数を渡します。
 
 =plamo-tr= はRustのライブラリとしても使えて、 =plamo-tr-po= はこのライブラリの上に作りました。
-=Translator::translate_batch= は複数の文章を1回のリクエストで送ってHTMLのタグを保ったまま訳し、長く動かしているあいだもIDトークンを更新し直します。
+ライブラリの[[https://github.com/conao3/rust-plamo-tr/blob/a8ebe3f2235743c4845ab9a38b7c17db5ffecd0e/src/api.rs#L199-L207][Translator::translate_batch]]は複数の文章を1回のリクエストで送ってHTMLのタグを保ったまま訳し、長く動かしているあいだもIDトークンを更新し直します。
 
 ** POファイルを訳すplamo-tr-po
 gettextのPOファイルは原文の =msgid= と訳文の =msgstr= の組を項目として並べたファイルで、原文が変わると =msgmerge= がその項目に =fuzzy= のフラグを付けて訳し直しが要ることを示します。
@@ -32906,14 +32906,14 @@ $ plamo-tr-po po-file translate-po-files --source-language en --format html \
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Visiting.html
-msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) and use the minibuffer to enter the name of the desired file."
-msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力し、ミニバッファを使用して目的のファイル名を入力してください。"
+msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>)."
+msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力してください。"
 
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファをファイルに保存します。"
 
 #. type: Content of: <html><body><pre>
 #: build/html/emacs/Visiting.html
@@ -32923,9 +32923,9 @@ msgstr ""
 #+end_src
 
 訳した項目には =# Machine-translated by PLaMo Translate.= のコメントが付き、 =<kbd>= と =<code>= の中身は英語のままです。
-=--format html= を付けると =code= や =kbd= などの要素を =<x-N/>= の形の文字列に置き換えて送り、訳文が返ってきてから元に戻すからです。
+=--format html= を付けると =code= や =kbd= などの要素を =<x-N/>= の形の文字列に[[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/protect.rs#L1-L6][置き換えて]]送り、訳文が返ってきてから元に戻すからです。
 
-そのほかのタグの組が原文と変わった訳は捨ててその項目だけを1件ずつ訳し直し、それでも変わるときは未訳のまま残します。
+そのほかの[[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/main.rs#L170-L183][タグの組]]が原文と変わった訳は捨ててその項目だけを[[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/main.rs#L215-L251][1件ずつ訳し直し]]、それでも変わるときは未訳のまま残します。
 =<pre>= から取り出した3つ目の項目は =#.= のコメントが =--skip-context= の正規表現に合ったので訳していません。
 
 ** 原文が変わった項目と手で直した訳
@@ -32940,9 +32940,9 @@ msgstr ""
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
 #, fuzzy
-#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer."
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は現在のバッファを保存します。"
+#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer."
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファを保存します。"
 
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
@@ -32965,8 +32965,8 @@ $ plamo-tr-po po-file translate-po-files --source-language en --format html \
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファをファイルに保存します。"
 
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
@@ -32987,7 +32987,7 @@ emacs-docは[[https://github.com/emacs-mirror/emacs][Emacs]]のmasterブラン�
 [[./resources/public/img/29c4d6-visiting.png]]
 
 emacs-docは文書の段落をPOファイルに取り出して訳文の文書を作り直す[[https://po4a.org/][po4a]]でマニュアルを扱っています。
-サイトは =make= のターゲットを次の順に実行して作ります。
+サイトは[[https://github.com/conao3/emacs-doc/blob/da1a253c2b1dab2da36c89ba6f46893cfa52c582/Makefile][Makefile]]のターゲットを次の順に実行して作ります。
 
 1. =make fetch-latest= でEmacsのmasterの =doc= ディレクトリを取り出し、そのcommitを =EMACS_REVISION= に書きます。
 2. =make html= で =makeinfo --html= がマニュアルを、ノードごとのページと1冊を1ページにまとめたページの2通りのHTMLにします。
@@ -33007,7 +33007,7 @@ eintr: 6808 translated messages, 1 fuzzy translation, 784 untranslated messages.
 未訳の項目のうちemacsの445件とelispの2,278件とeintrの769件は =<pre>= などから取り出したコードの項目で、 =--skip-context= で訳さないようにしています。
 残りの未訳はemacsが46件、elispが99件、eintrが15件です。
 
-GitHub Actionsの =Update= のworkflowを手で起動すると、Emacsのmasterを取り込んでPOファイルを合わせてサイトを作り直します。
+GitHub Actionsの[[https://github.com/conao3/emacs-doc/blob/da1a253c2b1dab2da36c89ba6f46893cfa52c582/.github/workflows/update.yml][workflow]]の =Update= を手で起動すると、Emacsのmasterを取り込んでPOファイルを合わせてサイトを作り直します。
 新しい段落と原文が変わった段落は手元で =make translate= を実行してPOファイルをpushし、 =Update= をもう一度起動するまで英語のまま表示されます。
 
 デプロイはCloudflareのWorkers Buildsがmasterへのpushのたびに行うので、リポジトリにはCloudflareのAPIトークンを置いていません。
@@ -33031,7 +33031,7 @@ GitHub Actionsの =Update= のworkflowを手で起動すると、Emacsのmaster�
 I wrote =plamo-tr=, a CLI for PLaMo Translate, and =plamo-tr-po=, which fills gettext PO files with PLaMo Translate, and used the two to publish the GNU Emacs manuals machine-translated into Japanese at [[https://emacs-doc.conao3.com]].
 
 =plamo-tr= translates text, =plamo-tr-po= translates the entries of a PO file through =plamo-tr=, and emacs-doc turns the Emacs manuals into PO files and builds the translated HTML from them.
-With the work split this way, an update to the Emacs manuals only sends the changed paragraphs back to PLaMo Translate.
+With the work split this way, I only send the changed paragraphs back to PLaMo Translate when the Emacs manuals change.
 
 The repositories are [[https://github.com/conao3/rust-plamo-tr][conao3/rust-plamo-tr]], [[https://github.com/conao3/rust-plamo-tr-po][conao3/rust-plamo-tr-po]], and [[https://github.com/conao3/emacs-doc][conao3/emacs-doc]], and both CLIs are under the Apache-2.0 license.
 emacs-doc distributes the manuals and their translations under the GFDL 1.3 or later, the license of the original manuals, and its scripts and configuration under Apache-2.0.
@@ -33075,7 +33075,7 @@ Your translations count toward the browser extension quota of your plan.
 The command line has the same shape as [[/blog/2026/c5f673][plamo-tr-local]], which runs PLaMo 3 Translate on your own machine: both take named parameters after =text translate-text=.
 
 =plamo-tr= also builds as a Rust library, and I built =plamo-tr-po= on it.
-=Translator::translate_batch= sends several texts in one request, keeps their HTML tags, and renews the ID token while a long job runs.
+Its [[https://github.com/conao3/rust-plamo-tr/blob/a8ebe3f2235743c4845ab9a38b7c17db5ffecd0e/src/api.rs#L199-L207][Translator::translate_batch]] sends several texts in one request, keeps their HTML tags, and renews the ID token while a long job runs.
 
 ** plamo-tr-po, a translator for PO files
 A gettext PO file lists entries, each a pair of an original =msgid= and a translated =msgstr=, and when the original changes, =msgmerge= flags the entry =fuzzy= so you know it needs a new translation.
@@ -33108,14 +33108,14 @@ Here are the three entries of =sample.ja.po= after the run.
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Visiting.html
-msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) and use the minibuffer to enter the name of the desired file."
-msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力し、ミニバッファを使用して目的のファイル名を入力してください。"
+msgid "To visit a file, type <kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>)."
+msgstr "ファイルにアクセスするには、<kbd class=\"kbd\">C-x C-f</kbd> (<code class=\"code\">find-file</code>) と入力してください。"
 
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファをファイルに保存します。"
 
 #. type: Content of: <html><body><pre>
 #: build/html/emacs/Visiting.html
@@ -33125,9 +33125,9 @@ msgstr ""
 #+end_src
 
 Each translated entry gets the comment =# Machine-translated by PLaMo Translate.=, and the contents of =<kbd>= and =<code>= stay in English.
-With =--format html=, =plamo-tr-po= replaces elements such as =code= and =kbd= with strings of the form =<x-N/>= before it sends the text, and puts them back when the translation returns.
+With =--format html=, =plamo-tr-po= [[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/protect.rs#L1-L6][replaces]] elements such as =code= and =kbd= with strings of the form =<x-N/>= before it sends the text, and puts them back when the translation returns.
 
-If a translation changes any other tags of the original, =plamo-tr-po= drops it and retries that entry alone, and if the tags still change, it leaves the entry untranslated.
+If a translation changes any [[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/main.rs#L170-L183][other tags]] of the original, =plamo-tr-po= drops it and [[https://github.com/conao3/rust-plamo-tr-po/blob/39b432a186ba1fdd7e71a57cc50a7017fcb9690e/src/main.rs#L215-L251][retries that entry alone]], and if the tags still change, it leaves the entry untranslated.
 It skipped the third entry, which came from =<pre>=, because its =#.= comment matched the =--skip-context= regular expression.
 
 ** Changed originals and hand-corrected translations
@@ -33142,9 +33142,9 @@ The =#|= lines hold the previous originals, which =msgmerge --previous= keeps.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
 #, fuzzy
-#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer."
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は現在のバッファを保存します。"
+#| msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer."
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファを保存します。"
 
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
@@ -33167,8 +33167,8 @@ The hand-written second entry is still =fuzzy=.
 # Machine-translated by PLaMo Translate.
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
-msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the current buffer in its visited file."
-msgstr "<kbd class=\"kbd\">C-x C-s</kbd> は、現在のバッファを訪問済みファイルに保存します。"
+msgid "<kbd class=\"kbd\">C-x C-s</kbd> saves the buffer in its file."
+msgstr "<kbd class=\"kbd\">C-x C-s</kbd> はバッファをファイルに保存します。"
 
 #. type: Content of: <html><body><p>
 #: build/html/emacs/Saving.html
@@ -33189,7 +33189,7 @@ Every page says that it's a machine translation and links to the original page o
 [[./resources/public/img/29c4d6-visiting.png]]
 
 emacs-doc handles the manuals with [[https://po4a.org/][po4a]], a tool that extracts the paragraphs of a document into a PO file and rebuilds the translated document from it.
-You build the site by running these =make= targets in order:
+You build the site by running these targets of the [[https://github.com/conao3/emacs-doc/blob/da1a253c2b1dab2da36c89ba6f46893cfa52c582/Makefile][Makefile]] in order:
 
 1. =make fetch-latest= checks out the =doc= directory of the Emacs master branch and writes its commit to =EMACS_REVISION=.
 2. =make html= runs =makeinfo --html= to build each manual twice: one page per node, and the whole manual on one page.
@@ -33209,7 +33209,7 @@ eintr: 6808 translated messages, 1 fuzzy translation, 784 untranslated messages.
 Of the untranslated entries, 445 in emacs, 2,278 in elisp, and 769 in eintr are code that po4a extracted from =<pre>= and similar elements, and =--skip-context= keeps them out of the translation.
 That leaves 46 untranslated entries in emacs, 99 in elisp, and 15 in eintr.
 
-I start the GitHub Actions workflow =Update= by hand, and it pulls in the Emacs master branch, merges the PO files, and rebuilds the site.
+I start the GitHub Actions [[https://github.com/conao3/emacs-doc/blob/da1a253c2b1dab2da36c89ba6f46893cfa52c582/.github/workflows/update.yml][workflow]] =Update= by hand, and it pulls in the Emacs master branch, merges the PO files, and rebuilds the site.
 New paragraphs and paragraphs whose original changed show in English until you run =make translate= locally, push the PO files, and start =Update= again.
 
 Cloudflare Workers Builds deploys the site on every push to master, so the repository holds no Cloudflare API token.
@@ -33229,13 +33229,15 @@ With =plamo-tr= translating text, =plamo-tr-po= translating the entries of PO fi
 :end:
 
 HonoのアプリでApollo Server 5のGraphQLを動かすライブラリとして、apollo-server-integration-honoを作りました。
-関数 =startServerAndCreateHonoHandler= 1つで =ApolloServer= をHonoのハンドラーにでき、 =@defer= を使った問い合わせには、Apollo Serverができた部分から順に返す =multipart/mixed= の応答をそのまま流します。
+関数 =startServerAndCreateHonoHandler= 1つで =ApolloServer= をHonoのハンドラーにできます。
 
+=@defer= を使った問い合わせでは、Apollo Serverが部分ごとに返す =multipart/mixed= の応答を、できた順にそのまま流します。
 リポジトリは[[https://github.com/conao3/ts-apollo-server-integration-hono][conao3/ts-apollo-server-integration-hono]]、ライセンスはApache-2.0で、npmに[[https://www.npmjs.com/package/@conao3/apollo-server-integration-hono][@conao3/apollo-server-integration-hono]]として公開しています。
+
 この記事は0.1.3と、この記事を書いた時点のmasterの[[https://github.com/conao3/ts-apollo-server-integration-hono/tree/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f][b3a486e]]をもとに、Apollo Server 5.5.2とHono 4.13.23とNode.js 26.13.1で動かして書いています。
 
 本体は[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/src/index.ts][src/index.ts]]の112行で、Honoが受けたリクエストをApollo Serverの形に直して渡し、返ってきた本文をWeb標準の =Response= にしています。
-依存は =@apollo/server= と =hono= だけなので、Honoが動くランタイムでそのまま使えるように書いています。
+Web標準のAPIと、 =@apollo/server= と =hono= の2つの依存だけで書いていて、Honoが動くランタイムで使えるようにしています。
 
 [[github:conao3/ts-apollo-server-integration-hono::TypeScript][Apollo Server integration for Hono]]
 
@@ -33252,8 +33254,10 @@ allowBuilds:
 pnpm add @conao3/apollo-server-integration-hono @apollo/server graphql@16 hono @hono/node-server
 #+end_src
 
-次の =server.mts= は、Honoのミドルウェアがヘッダー =x-user= から読んだ利用者の名前を、GraphQLのリゾルバーに渡すサーバーです。
-=context= の関数は引数 =c= にHonoのコンテキストを受け取り、 =HonoContextFunctionArgument<AppEnv>= で型を付けると =c.get("user")= がアプリの =Env= の型で読めます。
+次の =server.mts= では、Honoのミドルウェアがヘッダー =x-user= から利用者の名前を読み、GraphQLのリゾルバーに渡します。
+
+=context= の関数は引数 =c= にHonoのコンテキストを受け取ります。
+この引数に =HonoContextFunctionArgument<AppEnv>= で型を付けると、 =c.get("user")= がアプリの =Env= の型で読めます。
 
 #+begin_src typescript
 import { ApolloServer } from "@apollo/server"
@@ -33310,19 +33314,19 @@ $ curl -s http://localhost:4000/api/graphql \
 {"data":{"hello":"world","user":"alice"}}
 #+end_src
 
-=startServerAndCreateHonoHandler= はApollo Serverをバックグラウンドで起動するので、 =server.start()= を自分で呼ばずに、起動時に1回だけ呼びます。
-=hono/cors= のようなミドルウェアがHonoのコンテキストに付けたヘッダーは、GraphQLの応答にも付いたまま返ります。
+=startServerAndCreateHonoHandler= はApollo Serverをバックグラウンドで起動するので、 =server.start()= を自分で書く代わりに、アプリの起動時に =startServerAndCreateHonoHandler= を1回だけ呼びます。
+=hono/cors= のようなミドルウェアがHonoのコンテキストに付けたヘッダーは、GraphQLの応答にもそのまま入ります。
 
 ** @deferの応答を流す
 =@defer= は、問い合わせの一部を後から返してよいとサーバーに伝えるGraphQLのディレクティブです。
-Apollo Server 5は、graphqlのパッケージがちょうど =17.0.0-alpha.9= のときだけ =@defer= の部分を後から返すと[[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Serverのドキュメント]]に書かれているので、graphqlをこの版に入れ替えます。
+
+[[https://www.apollographql.com/docs/apollo-server/workflow/requests#incremental-delivery-experimental][Apollo Serverのドキュメント]]によると、Apollo Server 5はgraphqlのパッケージがちょうど =17.0.0-alpha.9= のときだけ =@defer= の部分を後から返すので、graphqlをこの版に入れ替えます。
 
 #+begin_src shell
 pnpm add graphql@17.0.0-alpha.9
 #+end_src
 
-次の =defer.mts= は、すぐ返る =hello= と、2秒かかる =slow= を持つサーバーです。
-スキーマには =@defer= の宣言を書いておきます。
+次の =defer.mts= はすぐ返る =hello= と2秒かかる =slow= を持ち、スキーマに =@defer= の宣言を書いたサーバーです。
 
 #+begin_src typescript
 import { ApolloServer } from "@apollo/server"
@@ -33358,7 +33362,7 @@ app.post("/api/graphql", startServerAndCreateHonoHandler(server))
 serve({ fetch: app.fetch, port: 4000 })
 #+end_src
 
-次の =defer.sh= は、問い合わせを送ってから応答のJSONの部分が届くまでの秒数を、部分ごとに行の先頭に付けます。
+次の =defer.sh= は、問い合わせを送ってから応答のJSONが届くまでの秒数を、JSONの行ごとに先頭に付けます。
 =@defer= を使わない問い合わせと使う問い合わせを、同じ =accept= ヘッダーで1回ずつ送ります。
 
 #+begin_src bash
@@ -33387,15 +33391,18 @@ $ bash defer.sh
 #+end_src
 
 =@defer= を使わない問い合わせは、 =slow= を待って2秒後に1つのJSONで返ります。
-=@defer= を使うと =hello= の部分が0秒で届き、 =slow= の部分は2秒後に =incremental= として届くので、応答を最後まで溜めずに流していることが分かります。
+=@defer= を使うと0秒で =hello= が届き、2秒後に =slow= が =incremental= として返るので、apollo-server-integration-honoが応答を最後まで溜めずに流していることが分かります。
 
 ** HonoとApollo Serverのあいだでしていること
 Apollo ServerはHTTPのリクエストとレスポンスを、フレームワークによらない =HTTPGraphQLRequest= と =HTTPGraphQLResponse= の形で受け渡します。
-統合のパッケージの仕事は、この形とフレームワークの形のあいだを直すことで、Apollo Serverの[[https://www.apollographql.com/docs/apollo-server/integrations/building-integrations][統合の作り方]]もこの手順で書かれています。
+
+統合のパッケージの仕事はこの形とフレームワークの形のあいだを直すことです。
+Apollo Serverの[[https://www.apollographql.com/docs/apollo-server/integrations/building-integrations][統合の作り方]]もこの手順で書かれています。
 
 [[./resources/public/img/963012-flow.svg]]
 
 リクエストの側では、 =c.req.raw= のヘッダーを =HeaderMap= に写し、クエリ文字列と本文を取り出して =executeHTTPGraphQLRequest= に渡します。
+
 =content-type= がJSONの本文は =JSON.parse= で読み、壊れたJSONには400を返します。
 =context= の関数には =c= を渡すので、リゾルバーからHonoのミドルウェアが付けた値を読めます。
 
@@ -33420,18 +33427,23 @@ return new ReadableStream<Uint8Array>({
 })
 #+end_src
 
-=pull= は読み手が次の部分を求めるたびに呼ばれ、イテレーターから1つ取って流すので、前の節の =hello= の部分は =slow= の解決を待たずに届きます。
-クライアントが途中で接続を切ったときは、 =cancel= がイテレーターの =return= を呼んで後始末をApollo Serverに渡します。
+読み手が次の部分を求めるたびに =pull= が呼ばれ、イテレーターから1つ取って流します。
+このため、前の節の =hello= の部分は =slow= の解決を待たずに届きます。
+
+クライアントが途中で接続を切ったときは、 =cancel= がイテレーターの =return= を呼びます。
 
 ** Apollo Serverの結合テスト
-Apollo Serverは統合のパッケージ向けのテスト集[[https://github.com/apollographql/apollo-server/tree/main/packages/integration-testsuite][@apollo/server-integration-testsuite]]を公開していて、apollo-server-integration-honoは[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/test/integration/integration.test.ts][test/integration/integration.test.ts]]でこれをJestで回しています。
-CIと同じgraphql 16では、270件のうち246件が通り、graphql 17が要る =@defer= と =@stream= の24件は飛ばされます。
+Apollo Serverは統合のパッケージ向けのテスト集[[https://github.com/apollographql/apollo-server/tree/main/packages/integration-testsuite][@apollo/server-integration-testsuite]]を公開しています。
+apollo-server-integration-honoは、[[https://github.com/conao3/ts-apollo-server-integration-hono/blob/b3a486e68f2a2c3f05fdf099d50799a4f9fb709f/test/integration/integration.test.ts][test/integration/integration.test.ts]]でこれをJestで回しています。
+
+CIと同じgraphql 16で動かすと270件のうち246件が通り、graphql 17が要る =@defer= と =@stream= の24件は飛ばされます。
 
 #+begin_example
 Tests:       24 skipped, 246 passed, 270 total
 #+end_example
 
-飛ばされる24件も、リポジトリの =pnpm-workspace.yaml= の =overrides= に =graphql: 17.0.0-alpha.9= を足し、古い形式の =@defer= のテストが読む =@yaacovcr/transform= を入れて、環境変数 =INCREMENTAL_DELIVERY_TESTS_ENABLED= を付けると動きます。
+飛ばされる24件を動かすには、リポジトリの =pnpm-workspace.yaml= の =overrides= に =graphql: 17.0.0-alpha.9= を足し、古い形式の =@defer= のテストが読む =@yaacovcr/transform= を入れます。
+そのうえで環境変数 =INCREMENTAL_DELIVERY_TESTS_ENABLED= を付けると、この24件も動きます。
 
 #+begin_src shell
 pnpm add -D @yaacovcr/transform
@@ -34445,6 +34457,387 @@ Approval doesn't cover actions the agent doesn't declare, shortcuts sent with =k
 ** A separate desktop with the same OS permissions
 The agent's desktop runs with the permissions of the user who runs the MCP server, so apps opened with =launch= can read and write that user's files and sockets.
 sellaite separates only the input seats, so for an agent you don't fully trust, create a dedicated Linux user or a container and run sellaite inside it.
+
+||||||| Stash base
+
+* Claude CodeとCodexを1台で複数のアカウントに分けて使えるhome-managerモジュールのnix-agentsを作った
+:properties:
+:export_file_name: generated/contents/blog/2026/955ac0
+:export_date: 2026-11-27 23:22
+:export_updated: 2026-11-27 23:22
+:export_tags: nix home-manager ai-agent claude-code codex release nix-agents
+:export_draft: t
+:end:
+Claude CodeとCodexを1台で複数のアカウントに分けて使えるhome-managerのモジュール、nix-agentsを作りました。
+=claude.personal= と =claude.work= のような実行ファイルをインスタンスごとに作り、それぞれが別の設定ディレクトリでエージェントを起動します。
+
+MCPサーバーは1か所に書くと、エージェントごとの設定ファイルにそれぞれの形式で入ります。
+エージェントが自分で書き換える =settings.json= のような設定ファイルには、宣言したキーだけをマージします。
+
+対応しているエージェントはClaude CodeとCodexとpiとcursor-agentの4つで、どれも設定ディレクトリを環境変数で切り替えられるので、その環境変数をインスタンスごとに変えています。
+
+リポジトリは [[https://github.com/conao3/nix-agents][conao3/nix-agents]] で、ライセンスは [[https://github.com/conao3/nix-agents/blob/d9c223c6ecbfe845896615bd62d768e8f597dcb8/LICENSE][Apache-2.0]] です。
+この記事ではmasterの [[https://github.com/conao3/nix-agents/commit/d9c223c6ecbfe845896615bd62d768e8f597dcb8][d9c223c]] と、nixpkgs-unstableのClaude Code 2.1.330とCodex 0.171.0を使いました。
+
+[[github:conao3/nix-agents::Nix][home-manager module for running coding agents (Claude Code, Codex, pi, cursor-agent) as multiple instances]]
+
+** nix-agentsでできること
+
+- =claude.work= のような実行ファイルを作り、エージェントの設定ディレクトリをインスタンスごとに分ける。
+- 同じエージェントのインスタンスどうしで設定や履歴を共有し、ログインの情報はインスタンスごとに持たせる。
+- MCPサーバーを =programs.agents.mcpServers= に1回だけ書き、Claude Codeの =.claude.json= 、 Codexの =config.toml= 、 cursor-agentの =mcp.json= に入れる。
+- MCPサーバーのトークンを環境変数の名前かファイルのパスで渡し、Nixのストアにトークンを書き込まない。
+- エージェントが書き換える設定ファイルに、宣言したキーだけをマージする。
+
+** Claude Codeのインスタンスを宣言する
+
+home-managerの [[https://github.com/nix-community/home-manager/blob/5f5abf5eb8de62d954232f3797b5bf4505656b91/modules/programs/claude-code/default.nix#L353-L355][programs.claude-code]] は設定ディレクトリを =configDir= の1つだけ持ち、それを =CLAUDE_CONFIG_DIR= としてセッションの環境変数にします。
+nix-agentsは環境変数を実行ファイルの中で設定するので、仕事用と個人用のClaude Codeを同じシェルから並べて起動できます。
+
+flakeのinputにnix-agentsを足して、 =homeManagerModules.default= をhome-managerのモジュールに入れます。
+
+#+begin_src nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-agents = {
+      url = "github:conao3/nix-agents";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+  };
+
+  outputs =
+    { nixpkgs, home-manager, nix-agents, ... }:
+    {
+      homeConfigurations.alice = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          system = "x86_64-linux";
+          config.allowUnfree = true;
+        };
+        modules = [
+          nix-agents.homeManagerModules.default
+          {
+            home = {
+              username = "alice";
+              homeDirectory = "/home/alice";
+              stateVersion = "25.11";
+            };
+          }
+          ./agents.nix
+        ];
+      };
+    };
+}
+#+end_src
+
+=claude-code= はnixpkgsでunfreeなので、 =allowUnfree= を有効にしています。
+
+=agents.nix= にClaude Codeの2つのインスタンスとCodexの1つのインスタンス、それに2つのMCPサーバーを書きます。
+
+#+begin_src nix
+{ pkgs, lib, ... }:
+{
+  programs.agents = {
+    enable = true;
+
+    types.claude = {
+      package = pkgs.claude-code;
+      envVar = "CLAUDE_CONFIG_DIR";
+      homeDir = ".claude";
+      share = {
+        enable = true;
+        exclude = [
+          ".claude.json"
+          ".claude.json.tmp"
+          ".claude.json.*"
+          ".credentials.json"
+        ];
+      };
+      mcp = {
+        format = "claude";
+        key = "mcpServers";
+        files = [
+          "settings.json"
+          ".claude.json"
+        ];
+      };
+      files = {
+        "settings.json".settings = {
+          theme = "dark";
+          permissions.defaultMode = "acceptEdits";
+        };
+        ".claude.json".scope = "instances";
+      };
+    };
+
+    types.codex = {
+      package = pkgs.codex;
+      envVar = "CODEX_HOME";
+      homeDir = ".codex";
+      share = {
+        enable = true;
+        exclude = [ "auth.json" ];
+      };
+      mcp = {
+        format = "codex";
+        key = "mcp_servers";
+        files = [ "config.toml" ];
+      };
+      files."config.toml".settings.approval_policy = "on-request";
+    };
+
+    instances = {
+      "claude.personal" = { };
+      "claude.work" = { };
+      "codex.personal" = { };
+    };
+
+    mcpServers = {
+      time.command = lib.getExe pkgs.mcp-server-time;
+      issues = {
+        url = "https://mcp.example.com/issues";
+        bearerTokenEnvVar = "ISSUES_API_KEY";
+      };
+    };
+  };
+}
+#+end_src
+
+=types= にはエージェントのプログラムと、設定ディレクトリを決める環境変数を書きます。
+=instances= の名前は =<type>.<suffix>= の形で、そのまま実行ファイルの名前になります。
+
+=share.enable= を有効にすると、同じエージェントのインスタンスは =~/.agents/.claude= のような共有のディレクトリを使います。
+=share.exclude= に書いた名前はインスタンスのディレクトリに残るので、アカウントの状態を持つ =.claude.json= とログインの情報を持つ =.credentials.json= 、 Codexの =auth.json= はインスタンスごとに分かれます。
+
+この記事のコマンドは、ホームディレクトリを =/home/alice= にした [[https://github.com/containers/bubblewrap][bubblewrap]] のサンドボックスで動かしました。
+=home-manager switch= を実行すると、nix-agentsが足した4つの手順が動きます。
+
+#+begin_src sh
+$ home-manager switch --flake .#alice 2>&1 | grep '^Activating agents'
+Activating agentsDirs
+Activating agentsCommon
+Activating agentsShare
+Activating agentsFiles
+#+end_src
+
+=PATH= にはインスタンスの実行ファイルが入ります。
+
+#+begin_src sh
+$ ls ~/.nix-profile/bin | grep -E '^(claude|codex)'
+claude
+claude.personal
+claude.work
+codex
+codex-code-mode-host
+codex.personal
+#+end_src
+
+実行ファイルは [[https://github.com/conao3/nix-agents/blob/d9c223c6ecbfe845896615bd62d768e8f597dcb8/default.nix#L174-L187][makeWrapperで作ったシェルスクリプト]] で、環境変数を設定してから本体の =claude= や =codex= を起動します。
+
+#+begin_src sh
+$ grep -h -E 'CLAUDE_CONFIG_DIR|CODEX_HOME' ~/.nix-profile/bin/{claude.personal,claude.work,codex.personal}
+export CLAUDE_CONFIG_DIR="$HOME/.agents/.claude.personal"
+export CLAUDE_CONFIG_DIR="$HOME/.agents/.claude.work"
+export CODEX_HOME="$HOME/.agents/.codex.personal"
+#+end_src
+
+=~/.agents= には、インスタンスのディレクトリと共有のディレクトリができます。
+
+#+begin_src sh
+$ tree -a ~/.agents
+/home/alice/.agents
+├── .claude
+│   └── settings.json
+├── .claude.personal
+│   ├── .claude.json
+│   └── settings.json -> /home/alice/.agents/.claude/settings.json
+├── .claude.work
+│   ├── .claude.json
+│   └── settings.json -> /home/alice/.agents/.claude/settings.json
+├── .codex
+│   └── config.toml
+├── .codex.personal
+│   └── config.toml -> /home/alice/.agents/.codex/config.toml
+└── share
+
+7 directories, 7 files
+#+end_src
+
+=settings.json= は共有のディレクトリにあり、2つのインスタンスからシンボリックリンクで指されています。
+=.claude.json= は =share.exclude= に書いたので、インスタンスごとの普通のファイルです。
+
+[[./resources/public/img/955ac0-layout.svg]]
+
+** MCPサーバーを1か所に書く
+
+=mcpServers= には、ローカルで動かす =time= とHTTPでつなぐ =issues= の2つを書きました。
+=time= はnixpkgsの =mcp-server-time= で、 =issues= のURLは記事のために作った存在しないものです。
+
+Claude Codeのインスタンスの =.claude.json= には、Claude Codeの形式で入ります。
+=bearerTokenEnvVar= は、Claude Codeが起動したときに環境変数から展開する =Authorization= ヘッダーになります。
+
+#+begin_src sh
+$ jq .mcpServers ~/.agents/.claude.work/.claude.json
+{
+  "issues": {
+    "headers": {
+      "Authorization": "Bearer ${ISSUES_API_KEY}"
+    },
+    "type": "http",
+    "url": "https://mcp.example.com/issues"
+  },
+  "time": {
+    "args": [],
+    "command": "/nix/store/ad9inx3brh3al09xcas4wdf5c9midyxj-mcp-server-time-2.5.0/bin/mcp-server-time",
+    "type": "stdio"
+  }
+}
+#+end_src
+
+Codexの =config.toml= では、同じ =bearerTokenEnvVar= がCodexの =bearer_token_env_var= になります。
+
+#+begin_src sh
+$ cat ~/.agents/.codex/config.toml
+approval_policy = "on-request"
+
+[mcp_servers.issues]
+bearer_token_env_var = "ISSUES_API_KEY"
+type = "http"
+url = "https://mcp.example.com/issues"
+
+[mcp_servers.time]
+args = []
+command = "/nix/store/ad9inx3brh3al09xcas4wdf5c9midyxj-mcp-server-time-2.5.0/bin/mcp-server-time"
+#+end_src
+
+エージェント自身にMCPサーバーの一覧を出させてみると、どちらも2つのサーバーを読んでいます。
+Claude Codeでは =time= につながり、 =issues= はホストが無いので失敗します。
+
+#+begin_src sh
+$ export ISSUES_API_KEY=dummy
+$ claude.work mcp list
+Checking MCP server health…
+
+issues: https://mcp.example.com/issues (HTTP) - ✘ Failed to connect — ENOTFOUND: getaddrinfo ENOTFOUND mcp.example.com
+time: /nix/store/ad9inx3brh3al09xcas4wdf5c9midyxj-mcp-server-time-2.5.0/bin/mcp-server-time  - ✔ Connected
+
+$ codex.personal mcp list
+Name  Command                                                                                Args  Env  Cwd  Status   Auth
+time  /nix/store/ad9inx3brh3al09xcas4wdf5c9midyxj-mcp-server-time-2.5.0/bin/mcp-server-time  -     -    -    enabled  Unsupported
+
+Name    Url                             Bearer Token Env Var  Status   Auth
+issues  https://mcp.example.com/issues  ISSUES_API_KEY        enabled  Bearer token
+#+end_src
+
+トークンをファイルに置くときは =bearerTokenFile= にパスを書きます。
+Claude Codeには、つなぐたびにそのファイルを読む =headersHelper= のコマンドが入るので、Nixのストアにはパスだけが残ります。
+
+** エージェントが書き換える設定ファイルをマージする
+
+Claude Codeは起動すると、設定ディレクトリの =.claude.json= にアカウントや起動の状態を書き込みます。
+home-managerの =home.file= で置くファイルはNixのストアへの読み取り専用のリンクなので、エージェントが書き込むファイルには使えません。
+
+nix-agentsの =files= は、既定で =merge= という方法でファイルを置きます。
+=home-manager switch= のたびに、宣言したキーを今のファイルに当てはめ、ほかのキーはそのまま残します。
+
+上で =claude.work mcp list= を実行したので、 =claude.work= のディレクトリにはClaude Codeが書き込んだキーと、Claude Codeが作った =backups= のディレクトリがあります。
+
+#+begin_src sh
+$ tree -a ~/.agents/.claude.work
+/home/alice/.agents/.claude.work
+├── backups
+│   └── .claude.json.backup.1795840307736
+├── .claude.json
+└── settings.json -> /home/alice/.agents/.claude/settings.json
+
+2 directories, 3 files
+$ jq 'del(.mcpServers) | keys' ~/.agents/.claude.work/.claude.json
+[
+  "firstStartTime",
+  "firstStartVersion",
+  "hasResetAutoModeOptInForDefaultOffer",
+  "machineID",
+  "migrationVersion",
+  "opusProMigrationComplete",
+  "seenNotifications",
+  "userID"
+]
+#+end_src
+
+ここで、宣言で =dark= にした =settings.json= の =theme= を手で =light= に変えてから、 =switch= し直してみます。
+
+#+begin_src sh
+$ jq 'del(.mcpServers)' ~/.agents/.claude/settings.json
+{
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  },
+  "theme": "dark"
+}
+$ jq '.theme = "light"' ~/.agents/.claude/settings.json > /tmp/s.json
+$ cp /tmp/s.json ~/.agents/.claude/settings.json
+$ home-manager switch --flake .#alice 2>&1 | grep '^Activating agents'
+Activating agentsDirs
+Activating agentsCommon
+Activating agentsShare
+Activating agentsFiles
+#+end_src
+
+=.claude.json= はClaude Codeが書いたキーを残したまま =mcpServers= だけが入れ直され、 =backups= は共有のディレクトリに移ってリンクになりました。
+
+#+begin_src sh
+$ tree -a ~/.agents/.claude.work
+/home/alice/.agents/.claude.work
+├── backups -> /home/alice/.agents/.claude/backups
+├── .claude.json
+└── settings.json -> /home/alice/.agents/.claude/settings.json
+
+2 directories, 2 files
+$ jq 'del(.mcpServers) | keys' ~/.agents/.claude.work/.claude.json
+[
+  "firstStartTime",
+  "firstStartVersion",
+  "hasResetAutoModeOptInForDefaultOffer",
+  "machineID",
+  "migrationVersion",
+  "opusProMigrationComplete",
+  "seenNotifications",
+  "userID"
+]
+#+end_src
+
+インスタンスのディレクトリにできたファイルやディレクトリは、このように次の =switch= で共有のディレクトリに移ります。
+履歴の =history.jsonl= は、2つのインスタンスの行を合わせて時刻の順に並べ直します。
+
+=settings.json= の =theme= は宣言と違う値なので =light= のまま残り、警告のログに1行が書かれました。
+
+#+begin_src sh
+$ jq 'del(.mcpServers)' ~/.agents/.claude/settings.json
+{
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  },
+  "theme": "light"
+}
+$ cat ~/.agents/settings-warnings.log
+WARN: claude settings: /home/alice/.agents/.claude/settings.json: .theme: expected null or "dark", got "light", skipping
+#+end_src
+
+宣言の値で毎回書き換えたいキーは =agentsLib.force= で包むか、ファイルの =onConflict= を ="overwrite"= にします。
+
+マージの中身は [[https://github.com/conao3/nix-agents/blob/d9c223c6ecbfe845896615bd62d768e8f597dcb8/merge.jq][merge.jq]] の15行で、Nixが宣言から作った操作の列を、 =switch= のときにjqが今のファイルに順に当てはめます。
+操作の列は =builtins.toJSON= でストアのファイルにしてからjqに読ませるので、設定の値がシェルのコマンドに埋め込まれることはありません。
+
+
+** おわりに
+
+piとcursor-agentも含めた4つのエージェントの設定例と、すべてのoptionの説明は [[https://github.com/conao3/nix-agents/blob/d9c223c6ecbfe845896615bd62d768e8f597dcb8/README.md][README]] に書いています。
+1台でClaude CodeやCodexを複数のアカウントで使い分けたいときに、nix-agentsを試してみてください。
 
 * COMMENT Local variables
 # Local Variables:
