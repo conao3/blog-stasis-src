@@ -30737,6 +30737,129 @@ With Corfu installed, completion candidates pop up even in =emacs -nw= over SSH.
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L1064][treesit-auto-install-grammar]] controls whether a tree-sitter mode installs a missing grammar library when it starts.
 - [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS#L3481][newcomers-presets]] is a theme that collects settings for new users that are too invasive to turn on by default.
 
+* Emacs 30の新機能から、動かして楽しいものを7つ画面つきで紹介する
+:properties:
+:export_file_name: generated/contents/blog/2026/771a69
+:export_date: 2026-11-27 22:40
+:export_updated: 2026-11-27 22:40
+:export_tags: emacs release-notes
+:export_draft: t
+:end:
+Emacs 30のNEWSから動かしてすぐに違いが分かる新機能を7つ選び、Emacs 30.2の実際の画面と一緒に紹介します。
+本体に入ったwhich-keyや、コードを打つと補完の候補が薄く出る =completion-preview-mode= のように、パッケージを入れずに手に入るものを中心にしました。
+
+NEWSは [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30][etc/NEWS.30]] にあり、2,859行あります。
+画面はすべて =emacs -Q= で起動したEmacs 30.2で撮っていて、設定が要るものはその式を添えています。
+
+** which-keyで、続けて押せるキーの一覧を出す
+
+GNU ELPAにあった [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1927][which-key]] が本体に入り、 =which-key-mode= を有効にして =C-x= のようなプレフィックスキーを押してから少し待つと、続けて押せるキーとコマンドの一覧がミニバッファに広がります。
+
+#+begin_src emacs-lisp
+(which-key-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-which-key.png]]
+
+=C-x= の後に押せるキーは画面に入りきらないので6ページに分かれます。
+=C-h= を押すとページを送る操作の案内が出ます。
+
+キーバインドを覚えきれていないコマンドも、プレフィックスキーを押して待てば名前から探せます。
+
+** 打つそばに、補完の候補を薄い字で出す
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1935][completion-preview-mode]] を有効にすると、シンボルを打つにつれて補完の候補がカーソルの後ろに薄い字で出ます。
+TABで候補を確定でき、 =M-i= で候補に共通する部分までを補完します。
+
+#+begin_src emacs-lisp
+(global-completion-preview-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-completion-preview.png]]
+
+シンボルを3文字以上打つと候補が出ます。
+画面はEmacs Lispのバッファで =(with-cur= まで打ったところで、続きの =rent-buffer= が薄い字で出ています。
+
+** 折り返した行を、 =M-q= で整えたように字下げして見せる
+
+GNU ELPAのadaptive-wrapを本体に入れた [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L607][visual-wrap-prefix-mode]] は、ウィンドウの端で折り返した行を前の行の字下げに合わせて表示します。
+=M-q= と違ってバッファの文字は変えず、表示だけを整えます。
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'text-mode-hook #'visual-wrap-prefix-mode)
+#+end_src
+
+[[./resources/public/img/771a69-visual-wrap.png]]
+
+左が =visual-wrap-prefix-mode= を有効にしたバッファで、右が同じ文字の無効のバッファです。
+左では箇条書きの続きが記号の後ろにそろい、コメントの続きもコメントの開始の後ろにそろっています。
+
+** Modusのテーマが8つになる
+
+Emacs 28から入っている明るい =modus-operandi= と暗い =modus-vivendi= に [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1968][6つのテーマが加わりました]]。
+読みやすさを優先した =-tinted= に加えて、赤と緑の区別がつきにくい人に向けた =-deuteranopia= と青と黄色の区別がつきにくい人に向けた =-tritanopia= が明暗それぞれにあります。
+
+#+begin_src emacs-lisp
+(load-theme 'modus-vivendi-tinted t)
+#+end_src
+
+[[./resources/public/img/771a69-modus.png]]
+
+左が =modus-vivendi-tinted= で、右が =modus-operandi-deuteranopia= です。
+8つのテーマはどれも =load-theme= で切り替えられます。
+
+** Flymakeの指摘を行末に出す
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1477][flymake-show-diagnostics-at-end-of-line]] を =t= にすると、その行の末尾にFlymakeの指摘が枠付きで出ます。
+マウスを当てたり別のバッファを開いたりせずに、指摘の文をその場で読めます。
+
+#+begin_src emacs-lisp
+(setopt flymake-show-diagnostics-at-end-of-line t)
+#+end_src
+
+[[./resources/public/img/771a69-flymake-eol.png]]
+
+Emacs Lispのファイルに未定義の関数と変数を使う =my-broken= を書いて =flymake-mode= を有効にした画面では、バイトコンパイルの警告が2行の末尾に出て、モードラインにも警告の数の2が出ています。
+
+Emacs 30ではEmacs Lispのバックエンドが [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L194][trusted-content]] に入っているファイルでだけ動きます。
+試すときは =(setopt trusted-content :all)= のように信頼するファイルを指定します。
+
+** 今いる関数の名前をヘッダー行に出す
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L1208][which-func-display]] を =header= にすると、ポイントのある関数の名前を =which-function-mode= がウィンドウの上端のヘッダー行に出します。
+既定の =mode= ではモードラインに出していて、 =mode-and-header= にすると両方に出ます。
+
+#+begin_src emacs-lisp
+(setopt which-func-display 'header)
+(which-function-mode 1)
+#+end_src
+
+[[./resources/public/img/771a69-which-func.png]]
+
+Pythonのクラス =Store= のメソッド =put= の中にポイントがあり、 =class Store:= の行が画面の外にあってもヘッダー行に =Store.put= と出ています。
+長いメソッドの中でスクロールしても、どの関数の中にいるかをヘッダー行で確かめられます。
+
+** grepの結果をファイルごとにまとめる
+
+[[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L864][grep-use-headings]] を =t= にすると、 =M-x grep= の結果をファイルごとにまとめて、ファイル名の見出しの下に一致した行を並べます。
+=git grep= や =rg= の =--heading= と同じ見た目です。
+
+#+begin_src emacs-lisp
+(setopt grep-use-headings t)
+#+end_src
+
+[[./resources/public/img/771a69-grep-headings.png]]
+
+緑のファイル名の下に行番号と一致した行が並ぶので、同じファイルに一致が多いときにファイル名の繰り返しが消えて読みやすくなります。
+
+** ほかに目についたもの
+
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L25][ネイティブコンパイル]] は、libgccjitがあれば =configure= が既定で有効にします。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L641][replace-regexp-as-diff]] は、正規表現の置換の結果をdiffで見せて、見たあとでパッチとして当てられます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L620][kill-ring-deindent-mode]] を有効にすると、字下げされたコードをコピーしたときに、先頭の字下げを外してキルリングに入れます。
+- [[https://github.com/emacs-mirror/emacs/blob/emacs-31.1/etc/NEWS.30#L233][mode-line-format-right-align]] より後ろに置いたモードラインの項目は、右に寄せて表示されます。
+
 * COMMENT Local variables
 # Local Variables:
 # org-download-image-dir: "./resources/public/img"
