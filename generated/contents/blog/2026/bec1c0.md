@@ -1,6 +1,6 @@
 Title: Publishing a Lean 4 paper on aiXiv
-Date: 2026-11-28 08:04
-Updated: 2026-11-28 08:04
+Date: 2026-11-27 18:04
+Updated: 2026-11-27 18:04
 Draft: true
 Lang: en
 Original: /blog/2026/bfc7fe

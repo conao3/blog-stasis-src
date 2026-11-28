@@ -16168,8 +16168,8 @@ emacsclientに興味がありながらも上手く設定できずに悩んでい
 * emacsclient on NixOS: run Emacs as a server with services.emacs
 :properties:
 :export_file_name: generated/contents/blog/2026/7d3afe
-:export_date: 2026-11-28 09:03
-:export_updated: 2026-11-28 09:03
+:export_date: 2026-11-27 19:03
+:export_updated: 2026-11-27 19:03
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/26583e
@@ -17002,8 +17002,8 @@ Nixを使う場合は =nix run github:conao3/lean-ritsuryo -- help= で実行で
 * lean-ritsuryo: Japanese statutory deadline and tax calculations in Lean 4, with proofs
 :properties:
 :export_file_name: generated/contents/blog/2026/232531
-:export_date: 2026-11-28 08:04
-:export_updated: 2026-11-28 08:04
+:export_date: 2026-11-27 18:04
+:export_updated: 2026-11-27 18:04
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/5499a8
@@ -17635,8 +17635,8 @@ Claude Codeと書いた[[https://aixiv.online/abs/2611.00464][論文]]と[[https
 * Publishing a Lean 4 paper on aiXiv
 :properties:
 :export_file_name: generated/contents/blog/2026/bec1c0
-:export_date: 2026-11-28 08:04
-:export_updated: 2026-11-28 08:04
+:export_date: 2026-11-27 18:04
+:export_updated: 2026-11-27 18:04
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/bfc7fe
@@ -17861,8 +17861,8 @@ Workersの静的アセットで配りたいけれど、Cloudflareのトークン
 * Deploying GitHub Actions builds to Cloudflare Workers without an API token in GitHub
 :properties:
 :export_file_name: generated/contents/blog/2026/881c64
-:export_date: 2026-11-28 07:50
-:export_updated: 2026-11-28 07:50
+:export_date: 2026-11-27 17:50
+:export_updated: 2026-11-27 17:50
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/12e5f6
@@ -18213,8 +18213,8 @@ llama.cppの =llama-server= で2Bと8BのQ4_K_MのGGUFを動かし、temperature
 * plamo-tr-local: a CLI that runs PLaMo 3 Translate on your machine and translates text in a shell pipe
 :properties:
 :export_file_name: generated/contents/blog/2026/c5f673
-:export_date: 2026-11-28 08:30
-:export_updated: 2026-11-28 08:30
+:export_date: 2026-11-27 18:30
+:export_updated: 2026-11-27 18:30
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/33d2c2
@@ -19568,8 +19568,8 @@ PRのブランチにmasterをmergeし、その上に移植のcommitを積んで�
 * Keeping awsr in sync with new AWS CLI v2 releases through a daily GitHub Actions workflow
 :properties:
 :export_file_name: generated/contents/blog/2026/0fe13b
-:export_date: 2026-11-28 08:26
-:export_updated: 2026-11-28 08:26
+:export_date: 2026-11-27 18:26
+:export_updated: 2026-11-27 18:26
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/7fe084
@@ -19976,8 +19976,8 @@ Issue / PR大歓迎です。
 * lean-rs: call Lean 4 functions from Rust, and prove Rust functions in Lean
 :properties:
 :export_file_name: generated/contents/blog/2026/1ff994
-:export_date: 2026-11-28 08:40
-:export_updated: 2026-11-28 08:40
+:export_date: 2026-11-27 18:40
+:export_updated: 2026-11-27 18:40
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/b43a06
@@ -20359,8 +20359,8 @@ Rustのコードを作るときはlean-ritsuryoの証明も含めてLeanのパ�
 * rust-ritsuryo: Japanese date and tax calculations proved in Lean 4, as a Rust crate and a web page
 :properties:
 :export_file_name: generated/contents/blog/2026/c37a82
-:export_date: 2026-11-28 08:40
-:export_updated: 2026-11-28 08:40
+:export_date: 2026-11-27 18:40
+:export_updated: 2026-11-27 18:40
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/c4f11a
@@ -20768,8 +20768,8 @@ LeanでPythonの関数を書けるようにして、Leanの型をpydanticのmode
 * lean-py: call Lean 4 functions from Python, and prove Python functions in Lean
 :properties:
 :export_file_name: generated/contents/blog/2026/f29ae0
-:export_date: 2026-11-28 08:50
-:export_updated: 2026-11-28 08:50
+:export_date: 2026-11-27 18:50
+:export_updated: 2026-11-27 18:50
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/dc65bb
@@ -21223,8 +21223,8 @@ lsp-mode、Neovim、Helix、VS Codeの設定と、エディタごとの結果の
 * lsp-touchstone: a strict LSP client and server, with parts proved in Lean 4, that finds spec violations in editors and rust-analyzer
 :properties:
 :export_file_name: generated/contents/blog/2026/45f8b5
-:export_date: 2026-11-28 08:50
-:export_updated: 2026-11-28 08:50
+:export_date: 2026-11-27 18:50
+:export_updated: 2026-11-27 18:50
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/ccc5ed
@@ -21584,8 +21584,8 @@ $ ./python -m test test_macros
 * cpython-pep638: PEP 638 syntactic macros for Python, implemented in CPython 3.15.2
 :properties:
 :export_file_name: generated/contents/blog/2026/2e46f5
-:export_date: 2026-11-28 09:02
-:export_updated: 2026-11-28 09:02
+:export_date: 2026-11-27 19:02
+:export_updated: 2026-11-27 19:02
 :export_draft: t
 :export_lang: en
 :export_original: /blog/2026/f4154e
